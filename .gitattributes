@@ -1,0 +1,8 @@
+# 统一文本文件行尾为 LF，避免 Windows/Linux 协作时产生噪音
+* text=auto eol=lf
+
+# 二进制资源
+*.ico binary
+*.png binary
+*.abr binary
+*.bundle binary

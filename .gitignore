@@ -1,0 +1,38 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+env/
+
+# ---- PyInstaller 打包产物 ----
+build/
+dist/
+
+# ---- 运行/转换输出 ----
+converted/
+extracted/
+
+# ---- 第三方参考源码（研究用，仅本地保留）----
+research/
+gimp-utils.c
+gimpbrush-load-2014.c
+
+# ---- 测试样本（商用笔刷素材，体积大，请自备）----
+tests/*.abr
+
+# ---- IDE / 编辑器 ----
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ---- WorkBuddy 项目数据 ----
+.workbuddy/
+
+# ---- OS ----
+.DS_Store
+Thumbs.db

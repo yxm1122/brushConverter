@@ -1,0 +1,4 @@
+numpy>=2.0
+Pillow>=10.0
+PySide6>=6.5
+pyinstaller>=6.0
