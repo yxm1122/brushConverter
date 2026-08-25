@@ -54,6 +54,7 @@ pyinstaller brushconverter-gui.spec    # → dist/brushConverter/brushConverter.
 - 参数映射见 `docs/parameter-mapping.md`（完整清单）。
 - 交付物：Krita 5.x 资源包 `.bundle`（一键导入）+ 自包含 `.kpp`（笔尖 base64 内嵌）。
 - 纹理（patt）、双笔刷、颜色动态、湿边等暂不映射（引擎差异大）。
+- 想了解实现原理与开发中踩过的坑，见 `docs/developer-guide.md`。
 
 ## 在 Krita 中验证
 
