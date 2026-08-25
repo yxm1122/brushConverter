@@ -12,6 +12,9 @@ env/
 build/
 dist/
 
+# ---- Release 附件（zip 产物）----
+releases/*.zip
+
 # ---- 运行/转换输出 ----
 converted/
 extracted/

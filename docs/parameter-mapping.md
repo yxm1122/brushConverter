@@ -10,7 +10,7 @@
 | `samp` 位图 + `sampledData` UUID | 采样笔尖 | png_brush 内嵌笔尖 | 灰度 PNG，白=墨（base64 内嵌） | ✅ |
 | `Brsh.Dmtr` | 主直径 px | `scale` | `scale = Dmtr / 笔尖宽度` | ✅ |
 | `Brsh.Spcn` | 间距 % | `spacing` | `spacing = Spcn / 100` | ✅ |
-| `Brsh.Angl` | 角度（度） | `angle` | 直接 | ✅ |
+| `Brsh.Angl` | 角度（度） | `angle` | `math.radians(Angl % 360)`（度→弧度，负角先 normalize 到 [0,360)） | ✅ |
 | `Brsh.Rndn` | 圆度 % | （采样笔刷不映射，见注①） | — | ⛔ |
 | `Brsh.Hrdn` | 硬度 % | （采样笔刷不映射，见注①） | — | ⛔ |
 | `Nm ` | 笔刷名 | preset name | 直接 | ✅ |
@@ -22,10 +22,12 @@
 | ABR 键 | → Krita | 映射公式 | 状态 |
 |--------|---------|----------|------|
 | `Dmtr` | `MaskGenerator.diameter` | 直接 | ✅ |
-| `Hrdn` | `hfade`/`vfade` | `(100 - Hrdn) / 100` | ✅ |
+| `Hrdn` | `hfade`/`vfade` | `Hrdn / 100`（fade=实心区占比，与硬度同向） | ✅ |
 | `Rndn` | `ratio` | `Rndn / 100` | ✅ |
-| `Angl` | `angle` | 直接 | ✅ |
+| `Angl` | `angle` | `math.radians(Angl % 360)`（度→弧度，负角 normalize） | ✅ |
 | `Spcn` | `spacing` | `Spcn / 100` | ✅ |
+
+> 注①：圆度/硬度只对「计算笔刷」有意义。硬度映射 `fade = Hrdn/100`（Krita 的 `hfade/vfade` 是「实心区占半径比例」，硬度 100%→1.0 硬边、0%→0.0 全软，与 Photoshop 硬度同向，不是 `(100-Hrdn)/100`）。角度 `angle` 在 Krita XML 里存**弧度**、UI 范围 **[0,360) 度**，负角度需先 `% 360` normalize，否则被角度控件 clamp 到 0。
 
 ## 3. 形状动态（Shape Dynamics）
 

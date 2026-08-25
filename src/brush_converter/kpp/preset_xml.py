@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import base64
 import hashlib
+import math
 import re
 from xml.sax.saxutils import escape, quoteattr
 
@@ -101,10 +102,15 @@ def _drawing_angle_sensor(jitter: float = 0.0) -> str:
 
 def sampled_brush_definition(filename: str, md5sum: str, spacing: float,
                              angle: float, scale: float) -> str:
-    """图像笔尖（png_brush）的 <Brush> 定义。"""
+    """图像笔尖（png_brush）的 <Brush> 定义。
+
+    angle 为度（Photoshop #Ang，可为负），Krita XML 存弧度、UI 范围 [0,360)。
+    负角度需先 normalize 到 [0,360)（否则被 Krita 角度控件 clamp 到 0）。
+    """
+    angle_rad = math.radians(angle % 360.0)
     return (
         f'<Brush type="png_brush" useAutoSpacing="0" autoSpacingCoeff="1" '
-        f'filename={quoteattr(filename)} AutoAdjustMidPoint="1" angle="{angle:g}" '
+        f'filename={quoteattr(filename)} AutoAdjustMidPoint="1" angle="{angle_rad:g}" '
         f'ContrastAdjustment="0" AdjustmentVersion="2" scale="{scale:g}" '
         f'AdjustmentMidPoint="127" md5sum={quoteattr(md5sum)} brushApplication="0" '
         f'BrushVersion="2" ColorAsMask="1" BrightnessAdjustment="0" spacing="{spacing:g}"/>'
@@ -113,12 +119,19 @@ def sampled_brush_definition(filename: str, md5sum: str, spacing: float,
 
 def auto_brush_definition(diameter: float, spacing: float, angle: float,
                           roundness: float, hardness: float | None) -> str:
-    """计算笔尖（auto_brush）的 <Brush> 定义。"""
+    """计算笔尖（auto_brush）的 <Brush> 定义。
+
+    - angle：度 → 弧度（Krita XML 存弧度，normalizeAngle 为 [0,2π) 弧度版）；
+      负角度先 normalize 到 [0,360)，否则 Krita 角度控件（[0,360]）会 clamp 到 0。
+    - fade（hfade/vfade）= hardness/100：Krita 里 fade 是「实心区占半径比例」，
+      硬度 100% → 1.0（硬边），硬度 0% → 0.0（全软），与 Photoshop 硬度同向。
+    """
     ratio = roundness / 100.0
-    fade = 0.5 if hardness is None else max(0.0, min(1.0, (100.0 - hardness) / 100.0))
+    angle_rad = math.radians(angle % 360.0)
+    fade = 0.5 if hardness is None else max(0.0, min(1.0, hardness / 100.0))
     return (
         f'<Brush type="auto_brush" randomness="0" density="1" BrushVersion="2" '
-        f'spacing="{spacing:g}" angle="{angle:g}"> '
+        f'spacing="{spacing:g}" angle="{angle_rad:g}"> '
         f'<MaskGenerator ratio="{ratio:g}" type="circle" vfade="{fade:g}" '
         f'id="default" spikes="2" antialiasEdges="1" hfade="{fade:g}" '
         f'diameter="{diameter:g}"/> </Brush> '

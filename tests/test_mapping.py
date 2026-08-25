@@ -97,3 +97,32 @@ def test_computed_brush():
     assert comp.tip_gray is None
     assert comp.diameter == 25.0
     assert comp.hardness == 84.0
+
+
+def test_auto_brush_angle_radians():
+    # 角度：Photoshop Angl 是度，Krita XML 存弧度；负角度 normalize 到 [0,360) 再转弧度
+    from brush_converter.kpp.preset_xml import auto_brush_definition
+    import math
+    xml = auto_brush_definition(25.0, 0.05, -33.0, 100.0, 84.0)
+    # -33° → 327° → 弧度
+    assert f'angle="{math.radians(-33.0 % 360.0):g}"' in xml
+
+
+def test_auto_brush_hardness_fade():
+    # 硬度 84% → fade 0.84（fade=实心区占比，与硬度同向，不是 (100-h)/100）
+    from brush_converter.kpp.preset_xml import auto_brush_definition
+    xml = auto_brush_definition(25.0, 0.05, 0.0, 100.0, 84.0)
+    assert 'hfade="0.84"' in xml
+    assert 'vfade="0.84"' in xml
+    # 边界：硬度 100% → 1.0，硬度 0% → 0.0
+    assert 'hfade="1"' in auto_brush_definition(25.0, 0.05, 0.0, 100.0, 100.0)
+    assert 'hfade="0"' in auto_brush_definition(25.0, 0.05, 0.0, 100.0, 0.0)
+
+
+def test_sampled_brush_angle_radians():
+    # 采样笔刷的 angle 同样要度→弧度 + normalize
+    from brush_converter.kpp.preset_xml import sampled_brush_definition
+    import math
+    xml = sampled_brush_definition("x.png", "abc123", 0.25, -33.0, 1.0)
+    assert f'angle="{math.radians(-33.0 % 360.0):g}"' in xml
+
