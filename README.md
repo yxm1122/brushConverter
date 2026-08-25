@@ -4,13 +4,24 @@ Convert Photoshop brush sets (`.abr`) into Krita brushes (`.kpp` presets / `.bun
 
 Photoshop 笔刷（`.abr`）转 Krita 笔刷（`.kpp` / `.bundle`）工具，支持参数自动映射，提供命令行与图形界面两种方式。
 
-## 阶段进度
+## 使用指南
 
-- [x] 阶段 1：格式调研 + 可行性分析（`docs/feasibility.md`）
-- [x] 阶段 2：ABR 解析器 + CLI（`src/brush_converter/abr/`，`cli.py`）
-- [x] 阶段 3：desc 解析 + KPP/bundle 生成（`src/brush_converter/kpp/`，`mapping.py`，`convert.py`）
-- [x] 阶段 4：GUI（`gui/`，PySide6）
-- [x] 阶段 5：PyInstaller 打包（`brushconverter-cli.spec` / `brushconverter-gui.spec`）
+### 图形界面
+
+![GUI 截图](docs/screenshot-gui.png)
+
+打开 .abr → 预览每支笔尖缩略图与名称 → 勾选要转换的笔刷（支持全选/全不选）→ 选择产物格式（`.kpp` 每支一个文件，或 `.bundle` Krita 资源包）→ 选择输出目录 → 点击"开始转换"。含未映射参数（纹理/双笔刷/颜色动态/湿边等）的笔刷会有 ⚠ 标注，转换时会先弹窗提醒确认。
+
+下载打包好的 Windows 可执行文件（见下方[打包](#打包)章节）双击即可使用。
+
+### 命令行
+
+```bash
+python cli.py gui                                                # 启动 GUI
+python cli.py convert <file.abr> -o 输出目录                      # 批量转换
+python cli.py info <file.abr>                                    # 笔刷概况（版本/区段/笔尖）
+python cli.py extract <file.abr> -o out/ [--contact-sheet]       # 导出笔尖 PNG + 总览图
+```
 
 ## 环境
 
@@ -60,3 +71,8 @@ pyinstaller brushconverter-gui.spec    # → dist/brushConverter/brushConverter.
 
 1. 设置 → 管理资源 → 导入资源包，选择生成的 `.bundle`；
 2. 或把 `converted/kpp/*.kpp` 复制到 Krita 资源目录的 `paintoppresets/` 下，重启 Krita。
+
+## 相关文档
+
+- [`docs/developer-guide.md`](docs/developer-guide.md) — 项目结构、ABR 解析原理、参数映射、KPP/bundle 生成，以及开发过程中踩过的所有坑（`.kpp` 是 PNG 不是 ZIP、笔尖是 PNG 不是 GBR、角度归一化到 [0,360)、硬度 fade = Hrdn/100 等）。
+- [`docs/parameter-mapping.md`](docs/parameter-mapping.md) — ABR → Krita 各字段的逐项映射清单（尺寸、动态、散布、bVTy 控制源编码等）。
