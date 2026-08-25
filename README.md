@@ -12,15 +12,16 @@ Photoshop 笔刷（`.abr`）转 Krita 笔刷（`.kpp` / `.bundle`）工具，支
 
 打开 .abr → 预览每支笔尖缩略图与名称 → 勾选要转换的笔刷（支持全选/全不选）→ 选择产物格式（`.kpp` 每支一个文件，或 `.bundle` Krita 资源包）→ 选择输出目录 → 点击"开始转换"。含未映射参数（纹理/双笔刷/颜色动态/湿边等）的笔刷会有 ⚠ 标注，转换时会先弹窗提醒确认。
 
-下载打包好的 Windows 可执行文件（见下方[打包](#打包)章节）双击即可使用。
+下载 `brushConverter-*-win64.zip`（见 [releases](https://github.com/yxm1122/brushConverter/releases)），解压后双击 `brushConverter.exe` 即可使用。
 
 ### 命令行
 
+下载 `brushconverter-cli-*-win64.zip` 解压后，在命令行使用 `brushconverter-cli.exe`：
+
 ```bash
-python cli.py gui                                                # 启动 GUI
-python cli.py convert <file.abr> -o 输出目录                      # 批量转换
-python cli.py info <file.abr>                                    # 笔刷概况（版本/区段/笔尖）
-python cli.py extract <file.abr> -o out/ [--contact-sheet]       # 导出笔尖 PNG + 总览图
+brushconverter-cli.exe convert <file.abr> -o 输出目录                # 批量转换为 Krita 预设/资源包
+brushconverter-cli.exe info <file.abr>                              # 查看笔刷概况（版本/区段/笔尖）
+brushconverter-cli.exe extract <file.abr> -o out/ [--contact-sheet] # 导出笔尖 PNG + 总览图
 ```
 
 ## 环境
