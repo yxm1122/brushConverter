@@ -8,7 +8,7 @@
 | ABR 键 | 含义 | → Krita | 映射公式 | 状态 |
 |--------|------|---------|----------|------|
 | `samp` 位图 + `sampledData` UUID | 采样笔尖 | png_brush 内嵌笔尖 | 灰度 PNG，白=墨（base64 内嵌） | ✅ |
-| `Brsh.Dmtr` | 主直径 px | `scale` | `scale = Dmtr / 笔尖宽度` | ✅ |
+| `Brsh.Dmtr` | 主直径 px | `scale` | `scale = Dmtr / max(笔尖宽, 笔尖高)`；采样笔尖内嵌 PNG 补零为正方形 | ✅（Krita 显示尺寸修正） |
 | `Brsh.Spcn` | 间距 % | `spacing` | `spacing = Spcn / 100` | ✅ |
 | `Brsh.Angl` | 角度（度） | `angle` | `math.radians(Angl % 360)`（度→弧度，负角先 normalize 到 [0,360)） | ✅ |
 | `Brsh.Rndn` | 圆度 % | （采样笔刷不映射，见注①） | — | ⛔ |
@@ -36,7 +36,7 @@
 | `szVr.bVTy==2` | 压力 | `PressureSize=true` | — | ✅ |
 | `minimumDiameter` | — | `SizecommonCurve` | `0,{minD/100};1,1;` | ✅ |
 | `angleDynamics.bVTy==6` | 方向 | `RotationSensor=drawingangle` | sensorslist + fuzzy | ✅ |
-| `angleDynamics.jitter` | — | fuzzy 曲线 | `0,0;1,{jitter/100};` | ✅ |
+| `angleDynamics.jitter` | `RotationValue`（旋转-效果强度） | fuzzy/fuzzystroke 曲线 | `RotationValue=jitter/100`；两条随机度曲线固定 `0,0;1,1;`（Krita UI 对应 -180°..+180°，XML 坐标归一化为 0..1） | ✅（按手调 KPP 校准） |
 | `angleDynamics.bVTy==2` | 压力 | `RotationSensor=pressure` | — | ✅ |
 | `roundnessDynamics.bVTy==2` | 压力 | `PressureRatio=true` | — | ✅ |
 | `minimumRoundness` | — | `RatiocommonCurve` | `0,{minR/100};1,1;` | ✅ |
@@ -74,14 +74,40 @@
 
 | ABR 键 | 含义 | 原因 |
 |--------|------|------|
-| `useTexture` + `patt` 区 | 纹理 | Krita 纹理引擎不同；patt 可另存 pattern |
 | `dualBrush` | 双笔刷 | Krita 是 masking brush 机制，语义不同 |
 | `useColorDynamics`（`H`/`Strt`/`Brgh`/`purity`/`clVr`） | 颜色动态 | 两软件颜色模型差异大 |
 | `Wtdg`（湿边） | 湿边 | 像素引擎需「Wet」选项，暂不启用 |
 | `Nose`/`Rpt`（喷嘴/重复） | — | 喷枪特性，暂不映射 |
 | `brushProjection` / `useBrushPose` | 投影/姿态 | 高级倾斜特性，暂不映射 |
 
-## 7. 控制源编码（bVTy → Krita 传感器）
+## 7. 纹理（Texture）✅（v1.1 新增）
+
+> 纹理数据源：ABR `patt` 区段（按 UUID 匹配 `Txtr.Idnt`），资源以 PNG 内嵌
+> （`type="patterns"`，与 Krita 5.x 官方样本一致）。格式细节见
+> `docs/developer-guide.md` 与 `docs/texture-mapping-proposal.md`。
+
+| ABR 键 | → Krita 参数 | 映射公式 | 状态 |
+|--------|--------------|----------|------|
+| `useTexture` | `Texture/Pattern/Enabled` | `true` | ✅ |
+| `Txtr.Idnt` | 资源查找 | patt 记录按 UUID 匹配，PNG 内嵌 | ✅ |
+| `Txtr.Nm` | `Name` / `PatternFileName` | 安全文件名 `tex_<uuid前8>.png` | ✅ |
+| PNG 字节 | `PatternMD5Sum` | md5 hex（`PatternMD5` 留空，绕开 Krita 5.0 写二进制 bug） | ✅ |
+| `textureScale`（%） | `Texture/Pattern/Scale` | `textureScale/100`，clamp [0.01, 10] | ✅（系数待实测校准） |
+| `textureDepth`（%） | `Texture/Strength/Value` | `textureDepth/100`（0..1） | ✅ |
+| `textureDepthDynamics.bVTy==2` | `PressureTexture/Strength/` | `true` + `Strength/UseCurve=true` | ✅ |
+| `textureDepthDynamics.Mnm` | `Texture/Strength/commonCurve` | `0,{Mnm/100};1,1;` | ✅ |
+| `InvT` | `Texture/Pattern/Invert` | 直接 | ✅ |
+| `textureBlendMode` | `Texture/Pattern/TexturingMode` | `linearHeight`→Height(4)；`Mul `→0、`Sbtr`→1、`Scrn`→2；未知回退 0 + 警告 | ✅ |
+| `textureBrightness`（-100..100） | `Texture/Pattern/Brightness` | `round(v×2.55)`，clamp [-255,255]，0→0 | ✅（公式待 Krita 实测校准） |
+| `textureContrast`（-100..100） | `Texture/Pattern/Contrast` | `round(v×2.55)+1`，clamp [0,255]，0→1 | ✅（公式待 Krita 实测校准） |
+| `TxtC` / `interpretation` | — | Krita 无对应，静默忽略（源文件默认值） | ⚠️ |
+| `protectTexture` | — | Krita 无对应，保留轻量警告 | ⚠️ |
+
+> 亮/对比度换算为经验公式（同散布 ÷400 的校准流程）：先在 Krita 实测，
+> 再调系数固化到本表。`linearHeight`（Linear Height）→ Krita Height 模式的
+> 枚举数值（4）实现时已按预期值写入，若 Krita 版本不同需复核。方向旋转随机度曲线在 UI 中显示为 -180°..+180°，但 XML 使用归一化坐标，完整范围序列化为 `0,0;1,1;`。
+
+## 8. 控制源编码（bVTy → Krita 传感器）
 
 | bVTy | Photoshop | Krita 传感器 | 状态 |
 |------|-----------|--------------|------|
@@ -90,9 +116,9 @@
 | 2 | 压力 | `pressure` | ✅ |
 | 3 | 倾斜 | `tilt`（预留，未启用） | ⛔ |
 | 4 | 转轮 | 无对应 | ⛔ |
-| 5 | 旋转 | 无对应 | ⛔ |
+| 5 | 旋转随机 | `RotationValue` + `fuzzy`/`fuzzystroke` | ✅（若源文件使用此控制源，当前仍按方向旋转分支处理） |
 | 6 / 7 | 初始方向/方向 | `drawingangle` | ✅ |
 
-## 8. 去重规则
+## 9. 去重规则
 
 - 完全重复的预设（同名 + 同 UUID + 同 Dmtr）只保留首个。当前文件因此去掉 1 个重复的「淘宝店」横幅笔刷（20 → 19）。

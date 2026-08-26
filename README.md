@@ -58,14 +58,15 @@ pyinstaller brushconverter-gui.spec    # → dist/brushConverter/brushConverter.
 - 打开 .abr，预览每支笔刷的笔尖缩略图与名称；
 - 勾选要转换的笔刷（支持全选/全不选）；
 - 产物可选 `.kpp`（每支一个文件）或 `.bundle`（Krita 资源包）；
-- 含纹理/双笔刷/颜色动态/湿边等无法映射参数的笔刷会弹出提醒。
+- 含双笔刷/颜色动态/湿边等无法映射参数的笔刷会弹出提醒（纹理已支持映射）。
 
 ## 转换说明
 
 - 支持 v1/v2 旧格式 + v6.1/v6.2 新格式；采样笔尖转为内嵌 PNG 笔尖，计算笔刷映射为 Krita auto_brush。
 - 参数映射见 `docs/parameter-mapping.md`（完整清单）。
 - 交付物：Krita 5.x 资源包 `.bundle`（一键导入）+ 自包含 `.kpp`（笔尖 base64 内嵌）。
-- 纹理（patt）、双笔刷、颜色动态、湿边等暂不映射（引擎差异大）。
+- 纹理（ABR `patt`）已支持：PNG 内嵌 + 缩放/深度（可随压感）/反相/混合模式/亮度/对比度映射。
+- 双笔刷、颜色动态、湿边等暂不映射（引擎差异大）。
 - 想了解实现原理与开发中踩过的坑，见 `docs/developer-guide.md`。
 
 ## 在 Krita 中验证

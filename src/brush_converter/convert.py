@@ -11,8 +11,8 @@ import numpy as np
 from PIL import Image
 
 from .abr import AbrFile
-from .mapping import BrushPreset, map_presets
-from .kpp import build_preset_xml, write_kpp, write_bundle
+from .mapping import BrushPreset, TextureSettings, map_presets, _TEXTURING_MODE
+from .kpp import TextureXml, build_preset_xml, write_kpp, write_bundle
 from .kpp.kpp_writer import render_tip_preview
 
 
@@ -21,6 +21,59 @@ def _png_bytes(gray: np.ndarray) -> bytes:
     buf = io.BytesIO()
     Image.fromarray(gray, mode="L").save(buf, format="PNG")
     return buf.getvalue()
+
+
+def _square_tip(gray: np.ndarray) -> np.ndarray:
+    """将采样笔尖居中填充到正方形画布，避免 Krita 非正方形尺寸显示偏差。"""
+    if gray.ndim != 2:
+        raise ValueError("笔尖蒙版必须是二维灰度数组")
+    h, w = gray.shape
+    side = max(h, w)
+    if h == side and w == side:
+        return gray
+    # ABR/Krita 笔尖蒙版约定 255=白色笔迹（墨），0=透明；
+    # 用白色填充，避免透明边框被 Krita 当作笔尖边界参与尺寸计算。
+    canvas = np.full((side, side), 255, dtype=gray.dtype)
+    y = (side - h) // 2
+    x = (side - w) // 2
+    canvas[y:y + h, x:x + w] = gray
+    return canvas
+
+
+def _texture_png(texture: TextureSettings) -> bytes:
+    """纹理位图 → PNG 字节（RGB 或灰度，原样像素）。"""
+    buf = io.BytesIO()
+    img = texture.image
+    if img.ndim == 3 and img.shape[2] == 3:
+        Image.fromarray(img, mode="RGB").save(buf, format="PNG")
+    else:
+        Image.fromarray(img, mode="L").save(buf, format="PNG")
+    return buf.getvalue()
+
+
+def _texture_xml(bp: BrushPreset) -> TextureXml | None:
+    """把 BrushPreset.texture 组装成 Krita 纹理选项（无位图时返回 None）。"""
+    tex = bp.texture
+    if tex is None or tex.image is None:
+        return None
+    filename = f"tex_{tex.uuid[:8]}.png" if tex.uuid else "texture.png"
+    # 亮/对比度：PS -100..100 → Krita（先按比例映射，待 Krita 实测校准，
+    # 与散布 ÷400 的校准流程一致）。中性值保持 0 / 1。
+    brightness = max(-255, min(255, round(tex.brightness * 2.55)))
+    contrast = max(0, min(255, round(tex.contrast * 2.55) + 1))
+    return TextureXml(
+        pattern_filename=filename,
+        png_bytes=_texture_png(tex),
+        scale=max(0.01, min(10.0, tex.scale / 100.0)),
+        brightness=brightness,
+        contrast=contrast,
+        invert=tex.invert,
+        texturing_mode=_TEXTURING_MODE.get(tex.blend_mode, 0),
+        strength=max(0.0, min(100.0, tex.depth)) / 100.0,
+        strength_curve=f"0,{max(0.0, min(100.0, tex.depth_min)) / 100.0:g};1,1;"
+        if tex.pressure else None,
+        strength_pressure=tex.pressure,
+    )
 
 
 def _safe_filename(name: str, index: int) -> str:
@@ -82,7 +135,10 @@ def _render_preset(bp: BrushPreset, index: int) -> tuple[str, str, np.ndarray]:
             _circle_mask(bp.diameter or 30.0, bp.hardness if bp.hardness is not None else 100.0,
                          bp.roundness, 256))
     else:
-        tip_png = _png_bytes(bp.tip_gray)
+        # Krita 对非正方形 png_brush 的编辑器尺寸显示存在偏差；
+        # 与映射时的 max(width,height) 基准保持一致，内嵌正方形笔尖。
+        square_tip = _square_tip(bp.tip_gray)
+        tip_png = _png_bytes(square_tip)
         res_name = _safe_filename(bp.name, index).rsplit(".", 1)[0]
         brush_def = _sampled_brush_def(res_name, tip_png, bp)
         preview = render_tip_preview(bp.tip_gray)
@@ -102,6 +158,7 @@ def _render_preset(bp: BrushPreset, index: int) -> tuple[str, str, np.ndarray]:
         scatter_pressure=bp.scatter_pressure,
         scatter_both_axes=bp.scatter_both_axes,
         scatter_amount=bp.scatter_amount,
+        texture=_texture_xml(bp),
     )
     return _safe_filename(bp.name, index), xml, preview
 

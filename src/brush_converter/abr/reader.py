@@ -6,6 +6,7 @@ import os
 import struct
 from dataclasses import dataclass, field
 
+from .patterns import PatternTexture, parse_patterns
 from .samples import BrushTip, parse_samples
 
 
@@ -35,6 +36,7 @@ class AbrFile:
     subversion: int
     sections: dict[str, AbrSection] = field(default_factory=dict)
     tips: list[BrushTip] = field(default_factory=list)
+    patterns: dict[str, PatternTexture] = field(default_factory=dict)  # patt 纹理 {uuid: PatternTexture}
     name: str = ""  # 文件名（不含扩展名）
 
     @classmethod
@@ -74,6 +76,9 @@ class AbrFile:
             abr.tips = parse_samples(samp.data, version, subversion, base_name)
         elif version in (1, 2):
             abr.tips = parse_samples(data, version, subversion, base_name)
+        patt = sections.get("patt")
+        if patt is not None:
+            abr.patterns = parse_patterns(patt.data)
         return abr
 
     @property
@@ -89,6 +94,7 @@ class AbrFile:
             f"版本: {self.version}.{self.subversion}",
             f"区段: {', '.join(f'{k}({v.length}B)' for k, v in self.sections.items()) or '(旧格式无区段)'}",
             f"采样笔尖: {len(self.tips)} 个",
+            f"纹理图案: {len(self.patterns)} 个",
         ]
         for t in self.tips:
             name = t.uuid or t.name or ""

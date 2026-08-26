@@ -38,7 +38,8 @@ brushConverter/
 │   │   ├── reader.py             #   头部 + 8BIM 区段遍历（AbrFile）
 │   │   ├── samples.py            #   samp 采样笔尖提取（v1/v2 + v6.1/v6.2）
 │   │   ├── rle.py                #   Photoshop PackBits RLE 解码
-│   │   └── descriptors.py        #   desc 描述符解析（Descriptor/Value/Reader）
+│   │   ├── descriptors.py        #   desc 描述符解析（Descriptor/Value/Reader）
+│   │   └── patterns.py           #   patt 纹理图案解析（Pattern/VMA/RLE）
 │   ├── kpp/                      # KPP/bundle 生成
 │   │   ├── preset_xml.py         #   预设 XML 组装 + 笔尖定义（png_brush/auto_brush）
 │   │   ├── kpp_writer.py         #   PNG 块手工构造（iTXt/tEXt/IDAT）
@@ -129,6 +130,30 @@ value 类型：`long`/`doub`/`bool`/`TEXT`/`enum`/`UntF`（4 字节单位 + doub
 
 > 解析算法参考 SonyStone/ABR-Viewer（MIT），`research/descriptor-parser.ts` 有完整 TS 参考。
 
+### 3.6 patt 纹理图案（`patterns.py`）
+
+`patt` 区段存纹理图案，结构为「长度前缀」的 Pattern 记录（实测逆向，对照 psd-tools 的
+Pattern / VirtualMemoryArrayList 结构修正 ABR 差异）：
+
+```
+Record = u32 len | 记录体（len 字节） | pad 到 4
+记录体 = u32 version(=1) | u32 颜色模式(3=RGB, 1=灰度) | 2×i16 (宽,高) |
+        u32 名字符数(含结尾 NUL 字符) | 名字 UTF-16BE | u8 名字节数(=36) | UUID(ASCII) |
+        VMA 列表: u32 version(=3) | u32 body_len | body {
+          u32×4 矩形(top,left,bottom,right) | u32 通道数 | (通道数+2) 个通道块 }
+通道块 = u32 is_written(0=空) | u32 len | u32 depth | u32×4 矩形 |
+        u16 pixel_depth | u8 compression(0=RAW, 1=RLE) | 数据(len-23)
+```
+
+要点：
+- **名字符数包含结尾 NUL 字符**（27 的字符串实际 26 个可见字符 + NUL）。
+- **图案 id 是 u8 长度 + ASCII UUID**（与 psd-tools PSD Pattern 的 Pascal 字符串不同）。
+- 图案按 **UUID** 关联笔刷（`desc` 的 `Txtr.Idnt`）；不能按名字（样本里有 3 张同名
+  "Shape 2.png" 内容各不同）。
+- RLE(1) 为 PSD 版：`height` 个 u16 行字节数 + 每行 PackBits（4 个重复字节的头是
+  `0xFD`，即 256-3，不是 256-4）。
+- `parse_patterns()` 游标必须精确走完区段（4 字节对齐），否则视为格式错误。
+
 ## 4. 参数映射（`mapping.py`）
 
 `map_presets(abr)` 把 desc 里的每个预设描述符转成一个 `BrushPreset` dataclass，字段包括：名称、间距、角度、圆度、硬度、直径、缩放、笔尖灰度数组、UUID、是否计算笔刷、各动态曲线、散布参数、未映射警告。
@@ -137,7 +162,7 @@ value 类型：`long`/`doub`/`bool`/`TEXT`/`enum`/`UntF`（4 字节单位 + doub
 
 | 类别 | ABR 源 | Krita 目标 |
 |------|--------|-----------|
-| 尺寸 | `Dmtr` | `scale = Dmtr / 笔尖宽度` |
+| 尺寸 | `Dmtr` | `scale = Dmtr / max(笔尖宽, 笔尖高)`；采样笔尖内嵌 PNG 补零为正方形 |
 | 间距 | `Spcn`（#Prc） | `spacing = Spcn/100` |
 | 角度 | `Angl`（度） | `angle = math.radians(Angl % 360)` |
 | 硬度（计算笔刷） | `Hrdn` | `hfade/vfade = Hrdn/100` |
@@ -148,7 +173,7 @@ value 类型：`long`/`doub`/`bool`/`TEXT`/`enum`/`UntF`（4 字节单位 + doub
 | 旋转 | `angleDynamics.bVTy` | `RotationSensor`（drawingangle/pressure） |
 | 散布 | `useScatter` + `scatterDynamics.jitter` | `PressureScatter` + `ScatterValue` |
 
-**控制源编码（bVTy）**：0=关、1=渐隐、2=压力、3=倾斜、4=转轮、5=旋转、6/7=初始方向/方向。映射到 Krita 传感器（pressure/drawingangle/tilt）。
+**控制源编码（bVTy）**：0=关、1=渐隐、2=压力、3=倾斜、4=转轮、5=旋转、6/7=初始方向/方向。映射到 Krita 传感器（pressure/drawingangle/tilt）。对于方向旋转，Photoshop `angleDynamics.jitter` 映射到 Krita `RotationValue`（效果强度，jitter/100），`fuzzy` 与 `fuzzystroke` 随机度曲线在 UI 中对应 -180°..+180°，但 XML 使用归一化坐标，完整范围写为 `0,0;1,1;`。
 
 **计算笔刷**（无 `sampledData` UUID，只有参数）：映射为 Krita 的 `auto_brush`（程序化圆形笔尖），`diameter`/`ratio`（圆度）/`hfade`/`vfade`（硬度）放进 `MaskGenerator`。
 
@@ -191,7 +216,30 @@ Krita 5.x 用 `embedded_resources="2"`，笔尖 PNG 以 **base64 内嵌**在预�
 
 `md5sum` = 笔尖 PNG **原始字节**的 MD5（hex）。
 
-### 5.3 bundle 结构
+### 5.3 纹理内嵌（`type="patterns"`）
+
+纹理与笔尖一样内嵌在 `<resources>` 里，但 `type="patterns"`，PNG base64：
+
+```xml
+<resource name="tex_66e2987f.png" filename="tex_66e2987f.png"
+         type="patterns" md5sum="...">
+  <![CDATA[ base64(PNG) ]]></resource>
+```
+
+预设参数（`preset_xml.py` 的 `TextureXml` / `_apply_texture`）：
+`Texture/Pattern/{Enabled,Name,PatternFileName,PatternMD5Sum,Scale,Brightness,
+Contrast,Invert,TexturingMode}`、`Texture/Strength/{Value,UseCurve,commonCurve}`、
+`PressureTexture/Strength/`。
+
+注意：
+- **`PatternMD5Sum` 存 hex md5**；`PatternMD5` 留空——Krita 5.0 曾在该字段写原始
+  二进制导致非法 XML（Krita 官方 MR 修复），新版本以 `PatternMD5Sum` 为准。
+- `TexturingMode` 数值：Multiply=0 / Subtract=1 / Screen=2 / Height=4（PS
+  `linearHeight` → Height）。
+- 亮/对比度换算（PS -100..100 → Krita）目前是经验公式（`×2.55` / `×2.55+1`），
+  待 Krita 实测校准，系数集中在 `convert._texture_xml`。
+
+### 5.4 bundle 结构
 
 `.bundle` 是 ZIP 归档（严格照 `KoResourceBundleManifest.cpp`）：
 

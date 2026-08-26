@@ -4,7 +4,8 @@
 在 Python 中独立重写。
 """
 
+from .patterns import PatternTexture, parse_patterns
 from .reader import AbrFile
 from .samples import BrushTip
 
-__all__ = ["AbrFile", "BrushTip"]
+__all__ = ["AbrFile", "BrushTip", "PatternTexture", "parse_patterns"]

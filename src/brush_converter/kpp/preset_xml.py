@@ -13,6 +13,7 @@ import base64
 import hashlib
 import math
 import re
+from dataclasses import dataclass
 from xml.sax.saxutils import escape, quoteattr
 
 # 每个传感器都有一组参数：Sensor / UseCurve / UseSameCurve / Value / commonCurve / curveMode
@@ -47,6 +48,38 @@ def _build_default_params() -> dict[str, tuple[str, str]]:
     for s in _SENSORS:
         p[f"Pressure{s}"] = ("internal", "false")
     p["PressureTexture/Strength/"] = ("internal", "false")
+
+    # 纹理选项默认值（对照 Krita 5.x 导出样本 ref_5.0.xml / ref_勾线笔.xml）
+    texture_defaults = {
+        "Texture/Pattern/Brightness": ("internal", "0"),
+        "Texture/Pattern/Contrast": ("internal", "1"),
+        "Texture/Pattern/CutoffLeft": ("internal", "0"),
+        "Texture/Pattern/CutoffPolicy": ("internal", "0"),
+        "Texture/Pattern/CutoffRight": ("internal", "255"),
+        "Texture/Pattern/Enabled": ("internal", "false"),
+        "Texture/Pattern/Invert": ("internal", "false"),
+        "Texture/Pattern/MaximumOffsetX": ("internal", "2"),
+        "Texture/Pattern/MaximumOffsetY": ("internal", "2"),
+        "Texture/Pattern/Name": ("string", ""),
+        "Texture/Pattern/NeutralPoint": ("internal", "0.5"),
+        "Texture/Pattern/OffsetX": ("internal", "0"),
+        "Texture/Pattern/OffsetY": ("internal", "0"),
+        "Texture/Pattern/PatternFileName": ("string", ""),
+        "Texture/Pattern/PatternMD5": ("string", ""),  # 5.0 曾写原始二进制（bug），这里留空
+        "Texture/Pattern/PatternMD5Sum": ("string", ""),  # hex md5，Krita 5.1+ 读取
+        "Texture/Pattern/Scale": ("internal", "1"),
+        "Texture/Pattern/TexturingMode": ("internal", "0"),
+        "Texture/Pattern/UseSoftTexturing": ("internal", "false"),
+        "Texture/Pattern/isRandomOffsetX": ("internal", "false"),
+        "Texture/Pattern/isRandomOffsetY": ("internal", "false"),
+        "Texture/Strength/Sensor": ("string", _SENSOR_XML),
+        "Texture/Strength/UseCurve": ("internal", "true"),
+        "Texture/Strength/UseSameCurve": ("internal", "true"),
+        "Texture/Strength/Value": ("internal", "1"),
+        "Texture/Strength/commonCurve": ("string", _CURVE_ID),
+        "Texture/Strength/curveMode": ("internal", "0"),
+    }
+    p.update(texture_defaults)
 
     fixed = {
         "ColorSource/Type": ("string", "plain"),
@@ -87,15 +120,15 @@ def _pressure_sensor(curve: str | None = None) -> str:
     return f'<!DOCTYPE params> <params id="pressure"> <curve>{curve}</curve> </params> '
 
 
-def _drawing_angle_sensor(jitter: float = 0.0) -> str:
-    """「随笔迹方向旋转」传感器（sensorslist + drawingangle + fuzzy）。"""
-    j = max(0.0, min(1.0, jitter / 100.0))
+def _drawing_angle_sensor() -> str:
+    """「随笔迹方向旋转」传感器。Krita 界面将随机度曲线显示为 -180°..+180°，
+    但 XML 曲线值使用归一化范围 0..1；因此完整随机范围必须序列化为末点 1。"""
     return (
         '<!DOCTYPE params> <params id="sensorslist"> '
         '<ChildSensor id="drawingangle" lockedAngleMode="0" fanCornersEnabled="0" '
         'fanCornersStep="30" angleOffset="0"/> '
-        f'<ChildSensor id="fuzzy"> <curve>0,0;1,{j:g};</curve> </ChildSensor> '
-        f'<ChildSensor id="fuzzystroke"> <curve>0,0;1,{j:g};</curve> </ChildSensor> '
+        '<ChildSensor id="fuzzy"> <curve>0,0;1,1;</curve> </ChildSensor> '
+        '<ChildSensor id="fuzzystroke"> <curve>0,0;1,1;</curve> </ChildSensor> '
         '</params> '
     )
 
@@ -138,14 +171,65 @@ def auto_brush_definition(diameter: float, spacing: float, angle: float,
     )
 
 
-def _resources_xml(tip_png: bytes, name: str, filename: str) -> str:
-    """生成 <resources> 元素：把笔尖 PNG 以 base64 内嵌（embedded_resources="2"）。"""
-    md5sum = hashlib.md5(tip_png).hexdigest()
-    b64 = base64.b64encode(tip_png).decode("ascii")
+def _resource_xml(res_type: str, name: str, filename: str, png: bytes) -> str:
+    """单个内嵌资源元素（embedded_resources="2"，type=brushes/patterns）。"""
+    md5sum = hashlib.md5(png).hexdigest()
+    b64 = base64.b64encode(png).decode("ascii")
     return (
-        f'<resources> <resource name={quoteattr(name)} filename={quoteattr(filename)} '
-        f'type="brushes" md5sum={quoteattr(md5sum)}><![CDATA[{b64}]]></resource> </resources>'
+        f'<resource name={quoteattr(name)} filename={quoteattr(filename)} '
+        f'type={quoteattr(res_type)} md5sum={quoteattr(md5sum)}><![CDATA[{b64}]]></resource> '
     )
+
+
+def _resources_xml(resources: list[tuple[str, str, str, bytes]]) -> str:
+    """生成 <resources> 元素：笔尖 PNG 与纹理 PNG 一起以 base64 内嵌。"""
+    return "<resources> " + "".join(
+        _resource_xml(res_type, name, filename, png)
+        for res_type, name, filename, png in resources
+    ) + "</resources>"
+
+
+@dataclass
+class TextureXml:
+    """Krita 纹理选项所需的数据（由 convert 从 TextureSettings 组装）。"""
+
+    pattern_filename: str   # 内嵌资源文件名（如 tex_66e2987f.png）
+    png_bytes: bytes
+    scale: float = 1.0      # 0.01..10，1=100%
+    brightness: int = 0
+    contrast: int = 1
+    invert: bool = False
+    texturing_mode: int = 0
+    strength: float = 1.0   # 0..1（PS textureDepth/100）
+    strength_curve: str | None = None  # "x,y;x,y;"
+    strength_pressure: bool = False
+
+
+def _apply_texture(params: dict[str, tuple[str, str]], tex: TextureXml) -> None:
+    """把 TextureXml 写进参数集（Texture/… 分支）。"""
+    def set_internal(key: str, value: str) -> None:
+        params[key] = ("internal", value)
+
+    def set_string(key: str, value: str) -> None:
+        params[key] = ("string", value)
+
+    md5sum = hashlib.md5(tex.png_bytes).hexdigest()
+    set_internal("Texture/Pattern/Enabled", "true")
+    set_string("Texture/Pattern/Name", tex.pattern_filename)
+    set_string("Texture/Pattern/PatternFileName", tex.pattern_filename)
+    set_string("Texture/Pattern/PatternMD5Sum", md5sum)
+    set_string("Texture/Pattern/PatternMD5", "")  # 留空，避免 Krita 5.0 写二进制 bug
+    set_internal("Texture/Pattern/Scale", f"{max(0.01, min(10.0, tex.scale)):g}")
+    set_internal("Texture/Pattern/Brightness", str(tex.brightness))
+    set_internal("Texture/Pattern/Contrast", str(tex.contrast))
+    set_internal("Texture/Pattern/Invert", "true" if tex.invert else "false")
+    set_internal("Texture/Pattern/TexturingMode", str(tex.texturing_mode))
+    set_internal("Texture/Strength/Value", f"{max(0.0, min(1.0, tex.strength)):g}")
+    if tex.strength_pressure:
+        set_internal("PressureTexture/Strength/", "true")
+        set_internal("Texture/Strength/UseCurve", "true")
+        if tex.strength_curve:
+            set_string("Texture/Strength/commonCurve", tex.strength_curve)
 
 
 def build_preset_xml(
@@ -164,6 +248,7 @@ def build_preset_xml(
     scatter_both_axes: bool = False,
     scatter_amount: float | None = None,  # PS 散布量 0..1000%（scatterDynamics.jitter）
     extra_params: dict[str, str] | None = None,
+    texture: TextureXml | None = None,
 ) -> str:
     """组装完整的 <Preset> XML。曲线参数为 "x,y;x,y;"（不含尾随分号）。"""
     params = dict(DEFAULT_PARAMS)
@@ -190,8 +275,13 @@ def build_preset_xml(
         set_string("RatiocommonCurve", ratio_curve)
         set_internal("PressureRatio", "true")
     if rotation_sensor == "drawingangle":
-        set_string("RotationSensor", _drawing_angle_sensor(rotation_jitter))
+        # Photoshop angle jitter 直接映射为 Krita「旋转-效果强度」；
+        # Krita 的 fuzzy/fuzzystroke 曲线本身负责 ±180° 随机方向；
+        # 曲线 XML 使用归一化 0..1，不能直接写 UI 显示的 180。
+        set_string("RotationSensor", _drawing_angle_sensor())
         set_internal("PressureRotation", "true")
+        set_internal("RotationValue", f"{max(0.0, min(100.0, rotation_jitter)) / 100.0:g}")
+        set_internal("RotationUseCurve", "true")
         set_internal("RotationUseSameCurve", "false")
         set_internal("RotationcurveMode", "1")
     elif rotation_sensor == "pressure":
@@ -219,16 +309,23 @@ def build_preset_xml(
             t = params.get(k, ("internal", ""))[0]
             params[k] = (t, v)
 
-    parts = []
+    parts: list[str] = []
+    resources: list[tuple[str, str, str, bytes]] = []
     if tip_png is not None:
         res_name = tip_name or _safe_name(name)
-        res_xml = _resources_xml(tip_png, res_name, res_name + ".png")
+        resources.append(("brushes", res_name, res_name + ".png", tip_png))
         parts.append(
             '<Preset paintopid="paintbrush" name=' + quoteattr(name)
-            + ' embedded_resources="2"> ' + res_xml
+            + ' embedded_resources="2"> '
         )
     else:
         parts.append('<Preset paintopid="paintbrush" name=' + quoteattr(name) + '>')
+    if texture is not None:
+        resources.append(("patterns", texture.pattern_filename,
+                          texture.pattern_filename, texture.png_bytes))
+        _apply_texture(params, texture)
+    if resources:
+        parts.append(_resources_xml(resources))
 
     for key, (typ, value) in params.items():
         if typ == "string":

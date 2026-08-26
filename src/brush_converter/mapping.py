@@ -7,7 +7,7 @@
   - 压感→不透明度：opVr.Mnm（opVr.bVTy==2）
   - 压感→流量：prVr.Mnm（prVr.bVTy==2）
   - 压感→宽高比：minimumRoundness（roundnessDynamics.bVTy==2）
-  - 旋转：angleDynamics.bVTy==6 → 随笔迹方向（drawingangle）
+  - 旋转：angleDynamics.bVTy==6 → 随笔迹方向（drawingangle）；jitter 作为 Krita RotationValue 效果强度，随机度曲线固定 ±180°
   - 散布：useScatter → 启用开关；scatterDynamics.jitter → 散布量
     （经验换算 ScatterValue = jitter/400，见 preset_xml.py 散布分支）
     bVTy==2 → 压感控制，bVTy==0 → 恒定；bothAxes → 两轴
@@ -22,6 +22,38 @@ import numpy as np
 
 from .abr import AbrFile
 from .abr import descriptors as D
+
+
+# Photoshop 纹理混合模式（enum BlnM 成员）→ Krita TexturingMode 数值。
+# 未列出的模式回退 Multiply(0)，并在警告里注明（见 _collect_warnings）。
+_TEXTURING_MODE = {
+    "Mul ": 0,           # Multiply
+    "Sbtr": 1,           # Subtract
+    "Scrn": 2,           # Screen
+    "linearHeight": 4,   # Linear Height → Krita Height
+}
+
+
+@dataclass
+class TextureSettings:
+    """一个笔刷预设的纹理设置（ABR desc 的纹理参数 + patt 位图）。
+
+    scale/brightness/contrast/depth 为 Photoshop 原始语义：
+    scale: textureScale %（0..100）；brightness/contrast: -100..100；
+    depth: textureDepth %（0..100）。
+    """
+
+    name: str
+    uuid: str
+    scale: float = 100.0
+    invert: bool = False
+    brightness: int = 0
+    contrast: int = 0
+    depth: float = 100.0
+    depth_min: float = 0.0      # 压感→深度曲线的最小值（textureDepthDynamics.Mnm）
+    pressure: bool = False      # 深度随压感（bVTy==2）
+    blend_mode: str = "Mul "    # PS 4CC 成员（'linearHeight' 等）
+    image: np.ndarray | None = None  # (h,w,3) RGB 或 (h,w) 灰度，来自 patt
 
 
 @dataclass
@@ -46,6 +78,7 @@ class BrushPreset:
     scatter_pressure: bool = False        # scatterDynamics.bVTy==2 → 散布量随压感
     scatter_both_axes: bool = False
     scatter_amount: float | None = None   # PS 散布量（scatterDynamics.jitter，0..1000%）
+    texture: TextureSettings | None = None  # 纹理设置（useTexture 且找到图案时非空）
     warnings: list[str] = field(default_factory=list)  # 未映射参数的中文名
     meta: dict = field(default_factory=dict)
 
@@ -64,6 +97,42 @@ def _dyn(obj: dict[str, D.Value] | None) -> dict[str, float]:
         for k, v in obj.items()
         if v.type in ("long", "doub", "UntF")
     }
+
+
+def _texture_blend_mode(p: dict[str, D.Value]) -> str:
+    """取 textureBlendMode 枚举成员（如 'linearHeight'）。
+
+    描述符解析器里 enum 存成 value=类 id('BlnM')、type_id=成员 id，
+    语义值在 type_id 上（与 toolOptions.Md 的 'Nrml' 同理）。
+    """
+    v = p.get("textureBlendMode")
+    if v is not None and v.type == "enum" and isinstance(v.type_id, str):
+        return v.type_id
+    return "Mul "
+
+
+def _map_texture(p: dict[str, D.Value],
+                 patterns: dict[str, object]) -> TextureSettings | None:
+    """从 useTexture 预设提取纹理设置（含 patt 位图查找，按 UUID）。"""
+    tex_obj = D.get_obj(p, "Txtr") or {}
+    tex_uuid = D.get_text(tex_obj, "Idnt")
+    tex_name = D.get_text(tex_obj, "Nm  ")
+    pat = patterns.get(tex_uuid) if tex_uuid else None
+    tdd = _dyn(D.get_obj(p, "textureDepthDynamics"))
+    min_depth = D.get_number(p, "minimumDepth")
+    return TextureSettings(
+        name=tex_name or (getattr(pat, "name", None) or tex_uuid or "texture"),
+        uuid=tex_uuid or "",
+        scale=D.get_number(p, "textureScale") or 100.0,
+        invert=D.get_bool(p, "InvT") or False,
+        brightness=int(D.get_number(p, "textureBrightness") or 0),
+        contrast=int(D.get_number(p, "textureContrast") or 0),
+        depth=D.get_number(p, "textureDepth") or 100.0,
+        depth_min=float(tdd.get("Mnm ", min_depth or 0.0)),
+        pressure=tdd.get("bVTy") == 2,
+        blend_mode=_texture_blend_mode(p),
+        image=getattr(pat, "image", None),
+    )
 
 
 def _bvty_sensor(bvty: float | None) -> str | None:
@@ -96,6 +165,8 @@ def map_presets(abr: AbrFile) -> list[BrushPreset]:
     top = D.parse_descriptor_block(abr.sections["desc"].data)
     presets = D.iter_brush_presets(top)
 
+    patterns = getattr(abr, "patterns", None) or {}
+
     tip_by_uuid: dict[str, object] = {}
     for t in abr.tips:
         if t.uuid:
@@ -121,7 +192,9 @@ def map_presets(abr: AbrFile) -> list[BrushPreset]:
 
         scale = 1.0
         if tip is not None and diameter is not None:
-            scale = diameter / max(1, tip.width)
+            # Krita sampled brush 的 scale 以方形笔尖画布为基准；非正方形
+            # 若仍使用 width，会导致预设编辑器显示尺寸与实际绘图区不一致。
+            scale = diameter / max(1, tip.width, tip.height)
 
         # 各动态的 bVTy / 数值
         sz = _dyn(D.get_obj(p, "szVr"))
@@ -163,7 +236,8 @@ def map_presets(abr: AbrFile) -> list[BrushPreset]:
         # PS 散布量存于 scatterDynamics.jitter（#Prc，0..1000%），顶层 Spcn 是间距
         scatter_amount = sct.get("jitter") if (scatter and "jitter" in sct) else None
 
-        warnings = _collect_warnings(p)
+        texture = _map_texture(p, patterns) if D.get_bool(p, "useTexture") else None
+        warnings = _collect_warnings(p, texture)
 
         out.append(BrushPreset(
             name=name,
@@ -186,17 +260,27 @@ def map_presets(abr: AbrFile) -> list[BrushPreset]:
             scatter_pressure=scatter_pressure,
             scatter_both_axes=scatter_both_axes,
             scatter_amount=scatter_amount,
+            texture=texture,
             warnings=warnings,
             meta={"Dmtr": diameter, "Hrdn": hardness, "Rndn": roundness, "Spcn": spacing * 100.0},
         ))
     return _dedupe(out)
 
 
-def _collect_warnings(p: dict[str, D.Value]) -> list[str]:
+def _collect_warnings(p: dict[str, D.Value],
+                          texture: TextureSettings | None = None) -> list[str]:
     """收集当前预设里未映射的参数（供 GUI 弹出提醒）。"""
     warnings: list[str] = []
     if D.get_bool(p, "useTexture"):
-        warnings.append("纹理")
+        # 纹理主体已映射：只对异常/回退/无对应项保留轻量警告
+        if texture is None or texture.image is None:
+            warnings.append("纹理(图案缺失)")
+        elif texture.blend_mode not in _TEXTURING_MODE:
+            warnings.append(f"纹理混合模式({texture.blend_mode!r} 回退Multiply)")
+        if D.get_bool(p, "protectTexture"):
+            warnings.append("纹理(protectTexture 未映射)")
+        # TxtC(Texture Each Tip) / interpretation 在 Krita 无对应，但为本文件默认值，
+        # 静默忽略（与用户确认的方案一致）。
     if D.get_bool(p, "useColorDynamics"):
         warnings.append("颜色动态")
     if D.get_bool(p, "Wtdg"):
