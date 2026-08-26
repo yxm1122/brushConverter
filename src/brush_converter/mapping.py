@@ -27,10 +27,28 @@ from .abr import descriptors as D
 # Photoshop 纹理混合模式（enum BlnM 成员）→ Krita TexturingMode 数值。
 # 未列出的模式回退 Multiply(0)，并在警告里注明（见 _collect_warnings）。
 _TEXTURING_MODE = {
-    "Mul ": 0,           # Multiply
-    "Sbtr": 1,           # Subtract
-    "Scrn": 2,           # Screen
-    "linearHeight": 4,   # Linear Height → Krita Height
+    # Krita KisTextureOptionData::TexturingMode enum（Krita master/6.x）
+    "Mul ": 0,           # MULTIPLY
+    "Sbtr": 1,           # SUBTRACT
+    "Lght": 2,           # LIGHTNESS
+    "Grdn": 3,           # GRADIENT
+    "Drkn": 4,           # DARKEN
+    "Ovrl": 5,           # OVERLAY
+    "CDdg": 6,           # COLOR_DODGE
+    "CBrn": 7,           # COLOR_BURN
+    "LDdg": 8,           # LINEAR_DODGE
+    "LBur": 9,           # LINEAR_BURN
+    "HdMx": 10,          # HARD_MIX_PHOTOSHOP
+    "HdMxS": 11,         # HARD_MIX_SOFTER_PHOTOSHOP
+    "Hght": 14,          # HEIGHT_PHOTOSHOP（测试样本实际值）
+    "hardMix": 10,       # HARD_MIX_PHOTOSHOP（测试样本实际值）
+    # Photoshop 专用模式必须优先使用 Krita 的 (Photoshop) 项；
+    # ABR 的 linearHeight 即 Photoshop Linear Height。
+    "linearHeight": 15,  # LINEAR_HEIGHT_PHOTOSHOP
+    "height": 14,        # HEIGHT_PHOTOSHOP
+    "linearHeightPhotoshop": 15,  # LINEAR_HEIGHT_PHOTOSHOP
+    "linearHeightPS": 15,
+    "HghtPS": 14,
 }
 
 

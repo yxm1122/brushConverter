@@ -106,26 +106,27 @@
 | `textureDepthDynamics.Mnm` | `Texture/Strength/commonCurve` | `0,{Mnm/100};1,1;`（`UseCurve=true`） | ✅ |
 | `InvT` | `Texture/Pattern/Invert` | 直接 | ✅ |
 | `textureBlendMode` | `Texture/Pattern/TexturingMode` | **见下表** | ✅/❓ |
-| `textureBrightness` | `Texture/Pattern/Brightness` | PS -100..100 → Krita（0..255？）`round(v*2.55)`，0→0 | ❓待实测校准 |
-| `textureContrast` | `Texture/Pattern/Contrast` | `round(v*2.55)+1`，0→1 | ❓待实测校准 |
+| `textureBrightness` | `Texture/Pattern/Brightness` | PS 范围 -150..150；所有模式统一使用 `v/150`，clamp [-1,1]；内部执行 `maskValue -= brightness` | ✅（源码+实测方向） |
+| `textureContrast` | `Texture/Pattern/Contrast` | PS 范围 -50..100；负值 `1+v/50`，正值 `1+v/100`，范围 [0,2]；内部以 0.5 为中心相乘 | ✅（源码+范围） |
 | `TxtC` / `interpretation` / `protectTexture` | — | Krita 无对应，忽略并保留轻量警告 | ⚠️ |
 
 ### 2.1 混合模式映射表（Photoshop → Krita TexturingMode）
 
 | PS 值 | 含义 | Krita 模式 | 预期数值 |
 |-------|------|-----------|----------|
-| `linearHeight` | Linear Height | Height | 4（待源码核对） |
+| `Hght` | Height (Photoshop) | Height (Photoshop) | 14（测试用.abr 实测） |
+| `linearHeight` | Linear Height (Photoshop) | Linear Height (Photoshop) | 15（KisTextureOptionData enum） |
 | `Mul ` | Multiply | Multiply | 0 |
 | `Scrn` | Screen | Screen | 2 |
 | `Sbtr` | Subtract | Subtract | 1 |
 | `Ovld` | Overlay | —（无直接对应，回退 Multiply + 警告） | — |
 | 其他/未知 | — | 回退 Multiply(0) + 警告 | — |
 
-> Krita TexturingMode 枚举（Multiply/Subtract/Screen/Gradient/Height/Luminosity）的**确切数值**实现前用 Krita 源码或实测核对一次。
+> 已根据 Krita `KisTextureOptionData.h` 核对完整枚举：Photoshop 专用模式为 Hard Mix=10、Hard Mix Softer=11、Height=14、Linear Height=15。
 
 ### 2.2 亮/对比度校准策略（沿用散布 ÷400 的做法）
 
-- 先按第 2 节公式生成，用户在 Krita 实测后反馈，再调系数并固化到 `docs/parameter-mapping.md`。
+- 已按 Krita `KisTextureMaskInfo::recalculateMask()` 源码与用户提供的 PS 控件范围改为归一化公式：brightness=`v/150`（所有模式同向），contrast 负值=`1+v/50`、正值=`1+v/100`；后续如有模式特定视觉偏差再基于 Krita 实测校准。
 - 中性值必须保守：PS 0/0 → Krita 0/1（Krita 官方样本的中性默认）。
 
 ## 3. 实现计划（文件级）

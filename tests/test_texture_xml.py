@@ -33,10 +33,10 @@ def test_texture_params_written():
         pattern_filename="tex_abc12345.png",
         png_bytes=b"fake-png-bytes",
         scale=0.5,
-        brightness=-21,
-        contrast=-49,
+        brightness=-0.18,
+        contrast=0.66,
         invert=True,
-        texturing_mode=4,
+        texturing_mode=15,
         strength=0.55,
         strength_curve="0,0;1,1;",
         strength_pressure=True,
@@ -48,10 +48,10 @@ def test_texture_params_written():
     assert f"PatternMD5Sum\" type=\"string\"><![CDATA[{md5}]]>" in xml
     assert "Texture/Pattern/Enabled\" type=\"internal\">true" in xml
     assert "Texture/Pattern/Scale\" type=\"internal\">0.5" in xml
-    assert "Texture/Pattern/Brightness\" type=\"internal\">-21" in xml
-    assert "Texture/Pattern/Contrast\" type=\"internal\">-49" in xml
+    assert "Texture/Pattern/Brightness\" type=\"internal\">-0.18" in xml
+    assert "Texture/Pattern/Contrast\" type=\"internal\">0.66" in xml
     assert "Texture/Pattern/Invert\" type=\"internal\">true" in xml
-    assert "Texture/Pattern/TexturingMode\" type=\"internal\">4" in xml
+    assert "Texture/Pattern/TexturingMode\" type=\"internal\">15" in xml
     assert "Texture/Strength/Value\" type=\"internal\">0.55" in xml
     assert "Texture/Strength/commonCurve\" type=\"string\"><![CDATA[0,0;1,1;]]>" in xml
     assert "PressureTexture/Strength/\" type=\"internal\">true" in xml
@@ -84,12 +84,43 @@ def test_convert_texture_xml_formulas():
     tex = _texture_xml(BrushPreset(name="x", texture=ts))
     assert tex is not None
     assert tex.scale == 10.0
-    assert tex.brightness == -255
-    assert tex.contrast == 255
+    assert abs(tex.brightness + 2/3) < 1e-9
+    assert tex.contrast == 2.0
     assert tex.texturing_mode == 0
     assert abs(tex.strength - 0.55) < 1e-9
     assert tex.strength_pressure is True
     assert tex.strength_curve == "0,0;1,1;"
+
+
+def test_photoshop_brightness_contrast_use_krita_native_ranges():
+    img = np.zeros((2, 2, 3), dtype=np.uint8)
+    ts = TextureSettings(name="x", uuid="x", brightness=-27, contrast=-17, image=img)
+    tex = _texture_xml(BrushPreset(name="x", texture=ts))
+    assert tex is not None
+    # Krita KisTextureMaskInfo: brightness is subtracted in [−1,1],
+    # contrast is a multiplier around 0.5 with neutral value 1.
+    assert tex.brightness == -0.18
+    assert abs(tex.contrast - 0.66) < 1e-9
+
+
+def test_photoshop_linear_height_brightness_uses_common_direction():
+    img = np.zeros((2, 2, 3), dtype=np.uint8)
+    from brush_converter.mapping import TextureSettings
+    tex = _texture_xml(BrushPreset(name="x", texture=TextureSettings(name="x", uuid="x", brightness=30, image=img, blend_mode="linearHeight")))
+    assert tex is not None
+    assert abs(tex.brightness - 0.2) < 1e-9
+
+
+def test_photoshop_texture_modes_use_krita_photoshop_variants():
+    from brush_converter.mapping import _TEXTURING_MODE
+    assert _TEXTURING_MODE["linearHeight"] == 15
+    assert _TEXTURING_MODE["height"] == 14
+    assert _TEXTURING_MODE["Hght"] == 14
+    assert _TEXTURING_MODE["HdMx"] == 10
+    assert _TEXTURING_MODE["HdMxS"] == 11
+    assert _TEXTURING_MODE["hardMix"] == 10
+    assert _TEXTURING_MODE["Mul "] == 0
+    assert _TEXTURING_MODE["Sbtr"] == 1
 
 
 def test_convert_texture_filename_from_uuid():

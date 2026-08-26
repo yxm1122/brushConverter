@@ -196,10 +196,11 @@ class TextureXml:
     pattern_filename: str   # 内嵌资源文件名（如 tex_66e2987f.png）
     png_bytes: bytes
     scale: float = 1.0      # 0.01..10，1=100%
-    brightness: int = 0
-    contrast: int = 1
+    brightness: float = 0.0
+    contrast: float = 1.0
     invert: bool = False
     texturing_mode: int = 0
+    use_soft_texturing: bool = False
     strength: float = 1.0   # 0..1（PS textureDepth/100）
     strength_curve: str | None = None  # "x,y;x,y;"
     strength_pressure: bool = False
@@ -220,10 +221,11 @@ def _apply_texture(params: dict[str, tuple[str, str]], tex: TextureXml) -> None:
     set_string("Texture/Pattern/PatternMD5Sum", md5sum)
     set_string("Texture/Pattern/PatternMD5", "")  # 留空，避免 Krita 5.0 写二进制 bug
     set_internal("Texture/Pattern/Scale", f"{max(0.01, min(10.0, tex.scale)):g}")
-    set_internal("Texture/Pattern/Brightness", str(tex.brightness))
-    set_internal("Texture/Pattern/Contrast", str(tex.contrast))
+    set_internal("Texture/Pattern/Brightness", f"{tex.brightness:g}")
+    set_internal("Texture/Pattern/Contrast", f"{tex.contrast:g}")
     set_internal("Texture/Pattern/Invert", "true" if tex.invert else "false")
     set_internal("Texture/Pattern/TexturingMode", str(tex.texturing_mode))
+    set_internal("Texture/Pattern/UseSoftTexturing", "true" if tex.use_soft_texturing else "false")
     set_internal("Texture/Strength/Value", f"{max(0.0, min(1.0, tex.strength)):g}")
     if tex.strength_pressure:
         set_internal("PressureTexture/Strength/", "true")

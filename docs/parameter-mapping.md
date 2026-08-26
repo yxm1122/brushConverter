@@ -92,20 +92,20 @@
 | `Txtr.Idnt` | 资源查找 | patt 记录按 UUID 匹配，PNG 内嵌 | ✅ |
 | `Txtr.Nm` | `Name` / `PatternFileName` | 安全文件名 `tex_<uuid前8>.png` | ✅ |
 | PNG 字节 | `PatternMD5Sum` | md5 hex（`PatternMD5` 留空，绕开 Krita 5.0 写二进制 bug） | ✅ |
-| `textureScale`（%） | `Texture/Pattern/Scale` | `textureScale/100`，clamp [0.01, 10] | ✅（系数待实测校准） |
+| `textureScale`（%） | `Texture/Pattern/Scale` | `textureScale/100`，clamp [0.01, 10] | ✅（用户已确认一致） |
 | `textureDepth`（%） | `Texture/Strength/Value` | `textureDepth/100`（0..1） | ✅ |
 | `textureDepthDynamics.bVTy==2` | `PressureTexture/Strength/` | `true` + `Strength/UseCurve=true` | ✅ |
 | `textureDepthDynamics.Mnm` | `Texture/Strength/commonCurve` | `0,{Mnm/100};1,1;` | ✅ |
 | `InvT` | `Texture/Pattern/Invert` | 直接 | ✅ |
-| `textureBlendMode` | `Texture/Pattern/TexturingMode` | `linearHeight`→Height(4)；`Mul `→0、`Sbtr`→1、`Scrn`→2；未知回退 0 + 警告 | ✅ |
-| `textureBrightness`（-100..100） | `Texture/Pattern/Brightness` | `round(v×2.55)`，clamp [-255,255]，0→0 | ✅（公式待 Krita 实测校准） |
-| `textureContrast`（-100..100） | `Texture/Pattern/Contrast` | `round(v×2.55)+1`，clamp [0,255]，0→1 | ✅（公式待 Krita 实测校准） |
+| `textureBlendMode` | `Texture/Pattern/TexturingMode` | 优先使用 Krita `(Photoshop)` 模式：`linearHeight`→Linear Height (Photoshop)=15、`Hght`/`height`→Height (Photoshop)=14、`hardMix`→Hard Mix (Photoshop)=10；其余模式按 Krita 枚举映射（`Mul `→0、`Sbtr`→1、`Ovrl`→5 等）；未知回退 0 + 警告 | ✅ |
+| `textureBrightness`（PS -150..150） | `Texture/Pattern/Brightness` | 所有模式统一：`v/150`，clamp [-1,1]；Krita 源码按 `maskValue -= brightness` | ✅（源码+实测方向修正） |
+| `textureContrast`（PS -50..100） | `Texture/Pattern/Contrast` | 负值：`1+v/50`；正值：`1+v/100`，clamp [0,2]；Krita 源码按 0.5 中心乘法处理 | ✅（源码+范围修正） |
 | `TxtC` / `interpretation` | — | Krita 无对应，静默忽略（源文件默认值） | ⚠️ |
 | `protectTexture` | — | Krita 无对应，保留轻量警告 | ⚠️ |
 
-> 亮/对比度换算为经验公式（同散布 ÷400 的校准流程）：先在 Krita 实测，
-> 再调系数固化到本表。`linearHeight`（Linear Height）→ Krita Height 模式的
-> 枚举数值（4）实现时已按预期值写入，若 Krita 版本不同需复核。方向旋转随机度曲线在 UI 中显示为 -180°..+180°，但 XML 使用归一化坐标，完整范围序列化为 `0,0;1,1;`。
+> 亮/对比度映射依据 Krita `KisTextureMaskInfo::recalculateMask()`，并结合 Photoshop 控件范围：
+> 亮度范围为 -150..150，普通模式写 `v/150`，Linear Height (Photoshop) 取反；
+> 对比度范围为 -50..100，负值写 `1+v/50`，正值写 `1+v/100`。
 
 ## 8. 控制源编码（bVTy → Krita 传感器）
 

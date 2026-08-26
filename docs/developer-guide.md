@@ -234,10 +234,8 @@ Contrast,Invert,TexturingMode}`、`Texture/Strength/{Value,UseCurve,commonCurve}
 注意：
 - **`PatternMD5Sum` 存 hex md5**；`PatternMD5` 留空——Krita 5.0 曾在该字段写原始
   二进制导致非法 XML（Krita 官方 MR 修复），新版本以 `PatternMD5Sum` 为准。
-- `TexturingMode` 数值：Multiply=0 / Subtract=1 / Screen=2 / Height=4（PS
-  `linearHeight` → Height）。
-- 亮/对比度换算（PS -100..100 → Krita）目前是经验公式（`×2.55` / `×2.55+1`），
-  待 Krita 实测校准，系数集中在 `convert._texture_xml`。
+- `TexturingMode` 数值来自 Krita `KisTextureOptionData::TexturingMode`：Multiply=0、Subtract=1、Lightness=2、Gradient=3、Darken=4、Overlay=5、Color Dodge=6、Color Burn=7、Linear Dodge=8、Linear Burn=9、Hard Mix (Photoshop)=10、Hard Mix Softer (Photoshop)=11、Height=12、Linear Height=13、Height (Photoshop)=14、Linear Height (Photoshop)=15。ABR 的 `linearHeight` 优先映射到 15，避免误落到 Darken=4。
+- 亮/对比度换算依据 Krita `KisTextureMaskInfo::recalculateMask()`：`maskValue -= brightness`，然后 `((maskValue - 0.5) * contrast) + 0.5`；因此当前用 `brightness=v/100`、`contrast=1+v/100`，并做范围限制。源码快照与来源链接见 `research/krita_texture/` 和 `research/README.md`。
 
 ### 5.4 bundle 结构
 

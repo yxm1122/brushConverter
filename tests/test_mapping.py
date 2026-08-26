@@ -193,6 +193,25 @@ def test_texture_mapping():
     assert t2.image is not None and t2.image.shape == (1920, 1920, 3)
 
 
+def test_new_texture_sample_modes():
+    sample = Path(__file__).parent / "测试用.abr"
+    if not sample.exists():
+        pytest.skip("缺少测试用.abr")
+    presets = map_presets(AbrFile.parse(sample))
+    assert len(presets) == 6
+    assert {p.texture.blend_mode for p in presets if p.texture} == {"Hght", "Sbtr", "hardMix"}
+    assert all(p.texture is not None for p in presets)
+    hard_mix = next(p for p in presets if p.texture and p.texture.blend_mode == "hardMix")
+    assert hard_mix.texture is not None
+    assert hard_mix.texture.blend_mode == "hardMix"
+    _, hard_xml, _ = __import__("brush_converter.convert", fromlist=["_render_preset"])._render_preset(hard_mix, 0)
+    assert "Texture/Pattern/TexturingMode\" type=\"internal\">10" in hard_xml
+
+    height = next(p for p in presets if p.texture and p.texture.blend_mode == "Hght")
+    _, height_xml, _ = __import__("brush_converter.convert", fromlist=["_render_preset"])._render_preset(height, 0)
+    assert "Texture/Pattern/TexturingMode\" type=\"internal\">14" in height_xml
+
+
 def test_texture_warnings_removed():
     # 纹理主体已映射：不再出现「纹理」警告；只保留其他未映射项
     presets = _presets()
@@ -211,7 +230,9 @@ def test_texture_xml_end_to_end():
     assert 'type="patterns"' in xml
     assert "tex_438c2948.png" in xml
     assert "Texture/Pattern/Enabled\" type=\"internal\">true" in xml
-    assert "Texture/Pattern/TexturingMode\" type=\"internal\">4" in xml
+    assert "Texture/Pattern/TexturingMode\" type=\"internal\">15" in xml
+    assert "Texture/Pattern/Brightness\" type=\"internal\">0" in xml
+    assert "Texture/Pattern/Contrast\" type=\"internal\">1" in xml
     assert "Texture/Strength/Value\" type=\"internal\">0.55" in xml
     assert "PressureTexture/Strength/\" type=\"internal\">true" in xml
 

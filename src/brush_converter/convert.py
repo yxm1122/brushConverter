@@ -57,10 +57,19 @@ def _texture_xml(bp: BrushPreset) -> TextureXml | None:
     if tex is None or tex.image is None:
         return None
     filename = f"tex_{tex.uuid[:8]}.png" if tex.uuid else "texture.png"
-    # 亮/对比度：PS -100..100 → Krita（先按比例映射，待 Krita 实测校准，
-    # 与散布 ÷400 的校准流程一致）。中性值保持 0 / 1。
-    brightness = max(-255, min(255, round(tex.brightness * 2.55)))
-    contrast = max(0, min(255, round(tex.contrast * 2.55) + 1))
+    # Krita 源码的 KisTextureMaskInfo 直接执行：
+    #   maskValue -= brightness
+    #   maskValue = ((maskValue - 0.5) * contrast) + 0.5
+    # PS 纹理亮度范围为 -150..150；Krita 的 brightness 以 0 为中性，
+    # 这里按完整范围归一化到 [-1,1]；所有纹理模式使用同一方向。
+    brightness = max(-1.0, min(1.0, tex.brightness / 150.0))
+    if brightness == 0:
+        brightness = 0.0
+    # PS 对比度范围为 -50..100，保持 0→1，并分别将两端映射到 0/2。
+    contrast = (1.0 + tex.contrast / 50.0
+                if tex.contrast < 0
+                else 1.0 + tex.contrast / 100.0)
+    contrast = max(0.0, min(2.0, contrast))
     return TextureXml(
         pattern_filename=filename,
         png_bytes=_texture_png(tex),
@@ -69,6 +78,12 @@ def _texture_xml(bp: BrushPreset) -> TextureXml | None:
         contrast=contrast,
         invert=tex.invert,
         texturing_mode=_TEXTURING_MODE.get(tex.blend_mode, 0),
+        # Krita 文档明确指出：除 Height/Linear Height 外，Soft Texturing
+        # 更接近 Photoshop；PS 专用 Height 模式本身不启用该优化。
+        use_soft_texturing=(tex.blend_mode not in {
+            "Hght", "height", "HghtPS", "linearHeight",
+            "linearHeightPhotoshop", "linearHeightPS",
+        }),
         strength=max(0.0, min(100.0, tex.depth)) / 100.0,
         strength_curve=f"0,{max(0.0, min(100.0, tex.depth_min)) / 100.0:g};1,1;"
         if tex.pressure else None,
