@@ -98,14 +98,14 @@
 | `textureDepthDynamics.Mnm` | `Texture/Strength/commonCurve` | `0,{Mnm/100};1,1;` | ✅ |
 | `InvT` | `Texture/Pattern/Invert` | 直接 | ✅ |
 | `textureBlendMode` | `Texture/Pattern/TexturingMode` | 优先使用 Krita `(Photoshop)` 模式：`linearHeight`→Linear Height (Photoshop)=15、`Hght`/`height`→Height (Photoshop)=14、`hardMix`→Hard Mix (Photoshop)=10；其余模式按 Krita 枚举映射（`Mul `→0、`Sbtr`→1、`Ovrl`→5 等）；未知回退 0 + 警告 | ✅ |
-| `textureBrightness`（PS -150..150） | `Texture/Pattern/Brightness` | 所有模式统一：`v/150`，clamp [-1,1]；Krita 源码按 `maskValue -= brightness` | ✅（源码+实测方向修正） |
-| `textureContrast`（PS -50..100） | `Texture/Pattern/Contrast` | 负值：`1+v/50`；正值：`1+v/100`，clamp [0,2]；Krita 源码按 0.5 中心乘法处理 | ✅（源码+范围修正） |
+| `textureBrightness`（PS -150..150） | `Texture/Pattern/Brightness` | 普通模式：`round(0.10-v/250,2)`；Linear Height Photoshop：`round(0.30-v/250,2)`；clamp [-1,1] | ✅（现有 Krita 对照） |
+| `textureContrast`（PS -50..100） | `Texture/Pattern/Contrast` | 普通模式使用 PS 因子；Linear Height Photoshop 使用其倒数；统一 round 到 0.01 并 clamp [0,2] | ✅（现有 Krita 对照） |
 | `TxtC` / `interpretation` | — | Krita 无对应，静默忽略（源文件默认值） | ⚠️ |
 | `protectTexture` | — | Krita 无对应，保留轻量警告 | ⚠️ |
 
-> 亮/对比度映射依据 Krita `KisTextureMaskInfo::recalculateMask()`，并结合 Photoshop 控件范围：
-> 亮度范围为 -150..150，普通模式写 `v/150`，Linear Height (Photoshop) 取反；
-> 对比度范围为 -50..100，负值写 `1+v/50`，正值写 `1+v/100`。
+> 亮/对比度映射依据 Krita `KisTextureMaskInfo::recalculateMask()` 与 `research/测试结果2`、`research/krita结果`：
+> 当前候选是模式相关校准，最终目标是让 Krita 模式合成结果匹配 Photoshop，而不是匹配中间纹理值。
+> Krita UI 只能精确到两位小数，所有候选值必须先四舍五入到 0.01 再验证。
 
 ## 8. 控制源编码（bVTy → Krita 传感器）
 

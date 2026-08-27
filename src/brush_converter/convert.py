@@ -52,7 +52,11 @@ def _texture_png(texture: TextureSettings) -> bytes:
 
 
 def _texture_xml(bp: BrushPreset) -> TextureXml | None:
-    """把 BrushPreset.texture 组装成 Krita 纹理选项（无位图时返回 None）。"""
+    """把 Photoshop 纹理参数映射为 Krita 纹理选项（无位图时返回 None）。
+
+    映射目标是 Krita 模式合成后的最终效果；校准常数来自
+    research/测试结果2 与 research/krita结果，而不是 Photoshop 中间纹理值。
+    """
     tex = bp.texture
     if tex is None or tex.image is None:
         return None
@@ -60,16 +64,38 @@ def _texture_xml(bp: BrushPreset) -> TextureXml | None:
     # Krita 源码的 KisTextureMaskInfo 直接执行：
     #   maskValue -= brightness
     #   maskValue = ((maskValue - 0.5) * contrast) + 0.5
-    # PS 纹理亮度范围为 -150..150；Krita 的 brightness 以 0 为中性，
-    # 这里按完整范围归一化到 [-1,1]；所有纹理模式使用同一方向。
-    brightness = max(-1.0, min(1.0, tex.brightness / 150.0))
+    # Krita brightness 作用于 0..1 的 mask，源码先执行减法。
+    # 定量对照得到的最终合成标尺是：普通模式以 0.10 为 PS=0
+    # 的 Krita 基线，Linear Height (Photoshop) 以 0.30 为基线；
+    # 两者每 25 个 PS 亮度约对应 Krita 0.10 的反向变化。
+    if tex.blend_mode in {"linearHeight", "linearHeightPhotoshop", "linearHeightPS"}:
+        brightness = 0.30 - tex.brightness / 250.0
+    else:
+        brightness = 0.10 - tex.brightness / 250.0
+    # Krita UI/预设实际只保留两位小数。
+    brightness = max(-1.0, min(1.0, round(brightness, 2)))
     if brightness == 0:
         brightness = 0.0
-    # PS 对比度范围为 -50..100，保持 0→1，并分别将两端映射到 0/2。
-    contrast = (1.0 + tex.contrast / 50.0
-                if tex.contrast < 0
-                else 1.0 + tex.contrast / 100.0)
-    contrast = max(0.0, min(2.0, contrast))
+    # 定量测试显示 Photoshop 对比度是现代调整层的分段因子，
+    # 并且 Krita 的 Contrast 参数正好接收这个中心乘法因子：
+    #   C < 0: factor = 1 + C/100
+    #   C >= 0: factor = 1/(1 - C/100)
+    # 例如 -50→0.5、25→1.333...、50→2、75→4；+100
+    # 理论上趋于无穷，使用大值逼近其完全二值化效果。
+    c = max(-50.0, min(100.0, tex.contrast))
+    if c < 0.0:
+        ps_factor = 1.0 + c / 100.0
+    elif c >= 100.0:
+        ps_factor = 1_000_000.0
+    else:
+        ps_factor = 1.0 / (1.0 - c / 100.0)
+    # Linear Height (Photoshop) 反转了对比度对最终 Alpha 的方向；
+    # Krita 中需使用倒数：PS -50/.5→K 2，PS +50/2→K .5。
+    contrast = (1.0 / ps_factor
+                if tex.blend_mode in {"linearHeight", "linearHeightPhotoshop", "linearHeightPS"}
+                else ps_factor)
+    # Krita Contrast UI/配置精确到两位小数，且有效范围为 0..2。
+    contrast = max(0.0, min(2.0, round(contrast, 2)))
     return TextureXml(
         pattern_filename=filename,
         png_bytes=_texture_png(tex),

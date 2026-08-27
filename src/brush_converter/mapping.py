@@ -11,6 +11,8 @@
   - 散布：useScatter → 启用开关；scatterDynamics.jitter → 散布量
     （经验换算 ScatterValue = jitter/400，见 preset_xml.py 散布分支）
     bVTy==2 → 压感控制，bVTy==0 → 恒定；bothAxes → 两轴
+  - 纹理：按 Krita 模式合成校准亮度/对比度；Linear Height (Photoshop) 使用独立基线
+    与反向对比度映射，Krita UI 数值按两位小数输出
   - 计算笔刷 → Krita auto_brush
 """
 
@@ -65,8 +67,8 @@ class TextureSettings:
     uuid: str
     scale: float = 100.0
     invert: bool = False
-    brightness: int = 0
-    contrast: int = 0
+    brightness: int = 0       # Photoshop 纹理亮度：-150..150
+    contrast: int = 0         # Photoshop 纹理对比度：-50..100
     depth: float = 100.0
     depth_min: float = 0.0      # 压感→深度曲线的最小值（textureDepthDynamics.Mnm）
     pressure: bool = False      # 深度随压感（bVTy==2）

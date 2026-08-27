@@ -106,8 +106,8 @@
 | `textureDepthDynamics.Mnm` | `Texture/Strength/commonCurve` | `0,{Mnm/100};1,1;`（`UseCurve=true`） | ✅ |
 | `InvT` | `Texture/Pattern/Invert` | 直接 | ✅ |
 | `textureBlendMode` | `Texture/Pattern/TexturingMode` | **见下表** | ✅/❓ |
-| `textureBrightness` | `Texture/Pattern/Brightness` | PS 范围 -150..150；所有模式统一使用 `v/150`，clamp [-1,1]；内部执行 `maskValue -= brightness` | ✅（源码+实测方向） |
-| `textureContrast` | `Texture/Pattern/Contrast` | PS 范围 -50..100；负值 `1+v/50`，正值 `1+v/100`，范围 [0,2]；内部以 0.5 为中心相乘 | ✅（源码+范围） |
+| `textureBrightness` | `Texture/Pattern/Brightness` | 普通模式 `round(0.10-v/250,2)`；Linear Height Photoshop `round(0.30-v/250,2)`；clamp [-1,1] | ✅（Krita 对照） |
+| `textureContrast` | `Texture/Pattern/Contrast` | 普通模式使用 PS 因子；Linear Height Photoshop 使用倒数；+100/倒数极限按 Krita UI clamp [0,2] | ✅（Krita 对照） |
 | `TxtC` / `interpretation` / `protectTexture` | — | Krita 无对应，忽略并保留轻量警告 | ⚠️ |
 
 ### 2.1 混合模式映射表（Photoshop → Krita TexturingMode）
@@ -126,7 +126,7 @@
 
 ### 2.2 亮/对比度校准策略（沿用散布 ÷400 的做法）
 
-- 已按 Krita `KisTextureMaskInfo::recalculateMask()` 源码与用户提供的 PS 控件范围改为归一化公式：brightness=`v/150`（所有模式同向），contrast 负值=`1+v/50`、正值=`1+v/100`；后续如有模式特定视觉偏差再基于 Krita 实测校准。
+- 已按 Krita `KisTextureMaskInfo::recalculateMask()` 源码与 Photoshop 定量测试改为最终合成匹配公式：brightness=`-v/255`（所有模式统一），contrast 负值=`1+v/100`、正值=`1/(1-v/100)`；Height/Linear Height 仍需 Krita 实测复核。
 - 中性值必须保守：PS 0/0 → Krita 0/1（Krita 官方样本的中性默认）。
 
 ## 3. 实现计划（文件级）

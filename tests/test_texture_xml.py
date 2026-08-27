@@ -84,7 +84,7 @@ def test_convert_texture_xml_formulas():
     tex = _texture_xml(BrushPreset(name="x", texture=ts))
     assert tex is not None
     assert tex.scale == 10.0
-    assert abs(tex.brightness + 2/3) < 1e-9
+    assert tex.brightness == 0.5
     assert tex.contrast == 2.0
     assert tex.texturing_mode == 0
     assert abs(tex.strength - 0.55) < 1e-9
@@ -99,8 +99,21 @@ def test_photoshop_brightness_contrast_use_krita_native_ranges():
     assert tex is not None
     # Krita KisTextureMaskInfo: brightness is subtracted in [−1,1],
     # contrast is a multiplier around 0.5 with neutral value 1.
-    assert tex.brightness == -0.18
-    assert abs(tex.contrast - 0.66) < 1e-9
+    assert tex.brightness == 0.21
+    assert abs(tex.contrast - 0.83) < 1e-9
+
+
+def test_photoshop_contrast_uses_modern_adjustment_factor():
+    img = np.zeros((2, 2, 3), dtype=np.uint8)
+    from brush_converter.mapping import TextureSettings
+    for value, expected in [(-50, 0.5), (25, 4/3), (50, 2.0), (75, 2.0)]:
+        ts = TextureSettings(name="x", uuid="x", contrast=value, image=img)
+        tex = _texture_xml(BrushPreset(name="x", texture=ts))
+        assert tex is not None
+        assert abs(tex.contrast - round(expected, 2)) < 1e-9
+    ts = TextureSettings(name="x", uuid="x", contrast=100, image=img)
+    tex = _texture_xml(BrushPreset(name="x", texture=ts))
+    assert tex is not None and tex.contrast == 2.0
 
 
 def test_photoshop_linear_height_brightness_uses_common_direction():
@@ -108,7 +121,17 @@ def test_photoshop_linear_height_brightness_uses_common_direction():
     from brush_converter.mapping import TextureSettings
     tex = _texture_xml(BrushPreset(name="x", texture=TextureSettings(name="x", uuid="x", brightness=30, image=img, blend_mode="linearHeight")))
     assert tex is not None
-    assert abs(tex.brightness - 0.2) < 1e-9
+    assert abs(tex.brightness - (0.30 - 30 / 250)) < 1e-9
+
+
+def test_linear_height_inverts_contrast_factor():
+    img = np.zeros((2, 2, 3), dtype=np.uint8)
+    from brush_converter.mapping import TextureSettings
+    for value, expected in [(-50, 2.0), (-25, 1.33), (25, 0.75), (50, 0.5), (75, 0.25), (100, 0.0)]:
+        ts = TextureSettings(name="x", uuid="x", contrast=value, image=img, blend_mode="linearHeight")
+        tex = _texture_xml(BrushPreset(name="x", texture=ts))
+        assert tex is not None
+        assert abs(tex.contrast - round(expected, 2)) < 1e-9
 
 
 def test_photoshop_texture_modes_use_krita_photoshop_variants():
