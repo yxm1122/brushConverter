@@ -36,6 +36,12 @@ tests/*.abr
 # ---- WorkBuddy 项目数据 ----
 .workbuddy/
 
+# ---- Mnemon 运行时记忆（本地，勿提交）----
+.mnemon/
+
+# ---- 测试生成产物 ----
+tests/*.kpp
+
 # ---- OS ----
 .DS_Store
 Thumbs.db

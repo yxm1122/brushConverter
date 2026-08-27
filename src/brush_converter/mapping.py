@@ -258,6 +258,10 @@ def map_presets(abr: AbrFile) -> list[BrushPreset]:
 
         texture = _map_texture(p, patterns) if D.get_bool(p, "useTexture") else None
         warnings = _collect_warnings(p, texture)
+        # 旋转控制源 bVTy=1(渐隐)/3(倾斜)/4(转轮)/5(旋转) 尚未映射；
+        # 若 jitter>0 说明 PS 中该效果实际存在，丢失效果需要提示。
+        if rotation_jitter > 0 and ang.get("bVTy") not in (0, 2, 6, 7, None):
+            warnings.append(f"旋转控制源(bVTy={int(ang['bVTy'])} 未映射)")
 
         out.append(BrushPreset(
             name=name,

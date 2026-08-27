@@ -65,13 +65,11 @@ def _texture_xml(bp: BrushPreset) -> TextureXml | None:
     #   maskValue -= brightness
     #   maskValue = ((maskValue - 0.5) * contrast) + 0.5
     # Krita brightness 作用于 0..1 的 mask，源码先执行减法。
-    # 定量对照得到的最终合成标尺是：普通模式以 0.10 为 PS=0
-    # 的 Krita 基线，Linear Height (Photoshop) 以 0.30 为基线；
-    # 两者每 25 个 PS 亮度约对应 Krita 0.10 的反向变化。
-    if tex.blend_mode in {"linearHeight", "linearHeightPhotoshop", "linearHeightPS"}:
-        brightness = 0.30 - tex.brightness / 250.0
-    else:
-        brightness = 0.10 - tex.brightness / 250.0
+    # 定量对照得到的最终合成标尺：以 0.10 为 PS=0 的 Krita 基线，
+    # 每 25 个 PS 亮度约对应 Krita 0.10 的反向变化。
+    # 所有模式统一使用该普通映射（Linear Height (Photoshop) 曾用
+    # 0.30 基线，实测效果不好，2026-08-27 确认取消特殊映射）。
+    brightness = 0.10 - tex.brightness / 250.0
     # Krita UI/预设实际只保留两位小数。
     brightness = max(-1.0, min(1.0, round(brightness, 2)))
     if brightness == 0:
@@ -89,11 +87,9 @@ def _texture_xml(bp: BrushPreset) -> TextureXml | None:
         ps_factor = 1_000_000.0
     else:
         ps_factor = 1.0 / (1.0 - c / 100.0)
-    # Linear Height (Photoshop) 反转了对比度对最终 Alpha 的方向；
-    # Krita 中需使用倒数：PS -50/.5→K 2，PS +50/2→K .5。
-    contrast = (1.0 / ps_factor
-                if tex.blend_mode in {"linearHeight", "linearHeightPhotoshop", "linearHeightPS"}
-                else ps_factor)
+    # 所有模式统一使用 PS 中心因子（Linear Height (Photoshop) 曾用
+    # 其倒数，实测效果不好，2026-08-27 确认取消特殊映射）。
+    contrast = ps_factor
     # Krita Contrast UI/配置精确到两位小数，且有效范围为 0..2。
     contrast = max(0.0, min(2.0, round(contrast, 2)))
     return TextureXml(

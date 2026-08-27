@@ -102,12 +102,13 @@
 | — | `PatternMD5Sum` | PNG 字节 md5 hex（`PatternMD5` 留空，绕开 Krita 5.0 写二进制 bug） | ✅ |
 | `textureScale` | `Texture/Pattern/Scale` | `textureScale/100`，clamp [0.01, 10] | ✅（数值待实测校准） |
 | `textureDepth` | `Texture/Strength/Value` | `textureDepth/100` | ✅ |
-| `textureDepthDynamics.bVTy==2` | `PressureTexture/Strength/` = true | 压感→深度 | ✅ |
-| `textureDepthDynamics.Mnm` | `Texture/Strength/commonCurve` | `0,{Mnm/100};1,1;`（`UseCurve=true`） | ✅ |
+| `textureDepthDynamics.bVTy==2` | `PressureTexture/Strength/` = true + `Texture/Strength/UseCurve` = true | 压感→深度（`Mnm` 为最小值） | ✅ |
+| `textureDepthDynamics.bVTy==0` | `PressureTexture/Strength/` = true + `Texture/Strength/UseCurve` = false | 效果强度开启、无传感器，`Value`=`textureDepth/100` 恒定 | ✅ |
+| `textureDepthDynamics.Mnm` | `Texture/Strength/commonCurve` | `0,{Mnm/100};1,1;`（仅 `bVTy==2`） | ✅ |
 | `InvT` | `Texture/Pattern/Invert` | 直接 | ✅ |
 | `textureBlendMode` | `Texture/Pattern/TexturingMode` | **见下表** | ✅/❓ |
-| `textureBrightness` | `Texture/Pattern/Brightness` | 普通模式 `round(0.10-v/250,2)`；Linear Height Photoshop `round(0.30-v/250,2)`；clamp [-1,1] | ✅（Krita 对照） |
-| `textureContrast` | `Texture/Pattern/Contrast` | 普通模式使用 PS 因子；Linear Height Photoshop 使用倒数；+100/倒数极限按 Krita UI clamp [0,2] | ✅（Krita 对照） |
+| `textureBrightness` | `Texture/Pattern/Brightness` | 所有模式统一 `round(0.10-v/250,2)`；clamp [-1,1] | ✅ |
+| `textureContrast` | `Texture/Pattern/Contrast` | 所有模式统一使用 PS 中心因子；+100 极限按 Krita UI clamp [0,2] | ✅ |
 | `TxtC` / `interpretation` / `protectTexture` | — | Krita 无对应，忽略并保留轻量警告 | ⚠️ |
 
 ### 2.1 混合模式映射表（Photoshop → Krita TexturingMode）
@@ -126,7 +127,7 @@
 
 ### 2.2 亮/对比度校准策略（沿用散布 ÷400 的做法）
 
-- 已按 Krita `KisTextureMaskInfo::recalculateMask()` 源码与 Photoshop 定量测试改为最终合成匹配公式：brightness=`-v/255`（所有模式统一），contrast 负值=`1+v/100`、正值=`1/(1-v/100)`；Height/Linear Height 仍需 Krita 实测复核。
+- 已按 Krita `KisTextureMaskInfo::recalculateMask()` 源码与 Photoshop 定量测试改为最终合成匹配公式：所有模式统一——brightness=`round(0.10-v/250,2)`，contrast 负值=`1+v/100`、正值=`1/(1-v/100)`（round 两位并 clamp [0,2]）。Linear Height (Photoshop) 的特殊映射（0.30 基线/对比度倒数）实测效果不好，2026-08-27 确认取消。
 - 中性值必须保守：PS 0/0 → Krita 0/1（Krita 官方样本的中性默认）。
 
 ## 3. 实现计划（文件级）

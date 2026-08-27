@@ -1,6 +1,6 @@
 # brushConverter
 
-Convert Photoshop brush sets (`.abr`) into Krita brushes (`.kpp` presets / `.bundle` resource packs), with automatic brush-parameter mapping. Ships as both a command-line tool and a PySide6 GUI. **v1.1.0**
+Convert Photoshop brush sets (`.abr`) into Krita brushes (`.kpp` presets / `.bundle` resource packs), with automatic brush-parameter mapping. Ships as both a command-line tool and a PySide6 GUI. **v1.1.1**
 
 Photoshop 笔刷（`.abr`）转 Krita 笔刷（`.kpp` / `.bundle`）工具，支持参数自动映射，提供命令行与图形界面两种方式。
 
@@ -10,7 +10,7 @@ Photoshop 笔刷（`.abr`）转 Krita 笔刷（`.kpp` / `.bundle`）工具，支
 
 ![GUI 截图](docs/screenshot-gui.png)
 
-打开 .abr → 预览每支笔尖缩略图与名称 → 勾选要转换的笔刷（支持全选/全不选）→ 选择产物格式（`.kpp` 每支一个文件，或 `.bundle` Krita 资源包）→ 选择输出目录 → 点击"开始转换"。含未映射参数（双笔刷/颜色动态/湿边等）的笔刷会有 ⚠ 标注，转换时会先弹窗提醒确认。纹理（`patt`）已支持。
+打开 .abr → 预览每支笔尖缩略图与名称 → 勾选要转换的笔刷（支持全选/全不选）→ 选择产物格式（`.kpp` 每支一个文件，或 `.bundle` Krita 资源包）→ 选择输出目录 → 点击"开始转换"。含未映射参数（双笔刷/颜色动态/湿边等）的笔刷会有 ⚠ 标注，转换时会先弹窗提醒确认。纹理（`patt`）已支持；使用纹理的笔刷在转换前会提示"亮度/对比度为经验映射"，建议在 Krita 中手动微调。右上角可随时切换界面语言（中文 / English）。
 
 下载 `brushConverter-*-win64.zip`（见 [releases](https://github.com/yxm1122/brushConverter/releases)），解压后双击 `brushConverter.exe` 即可使用。
 
@@ -58,7 +58,9 @@ pyinstaller brushconverter-gui.spec    # → dist/brushConverter/brushConverter.
 - 打开 .abr，预览每支笔刷的笔尖缩略图与名称；
 - 勾选要转换的笔刷（支持全选/全不选）；
 - 产物可选 `.kpp`（每支一个文件）或 `.bundle`（Krita 资源包）；
-- 含双笔刷/颜色动态/湿边等无法映射参数的笔刷会弹出提醒（纹理已支持映射）。
+- 含双笔刷/颜色动态/湿边等无法映射参数的笔刷会弹出提醒（纹理已支持映射）；
+- 使用纹理的笔刷在转换前提示：纹理亮度/对比度为经验映射，可能不够准确，需在 Krita 手动微调；
+- 右上角语言切换（中文 / English），选择会记住（QSettings）。
 
 ## 转换说明
 
@@ -78,4 +80,4 @@ pyinstaller brushconverter-gui.spec    # → dist/brushConverter/brushConverter.
 
 - [`docs/developer-guide.md`](docs/developer-guide.md) — 项目结构、ABR 解析原理、参数映射、KPP/bundle 生成，以及开发过程中踩过的所有坑（`.kpp` 是 PNG 不是 ZIP、笔尖是 PNG 不是 GBR、角度归一化到 [0,360)、硬度 fade = Hrdn/100 等）。
 - [`docs/parameter-mapping.md`](docs/parameter-mapping.md) — ABR → Krita 各字段的逐项映射清单（尺寸、动态、散布、纹理和 bVTy 控制源编码等）。
-- [`releases/RELEASE_NOTES.md`](releases/RELEASE_NOTES.md) — v1.1.0 变更与已知限制。
+- [`releases/RELEASE_NOTES.md`](releases/RELEASE_NOTES.md) — v1.1.1 变更与已知限制。

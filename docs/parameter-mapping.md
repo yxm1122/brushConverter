@@ -38,6 +38,7 @@
 | `angleDynamics.bVTy==6` | 方向 | `RotationSensor=drawingangle` | sensorslist + fuzzy | ✅ |
 | `angleDynamics.jitter` | `RotationValue`（旋转-效果强度） | fuzzy/fuzzystroke 曲线 | `RotationValue=jitter/100`；两条随机度曲线固定 `0,0;1,1;`（Krita UI 对应 -180°..+180°，XML 坐标归一化为 0..1） | ✅（按手调 KPP 校准） |
 | `angleDynamics.bVTy==2` | 压力 | `RotationSensor=pressure` | — | ✅ |
+| `angleDynamics.bVTy==0` 且 jitter>0 | 无控制源（纯随机抖动） | `PressureRotation=true` + fuzzy-only 传感器 | `RotationValue=jitter/100`；fuzzy/fuzzystroke 曲线 `0,0;1,1;`，**不含** drawingangle（不随笔迹方向） | ✅（待 Krita 实测复核） |
 | `roundnessDynamics.bVTy==2` | 压力 | `PressureRatio=true` | — | ✅ |
 | `minimumRoundness` | — | `RatiocommonCurve` | `0,{minR/100};1,1;` | ✅ |
 
@@ -94,18 +95,19 @@
 | PNG 字节 | `PatternMD5Sum` | md5 hex（`PatternMD5` 留空，绕开 Krita 5.0 写二进制 bug） | ✅ |
 | `textureScale`（%） | `Texture/Pattern/Scale` | `textureScale/100`，clamp [0.01, 10] | ✅（用户已确认一致） |
 | `textureDepth`（%） | `Texture/Strength/Value` | `textureDepth/100`（0..1） | ✅ |
-| `textureDepthDynamics.bVTy==2` | `PressureTexture/Strength/` | `true` + `Strength/UseCurve=true` | ✅ |
-| `textureDepthDynamics.Mnm` | `Texture/Strength/commonCurve` | `0,{Mnm/100};1,1;` | ✅ |
+| `textureDepthDynamics.bVTy==2` | `PressureTexture/Strength/` + `Texture/Strength/UseCurve` | `true` + `true`（压感曲线，最小值见下） | ✅ |
+| `textureDepthDynamics.bVTy==0` | `PressureTexture/Strength/` + `Texture/Strength/UseCurve` | `true` + `false`（效果强度开启、无传感器，恒定用 Value） | ✅ |
+| `textureDepthDynamics.Mnm` | `Texture/Strength/commonCurve` | `0,{Mnm/100};1,1;`（仅 bVTy==2） | ✅ |
 | `InvT` | `Texture/Pattern/Invert` | 直接 | ✅ |
 | `textureBlendMode` | `Texture/Pattern/TexturingMode` | 优先使用 Krita `(Photoshop)` 模式：`linearHeight`→Linear Height (Photoshop)=15、`Hght`/`height`→Height (Photoshop)=14、`hardMix`→Hard Mix (Photoshop)=10；其余模式按 Krita 枚举映射（`Mul `→0、`Sbtr`→1、`Ovrl`→5 等）；未知回退 0 + 警告 | ✅ |
-| `textureBrightness`（PS -150..150） | `Texture/Pattern/Brightness` | 普通模式：`round(0.10-v/250,2)`；Linear Height Photoshop：`round(0.30-v/250,2)`；clamp [-1,1] | ✅（现有 Krita 对照） |
-| `textureContrast`（PS -50..100） | `Texture/Pattern/Contrast` | 普通模式使用 PS 因子；Linear Height Photoshop 使用其倒数；统一 round 到 0.01 并 clamp [0,2] | ✅（现有 Krita 对照） |
+| `textureBrightness`（PS -150..150） | `Texture/Pattern/Brightness` | 所有模式统一：`round(0.10-v/250,2)`；clamp [-1,1] | ✅ |
+| `textureContrast`（PS -50..100） | `Texture/Pattern/Contrast` | 所有模式统一使用 PS 中心因子；round 到 0.01 并 clamp [0,2] | ✅ |
 | `TxtC` / `interpretation` | — | Krita 无对应，静默忽略（源文件默认值） | ⚠️ |
 | `protectTexture` | — | Krita 无对应，保留轻量警告 | ⚠️ |
 
 > 亮/对比度映射依据 Krita `KisTextureMaskInfo::recalculateMask()` 与 `research/测试结果2`、`research/krita结果`：
-> 当前候选是模式相关校准，最终目标是让 Krita 模式合成结果匹配 Photoshop，而不是匹配中间纹理值。
-> Krita UI 只能精确到两位小数，所有候选值必须先四舍五入到 0.01 再验证。
+> 所有模式统一使用普通校准（Linear Height (Photoshop) 曾用 0.30 基线/对比度倒数的特殊映射，实测效果不好，2026-08-27 确认取消）。
+> Krita UI 只能精确到两位小数，所有值必须先四舍五入到 0.01 再验证。
 
 ## 8. 控制源编码（bVTy → Krita 传感器）
 
@@ -116,7 +118,7 @@
 | 2 | 压力 | `pressure` | ✅ |
 | 3 | 倾斜 | `tilt`（预留，未启用） | ⛔ |
 | 4 | 转轮 | 无对应 | ⛔ |
-| 5 | 旋转随机 | `RotationValue` + `fuzzy`/`fuzzystroke` | ✅（若源文件使用此控制源，当前仍按方向旋转分支处理） |
+| 5 | 旋转随机 | 无对应（未映射；jitter>0 时在 GUI 提示） | ⛔ |
 | 6 / 7 | 初始方向/方向 | `drawingangle` | ✅ |
 
 ## 9. 去重规则

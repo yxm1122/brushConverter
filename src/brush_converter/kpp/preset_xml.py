@@ -133,6 +133,20 @@ def _drawing_angle_sensor() -> str:
     )
 
 
+def _fuzzy_random_sensor() -> str:
+    """纯随机旋转传感器：只保留 fuzzy/fuzzystroke，不随笔迹方向。
+
+    Photoshop angleDynamics.bVTy==0（控制=关）且 jitter>0 时是纯随机角度抖动，
+    Krita 用 fuzzy 随机曲线表达；随机幅度由 RotationValue（=jitter/100）缩放。
+    """
+    return (
+        '<!DOCTYPE params> <params id="sensorslist"> '
+        '<ChildSensor id="fuzzy"> <curve>0,0;1,1;</curve> </ChildSensor> '
+        '<ChildSensor id="fuzzystroke"> <curve>0,0;1,1;</curve> </ChildSensor> '
+        '</params> '
+    )
+
+
 def sampled_brush_definition(filename: str, md5sum: str, spacing: float,
                              angle: float, scale: float) -> str:
     """图像笔尖（png_brush）的 <Brush> 定义。
@@ -227,11 +241,18 @@ def _apply_texture(params: dict[str, tuple[str, str]], tex: TextureXml) -> None:
     set_internal("Texture/Pattern/TexturingMode", str(tex.texturing_mode))
     set_internal("Texture/Pattern/UseSoftTexturing", "true" if tex.use_soft_texturing else "false")
     set_internal("Texture/Strength/Value", f"{max(0.0, min(1.0, tex.strength)):g}")
+    # Krita 的 PressureTexture/Strength/ 是「效果强度」选项的启用开关
+    # （isChecked，见 KisKritaSensorPack::read：getBool("Pressure"+id)），
+    # 与压感无关：PS 纹理深度无论是否接传感器都必须打开，否则该项被整体禁用。
+    set_internal("PressureTexture/Strength/", "true")
     if tex.strength_pressure:
-        set_internal("PressureTexture/Strength/", "true")
+        # PS textureDepthDynamics.bVTy==2：强度随压感，启用曲线（Mnm 为最小值）
         set_internal("Texture/Strength/UseCurve", "true")
         if tex.strength_curve:
             set_string("Texture/Strength/commonCurve", tex.strength_curve)
+    else:
+        # PS bVTy==0：恒定强度，只写 Value（textureDepth/100），不接传感器
+        set_internal("Texture/Strength/UseCurve", "false")
 
 
 def build_preset_xml(
@@ -289,6 +310,16 @@ def build_preset_xml(
     elif rotation_sensor == "pressure":
         set_string("RotationSensor", _pressure_sensor())
         set_internal("PressureRotation", "true")
+    elif rotation_jitter > 0:
+        # PS angleDynamics.bVTy==0（控制=关）但 jitter>0：纯随机角度抖动，
+        # 没有传感器。Krita 的「旋转-效果强度」仍需开启（PressureRotation=true），
+        # 用只有 fuzzy/fuzzystroke 的传感器表达随机，RotationValue=jitter/100。
+        set_string("RotationSensor", _fuzzy_random_sensor())
+        set_internal("PressureRotation", "true")
+        set_internal("RotationValue", f"{max(0.0, min(100.0, rotation_jitter)) / 100.0:g}")
+        set_internal("RotationUseCurve", "true")
+        set_internal("RotationUseSameCurve", "false")
+        set_internal("RotationcurveMode", "1")
     if scatter:
         # PressureScatter 在 Krita 里是「散布选项是否启用」开关（isChecked）
         set_internal("PressureScatter", "true")

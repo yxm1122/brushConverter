@@ -173,7 +173,7 @@ Record = u32 len | 记录体（len 字节） | pad 到 4
 | 旋转 | `angleDynamics.bVTy` | `RotationSensor`（drawingangle/pressure） |
 | 散布 | `useScatter` + `scatterDynamics.jitter` | `PressureScatter` + `ScatterValue` |
 
-**控制源编码（bVTy）**：0=关、1=渐隐、2=压力、3=倾斜、4=转轮、5=旋转、6/7=初始方向/方向。映射到 Krita 传感器（pressure/drawingangle/tilt）。对于方向旋转，Photoshop `angleDynamics.jitter` 映射到 Krita `RotationValue`（效果强度，jitter/100），`fuzzy` 与 `fuzzystroke` 随机度曲线在 UI 中对应 -180°..+180°，但 XML 使用归一化坐标，完整范围写为 `0,0;1,1;`。
+**控制源编码（bVTy）**：0=关、1=渐隐、2=压力、3=倾斜、4=转轮、5=旋转、6/7=初始方向/方向。当前映射到 Krita 传感器：pressure（bVTy=2）、drawingangle（bVTy=6/7，随笔迹方向）；bVTy=1/3/4/5 未映射（若 jitter>0 会在 GUI 提示「旋转控制源未映射」）。对于方向旋转，Photoshop `angleDynamics.jitter` 映射到 Krita `RotationValue`（效果强度，jitter/100），`fuzzy` 与 `fuzzystroke` 随机度曲线在 UI 中对应 -180°..+180°，但 XML 使用归一化坐标，完整范围写为 `0,0;1,1;`。bVTy=0（控制=关）但 jitter>0 时是纯随机角度抖动：旋转选项仍需开启（`PressureRotation=true`），使用只有 fuzzy/fuzzystroke 的传感器（不含 drawingangle），`RotationValue=jitter/100`。
 
 **计算笔刷**（无 `sampledData` UUID，只有参数）：映射为 Krita 的 `auto_brush`（程序化圆形笔尖），`diameter`/`ratio`（圆度）/`hfade`/`vfade`（硬度）放进 `MaskGenerator`。
 
@@ -231,11 +231,18 @@ Krita 5.x 用 `embedded_resources="2"`，笔尖 PNG 以 **base64 内嵌**在预�
 Contrast,Invert,TexturingMode}`、`Texture/Strength/{Value,UseCurve,commonCurve}`、
 `PressureTexture/Strength/`。
 
+`PressureTexture/Strength/` 是 Krita「效果强度」选项的启用开关（`isChecked`，
+见 `KisKritaSensorPack::read` 的 `getBool("Pressure"+id)`），与压感无关：
+PS 纹理深度无论是否接传感器都要设为 `true`；深度随压感（`bVTy==2`）时再设
+`Texture/Strength/UseCurve=true` 并写 `commonCurve`（最小值为 `Mnm/100`），
+`bVTy==0`（无传感器）时设 `Texture/Strength/UseCurve=false`，由
+`Texture/Strength/Value`（=`textureDepth/100`）提供恒定强度。
+
 注意：
 - **`PatternMD5Sum` 存 hex md5**；`PatternMD5` 留空——Krita 5.0 曾在该字段写原始
   二进制导致非法 XML（Krita 官方 MR 修复），新版本以 `PatternMD5Sum` 为准。
 - `TexturingMode` 数值来自 Krita `KisTextureOptionData::TexturingMode`：Multiply=0、Subtract=1、Lightness=2、Gradient=3、Darken=4、Overlay=5、Color Dodge=6、Color Burn=7、Linear Dodge=8、Linear Burn=9、Hard Mix (Photoshop)=10、Hard Mix Softer (Photoshop)=11、Height=12、Linear Height=13、Height (Photoshop)=14、Linear Height (Photoshop)=15。ABR 的 `linearHeight` 优先映射到 15，避免误落到 Darken=4。
-- 亮/对比度换算依据 Krita `KisTextureMaskInfo::recalculateMask()` 与 Photoshop/Krita 对照：普通模式亮度使用 `round(0.10-v/250,2)`，Linear Height Photoshop 使用 `round(0.30-v/250,2)`；普通模式对比度使用 Photoshop 因子，Linear Height Photoshop 使用倒数；最终统一 clamp 到 Krita UI 范围（亮度 [-1,1]、对比度 [0,2]）。源码快照与来源链接见 `research/krita_texture/` 和 `research/README.md`。
+- 亮/对比度换算依据 Krita `KisTextureMaskInfo::recalculateMask()` 与 Photoshop/Krita 对照：所有模式统一——亮度使用 `round(0.10-v/250,2)`，对比度使用 Photoshop 中心因子（`C<0→1+C/100`、`C>=0→1/(1-C/100)`）；最终统一 clamp 到 Krita UI 范围（亮度 [-1,1]、对比度 [0,2]）。Linear Height (Photoshop) 曾使用 0.30 基线与对比度倒数的特殊映射，实测效果不好，2026-08-27 确认取消。源码快照与来源链接见 `research/krita_texture/` 和 `research/README.md`。
 
 ### 5.4 bundle 结构
 

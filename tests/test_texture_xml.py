@@ -53,8 +53,44 @@ def test_texture_params_written():
     assert "Texture/Pattern/Invert\" type=\"internal\">true" in xml
     assert "Texture/Pattern/TexturingMode\" type=\"internal\">15" in xml
     assert "Texture/Strength/Value\" type=\"internal\">0.55" in xml
+    assert "Texture/Strength/UseCurve\" type=\"internal\">true" in xml
     assert "Texture/Strength/commonCurve\" type=\"string\"><![CDATA[0,0;1,1;]]>" in xml
     assert "PressureTexture/Strength/\" type=\"internal\">true" in xml
+
+
+def test_texture_strength_constant_without_sensor():
+    # PS textureDepthDynamics.bVTy==0（深度无传感器）：Krita「效果强度」应
+    # 保持开启（PressureTexture/Strength/=true）但关闭曲线（UseCurve=false），
+    # 强度由 Value=textureDepth/100 恒定提供，而不是整体禁用该项。
+    tex = TextureXml(
+        pattern_filename="tex_abc12345.png",
+        png_bytes=b"fake-png-bytes",
+        strength=0.55,
+        strength_pressure=False,
+    )
+    xml = _xml(tex)
+    assert "Texture/Strength/Value\" type=\"internal\">0.55" in xml
+    assert "Texture/Strength/UseCurve\" type=\"internal\">false" in xml
+    assert "PressureTexture/Strength/\" type=\"internal\">true" in xml
+    assert "Texture/Strength/commonCurve\" type=\"string\"><![CDATA[0,0;1,1;]]>" in xml
+
+
+def test_rotation_random_without_sensor_keeps_option_enabled():
+    # PS angleDynamics.bVTy==0（无传感器）但 jitter>0：纯随机角度抖动。
+    # Krita「旋转」选项应开启（PressureRotation=true），用只有 fuzzy 的
+    # 传感器表达随机（不随笔迹方向，无 drawingangle），RotationValue=jitter/100。
+    xml = build_preset_xml("random-rot", "", None, rotation_sensor=None, rotation_jitter=20.0)
+    assert 'PressureRotation" type="internal">true' in xml
+    assert 'RotationValue" type="internal">0.2' in xml
+    assert 'RotationUseCurve" type="internal">true' in xml
+    assert '<ChildSensor id="fuzzy"> <curve>0,0;1,1;</curve>' in xml
+    assert '<ChildSensor id="fuzzystroke"> <curve>0,0;1,1;</curve>' in xml
+    assert '<ChildSensor id="drawingangle"' not in xml
+
+
+def test_rotation_off_when_no_jitter_and_no_sensor():
+    xml = build_preset_xml("no-rot", "", None)
+    assert 'PressureRotation" type="internal">false' in xml
 
 
 def test_texture_disabled_by_default():
@@ -116,18 +152,20 @@ def test_photoshop_contrast_uses_modern_adjustment_factor():
     assert tex is not None and tex.contrast == 2.0
 
 
-def test_photoshop_linear_height_brightness_uses_common_direction():
+def test_linear_height_brightness_uses_common_mapping():
+    # Linear Height (Photoshop) 不再使用 0.30 基线：所有模式统一普通映射
     img = np.zeros((2, 2, 3), dtype=np.uint8)
     from brush_converter.mapping import TextureSettings
     tex = _texture_xml(BrushPreset(name="x", texture=TextureSettings(name="x", uuid="x", brightness=30, image=img, blend_mode="linearHeight")))
     assert tex is not None
-    assert abs(tex.brightness - (0.30 - 30 / 250)) < 1e-9
+    assert abs(tex.brightness - (0.10 - 30 / 250)) < 1e-9
 
 
-def test_linear_height_inverts_contrast_factor():
+def test_linear_height_contrast_uses_common_mapping():
+    # Linear Height (Photoshop) 不再反转对比度：所有模式统一 PS 中心因子
     img = np.zeros((2, 2, 3), dtype=np.uint8)
     from brush_converter.mapping import TextureSettings
-    for value, expected in [(-50, 2.0), (-25, 1.33), (25, 0.75), (50, 0.5), (75, 0.25), (100, 0.0)]:
+    for value, expected in [(-50, 0.5), (-25, 0.75), (25, 4/3), (50, 2.0), (75, 2.0), (100, 2.0)]:
         ts = TextureSettings(name="x", uuid="x", contrast=value, image=img, blend_mode="linearHeight")
         tex = _texture_xml(BrushPreset(name="x", texture=ts))
         assert tex is not None
