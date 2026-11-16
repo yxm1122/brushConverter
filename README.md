@@ -1,6 +1,6 @@
 # brushConverter
 
-Convert Photoshop brush sets (`.abr`) into Krita brushes (`.kpp` presets / `.bundle` resource packs), with automatic brush-parameter mapping. Ships as both a command-line tool and a PySide6 GUI. **v1.1.1**
+Convert Photoshop brush sets (`.abr`) into Krita brushes (`.kpp` presets / `.bundle` resource packs), with automatic brush-parameter mapping. Ships as both a command-line tool and a PySide6 GUI. **v1.1.2**
 
 Photoshop 笔刷（`.abr`）转 Krita 笔刷（`.kpp` / `.bundle`）工具，支持参数自动映射，提供命令行与图形界面两种方式。
 
@@ -80,4 +80,4 @@ pyinstaller brushconverter-gui.spec    # → dist/brushConverter/brushConverter.
 
 - [`docs/developer-guide.md`](docs/developer-guide.md) — 项目结构、ABR 解析原理、参数映射、KPP/bundle 生成，以及开发过程中踩过的所有坑（`.kpp` 是 PNG 不是 ZIP、笔尖是 PNG 不是 GBR、角度归一化到 [0,360)、硬度 fade = Hrdn/100 等）。
 - [`docs/parameter-mapping.md`](docs/parameter-mapping.md) — ABR → Krita 各字段的逐项映射清单（尺寸、动态、散布、纹理和 bVTy 控制源编码等）。
-- [`releases/RELEASE_NOTES.md`](releases/RELEASE_NOTES.md) — v1.1.1 变更与已知限制。
+- [`releases/RELEASE_NOTES.md`](releases/RELEASE_NOTES.md) — v1.1.2 变更与已知限制。
