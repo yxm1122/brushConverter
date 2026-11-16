@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -52,6 +53,16 @@ def cmd_info(args: argparse.Namespace) -> int:
     return 0 if abr.tips else 2
 
 
+def _safe_component(name: str) -> str:
+    """把（可能来自 ABR 的）名字清洗为安全的单段文件名。
+
+    Windows 保留字符 \\ : * ? " < > | 与控制字符都会让 open() 失败，
+    点号/空格结尾在 Windows 上也会被静默截断，全部替换掉。
+    """
+    cleaned = re.sub(r'[\\/:*?"<>|\x00-\x1f]+', "_", name).strip(" .")
+    return cleaned or "tip"
+
+
 def cmd_extract(args: argparse.Namespace) -> int:
     """把采样笔尖导出为 PNG（含 info.json，可选总览图）。"""
     abr = AbrFile.parse(args.file)
@@ -67,7 +78,7 @@ def cmd_extract(args: argparse.Namespace) -> int:
 
     manifest = []
     for tip in abr.tips:
-        safe_name = (tip.uuid or tip.name or f"tip{tip.index:03d}").replace("/", "_")
+        safe_name = _safe_component(tip.uuid or tip.name or f"tip{tip.index:03d}")
         png_path = out_dir / f"{stem}_{tip.index:02d}_{safe_name}.png"
         img = Image.fromarray(tip.gray, mode="L")
         img.save(png_path)
@@ -92,7 +103,7 @@ def cmd_extract(args: argparse.Namespace) -> int:
     (out_dir / f"{stem}_info.json").write_text(
         json.dumps(info, ensure_ascii=False, indent=2), encoding="utf-8")
 
-    if args.contact_sheet and abr.tips:
+    if args.contact_sheet:  # abr.tips 已由上面的 `if not abr.tips` 提前返回保证非空
         _contact_sheet(abr, out_dir / f"{stem}_preview.png")
 
     print(f"已导出 {len(abr.tips)} 个笔尖到 {out_dir}")

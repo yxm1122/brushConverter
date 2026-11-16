@@ -6,7 +6,10 @@
 
 from __future__ import annotations
 
+import logging
 import re
+
+_log = logging.getLogger(__name__)
 
 _LANG = "zh"
 
@@ -135,6 +138,10 @@ def tr(key: str, **kwargs) -> str:
         try:
             return text.format(**kwargs)
         except (KeyError, IndexError, ValueError):
+            # 静默回退会让界面直接显示 "{n}" 之类的占位符且毫无线索；
+            # 保留一条日志，开发/打包环境都能定位到坏掉的模板。
+            _log.warning("i18n 占位符不匹配: lang=%s key=%s kwargs=%s",
+                         _LANG, key, sorted(kwargs))
             return text
     return text
 
@@ -143,11 +150,12 @@ def tr_warning(warning: str) -> str:
     """把 mapping.py 产生的中文警告翻译为英文（中文界面原样返回）。"""
     if _LANG == "zh":
         return warning
-    m = re.match(r"纹理混合模式\((.*)\)", warning)
+    # fullmatch：避免把「纹理混合模式(...) 其它后缀」这样的字符串也吞掉
+    m = re.fullmatch(r"纹理混合模式\((.*)\)", warning)
     if m:
         inner = m.group(1).replace("回退Multiply", "falls back to Multiply")
         return f"Texture blend mode ({inner})"
-    m = re.match(r"旋转控制源\(bVTy=(\d+) 未映射\)", warning)
+    m = re.fullmatch(r"旋转控制源\(bVTy=(\d+) 未映射\)", warning)
     if m:
         return f"Rotation control source (bVTy={m.group(1)} not mapped)"
     return _WARNINGS_EN.get(warning, warning)

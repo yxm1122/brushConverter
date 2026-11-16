@@ -27,6 +27,11 @@ _SENSOR_XML = '<!DOCTYPE params> <params id="pressure"/> '
 _CURVE_ID = "0,0;1,1;"
 
 
+def _cdata(value: str) -> str:
+    """把任意文本包成 CDATA 段；文本里的 `]]>` 会提前结束 CDATA，需拆分拼接。"""
+    return "<![CDATA[" + value.replace("]]>", "]]]]><![CDATA[>") + "]]>"
+
+
 def _sensor_param_name(s: str, suffix: str) -> str:
     # h/s/v 用小写首字母：hcommonCurve / scurveMode 等
     return f"{s}{suffix}"
@@ -273,7 +278,7 @@ def build_preset_xml(
     extra_params: dict[str, str] | None = None,
     texture: TextureXml | None = None,
 ) -> str:
-    """组装完整的 <Preset> XML。曲线参数为 "x,y;x,y;"（不含尾随分号）。"""
+    """组装完整的 <Preset> XML。曲线参数形如 "x,y;x,y;"（Krita 实际输出带尾随分号）。"""
     params = dict(DEFAULT_PARAMS)
     params["brush_definition"] = ("string", brush_definition)
 
@@ -347,24 +352,26 @@ def build_preset_xml(
     if tip_png is not None:
         res_name = tip_name or _safe_name(name)
         resources.append(("brushes", res_name, res_name + ".png", tip_png))
-        parts.append(
-            '<Preset paintopid="paintbrush" name=' + quoteattr(name)
-            + ' embedded_resources="2"> '
-        )
-    else:
-        parts.append('<Preset paintopid="paintbrush" name=' + quoteattr(name) + '>')
     if texture is not None:
         resources.append(("patterns", texture.pattern_filename,
                           texture.pattern_filename, texture.png_bytes))
         _apply_texture(params, texture)
+    # embedded_resources="2" 必须与 <resources> 同时出现：计算笔刷
+    # （tip_png=None）只带纹理资源时同样要声明，否则 Krita 不读内嵌纹理。
+    attrs = ' embedded_resources="2"' if resources else ""
+    parts.append(
+        '<Preset paintopid="paintbrush" name=' + quoteattr(name) + attrs + '>')
     if resources:
         parts.append(_resources_xml(resources))
 
     for key, (typ, value) in params.items():
         if typ == "string":
-            parts.append(f' <param name={quoteattr(key)} type="string"><![CDATA[{value}]]></param>')
+            parts.append(
+                f' <param name={quoteattr(key)} type="string">{_cdata(value)}</param>')
         else:
-            parts.append(f' <param name={quoteattr(key)} type="internal">{value}</param>')
+            # internal 值直接进入元素内容，extra_params 还允许调用方传任意字符串
+            parts.append(
+                f' <param name={quoteattr(key)} type="internal">{escape(value)}</param>')
     parts.append(" </Preset>")
     return "".join(parts)
 

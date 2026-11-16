@@ -6,7 +6,7 @@ import os
 import struct
 from dataclasses import dataclass, field
 
-from .patterns import PatternTexture, parse_patterns
+from .patterns import PatternParseError, PatternTexture, parse_patterns
 from .samples import BrushTip, parse_samples
 
 
@@ -52,7 +52,13 @@ class AbrFile:
         with open(path, "rb") as f:
             data = f.read()
         base_name = os.path.splitext(os.path.basename(path))[0]
-        return cls._from_bytes(data, base_name)
+        try:
+            return cls._from_bytes(data, base_name)
+        except (struct.error, IndexError) as e:
+            # 截断/损坏的文件会让 struct 解包抛 struct.error、切片越界抛
+            # IndexError，二者都不是 ValueError；统一归一，CLI/GUI 才能按
+            # 「解析失败」友好提示而不是抛未捕获异常退出。
+            raise ValueError(f"ABR 结构损坏：{e}") from e
 
     @classmethod
     def _from_bytes(cls, data: bytes, base_name: str) -> "AbrFile":
@@ -85,8 +91,12 @@ class AbrFile:
                     key=key.decode("latin1"), offset=start, length=length,
                     data=data[start : start + length],
                 )
-                pos = start + length + (length % 4)
-        else:
+                # 4 字节对齐填充：补足量是 (-length) % 4，不是 length % 4
+                # （后者只在 length % 4 为 0/2 时碰巧相等）。用错会把下一段
+                # 的 8BIM 签名读偏 2 字节，导致后续区段被整段丢弃。
+                pos = start + length + (-length % 4)
+        elif version not in (1, 2):
+            # v1/v2 是旧格式（整文件即笔尖序列），不是异常，不能报诊断噪音
             diagnostics.append(f"主版本 {version} 不是已知的 6/10，未解析区段结构")
 
         abr = cls(version=version, subversion=subversion, sections=sections,
@@ -102,7 +112,13 @@ class AbrFile:
             diagnostics.append("缺少 samp 区，无法读取采样笔尖")
         patt = sections.get("patt")
         if patt is not None:
-            abr.patterns = parse_patterns(patt.data)
+            try:
+                abr.patterns = parse_patterns(patt.data)
+            except (PatternParseError, struct.error, IndexError) as e:
+                # 纹理图案解析失败不应让整个文件不可用：记录原因后继续，
+                # 笔刷仍可转换，只是相关预设会得到「纹理(图案缺失)」警告。
+                abr.patterns = {}
+                abr.diagnostics.append(f"patt 区解析失败：{e}")
         return abr
 
     @property

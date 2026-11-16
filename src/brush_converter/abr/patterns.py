@@ -61,10 +61,6 @@ def _u32(data: bytes, off: int) -> int:
     return struct.unpack_from(">I", data, off)[0]
 
 
-def _u16(data: bytes, off: int) -> int:
-    return struct.unpack_from(">H", data, off)[0]
-
-
 def _rle_decode_u16(buf: bytes, expected_size: int, height: int) -> bytes:
     """PSD 版 RLE 解码：height 个 u16 行字节数 + 每行 PackBits。"""
     if len(buf) < height * 2:
@@ -150,9 +146,16 @@ def _parse_vma_channels(body: bytes, want: int):
             continue
         if length < 23:
             raise PatternParseError(f"通道长度非法: {length}")
+        # 声明的通道长度必须落在 body 内，否则下面的 unpack_from 会读到
+        # 别的通道/记录的字节（或直接 struct.error）。
+        if b + length > len(body):
+            raise PatternParseError(
+                f"通道块越界: off={b} len={length} body={len(body)}")
         depth = _u32(body, b)
         crect = struct.unpack_from(">4I", body, b + 4)
         pixel_depth, compression = struct.unpack_from(">HB", body, b + 20)
+        if pixel_depth not in (8, 16):
+            raise PatternParseError(f"通道像素位深非法: {pixel_depth}")
         data = body[b + 23 : b + length]
         b += length
         chans.append((depth, crect, compression, data))
@@ -177,6 +180,8 @@ def parse_patterns(data: bytes) -> dict[str, PatternTexture]:
         if record_end > len(data):
             raise PatternParseError(
                 f"图案记录越界: @{pos} len={length} 超出区段")
+        if length < 20:  # version/mode/point/name_chars 四个 u32
+            raise PatternParseError(f"图案记录过短: @{pos} len={length}")
         p = pos + 4
         version = _u32(data, p)
         if version != 1:
@@ -192,6 +197,8 @@ def parse_patterns(data: bytes) -> dict[str, PatternTexture]:
         name = data[p : p + name_chars * 2].decode("utf-16-be", "replace")
         name = name.rstrip("\x00")
         p += name_chars * 2
+        if p >= record_end:  # 名字恰好填满记录时没有 id 长度字节
+            raise PatternParseError(f"缺少图案 id 长度字节 @{p}")
         id_len = data[p]
         p += 1
         if not (16 <= id_len <= 64) or p + id_len > record_end:
@@ -205,14 +212,16 @@ def parse_patterns(data: bytes) -> dict[str, PatternTexture]:
         if vma_version != 3:
             raise PatternParseError(f"未知 VMA 版本: {vma_version} (pattern {index})")
         body_len = _u32(data, p + 4)
+        # 必须同时落在区段与当前记录内，否则会把下一条记录的字节当作 VMA body
+        if p + 8 + body_len > record_end or p + 8 + body_len > len(data):
+            raise PatternParseError(
+                f"VMA 列表长度越界: @{p} len={body_len} record_end={record_end}")
         body = data[p + 8 : p + 8 + body_len]
-        if len(body) != body_len:
-            raise PatternParseError("VMA 列表长度越界")
 
         want = {1: 1, 3: 3}.get(color_mode)
         if want is None:
             raise PatternParseError(f"不支持的图案颜色模式: {color_mode}")
-        rect, nchans, chans = _parse_vma_channels(body, want)
+        rect, _nchans, chans = _parse_vma_channels(body, want)
         if len(chans) < want:
             raise PatternParseError(
                 f"图案通道不足: 需要 {want} 个，实际 {len(chans)} (pattern {index})")

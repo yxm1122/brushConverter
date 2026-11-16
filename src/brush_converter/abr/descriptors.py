@@ -27,11 +27,16 @@ value 类型（type 四字符码）：
 from __future__ import annotations
 
 import struct
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 
 class DescParseError(ValueError):
     pass
+
+
+# 描述符嵌套上限：Objc/VlLs 可以互相嵌套，损坏或恶意构造的文件
+# 会让递归无限展开（RecursionError / 栈溢出），这里显式设限。
+_MAX_DEPTH = 64
 
 
 @dataclass
@@ -69,6 +74,11 @@ class Reader:
     def _need(self, n: int) -> None:
         if self.pos + n > self.end:
             raise DescParseError(f"描述符越界: 需要 {n} 字节, 剩 {self.remaining()} @ {self.pos}")
+
+    @staticmethod
+    def _check_depth(depth: int) -> None:
+        if depth > _MAX_DEPTH:
+            raise DescParseError(f"描述符嵌套过深（上限 {_MAX_DEPTH} 层）")
 
     def u8(self) -> int:
         self._need(1)
@@ -119,17 +129,25 @@ class Reader:
         raw = self.raw(n * 2)
         return raw.decode("utf-16-be", "replace").rstrip("\x00")
 
-    def read_descriptor(self) -> dict[str, Value]:
-        name = self.read_unicode()
+    def read_descriptor(self, depth: int = 0) -> tuple[dict[str, Value], str]:
+        """读取一个描述符，返回 (条目表, classID)。
+
+        classID 必须一并返回，否则 Objc 的类身份（Value.class_id）会丢失。
+        """
+        self._check_depth(depth)
+        self.read_unicode()      # name（不参与映射）
         class_id = self.read_id()
         count = self.u32()
+        if count > self.remaining():
+            raise DescParseError(f"描述符条目数异常: {count} @ {self.pos}")
         items: dict[str, Value] = {}
         for _ in range(count):
             key = self.read_id()
-            items[key] = self.read_value()
-        return items
+            items[key] = self.read_value(depth + 1)
+        return items, class_id
 
-    def read_value(self) -> Value:
+    def read_value(self, depth: int = 0) -> Value:
+        self._check_depth(depth)
         typ = self.raw(4).decode("latin1")
         if typ == "long":
             return Value("long", self.i32())
@@ -140,16 +158,22 @@ class Reader:
         if typ == "TEXT":
             return Value("TEXT", self.read_unicode())
         if typ == "enum":
-            return Value("enum", self.read_id(), type_id=self.read_id())
+            # 规范顺序：先 typeID（类 id，如 'BlnM'），后 enum 值（如 'Hght'）。
+            # 两个 read_id 写在同一个调用里会先算 value 再算 type_id，字段互换。
+            type_id = self.read_id()
+            return Value("enum", self.read_id(), type_id=type_id)
         if typ == "UntF":
             unit = self.raw(4).decode("latin1")
             return Value("UntF", self.f64(), unit=unit)
         if typ == "Objc":
-            obj = self.read_descriptor()
-            return Value("Objc", obj)
+            obj, class_id = self.read_descriptor(depth + 1)
+            return Value("Objc", obj, class_id=class_id)
         if typ == "VlLs":
+            self._check_depth(depth + 1)
             count = self.u32()
-            return Value("VlLs", [self.read_value() for _ in range(count)])
+            if count > self.remaining() // 4:
+                raise DescParseError(f"值列表长度异常: {count} @ {self.pos}")
+            return Value("VlLs", [self.read_value(depth + 1) for _ in range(count)])
         if typ == "tdta":
             n = self.u32()
             return Value("tdta", data=self.raw(n))
@@ -171,24 +195,44 @@ class Reader:
 
 
 def _skip_object_reference(r: Reader) -> None:
-    """跳过 'obj ' 类型的对象引用（不常用，仅需正确定位长度）。"""
+    """跳过 'obj ' 类型的对象引用（不常用，仅需正确定位长度）。
+
+    每个引用项按 Photoshop 规范的 Reference structure 布局，各类型
+    载荷长度不同，必须逐类型分支处理（早先的 if 串联会重复消费字节）：
+        Clss : unicode name, classID
+        Enmr : classID, typeID, enum 值
+        prop : unicode name, classID, keyID
+        name : unicode name, classID
+        rele : classID, u32
+        Idnt / indx : u32
+    遇到未知类型时无法推断长度，直接报错而不是让游标错位。
+    """
     count = r.u32()
+    if count > r.remaining():
+        raise DescParseError(f"对象引用条目数异常: {count} @ {r.pos}")
     for _ in range(count):
         ref = r.raw(4).decode("latin1")
-        if ref in ("Clss", "Enmr", "name", "prop", "rele"):
-            r.read_id(); r.read_id()
-        if ref == "Enmr":
-            r.read_id(); r.read_id()
-        if ref == "Idnt":
-            r.u32()
-        if ref == "indx":
-            r.u32()
-        if ref == "name":
+        if ref == "Clss":
             r.read_unicode()
-        if ref == "prop":
             r.read_id()
-        if ref == "rele":
+        elif ref == "Enmr":
+            r.read_id()
+            r.read_id()
+            r.read_id()
+        elif ref == "prop":
+            r.read_unicode()
+            r.read_id()
+            r.read_id()
+        elif ref == "name":
+            r.read_unicode()
+            r.read_id()
+        elif ref == "rele":
+            r.read_id()
             r.u32()
+        elif ref in ("Idnt", "indx"):
+            r.u32()
+        else:
+            raise DescParseError(f"未知对象引用类型: {ref!r} @ {r.pos - 4}")
 
 
 def _skip_global_object(r: Reader) -> None:
@@ -201,7 +245,7 @@ def parse_descriptor_block(data: bytes) -> dict[str, Value]:
     """解析完整 desc 区段（含 4 字节 version 前缀），返回顶层描述符。"""
     r = Reader(data)
     version = r.u32()  # 值被忽略
-    desc = r.read_descriptor()
+    desc, _class_id = r.read_descriptor()
     return desc
 
 

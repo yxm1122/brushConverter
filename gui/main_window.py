@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 
 import numpy as np
-from PySide6.QtCore import Qt, QSettings
+from PySide6.QtCore import QSettings, QSignalBlocker, Qt
 from PySide6.QtGui import QImage, QPixmap
 from PySide6.QtWidgets import (
     QApplication, QButtonGroup, QCheckBox, QComboBox, QFileDialog, QGroupBox,
@@ -19,7 +19,6 @@ from brush_converter.convert import ConvertResult
 from brush_converter.kpp.kpp_writer import render_tip_preview
 from brush_converter.mapping import BrushPreset
 
-from . import i18n
 from .i18n import get_language, set_language, tr, tr_warning
 from .workers import ConvertWorker, ParseWorker
 
@@ -28,7 +27,6 @@ def _gray_to_pixmap(gray: np.ndarray | None, size: int = 64) -> QPixmap:
     """灰度蒙版（255=墨）→ 白色在透明底上的缩略图。"""
     if gray is None:
         # 计算笔刷：画一个简单圆点占位
-        gray = np.zeros((64, 64), dtype=np.uint8)
         yy, xx = np.mgrid[0:64, 0:64].astype(np.float64)
         d = np.sqrt((xx - 31.5) ** 2 + (yy - 31.5) ** 2)
         gray = np.clip(1.0 - d / 28.0, 0, 1) * 255.0
@@ -42,7 +40,7 @@ def _gray_to_pixmap(gray: np.ndarray | None, size: int = 64) -> QPixmap:
 class BrushItemWidget(QWidget):
     """单个笔刷卡片：勾选框 + 缩略图 + 名称 + 未映射警告。"""
 
-    def __init__(self, preset: BrushPreset, parent=None):
+    def __init__(self, preset: BrushPreset, checked: bool = True, parent=None):
         super().__init__(parent)
         self.preset = preset
         layout = QHBoxLayout(self)
@@ -50,7 +48,8 @@ class BrushItemWidget(QWidget):
         layout.setSpacing(10)
 
         self.checkbox = QCheckBox()
-        self.checkbox.setChecked(True)
+        # 默认全选；重建列表（例如切换语言）时沿用原有勾选状态
+        self.checkbox.setChecked(checked)
         layout.addWidget(self.checkbox)
 
         thumb = QLabel()
@@ -207,7 +206,8 @@ class MainWindow(QMainWindow):
         self.browse_btn.setText(tr("browse"))
         self.convert_btn.setText(tr("convert"))
         if self._presets:
-            self._populate(self._presets)
+            # 重建卡片会重新创建 QCheckBox，必须恢复用户已有的勾选状态
+            self._populate(self._presets, checked=self._checked_indices())
         self._refresh_status()
 
     def _set_status(self, key: str | None = None, **kwargs) -> None:
@@ -255,6 +255,13 @@ class MainWindow(QMainWindow):
         """解析完成的回调：填充列表，失败则弹窗。"""
         self.open_btn.setEnabled(True)
         if abr is None:
+            # 解析失败：清掉上一个文件的列表与预设，否则会出现「文件名是 B、
+            # 列表却还是 A 的笔刷」，切换语言时还会把这些旧预设再灌回来。
+            self._abr = None
+            self._presets = []
+            self.brush_list.clear()
+            self._update_count()
+            self.convert_btn.setEnabled(False)
             self._set_status(None)
             QMessageBox.critical(self, tr("parse_failed"), str(presets))
             return
@@ -275,12 +282,17 @@ class MainWindow(QMainWindow):
         self._set_status("loaded", n=len(presets))
         self.convert_btn.setEnabled(True)
 
-    def _populate(self, presets: list[BrushPreset]) -> None:
-        """把预设填充为列表项（每项一个 BrushItemWidget 卡片）。"""
+    def _populate(self, presets: list[BrushPreset],
+                  checked: set[int] | None = None) -> None:
+        """把预设填充为列表项（每项一个 BrushItemWidget 卡片）。
+
+        checked 为 None 表示全部勾选，否则只勾选给定索引（切换语言重建列表时用）。
+        """
         self.brush_list.clear()
-        for bp in presets:
+        for i, bp in enumerate(presets):
             item = QListWidgetItem()
-            widget = BrushItemWidget(bp)
+            widget = BrushItemWidget(
+                bp, checked=True if checked is None else i in checked)
             item.setSizeHint(widget.sizeHint())
             widget.checkbox.toggled.connect(self._update_count)
             self.brush_list.addItem(item)
@@ -297,12 +309,27 @@ class MainWindow(QMainWindow):
                 selected.append(widget.preset)
         return selected
 
+    def _checked_indices(self) -> set[int]:
+        """当前被勾选的列表索引（重建列表时用于恢复勾选状态）。"""
+        checked: set[int] = set()
+        for i in range(self.brush_list.count()):
+            widget = self.brush_list.itemWidget(self.brush_list.item(i))
+            if widget is not None and widget.checkbox.isChecked():
+                checked.add(i)
+        return checked
+
     def _set_all(self, checked: bool) -> None:
-        """全选 / 全不选。"""
+        """全选 / 全不选。
+
+        每次 setChecked 都会触发 toggled → _update_count（遍历整个列表），
+        N 支笔刷就是 O(N²) 次 itemWidget 查找。这里屏蔽信号，最后统一刷新一次。
+        """
         for i in range(self.brush_list.count()):
             widget = self.brush_list.itemWidget(self.brush_list.item(i))
             if widget is not None:
-                widget.checkbox.setChecked(checked)
+                with QSignalBlocker(widget.checkbox):
+                    widget.checkbox.setChecked(checked)
+        self._update_count()
 
     def _update_count(self) -> None:
         """刷新「共 N 支 · 已选 M 支」计数标签。"""
@@ -362,6 +389,8 @@ class MainWindow(QMainWindow):
         make_standalone = self.radio_kpp.isChecked()
 
         self.convert_btn.setEnabled(False)
+        # 转换期间不允许换文件：否则完成回调会把按钮指向不一致的状态
+        self.open_btn.setEnabled(False)
         self._set_status("converting")
         self._convert_worker = ConvertWorker(self._abr, selected, out_dir,
                                              make_bundle, make_standalone)
@@ -370,7 +399,9 @@ class MainWindow(QMainWindow):
 
     def _on_converted(self, result) -> None:
         """转换完成的回调：显示输出位置，失败则弹错误框。"""
-        self.convert_btn.setEnabled(True)
+        self.open_btn.setEnabled(True)
+        # 只有确实有已加载的预设时才恢复按钮，避免空状态被重新点亮
+        self.convert_btn.setEnabled(self._abr is not None and bool(self._presets))
         if isinstance(result, str):  # 错误信息
             self._set_status(None)
             QMessageBox.critical(self, tr("convert_failed"), result)
@@ -385,6 +416,14 @@ class MainWindow(QMainWindow):
         QMessageBox.information(
             self, tr("done_title"),
             tr("done_body", n=len(r.kpp_files), paths="\n".join(paths)))
+
+
+    def closeEvent(self, event) -> None:
+        """关窗前等待后台线程结束，避免 QThread 在运行中被销毁导致崩溃。"""
+        for worker in (self._parse_worker, self._convert_worker):
+            if worker is not None and worker.isRunning():
+                worker.wait(10000)
+        super().closeEvent(event)
 
 
 def main() -> int:

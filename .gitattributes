@@ -1,6 +1,12 @@
 # 统一文本文件行尾为 LF，避免 Windows/Linux 协作时产生噪音
 * text=auto eol=lf
 
+# Windows 专用脚本必须保留 CRLF：批量文件里的 goto/label 解析、
+# .cmd 双击执行都要求 CRLF，转成 LF 会直接失效。
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
 # 二进制资源
 *.ico binary
 *.png binary

@@ -17,7 +17,9 @@ from xml.sax.saxutils import escape, quoteattr
 MIMETYPE = "application/x-krita-resourcebundle"
 NS_MANIFEST = "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
 NS_META = "urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
-NS_DC = "http://purl.org/dc/elements/1.1"
+NS_OFFICE = "urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+# Dublin Core 的规范 URI 以斜杠结尾，缺斜杠会落到另一个命名空间
+NS_DC = "http://purl.org/dc/elements/1.1/"
 RES_TYPE = "paintoppresets"
 
 
@@ -30,9 +32,12 @@ def _manifest_xml(entries: list[tuple[str, str]]) -> str:
         f'manifest:media-type="{MIMETYPE}"/>',
     ]
     for fname, md5 in entries:
+        # 文件名来自 ABR/用户，属性值必须转义（" & < 会破坏 XML）
+        full_path = f"{RES_TYPE}/{fname}"
         lines.append(
             f'<manifest:file-entry manifest:media-type="{RES_TYPE}" '
-            f'manifest:full-path="{RES_TYPE}/{fname}" manifest:md5sum="{md5}"/>'
+            f'manifest:full-path={quoteattr(full_path)} '
+            f'manifest:md5sum={quoteattr(md5)}/>'
         )
     lines.append("</manifest:manifest>")
     return "".join(lines)
@@ -43,7 +48,9 @@ def _meta_xml(bundle_name: str) -> str:
     name = escape(bundle_name)
     return (
         '<?xml version="1.0" encoding="UTF-8"?>\n'
-        '<office:document-meta>\n'
+        # office: 前缀必须在根元素上声明，否则命名空间感知的解析器
+        # （Krita 的 QDomDocument、xml.etree）会报 unbound prefix
+        f'<office:document-meta xmlns:office="{NS_OFFICE}">\n'
         f'<meta:meta xmlns:meta="{NS_META}" xmlns:dc="{NS_DC}">\n'
         '<meta:generator>brushConverter</meta:generator>\n'
         '<meta:bundle-version>1</meta:bundle-version>\n'

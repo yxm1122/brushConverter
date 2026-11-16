@@ -6,7 +6,10 @@ __pycache__/
 .pytest_cache/
 .venv/
 venv/
-env/
+/env/
+.env
+.env.*
+!.env.example
 
 # ---- PyInstaller 打包产物 ----
 build/
@@ -25,7 +28,8 @@ gimp-utils.c
 gimpbrush-load-2014.c
 
 # ---- 测试样本（商用笔刷素材，体积大，请自备）----
-tests/*.abr
+# 用 ** 递归匹配，样本放进 tests/samples/ 之类的子目录时也不会被误提交
+tests/**/*.abr
 
 # ---- IDE / 编辑器 ----
 .idea/
@@ -40,7 +44,10 @@ tests/*.abr
 .mnemon/
 
 # ---- 测试生成产物 ----
-tests/*.kpp
+tests/**/*.kpp
+
+# ---- 代码审查工具输出 ----
+result.json
 
 # ---- OS ----
 .DS_Store

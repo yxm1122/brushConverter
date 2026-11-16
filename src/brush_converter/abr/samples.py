@@ -123,8 +123,10 @@ def _read_pascal_uuid(data, pos: int) -> str | None:
         text = raw.decode("ascii")
         if all(c in "0123456789abcdefABCDEF-" for c in text):
             return text
-    except Exception:
-        pass
+    except (IndexError, struct.error, UnicodeDecodeError):
+        # 只有「读不出来」这一种预期失败才吞掉；其它异常（如类型错误）
+        # 属于程序缺陷，应当暴露而不是静默丢失 UUID。
+        return None
     return None
 
 
@@ -140,8 +142,14 @@ def _parse_v6(data: memoryview | bytes, section_end: int,
         next_pos = pos + 4 + brush_size + (-brush_size % 4)
         if next_pos > section_end + 3:  # 允许最后一段轻微越界（无填充）
             raise AbrParseError(f"笔刷项长度越界: item@{item_start} size={brush_size}")
-        uuid = _read_pascal_uuid(data, pos + 4)
+        # 头部（skip + 4×i32 + i16 + i8 = skip+19 字节）必须先落在项内，
+        # 否则下面的 unpack_from / 索引会把后面的数据当头部读。
         rect_off = pos + 4 + skip
+        header_end = rect_off + 19
+        if brush_size < skip + 19 or header_end > min(next_pos, section_end):
+            raise AbrParseError(
+                f"笔刷项头部越界: item@{item_start} size={brush_size} skip={skip}")
+        uuid = _read_pascal_uuid(data, pos + 4)
         top, left, bottom, right = struct.unpack_from(">4i", data, rect_off)
         (depth_bits,) = struct.unpack_from(">H", data, rect_off + 16)
         compress = data[rect_off + 18]

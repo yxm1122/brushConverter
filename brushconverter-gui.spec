@@ -4,8 +4,8 @@
 用法（在项目根目录）:
     pyinstaller brushconverter-gui.spec
 
-入口 brushConverter_gui_entry.py 避免了 gui/__main__.py 里的
-sys.path 注入（打包后路径已无效，但保留无害）。
+入口 brushConverter_gui_entry.py 直接调用 gui.main_window.main；
+sys.path 引导现位于 gui/__init__.py（打包后指向不存在的 src/，无害）。
 """
 block_cipher = None
 

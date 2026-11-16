@@ -27,6 +27,13 @@ def rle_decode(buf: memoryview | bytes, expected_size: int, height: int) -> np.n
     -------
     np.ndarray : uint8 一维数组，长度 expected_size
     """
+    # 行长度表本身也可能被截断/伪造：先校验再解包，避免 struct.error
+    # 或 height 异常导致的越界读取。
+    if height <= 0:
+        raise ValueError(f"非法扫描行数: {height}")
+    if len(buf) < height * 2:
+        raise ValueError(
+            f"RLE 行长度表被截断: 需要 {height * 2} 字节, 实际 {len(buf)}")
     counts = struct.unpack_from(f">{height}h", buf, 0)
     offset = height * 2
     out = np.empty(expected_size, dtype=np.uint8)

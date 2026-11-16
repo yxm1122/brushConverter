@@ -32,7 +32,9 @@ def _square_tip(gray: np.ndarray) -> np.ndarray:
     if h == side and w == side:
         return gray
     # ABR/Krita 笔尖蒙版约定 255=白色笔迹（墨），0=透明；
-    # 用白色填充，避免透明边框被 Krita 当作笔尖边界参与尺寸计算。
+    # 用白色填充是刻意的：Krita 对采样笔尖按 PNG 尺寸计算预设大小，
+    # 透明边框会让「预设编辑器显示尺寸」与「实际绘图区大小」不一致。
+    # 2026-08-26 与用户在 Krita 实测确认（白色边框 + 居中），不要改成 0。
     canvas = np.full((side, side), 255, dtype=gray.dtype)
     y = (side - h) // 2
     x = (side - w) // 2
@@ -120,22 +122,27 @@ def _safe_filename(name: str, index: int) -> str:
     return f"{index:03d}_{cleaned}.kpp"
 
 
-def _circle_mask(diameter: float, hardness: float, roundness: float,
+def _circle_mask(hardness: float, roundness: float,
                  size: int = 256) -> np.ndarray:
-    """按直径/硬度/圆度生成一个圆形灰度蒙版（用于计算笔刷预览）。"""
+    """按硬度/圆度生成一个圆形灰度蒙版（用于计算笔刷预览）。
+
+    预览始终把笔尖铺满画布的 90%，与 PS 主直径无关：真实尺寸由预设里
+    auto_brush 的 diameter 决定，缩略图只反映形状与边缘软硬。
+    """
     s = size
     yy, xx = np.mgrid[0:s, 0:s].astype(np.float64)
     cy = cx = (s - 1) / 2.0
-    radius = diameter / 2.0 * (s / max(diameter, 1.0)) * 0.9  # 占画布 90%
-    ratio = roundness / 100.0
+    radius = (s - 1) / 2.0 * 0.9  # 占画布 90%
+    # 圆度可以合法为 0（线状笔尖），除数必须夹住，否则 dist 变成 inf/nan
+    ratio = max(roundness / 100.0, 1e-3)
     dx = (xx - cx) / radius
     dy = (yy - cy) / (radius * ratio)
     dist = np.sqrt(dx * dx + dy * dy)
-    # 硬度 → 边缘软度；硬度 100 = 硬边，0 = 全软
+    # 硬度 → 边缘过渡带占半径的比例（0.02..1）：硬度 100 = 几乎硬边，
+    # 0 = 从中心线性衰减。注意这里不能用 (1-falloff) 之类的混合：
+    # 硬笔刷的 falloff 远大于 1，会把整个圆盘压成一个小点。
     soft = max(0.02, (100.0 - hardness) / 100.0)
-    falloff = 1.0 / (soft * 3.0 + 0.01)
-    mask = np.clip(1.0 - dist, 0.0, 1.0)
-    mask = np.clip(mask * falloff + (1.0 - falloff) * (dist <= 1.0), 0.0, 1.0)
+    mask = np.clip((1.0 - dist) / soft, 0.0, 1.0)
     return (mask * 255.0).astype(np.uint8)
 
 
@@ -169,8 +176,8 @@ def _render_preset(bp: BrushPreset, index: int) -> tuple[str, str, np.ndarray]:
         tip_png = None
         brush_def = _computed_brush_def(bp)
         preview = render_tip_preview(
-            _circle_mask(bp.diameter or 30.0, bp.hardness if bp.hardness is not None else 100.0,
-                         bp.roundness, 256))
+            _circle_mask(bp.hardness if bp.hardness is not None else 100.0,
+                         bp.roundness))
     else:
         # Krita 对非正方形 png_brush 的编辑器尺寸显示存在偏差；
         # 与映射时的 max(width,height) 基准保持一致，内嵌正方形笔尖。
@@ -204,8 +211,11 @@ def convert_presets(abr: AbrFile, presets: list[BrushPreset], out_dir: str,
                     make_bundle: bool = True, make_standalone: bool = True) -> ConvertResult:
     """把给定预设子集转成 .kpp / .bundle。
 
-    make_bundle / make_standalone 至少一个为 True，对应「.bundle」与「.kpp」两种产物。
+    make_bundle / make_standalone 至少一个为 True，对应「.bundle」与「.kpp」两种产物；
+    两者都为 False 时不写任何文件，必须显式报错而不是假装转换成功。
     """
+    if not make_bundle and not make_standalone:
+        raise ValueError("make_bundle 与 make_standalone 至少需要一个为 True")
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
 

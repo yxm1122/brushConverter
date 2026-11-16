@@ -122,12 +122,12 @@ def _dyn(obj: dict[str, D.Value] | None) -> dict[str, float]:
 def _texture_blend_mode(p: dict[str, D.Value]) -> str:
     """取 textureBlendMode 枚举成员（如 'linearHeight'）。
 
-    描述符解析器里 enum 存成 value=类 id('BlnM')、type_id=成员 id，
-    语义值在 type_id 上（与 toolOptions.Md 的 'Nrml' 同理）。
+    描述符解析器里 enum 存成 type_id=类 id('BlnM')、value=成员 id，
+    语义值在 value 上（与 toolOptions.Md 的 'Nrml' 同理）。
     """
     v = p.get("textureBlendMode")
-    if v is not None and v.type == "enum" and isinstance(v.type_id, str):
-        return v.type_id
+    if v is not None and v.type == "enum" and isinstance(v.value, str):
+        return v.value
     return "Mul "
 
 
@@ -137,18 +137,25 @@ def _map_texture(p: dict[str, D.Value],
     tex_obj = D.get_obj(p, "Txtr") or {}
     tex_uuid = D.get_text(tex_obj, "Idnt")
     tex_name = D.get_text(tex_obj, "Nm  ")
-    pat = patterns.get(tex_uuid) if tex_uuid else None
+    # 与采样笔尖一致，按规范化 UUID 匹配 patt 图案
+    pat = patterns.get(_norm_uuid(tex_uuid)) if tex_uuid else None
     tdd = _dyn(D.get_obj(p, "textureDepthDynamics"))
     min_depth = D.get_number(p, "minimumDepth")
+    # 注意：必须按 None 判断缺失，不能用 `or <默认值>`——0 是合法值
+    # （纹理强度 0 = 关闭、缩放 0、间距 0 = 连续笔迹），or 会把它们改成默认值。
+    scale = D.get_number(p, "textureScale")
+    brightness = D.get_number(p, "textureBrightness")
+    contrast = D.get_number(p, "textureContrast")
+    depth = D.get_number(p, "textureDepth")
     return TextureSettings(
         name=tex_name or (getattr(pat, "name", None) or tex_uuid or "texture"),
         uuid=tex_uuid or "",
-        scale=D.get_number(p, "textureScale") or 100.0,
+        scale=100.0 if scale is None else scale,
         invert=D.get_bool(p, "InvT") or False,
-        brightness=int(D.get_number(p, "textureBrightness") or 0),
-        contrast=int(D.get_number(p, "textureContrast") or 0),
-        depth=D.get_number(p, "textureDepth") or 100.0,
-        depth_min=float(tdd.get("Mnm ", min_depth or 0.0)),
+        brightness=int(0 if brightness is None else brightness),
+        contrast=int(0 if contrast is None else contrast),
+        depth=100.0 if depth is None else depth,
+        depth_min=float(tdd.get("Mnm ", 0.0 if min_depth is None else min_depth)),
         pressure=tdd.get("bVTy") == 2,
         blend_mode=_texture_blend_mode(p),
         image=getattr(pat, "image", None),
@@ -164,8 +171,11 @@ def _bvty_sensor(bvty: float | None) -> str | None:
         return "pressure"
     if b in (6, 7):     # 初始方向 / 方向
         return "drawingangle"
-    if b == 3:          # 倾斜
-        return "tilt"
+    # 3=倾斜：Krita 预设的 RotationSensor 只实现了 pressure/drawingangle，
+    # 没有 tilt 分支；返回 None 让上层按「未映射」提示，而不是写一个
+    # 下游不会消费的传感器值（那样旋转效果会被静默丢弃）。
+    if b == 3:
+        return None
     return None         # 0=off, 1=fade, 4=wheel, 5=rotation 暂不映射
 
 
@@ -185,7 +195,10 @@ def map_presets(abr: AbrFile) -> list[BrushPreset]:
     top = D.parse_descriptor_block(abr.sections["desc"].data)
     presets = D.iter_brush_presets(top)
 
-    patterns = getattr(abr, "patterns", None) or {}
+    # 图案 uuid 与 desc 里的 Txtr.Idnt 都做同样的规范化，避免大小写/
+    # NUL 填充差异导致纹理明明存在却报「图案缺失」。
+    patterns = {_norm_uuid(k): v
+                for k, v in (getattr(abr, "patterns", None) or {}).items()}
 
     tip_by_uuid: dict[str, object] = {}
     for t in abr.tips:
@@ -197,7 +210,8 @@ def map_presets(abr: AbrFile) -> list[BrushPreset]:
         name = D.get_text(p, "Nm  ") or D.get_text(p, "name") or "Unnamed"
         brsh = D.get_obj(p, "Brsh") or {}
 
-        spacing = (D.get_number(brsh, "Spcn") or 25.0) / 100.0
+        spcn = D.get_number(brsh, "Spcn")
+        spacing = (25.0 if spcn is None else spcn) / 100.0
         angle = D.get_number(brsh, "Angl") or 0.0
         roundness = D.get_number(brsh, "Rndn")
         roundness = roundness if roundness is not None else 100.0

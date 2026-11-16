@@ -51,6 +51,14 @@ def _text_chunk(keyword: str, text: str) -> bytes:
 
 def render_tip_preview(gray: np.ndarray, size: int = 200) -> np.ndarray:
     """把灰度蒙版（255=墨）渲染为白笔刷在透明底上的 RGBA 预览。"""
+    if gray.ndim != 2:
+        raise ValueError(f"笔尖预览需要二维灰度数组，实际 shape={gray.shape}")
+    if gray.size == 0:
+        raise ValueError("笔尖预览需要非空蒙版")
+    if gray.dtype != np.uint8:
+        raise ValueError(f"笔尖预览必须是 uint8 蒙版，实际 dtype={gray.dtype}")
+    if size <= 0:
+        raise ValueError(f"预览尺寸必须为正: {size}")
     h, w = gray.shape
     scale = min(size / h, size / w)
     nw, nh = max(1, int(w * scale)), max(1, int(h * scale))
@@ -62,12 +70,23 @@ def render_tip_preview(gray: np.ndarray, size: int = 200) -> np.ndarray:
 
 
 def build_kpp(preset_xml: str, preview_rgba: np.ndarray) -> bytes:
-    """构造完整 .kpp 字节。preview_rgba 为 (h, w, 4) uint8 RGBA。"""
-    h, w = preview_rgba.shape[:2]
+    """构造完整 .kpp 字节。preview_rgba 必须为 (h, w, 4) uint8 RGBA。
+
+    IHDR 固定声明 8bit RGBA，因此这里必须校验形状/dtype，否则 float 或
+    RGB 数组会悄悄生成结构损坏的 PNG（Krita 读不出预览）。
+    """
+    preview = np.ascontiguousarray(preview_rgba)
+    if preview.ndim != 3 or preview.shape[2] != 4:
+        raise ValueError(f"预览必须是 (h, w, 4) RGBA，实际 shape={preview.shape}")
+    if preview.dtype != np.uint8:
+        raise ValueError(f"预览必须是 uint8，实际 dtype={preview.dtype}")
+    h, w = preview.shape[:2]
+    if h <= 0 or w <= 0:
+        raise ValueError(f"预览尺寸非法: {w}x{h}")
     out = bytearray()
     out += b"\x89PNG\r\n\x1a\n"
 
-    ihdr = struct.pack(">IIBBBBB", w, h, 8, 6, 0, 0, 0)  # 8bit RGBA
+    ihdr = struct.pack(">IIBBBBB", w, h, 8, 6, 0, 0, 0)  # 8bit RGBA（已校验）
     out += _chunk(b"IHDR", ihdr)
 
     out += _itxt_chunk("preset", preset_xml, compressed=True)
@@ -77,7 +96,7 @@ def build_kpp(preset_xml: str, preview_rgba: np.ndarray) -> bytes:
     raw = bytearray()
     for y in range(h):
         raw.append(0)
-        raw += bytes(preview_rgba[y])
+        raw += preview[y].tobytes()  # 连续 uint8 内存，无需逐元素拷贝
     out += _chunk(b"IDAT", zlib.compress(bytes(raw), 9))
 
     out += _chunk(b"IEND", b"")
