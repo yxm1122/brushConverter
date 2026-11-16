@@ -49,7 +49,7 @@ def cmd_info(args: argparse.Namespace) -> int:
     """打印 ABR 文件的版本、区段与笔尖概况。"""
     abr = AbrFile.parse(args.file)
     print(abr.summary())
-    return 0
+    return 0 if abr.tips else 2
 
 
 def cmd_extract(args: argparse.Namespace) -> int:
@@ -58,6 +58,12 @@ def cmd_extract(args: argparse.Namespace) -> int:
     out_dir = Path(args.output)
     out_dir.mkdir(parents=True, exist_ok=True)
     stem = Path(args.file).stem
+
+    if not abr.tips:
+        print("错误: 未从该文件读取到任何笔刷，无法提取。", file=sys.stderr)
+        for d in abr.diagnostics:
+            print(f"  诊断: {d}", file=sys.stderr)
+        return 2
 
     manifest = []
     for tip in abr.tips:

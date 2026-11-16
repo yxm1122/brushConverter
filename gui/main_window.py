@@ -261,6 +261,17 @@ class MainWindow(QMainWindow):
         self._abr = abr
         self._presets = presets
         self._populate(presets)
+        if not presets:
+            # 解析成功但没读到笔刷：说明格式变体不受支持，必须明确告知
+            # 而不是让用户对着空列表猜（见 issue #1）
+            self._set_status(None)
+            detail = "\n".join(getattr(abr, "diagnostics", []) or [])
+            QMessageBox.warning(
+                self, tr("no_brushes_title"),
+                tr("no_brushes_body", version=f"{abr.version}.{abr.subversion}",
+                   detail=detail or tr("no_brushes_no_detail")))
+            self.convert_btn.setEnabled(False)
+            return
         self._set_status("loaded", n=len(presets))
         self.convert_btn.setEnabled(True)
 

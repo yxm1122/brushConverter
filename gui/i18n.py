@@ -37,6 +37,13 @@ _STRINGS: dict[str, dict[str, str]] = {
         "parsing": "正在解析…",
         "parse_failed": "解析失败",
         "loaded": "已加载 {n} 支笔刷",
+        "no_brushes_title": "没有读到笔刷",
+        "no_brushes_body": (
+            "文件解析成功，但没有找到任何笔刷，因此无法转换。\n\n"
+            "文件版本：{version}\n{detail}\n\n"
+            "这通常说明该文件是不受支持的 ABR 格式变体。"
+            "你可以把该 .abr 反馈到项目的 GitHub issue，以便适配。"),
+        "no_brushes_no_detail": "（无更多结构信息）",
         "select_out_dir": "选择输出目录",
         "hint": "提示",
         "need_select": "请至少勾选一支笔刷。",
@@ -76,6 +83,13 @@ _STRINGS: dict[str, dict[str, str]] = {
         "parsing": "Parsing…",
         "parse_failed": "Parse Failed",
         "loaded": "Loaded {n} brushes",
+        "no_brushes_title": "No Brushes Found",
+        "no_brushes_body": (
+            "The file parsed successfully but contains no brushes, so it cannot be converted.\n\n"
+            "File version: {version}\n{detail}\n\n"
+            "This usually means the file is an unsupported ABR variant. "
+            "Please report the .abr on the project's GitHub issue so support can be added."),
+        "no_brushes_no_detail": "(no further structural details)",
         "select_out_dir": "Select output directory",
         "hint": "Notice",
         "need_select": "Please select at least one brush.",
