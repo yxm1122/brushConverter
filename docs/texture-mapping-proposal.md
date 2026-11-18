@@ -5,11 +5,13 @@
 > 26 项测试通过；映射清单见 `docs/parameter-mapping.md` 第 7 节。
 >
 > 基于真实样本 `tests/海怪笔刷-详情展示的勾线笔套装组18支.abr`（v6.2，20 预设）实测逆向得出。
-> 本方案供确认后再进入实现；实现方式沿用项目惯例：对照 Krita 5.x 官方导出样本 + 真实文件实测校准。
+> **本文的「待确认」状态已于 2026-08-25 结束**：下文的「现状」「待你确认的决策」都是当时的记录，
+> 保留原文以说明决策过程；当前实现口径以 `docs/parameter-mapping.md` §7 为准。
+> 实现方式沿用项目惯例：对照 Krita 5.x 官方导出样本 + 真实文件实测校准。
 
-## 0. 现状
+## 0. 现状（**写本文时的状态，已过时**）
 
-- 当前 `useTexture` 只进 `_collect_warnings`（提示"纹理"未映射），转换时丢弃纹理。
+- 当时 `useTexture` 只进 `_collect_warnings`（提示"纹理"未映射），转换时丢弃纹理。（现已在 v1.1 起完整映射。）
 - 该文件 **9/19 支笔刷**开启纹理（勾线笔×2、针管笔、碳铅、硬铅、软铅、上色笔×2、喷枪等），是最大的未映射项。
 
 ## 1. 已确证的事实（本次实测）
@@ -100,15 +102,15 @@
 | `Txtr.Idnt` | 资源查找 | patt 记录按 UUID 匹配，PNG 内嵌 type="patterns" | ✅ |
 | `Txtr.Nm` + UUID | `Name` / `PatternFileName` | 安全文件名（如 `tex_66e2987f.png`） | ✅ |
 | — | `PatternMD5Sum` | PNG 字节 md5 hex（`PatternMD5` 留空，绕开 Krita 5.0 写二进制 bug） | ✅ |
-| `textureScale` | `Texture/Pattern/Scale` | `textureScale/100`，clamp [0.01, 10] | ✅（数值待实测校准） |
+| `textureScale` | `Texture/Pattern/Scale` | `textureScale/100`，clamp [0.01, 10] | ✅（已按真实笔刷校准） |
 | `textureDepth` | `Texture/Strength/Value` | `textureDepth/100` | ✅ |
 | `textureDepthDynamics.bVTy==2` | `PressureTexture/Strength/` = true + `Texture/Strength/UseCurve` = true | 压感→深度（`Mnm` 为最小值） | ✅ |
 | `textureDepthDynamics.bVTy==0` | `PressureTexture/Strength/` = true + `Texture/Strength/UseCurve` = false | 效果强度开启、无传感器，`Value`=`textureDepth/100` 恒定 | ✅ |
 | `textureDepthDynamics.Mnm` | `Texture/Strength/commonCurve` | `0,{Mnm/100};1,1;`（仅 `bVTy==2`） | ✅ |
 | `InvT` | `Texture/Pattern/Invert` | 直接 | ✅ |
 | `textureBlendMode` | `Texture/Pattern/TexturingMode` | **见下表** | ✅/❓ |
-| `textureBrightness` | `Texture/Pattern/Brightness` | 所有模式统一 `round(0.10-v/250,2)`；clamp [-1,1] | ✅ |
-| `textureContrast` | `Texture/Pattern/Contrast` | 所有模式统一使用 PS 中心因子；+100 极限按 Krita UI clamp [0,2] | ✅ |
+| `textureBrightness` | `Texture/Pattern/Brightness` | **默认 `calibrated`（v1.2.0 起）**：`b_k = (1-k)/(510k) - v/255`（C>=0）或 `(1-k)/(510k) - v/(255k)`（C<0），3 位小数，clamp [-1,1]；历史 `legacy`：所有模式统一 `round(0.10-v/250,2)` | ✅ |
+| `textureContrast` | `Texture/Pattern/Contrast` | 两条路径共用 PS 中心因子（`C<0→1+C/100`、`C>=0→1/(1-C/100)`），按 Krita UI clamp [0,2] | ✅ |
 | `TxtC` / `interpretation` / `protectTexture` | — | Krita 无对应，忽略并保留轻量警告 | ⚠️ |
 
 ### 2.1 混合模式映射表（Photoshop → Krita TexturingMode）
@@ -125,7 +127,7 @@
 
 > 已根据 Krita `KisTextureOptionData.h` 核对完整枚举：Photoshop 专用模式为 Hard Mix=10、Hard Mix Softer=11、Height=14、Linear Height=15。
 
-### 2.2 亮/对比度校准策略（沿用散布 ÷400 的做法）
+### 2.2 亮/对比度校准策略（沿用散布 ÷400 的做法；**公式已于 v1.2.0 更新为 calibrated**）
 
 - 已按 Krita `KisTextureMaskInfo::recalculateMask()` 源码与 Photoshop 定量测试改为最终合成匹配公式：所有模式统一——brightness=`round(0.10-v/250,2)`，contrast 负值=`1+v/100`、正值=`1/(1-v/100)`（round 两位并 clamp [0,2]）。Linear Height (Photoshop) 的特殊映射（0.30 基线/对比度倒数）实测效果不好，2026-08-27 确认取消。
 - 中性值必须保守：PS 0/0 → Krita 0/1（Krita 官方样本的中性默认）。
@@ -159,7 +161,7 @@
 - 转换后：9 支纹理笔刷的 .kpp 内含 1920×1920 纹理 PNG（体积会增大，预计每支 +1~3MB）；`.bundle` 一键导入。
 - **需你在 Krita 实测**：纹理是否出现并生效、缩放/深度/反相/亮度/对比度/混合模式是否接近 PS 原笔刷；1×1 中性纹理（勾线笔）在 Krita 中应表现为近似无纹理效果（符合 PS 中的表现）。
 
-## 5. 待你确认的决策
+## 5. 待你确认的决策（**2026-08-25 已全部按推荐方案确认并落地**）
 
 1. **纹理资源嵌入格式**：PNG 内嵌（type="patterns"，与 Krita 5.0 官方样本一致）——推荐；还是转成 GIMP .pat？
 2. **混合模式**：按 2.1 表映射 + 未知回退 Multiply 并警告——推荐；还是未知一律 Multiply 不警告？

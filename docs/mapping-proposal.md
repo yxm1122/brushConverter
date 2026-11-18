@@ -1,7 +1,11 @@
-# ABR → Krita 参数映射方案（待确认）
+# ABR → Krita 参数映射方案（历史方案，已被取代）
 
+> **历史文档**：本文是 v1.1 之前的初版方案（2026-08-24 等待确认）。它当时提出的结构大部分已落地，
+> 但其结论已被 [`parameter-mapping.md`](parameter-mapping.md) 取代——**当前逐字段映射清单以该文件为准，
+> 不要按本文实现**。保留本文只为留存决策过程与当时的实测事实。
+>
 > 基于真实样本 `海怪笔刷…18支.abr`（v6.2，20 个预设：14 采样 + 6 计算）解析得出。
-> 本方案供确认后再进入实现。
+> 本方案供确认后再进入实现（**该「待确认」状态已结束**，确认与实现结果见 `texture-mapping-proposal.md` 与 `parameter-mapping.md`）。
 
 ## 0. 已确证的事实
 
@@ -32,16 +36,16 @@
 | `angleDynamics` / `roundnessDynamics` | Rotation / ratio 动态 | 含 jitter |
 | `prVr`（压力→？） | Pressure 传感器 | 按变量类型 bVTy 判断 |
 
-### 第三档 · 跳过或标注（引擎差异大，默认不做）
+### 第三档 · 跳过或标注（**历史判断：其中纹理与散布后来已实现，本档已过时**）
 | ABR 键 | 跳过原因 |
 |--------|----------|
-| `useTexture` + `patt` 区 | Krita 纹理引擎不同；patt 可另存为 Krita pattern，但纹理映射复杂 |
+| `useTexture` + `patt` 区 | ~~Krita 纹理引擎不同；patt 可另存为 Krita pattern，但纹理映射复杂~~ **已推翻：v1.1 起纹理已完整映射，见 `parameter-mapping.md` §7** |
 | `dualBrush`（双笔刷） | Krita 是 masking brush 机制，语义不同 |
 | `useColorDynamics`（H/Strt/Brgh/purity） | 颜色动态两软件模型差异大 |
-| `useScatter`（散布） | Krita 有基于 spacing 的散布，可近似但默认不做 |
+| `useScatter`（散布） | ~~Krita 有基于 spacing 的散布，可近似但默认不做~~ **已推翻：散布早已映射，见 `parameter-mapping.md` §5** |
 | 计算笔刷（无位图） | **见决策 3** |
 
-## 2. 待你确认的 4 个决策
+## 2. 当时待确认的 4 个决策（**均已在后续版本落地**）
 
 1. **直径 `Dmtr` 如何处理？**（影响笔刷在 Krita 里的实际渲染大小）
 2. **动态映射做到哪一档？**
@@ -49,3 +53,7 @@
 4. **交付形态？**
 
 （详见聊天里的选项）
+
+> **后续处置（历史记录）**：4 项均已落地并写进 `parameter-mapping.md`——
+> ① 直径 → `scale = Dmtr / max(笔尖宽, 笔尖高)`（§1）；② 动态 → 第一、二档全部实现（§3、§4）；
+> ③ 计算笔刷 → Krita `auto_brush`（§2）；④ 交付形态 → `.kpp` + `.bundle` 双形态（README「转换说明」）。

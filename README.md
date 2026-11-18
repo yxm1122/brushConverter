@@ -10,7 +10,7 @@ Photoshop 笔刷（`.abr`）转 Krita 笔刷（`.kpp` / `.bundle`）工具，支
 
 ![GUI 截图](docs/screenshot-gui.png)
 
-打开 .abr → 预览每支笔尖缩略图与名称 → 勾选要转换的笔刷（支持全选/全不选）→ 选择产物格式（`.kpp` 每支一个文件，或 `.bundle` Krita 资源包）→ 选择输出目录 → 点击"开始转换"。含未映射参数（双笔刷/颜色动态/湿边等）的笔刷会有 ⚠ 标注，转换时会先弹窗提醒确认。纹理（`patt`）已支持；使用纹理的笔刷在转换前会提示"亮度/对比度为经验映射"，建议在 Krita 中手动微调。右上角可随时切换界面语言（中文 / English）。
+打开 .abr → 预览每支笔尖缩略图与名称 → 勾选要转换的笔刷（支持全选/全不选）→ 选择产物格式（`.kpp` 每支一个文件，或 `.bundle` Krita 资源包）→ 选择输出目录 → 点击"开始转换"。含未映射参数（双笔刷/颜色动态/湿边等）的笔刷会有 ⚠ 标注，转换时会先弹窗提醒确认。纹理（`patt`）已支持；使用纹理的笔刷在转换前会弹窗说明「纹理亮度/对比度已按 Photoshop 公式校准（calibrated 方案，v1.2.0 起默认）」，并列出仍存在的结构性限制。右上角可随时切换界面语言（中文 / English）。
 
 下载 `brushConverter-*-win64.zip`（见 [releases](https://github.com/yxm1122/brushConverter/releases)），解压后双击 `brushConverter.exe` 即可使用。
 
@@ -59,7 +59,7 @@ pyinstaller brushconverter-gui.spec    # → dist/brushConverter/brushConverter.
 - 勾选要转换的笔刷（支持全选/全不选）；
 - 产物可选 `.kpp`（每支一个文件）或 `.bundle`（Krita 资源包）；
 - 含双笔刷/颜色动态/湿边等无法映射参数的笔刷会弹出提醒（纹理已支持映射）；
-- 使用纹理的笔刷在转换前提示：纹理亮度/对比度为经验映射，可能不够准确，需在 Krita 手动微调；
+- 使用纹理的笔刷在转换前提示：纹理亮度/对比度已按 Photoshop 公式校准（calibrated 默认），并说明仍存在的结构性限制（PS 对比度 > 50、PS 深度 > 83% 等）；
 - 右上角语言切换（中文 / English），选择会记住（QSettings）。
 
 ## 转换说明
@@ -68,6 +68,7 @@ pyinstaller brushconverter-gui.spec    # → dist/brushConverter/brushConverter.
 - 参数映射见 `docs/parameter-mapping.md`（完整清单）。
 - 交付物：Krita 5.x 资源包 `.bundle`（一键导入）+ 自包含 `.kpp`（笔尖 base64 内嵌）。
 - 纹理（ABR `patt`）已支持：PNG 内嵌 + 缩放/深度（可随压感）/反相/混合模式/亮度/对比度映射。
+  亮度/对比度默认使用 calibrated 公式（v1.2.0 起，同引擎掩码空间差异 0.00%，见 `docs/parameter-mapping.md` §7.1）；需要 v1.1.2 旧行为时，转换前设置环境变量 `BRUSHCONVERTER_TEXTURE_FORMULA=legacy` 即可回退。
 - 双笔刷、颜色动态、湿边等暂不映射（引擎差异大）。
 - 想了解实现原理与开发中踩过的坑，见 `docs/developer-guide.md`。
 

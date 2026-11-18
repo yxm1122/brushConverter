@@ -17,7 +17,8 @@
    │  AbrFile.parse()          —— 拆 8BIM 区段
    ├─ samp 区 → 采样笔尖位图（BrushTip）
    ├─ desc 区 → 笔刷参数描述符（Descriptor）
-   └─ patt / phry → （暂不用：纹理 / 缩略图）
+   ├─ patt 区 → 纹理图案（v1.1 起已映射，PNG base64 内嵌）
+   └─ phry 区 → 缩略图（忽略）
    │
    │  map_presets()            —— 参数映射
    ▼
@@ -76,7 +77,7 @@ ABR 有两个时代：
 |----------|------|----------------|
 | `samp` | 采样笔尖位图（RLE 压缩灰度） | ✅ 提取笔尖 |
 | `desc` | 笔刷参数描述符 | ✅ 参数映射 |
-| `patt` | 纹理图案 | ⛔ 暂不映射（引擎差异大） |
+| `patt` | 纹理图案 | ✅ 提取并内嵌（`type="patterns"`） |
 | `phry` | 缩略图 | ⛔ 忽略 |
 
 每个 8BIM 块 = `8BIM`(4B) + key(4B) + length(4B, 大端) + 数据 + 4 字节对齐填充（**最后一段可能没有填充**）。
@@ -172,6 +173,7 @@ Record = u32 len | 记录体（len 字节） | pad 到 4
 | 压感→宽高比 | `roundnessDynamics` + `minimumRoundness` | `RatiocommonCurve` |
 | 旋转 | `angleDynamics.bVTy` | `RotationSensor`（drawingangle/pressure） |
 | 散布 | `useScatter` + `scatterDynamics.jitter` | `PressureScatter` + `ScatterValue` |
+| 纹理 | `useTexture` + `Txtr.Idnt` + `textureScale/Depth/BlendMode/InvT/Brightness/Contrast` | `Texture/Pattern/*` + `Texture/Strength/*`（逐项见 `parameter-mapping.md` §7） |
 
 **控制源编码（bVTy）**：0=关、1=渐隐、2=压力、3=倾斜、4=转轮、5=旋转、6/7=初始方向/方向。当前映射到 Krita 传感器：pressure（bVTy=2）、drawingangle（bVTy=6/7，随笔迹方向）；bVTy=1/3/4/5 未映射（若 jitter>0 会在 GUI 提示「旋转控制源未映射」）。对于方向旋转，Photoshop `angleDynamics.jitter` 映射到 Krita `RotationValue`（效果强度，jitter/100），`fuzzy` 与 `fuzzystroke` 随机度曲线在 UI 中对应 -180°..+180°，但 XML 使用归一化坐标，完整范围写为 `0,0;1,1;`。bVTy=0（控制=关）但 jitter>0 时是纯随机角度抖动：旋转选项仍需开启（`PressureRotation=true`），使用只有 fuzzy/fuzzystroke 的传感器（不含 drawingangle），`RotationValue=jitter/100`。
 
@@ -242,7 +244,9 @@ PS 纹理深度无论是否接传感器都要设为 `true`；深度随压感（`
 - **`PatternMD5Sum` 存 hex md5**；`PatternMD5` 留空——Krita 5.0 曾在该字段写原始
   二进制导致非法 XML（Krita 官方 MR 修复），新版本以 `PatternMD5Sum` 为准。
 - `TexturingMode` 数值来自 Krita `KisTextureOptionData::TexturingMode`：Multiply=0、Subtract=1、Lightness=2、Gradient=3、Darken=4、Overlay=5、Color Dodge=6、Color Burn=7、Linear Dodge=8、Linear Burn=9、Hard Mix (Photoshop)=10、Hard Mix Softer (Photoshop)=11、Height=12、Linear Height=13、Height (Photoshop)=14、Linear Height (Photoshop)=15。ABR 的 `linearHeight` 优先映射到 15，避免误落到 Darken=4。
-- 亮/对比度换算依据 Krita `KisTextureMaskInfo::recalculateMask()` 与 Photoshop/Krita 对照：所有模式统一——亮度使用 `round(0.10-v/250,2)`，对比度使用 Photoshop 中心因子（`C<0→1+C/100`、`C>=0→1/(1-C/100)`）；最终统一 clamp 到 Krita UI 范围（亮度 [-1,1]、对比度 [0,2]）。Linear Height (Photoshop) 曾使用 0.30 基线与对比度倒数的特殊映射，实测效果不好，2026-08-27 确认取消。源码快照与来源链接见 `research/krita_texture/` 和 `research/README.md`。
+- 亮/对比度换算依据 Krita `KisTextureMaskInfo::recalculateMask()` 与 Photoshop/Krita 对照。**默认公式为 `calibrated`（v1.2.0 起，任务 12 拟合 + 任务 13 转正）**：对比度 `c_k = k`（PS 中心因子，`C<0→1+C/100`、`C>=0→1/(1-C/100)`）；亮度 `b_k = (1-k)/(510k) - v/255`（C>=0）或 `(1-k)/(510k) - v/(255k)`（C<0）；保留 3 位小数，最终 clamp 到 Krita UI 范围（亮度 [-1,1]、对比度 [0,2]）。掩码空间 A/B：`calibrated` 0.00% vs 旧公式 70.75%。
+  历史方案（`legacy`，v1.1.2 行为，可用环境变量回退）：所有模式统一亮度 `round(0.10-v/250,2)`，对比度用同一 PS 中心因子并 round 两位。开关与回退命令见 `parameter-mapping.md` §7.1。
+  Linear Height (Photoshop) 曾使用 0.30 基线与对比度倒数的特殊映射，实测效果不好，2026-08-27 确认取消。源码快照与来源链接见 `research/krita_texture/` 和 `research/README.md`。
 
 ### 5.4 bundle 结构
 
@@ -294,6 +298,25 @@ paintoppresets/*.kpp          自包含笔刷预设
 
 18. **PyInstaller 重打包时先手动清旧产物**。某些沙箱环境的安全删除 shim 会拦截 PyInstaller `--clean`/`--noconfirm` 内部的 `shutil.rmtree`（报 `SAFE_DELETE_FAIL_CLOSED`），解法是先 `rm -rf dist/ build/` 再打包、且不加 `--clean`。
 19. **Git Credential Manager 的 token 获取不稳定**。无 `gh`/无 PAT 时，可用 `git credential fill` 从 GCM 取 OAuth token 调 REST API 发布 release，但每次新 shell 常失败，需先 `git ls-remote`（或 push）触发凭据刷新，再**同一命令里**立即 fill + 使用。
+
+### 7.5 渲染验证与公式开关层面（v1.2.0 新增）
+
+20. **Krita 5.3.3 的 `kritarunner` 无头路线不能落笔，真实渲染必须走「GUI 路线 A」，且必须串行**。
+    `kritarunner` 能建文档、能读资源库（137 个预设），但 `Window.addView()` 必崩（退出码 `-1073741819` = `0xC0000005`，probe 3/3 复现）；
+    `Node.paintLine()` 依赖「当前主窗口 → 当前视图」，无视图即访问违例；且它的 Python API 只能按资源库选预设，
+    **没有「按 `.kpp` 路径加载预设」的接口**。所以真实渲染走路线 A：临时装 PyKrita 启动插件 + 临时改 `kritarc` +
+    把 `.kpp` 临时复制进 `paintoppresets/` → 启动 `krita.com --nosplash` → 插件 `addView`/`paintLine` 落笔 → 导出 PNG →
+    `finally` 还原配置。代价：需要交互式桌面会话、单支 11–14 秒，且**同一时刻只能跑一个渲染**（共用 `kritarc` 与插件目录；
+    上一轮 `krita.exe` 没退干净会让新实例秒退或插件不加载，任务 06 已用「等残留退出 + 清理残留 + 失败重试一次」兜底）。
+    判成败**不看退出码**（kritarunner 不透传，实测恒 0），看结果 JSON + PNG 产物 + Alpha 非零像素 > 0。
+    证据：`docs/验收报告/04-报告.md`、`docs/验收报告/06-报告.md`、`docs/研究报告/krita-runner-可行性.md`。
+
+21. **纹理亮度/对比度有环境变量开关 `BRUSHCONVERTER_TEXTURE_FORMULA`，默认 `calibrated`，回退用 `legacy`**。
+    v1.2.0 起默认公式已从 v1.1.2 的经验公式（legacy）切到按 Photoshop 公式反解的 calibrated；两条路径都保留在
+    `preset_xml.py`，选择集中在 `_texture_formula()`；非法取值回退默认公式并向 stderr 打印一次警告。回退命令
+    （GUI 同理：启动 GUI 前设同一环境变量）：`BRUSHCONVERTER_TEXTURE_FORMULA=legacy python cli.py convert tests/测试用.abr -o converted`。
+    **改默认值会改变产物字节**：默认路径下 15/25 个 `.kpp` 与 v1.1.2 不同（恰为 15 支带纹理笔刷），显式 `legacy` 下 25/25 与 v1.1.2 的 sha256 全同。
+    回归用例 `tests/test_texture_formula_switch.py` 同时断言两条路径的具体数值。公式、A/B 数字与 7 条局限见 `docs/parameter-mapping.md` §7.1 与 `docs/验收报告/13-报告.md`。
 
 ## 8. 参考实现与样本
 
