@@ -1,0 +1,1112 @@
+[
+  {
+    "section": ".rdata",
+    "va": "0x148469b70",
+    "file_offset": 138838896,
+    "text": "blend_mode"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a5268",
+    "file_offset": 140130920,
+    "text": "blend_normal"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a5278",
+    "file_offset": 140130936,
+    "text": "blend_darken"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a5288",
+    "file_offset": 140130952,
+    "text": "blend_lighten"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a5298",
+    "file_offset": 140130968,
+    "text": "blend_hue"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a52a8",
+    "file_offset": 140130984,
+    "text": "blend_saturation"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a52c0",
+    "file_offset": 140131008,
+    "text": "blend_color"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a52d0",
+    "file_offset": 140131024,
+    "text": "blend_luminosity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a52e8",
+    "file_offset": 140131048,
+    "text": "blend_multiply"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a52f8",
+    "file_offset": 140131064,
+    "text": "blend_screen"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a5308",
+    "file_offset": 140131080,
+    "text": "blend_dissolve"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a5318",
+    "file_offset": 140131096,
+    "text": "blend_dodge_s"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a5328",
+    "file_offset": 140131112,
+    "text": "blend_dodge_m"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a5338",
+    "file_offset": 140131128,
+    "text": "blend_dodge_h"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a5348",
+    "file_offset": 140131144,
+    "text": "blend_burn_in_s"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a5358",
+    "file_offset": 140131160,
+    "text": "blend_burn_in_m"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a5368",
+    "file_offset": 140131176,
+    "text": "blend_burn_in_h"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a5378",
+    "file_offset": 140131192,
+    "text": "blend_clear"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a5388",
+    "file_offset": 140131208,
+    "text": "blend_overlay"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a5398",
+    "file_offset": 140131224,
+    "text": "blend_hard_light"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a53b0",
+    "file_offset": 140131248,
+    "text": "blend_soft_light"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a53c8",
+    "file_offset": 140131272,
+    "text": "blend_desaturate"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a53e0",
+    "file_offset": 140131296,
+    "text": "blend_saturate"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a53f0",
+    "file_offset": 140131312,
+    "text": "blend_revert"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a5400",
+    "file_offset": 140131328,
+    "text": "blend_difference"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a5418",
+    "file_offset": 140131352,
+    "text": "blend_exclusion"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a5428",
+    "file_offset": 140131368,
+    "text": "blend_color_dodge"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a5440",
+    "file_offset": 140131392,
+    "text": "blend_color_burn"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a5458",
+    "file_offset": 140131416,
+    "text": "blend_test_hook"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a5468",
+    "file_offset": 140131432,
+    "text": "blend_behind"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a5478",
+    "file_offset": 140131448,
+    "text": "blend_pass_through"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a5490",
+    "file_offset": 140131472,
+    "text": "blend_linear_dodge"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a54a8",
+    "file_offset": 140131496,
+    "text": "blend_linear_burn"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a54c0",
+    "file_offset": 140131520,
+    "text": "blend_linear_light"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a54d8",
+    "file_offset": 140131544,
+    "text": "blend_vivid_light"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a54f0",
+    "file_offset": 140131568,
+    "text": "blend_pin_light"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a5500",
+    "file_offset": 140131584,
+    "text": "blend_hard_mix"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a5510",
+    "file_offset": 140131600,
+    "text": "blend_custom_table"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a5528",
+    "file_offset": 140131624,
+    "text": "blend_threshold"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a5538",
+    "file_offset": 140131640,
+    "text": "blend_add"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a5548",
+    "file_offset": 140131656,
+    "text": "blend_subtract"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a5558",
+    "file_offset": 140131672,
+    "text": "blend_height"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a5568",
+    "file_offset": 140131688,
+    "text": "blend_linear_height"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a5580",
+    "file_offset": 140131712,
+    "text": "blend_lighter_color"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a5598",
+    "file_offset": 140131736,
+    "text": "blend_darker_color"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a55b0",
+    "file_offset": 140131760,
+    "text": "blend_dodge_s_x"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a55c0",
+    "file_offset": 140131776,
+    "text": "blend_dodge_m_x"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a55d0",
+    "file_offset": 140131792,
+    "text": "blend_dodge_h_x"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a55e0",
+    "file_offset": 140131808,
+    "text": "blend_burn_in_s_x"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a55f8",
+    "file_offset": 140131832,
+    "text": "blend_burn_in_m_x"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a5610",
+    "file_offset": 140131856,
+    "text": "blend_burn_in_h_x"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a5628",
+    "file_offset": 140131880,
+    "text": "blend_increase_vibrance"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a5640",
+    "file_offset": 140131904,
+    "text": "blend_decrease_vibrance"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a5658",
+    "file_offset": 140131928,
+    "text": "blend_dividing_line"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a5670",
+    "file_offset": 140131952,
+    "text": "blend_subtraction"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485a5688",
+    "file_offset": 140131976,
+    "text": "blend_divide"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485dfbe8",
+    "file_offset": 140370920,
+    "text": "blend_mode_signature"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148a301c0",
+    "file_offset": 144894400,
+    "text": "blend_paint_data"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7d858",
+    "file_offset": 148357208,
+    "text": "blend_support_multiply"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7d870",
+    "file_offset": 148357232,
+    "text": "blend_support_screen"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7d888",
+    "file_offset": 148357256,
+    "text": "blend_support_overlay"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7d8a0",
+    "file_offset": 148357280,
+    "text": "blend_support_darken"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7d8b8",
+    "file_offset": 148357304,
+    "text": "blend_support_lighten"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7d8d0",
+    "file_offset": 148357328,
+    "text": "blend_support_colordodge"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7d8f0",
+    "file_offset": 148357360,
+    "text": "blend_support_colorburn"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7d908",
+    "file_offset": 148357384,
+    "text": "blend_support_hardlight"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7d920",
+    "file_offset": 148357408,
+    "text": "blend_support_softlight"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7d938",
+    "file_offset": 148357432,
+    "text": "blend_support_difference"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7d958",
+    "file_offset": 148357464,
+    "text": "blend_support_exclusion"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7d970",
+    "file_offset": 148357488,
+    "text": "blend_support_hsl_hue"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7d988",
+    "file_offset": 148357512,
+    "text": "blend_support_hsl_saturation"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7d9a8",
+    "file_offset": 148357544,
+    "text": "blend_support_hsl_color"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7d9c0",
+    "file_offset": 148357568,
+    "text": "blend_support_hsl_luminosity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7d9e0",
+    "file_offset": 148357600,
+    "text": "blend_support_all_equations"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d89bf8",
+    "file_offset": 148407288,
+    "text": "blend_support"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1495b5800",
+    "file_offset": 156975104,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1495c88c0",
+    "file_offset": 157053120,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1495dc140",
+    "file_offset": 157133120,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1495ee880",
+    "file_offset": 157208704,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149609820",
+    "file_offset": 157319200,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149621f20",
+    "file_offset": 157419296,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1496341e0",
+    "file_offset": 157493728,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149645360",
+    "file_offset": 157563744,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14965c580",
+    "file_offset": 157658496,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149671580",
+    "file_offset": 157744512,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1496843a0",
+    "file_offset": 157821856,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1496960c0",
+    "file_offset": 157894848,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1496a9760",
+    "file_offset": 157974368,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1496bbcc0",
+    "file_offset": 158049472,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1496cfbc0",
+    "file_offset": 158131136,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1496e2a20",
+    "file_offset": 158208544,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1496f7240",
+    "file_offset": 158292544,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14970a9e0",
+    "file_offset": 158372320,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14971edc0",
+    "file_offset": 158455232,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149732100",
+    "file_offset": 158533888,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1497564e0",
+    "file_offset": 158682336,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1497784c0",
+    "file_offset": 158821568,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14978a860",
+    "file_offset": 158896224,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14979bac0",
+    "file_offset": 158966464,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1497b2960",
+    "file_offset": 159060320,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1497c75c0",
+    "file_offset": 159145408,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1497d9ea0",
+    "file_offset": 159221408,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1497eb620",
+    "file_offset": 159292960,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1497fdbe0",
+    "file_offset": 159368160,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14980f060",
+    "file_offset": 159438944,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149823e20",
+    "file_offset": 159524384,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149837b40",
+    "file_offset": 159605568,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149850a60",
+    "file_offset": 159707744,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149867ae0",
+    "file_offset": 159802080,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14987a660",
+    "file_offset": 159878752,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14988c0a0",
+    "file_offset": 159951008,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1498a4540",
+    "file_offset": 160050496,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1498bb9c0",
+    "file_offset": 160145856,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1498d0540",
+    "file_offset": 160230720,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1498e3f60",
+    "file_offset": 160311136,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1498f97c0",
+    "file_offset": 160399296,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14990df80",
+    "file_offset": 160483200,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14992e8c0",
+    "file_offset": 160616640,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14994d3c0",
+    "file_offset": 160742336,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1499602a0",
+    "file_offset": 160819872,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149972040",
+    "file_offset": 160892992,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14998a780",
+    "file_offset": 160993152,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1499a1e20",
+    "file_offset": 161089056,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1499b4b20",
+    "file_offset": 161166112,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1499c66c0",
+    "file_offset": 161238720,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1499d96e0",
+    "file_offset": 161316576,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1499eb640",
+    "file_offset": 161390144,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149a06440",
+    "file_offset": 161500224,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149a201a0",
+    "file_offset": 161606048,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149a3d5c0",
+    "file_offset": 161725888,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149a5a0a0",
+    "file_offset": 161843360,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149a7a4e0",
+    "file_offset": 161975520,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149a99d00",
+    "file_offset": 162104576,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149ab97e0",
+    "file_offset": 162234336,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149ad86a0",
+    "file_offset": 162360992,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149aff720",
+    "file_offset": 162520864,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149b24320",
+    "file_offset": 162671392,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149b42f80",
+    "file_offset": 162797440,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149b60fa0",
+    "file_offset": 162920352,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149b84560",
+    "file_offset": 163065184,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149ba5d40",
+    "file_offset": 163202368,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149bc5440",
+    "file_offset": 163331136,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149be3f20",
+    "file_offset": 163456800,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149c037c0",
+    "file_offset": 163585984,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149c22440",
+    "file_offset": 163712064,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149c42e00",
+    "file_offset": 163845632,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149c62ba0",
+    "file_offset": 163976096,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149c836a0",
+    "file_offset": 164109984,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149ca3580",
+    "file_offset": 164240768,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149cc3f60",
+    "file_offset": 164374368,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149ce3d20",
+    "file_offset": 164504864,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149d15ac0",
+    "file_offset": 164709056,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149d458c0",
+    "file_offset": 164905152,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149d642e0",
+    "file_offset": 165030624,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149d820e0",
+    "file_offset": 165152992,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149da54a0",
+    "file_offset": 165297312,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149dc6900",
+    "file_offset": 165433600,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149de5700",
+    "file_offset": 165560064,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149e038c0",
+    "file_offset": 165683392,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149e22600",
+    "file_offset": 165809664,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149e40720",
+    "file_offset": 165932832,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149e61d00",
+    "file_offset": 166069504,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149e826c0",
+    "file_offset": 166203072,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149ea9620",
+    "file_offset": 166362656,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149ecec60",
+    "file_offset": 166515808,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149eedb00",
+    "file_offset": 166642432,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149f0bd60",
+    "file_offset": 166765920,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149f28fa0",
+    "file_offset": 166885280,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149f455a0",
+    "file_offset": 167001504,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149f66360",
+    "file_offset": 167136096,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149f86500",
+    "file_offset": 167267584,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149fa8560",
+    "file_offset": 167406944,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149fc99a0",
+    "file_offset": 167543200,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x149ff8120",
+    "file_offset": 167733536,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14a025020",
+    "file_offset": 167917600,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14a044200",
+    "file_offset": 168045056,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14a0627a0",
+    "file_offset": 168169376,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14a086f60",
+    "file_offset": 168318816,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14a0aab00",
+    "file_offset": 168465152,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14a0c9d40",
+    "file_offset": 168592704,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14a0e8340",
+    "file_offset": 168717120,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14a108320",
+    "file_offset": 168848160,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14a1276c0",
+    "file_offset": 168976064,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14a14e660",
+    "file_offset": 169135712,
+    "text": "blend_opacity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14a1749a0",
+    "file_offset": 169292192,
+    "text": "blend_opacity"
+  }
+]

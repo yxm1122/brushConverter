@@ -1,0 +1,1 @@
+step14|phase=painted|b=0|c=0|d=100|m=Sbtr|rb_b=0|rb_c=0|rb_d=100|rb_mode=subtract

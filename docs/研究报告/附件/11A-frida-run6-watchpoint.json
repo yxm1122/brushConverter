@@ -1,0 +1,44 @@
+[
+ {
+  "script_id": "59bb040a-ed98-43b7-addb-dbe64d08c80a",
+  "type": "send",
+  "payload": {
+   "t": "armed",
+   "base": "0x7ff672020000",
+   "hooks": [
+    "H1-entry@0x1a939d5"
+   ],
+   "mode": "MemoryAccessMonitor"
+  }
+ },
+ {
+  "script_id": "59bb040a-ed98-43b7-addb-dbe64d08c80a",
+  "type": "send",
+  "payload": {
+   "t": "H1-first",
+   "struct": "0x21b764ccdc0",
+   "page": "0x21b764cc000"
+  }
+ },
+ {
+  "script_id": "59bb040a-ed98-43b7-addb-dbe64d08c80a",
+  "type": "send",
+  "payload": {
+   "t": "watch-armed",
+   "page": "0x21b764cc000",
+   "window_ms": 3000
+  }
+ },
+ {
+  "script_id": "59bb040a-ed98-43b7-addb-dbe64d08c80a",
+  "type": "send",
+  "payload": {
+   "t": "watch-result",
+   "why": "timeout",
+   "struct": "0x21b764ccdc0",
+   "totalAccesses": 0,
+   "distinctSites": 0,
+   "sites": []
+  }
+ }
+]

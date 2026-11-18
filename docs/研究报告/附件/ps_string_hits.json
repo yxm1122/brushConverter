@@ -1,0 +1,234 @@
+{
+  "pe": {
+    "path": "<LOCAL_APP_DIR>/PS2025/Adobe Photoshop 2025/Photoshop.exe",
+    "file_size": 208456176,
+    "image_base": "0x140000000",
+    "pe_magic": "0x20b",
+    "machine": "0x8664",
+    "num_sections": 9,
+    "size_of_image": 218800128,
+    "entry_point_rva": "0x2a04d30",
+    "export_rva": "0xb1aa900",
+    "export_size": 104544,
+    "sections": [
+      {
+        "name": ".text",
+        "va": "0x1000",
+        "vsize": 136037140,
+        "raw_ptr": 1024,
+        "raw_size": 136037376,
+        "executable": true
+      },
+      {
+        "name": ".rdata",
+        "va": "0x81be000",
+        "vsize": 50608082,
+        "raw_ptr": 136038400,
+        "raw_size": 50608128,
+        "executable": false
+      },
+      {
+        "name": ".data",
+        "va": "0xb202000",
+        "vsize": 15536048,
+        "raw_ptr": 186646528,
+        "raw_size": 5202944,
+        "executable": false
+      },
+      {
+        "name": ".pdata",
+        "va": "0xc0d3000",
+        "vsize": 5258124,
+        "raw_ptr": 191849472,
+        "raw_size": 5258240,
+        "executable": false
+      },
+      {
+        "name": ".didat",
+        "va": "0xc5d7000",
+        "vsize": 4976,
+        "raw_ptr": 197107712,
+        "raw_size": 5120,
+        "executable": false
+      },
+      {
+        "name": ".itt_not",
+        "va": "0xc5d9000",
+        "vsize": 1154,
+        "raw_ptr": 197112832,
+        "raw_size": 1536,
+        "executable": false
+      },
+      {
+        "name": "_RDATA",
+        "va": "0xc5da000",
+        "vsize": 304,
+        "raw_ptr": 197114368,
+        "raw_size": 512,
+        "executable": false
+      },
+      {
+        "name": ".rsrc",
+        "va": "0xc5db000",
+        "vsize": 9910240,
+        "raw_ptr": 197114880,
+        "raw_size": 9910272,
+        "executable": false
+      },
+      {
+        "name": ".reloc",
+        "va": "0xcf4f000",
+        "vsize": 1420152,
+        "raw_ptr": 207025152,
+        "raw_size": 1420288,
+        "executable": false
+      }
+    ]
+  },
+  "string_hits": {
+    "Linear Height": [
+      {
+        "encoding": "ascii",
+        "file_offset": 140130648,
+        "file_offset_hex": "0x85a3958",
+        "rva": "0x85a5158",
+        "va": "0x1485a5158",
+        "section": ".rdata"
+      },
+      {
+        "encoding": "ascii",
+        "file_offset": 140134334,
+        "file_offset_hex": "0x85a47be",
+        "rva": "0x85a5fbe",
+        "va": "0x1485a5fbe",
+        "section": ".rdata"
+      }
+    ],
+    "Hard Mix": [
+      {
+        "encoding": "ascii",
+        "file_offset": 140130592,
+        "file_offset_hex": "0x85a3920",
+        "rva": "0x85a5120",
+        "va": "0x1485a5120",
+        "section": ".rdata"
+      },
+      {
+        "encoding": "ascii",
+        "file_offset": 140134257,
+        "file_offset_hex": "0x85a4771",
+        "rva": "0x85a5f71",
+        "va": "0x1485a5f71",
+        "section": ".rdata"
+      },
+      {
+        "encoding": "ascii",
+        "file_offset": 141043717,
+        "file_offset_hex": "0x8682805",
+        "rva": "0x8684005",
+        "va": "0x148684005",
+        "section": ".rdata"
+      },
+      {
+        "encoding": "ascii",
+        "file_offset": 143858121,
+        "file_offset_hex": "0x89319c9",
+        "rva": "0x89331c9",
+        "va": "0x1489331c9",
+        "section": ".rdata"
+      },
+      {
+        "encoding": "ascii",
+        "file_offset": 144076150,
+        "file_offset_hex": "0x8966d76",
+        "rva": "0x8968576",
+        "va": "0x148968576",
+        "section": ".rdata"
+      }
+    ],
+    "Linear Dodge": [
+      {
+        "encoding": "ascii",
+        "file_offset": 140130512,
+        "file_offset_hex": "0x85a38d0",
+        "rva": "0x85a50d0",
+        "va": "0x1485a50d0",
+        "section": ".rdata"
+      },
+      {
+        "encoding": "ascii",
+        "file_offset": 140134045,
+        "file_offset_hex": "0x85a469d",
+        "rva": "0x85a5e9d",
+        "va": "0x1485a5e9d",
+        "section": ".rdata"
+      },
+      {
+        "encoding": "ascii",
+        "file_offset": 143857525,
+        "file_offset_hex": "0x8931775",
+        "rva": "0x8932f75",
+        "va": "0x148932f75",
+        "section": ".rdata"
+      },
+      {
+        "encoding": "ascii",
+        "file_offset": 144075714,
+        "file_offset_hex": "0x8966bc2",
+        "rva": "0x89683c2",
+        "va": "0x1489683c2",
+        "section": ".rdata"
+      }
+    ],
+    "blend_linear_height": [
+      {
+        "encoding": "ascii",
+        "file_offset": 140131688,
+        "file_offset_hex": "0x85a3d68",
+        "rva": "0x85a5568",
+        "va": "0x1485a5568",
+        "section": ".rdata"
+      }
+    ],
+    "blend_hard_mix": [
+      {
+        "encoding": "ascii",
+        "file_offset": 140131584,
+        "file_offset_hex": "0x85a3d00",
+        "rva": "0x85a5500",
+        "va": "0x1485a5500",
+        "section": ".rdata"
+      }
+    ],
+    "textureBrightness": [
+      {
+        "encoding": "ascii",
+        "file_offset": 140046336,
+        "file_offset_hex": "0x858f000",
+        "rva": "0x8590800",
+        "va": "0x148590800",
+        "section": ".rdata"
+      }
+    ],
+    "textureContrast": [
+      {
+        "encoding": "ascii",
+        "file_offset": 140046360,
+        "file_offset_hex": "0x858f018",
+        "rva": "0x8590818",
+        "va": "0x148590818",
+        "section": ".rdata"
+      }
+    ],
+    "textureBlendMode": [
+      {
+        "encoding": "ascii",
+        "file_offset": 140046408,
+        "file_offset_hex": "0x858f048",
+        "rva": "0x8590848",
+        "va": "0x148590848",
+        "section": ".rdata"
+      }
+    ]
+  }
+}

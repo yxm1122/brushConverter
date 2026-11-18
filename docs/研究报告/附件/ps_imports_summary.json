@@ -1,0 +1,367 @@
+{
+  "artifact": {
+    "path": "<LOCAL_APP_DIR>\\PS2025\\Adobe Photoshop 2025\\Photoshop.exe",
+    "sha256": "05720af2cd207ead737b4c9ff422ffb7191f2d65cc0045b88735030cda76c953",
+    "bytes": 208456176
+  },
+  "import_directory": {
+    "rva": 186401120,
+    "size": 1700,
+    "locations": [
+      {
+        "offset": 186394976,
+        "bytes": 1700
+      }
+    ]
+  },
+  "delay_import_directory": {
+    "rva": 186275568,
+    "size": 640,
+    "locations": [
+      {
+        "offset": 186269424,
+        "bytes": 640
+      }
+    ]
+  },
+  "dll_count": 84,
+  "total_functions": 4036,
+  "dlls": [
+    {
+      "dll": "tbb12.dll",
+      "funcs": 33
+    },
+    {
+      "dll": "tbbmalloc.dll",
+      "funcs": 6
+    },
+    {
+      "dll": "LibXPUInfo.dll",
+      "funcs": 36
+    },
+    {
+      "dll": "CITThreading.dll",
+      "funcs": 2
+    },
+    {
+      "dll": "aif.dll",
+      "funcs": 108
+    },
+    {
+      "dll": "AdobeOwl.dll",
+      "funcs": 196
+    },
+    {
+      "dll": "AdobePDFSettings.dll",
+      "funcs": 2
+    },
+    {
+      "dll": "ZXPSignLib-Minimal.dll",
+      "funcs": 1
+    },
+    {
+      "dll": "MSVCP140.dll",
+      "funcs": 330
+    },
+    {
+      "dll": "VCRUNTIME140.dll",
+      "funcs": 29
+    },
+    {
+      "dll": "VCRUNTIME140_1.dll",
+      "funcs": 1
+    },
+    {
+      "dll": "api-ms-win-crt-runtime-l1-1-0.dll",
+      "funcs": 28
+    },
+    {
+      "dll": "api-ms-win-crt-string-l1-1-0.dll",
+      "funcs": 45
+    },
+    {
+      "dll": "api-ms-win-crt-convert-l1-1-0.dll",
+      "funcs": 20
+    },
+    {
+      "dll": "api-ms-win-crt-stdio-l1-1-0.dll",
+      "funcs": 53
+    },
+    {
+      "dll": "api-ms-win-crt-filesystem-l1-1-0.dll",
+      "funcs": 15
+    },
+    {
+      "dll": "api-ms-win-crt-math-l1-1-0.dll",
+      "funcs": 81
+    },
+    {
+      "dll": "api-ms-win-crt-heap-l1-1-0.dll",
+      "funcs": 11
+    },
+    {
+      "dll": "api-ms-win-crt-time-l1-1-0.dll",
+      "funcs": 18
+    },
+    {
+      "dll": "api-ms-win-crt-environment-l1-1-0.dll",
+      "funcs": 6
+    },
+    {
+      "dll": "api-ms-win-crt-locale-l1-1-0.dll",
+      "funcs": 5
+    },
+    {
+      "dll": "api-ms-win-crt-utility-l1-1-0.dll",
+      "funcs": 4
+    },
+    {
+      "dll": "KERNEL32.dll",
+      "funcs": 339
+    },
+    {
+      "dll": "USER32.dll",
+      "funcs": 252
+    },
+    {
+      "dll": "GDI32.dll",
+      "funcs": 97
+    },
+    {
+      "dll": "WINSPOOL.DRV",
+      "funcs": 7
+    },
+    {
+      "dll": "MPS.dll",
+      "funcs": 12
+    },
+    {
+      "dll": "dvacore.dll",
+      "funcs": 84
+    },
+    {
+      "dll": "dvaappsupport.dll",
+      "funcs": 3
+    },
+    {
+      "dll": "dvaui.dll",
+      "funcs": 889
+    },
+    {
+      "dll": "dvaadameve.dll",
+      "funcs": 100
+    },
+    {
+      "dll": "dvaworkspace.dll",
+      "funcs": 1
+    },
+    {
+      "dll": "VulcanControl.dll",
+      "funcs": 2
+    },
+    {
+      "dll": "VulcanMessage5.dll",
+      "funcs": 57
+    },
+    {
+      "dll": "icucnv74.dll",
+      "funcs": 32
+    },
+    {
+      "dll": "PlugPlugOwl.dll",
+      "funcs": 13
+    },
+    {
+      "dll": "CRClient.dll",
+      "funcs": 9
+    },
+    {
+      "dll": "LogSession.dll",
+      "funcs": 7
+    },
+    {
+      "dll": "dxgi.dll",
+      "funcs": 2
+    },
+    {
+      "dll": "mkl_sequential.2.dll",
+      "funcs": 31
+    },
+    {
+      "dll": "opencv_world4110.dll",
+      "funcs": 201
+    },
+    {
+      "dll": "AdbePM.dll",
+      "funcs": 75
+    },
+    {
+      "dll": "dynamic-torqnative.dll",
+      "funcs": 203
+    },
+    {
+      "dll": "libdynamic-napi.dll",
+      "funcs": 70
+    },
+    {
+      "dll": "act_tracing.dll",
+      "funcs": 16
+    },
+    {
+      "dll": "gdiplus.dll",
+      "funcs": 141
+    },
+    {
+      "dll": "IMM32.dll",
+      "funcs": 13
+    },
+    {
+      "dll": "mscms.dll",
+      "funcs": 3
+    },
+    {
+      "dll": "MSIMG32.dll",
+      "funcs": 2
+    },
+    {
+      "dll": "AdobeXMPFiles.dll",
+      "funcs": 11
+    },
+    {
+      "dll": "AID.dll",
+      "funcs": 2
+    },
+    {
+      "dll": "JP2KLib.dll",
+      "funcs": 2
+    },
+    {
+      "dll": "AdobeSVGAGM.dll",
+      "funcs": 2
+    },
+    {
+      "dll": "api-ms-win-shcore-scaling-l1-1-1.dll",
+      "funcs": 3
+    },
+    {
+      "dll": "ExtendScript.dll",
+      "funcs": 18
+    },
+    {
+      "dll": "ScCore.dll",
+      "funcs": 117
+    },
+    {
+      "dll": "dnssd.dll",
+      "funcs": 2
+    },
+    {
+      "dll": "WinRTSupport.dll",
+      "funcs": 4
+    },
+    {
+      "dll": "MSVCP140_CODECVT_IDS.dll",
+      "funcs": 1
+    },
+    {
+      "dll": "MSVCP140_1.dll",
+      "funcs": 2
+    },
+    {
+      "dll": "SensApi.dll",
+      "funcs": 1
+    },
+    {
+      "dll": "Secur32.dll",
+      "funcs": 1
+    },
+    {
+      "dll": "WINTRUST.dll",
+      "funcs": 1
+    },
+    {
+      "dll": "bcrypt.dll",
+      "funcs": 17
+    },
+    {
+      "dll": "WS2_32.dll",
+      "funcs": 48
+    },
+    {
+      "dll": "WINHTTP.dll",
+      "funcs": 20
+    },
+    {
+      "dll": "CRYPT32.dll",
+      "funcs": 21
+    },
+    {
+      "dll": "WININET.dll",
+      "funcs": 2
+    },
+    {
+      "dll": "icuuc74.dll",
+      "funcs": 9
+    },
+    {
+      "dll": "AdobeLinguistic.dll",
+      "funcs": 28
+    },
+    {
+      "dll": "d3d12.dll",
+      "funcs": 2
+    },
+    {
+      "dll": "D3DCOMPILER_47.dll",
+      "funcs": 2
+    },
+    {
+      "dll": "SETUPAPI.dll",
+      "funcs": 5
+    },
+    {
+      "dll": "DirectML.dll",
+      "funcs": 1
+    },
+    {
+      "dll": "onnxruntime.dll",
+      "funcs": 1
+    },
+    {
+      "dll": "IPHLPAPI.DLL",
+      "funcs": 6
+    },
+    {
+      "dll": "NETAPI32.dll",
+      "funcs": 3
+    },
+    {
+      "dll": "OLEACC.dll",
+      "funcs": 1
+    },
+    {
+      "dll": "api-ms-win-core-winrt-string-l1-1-0.dll",
+      "funcs": 2
+    },
+    {
+      "dll": "api-ms-win-core-winrt-l1-1-0.dll",
+      "funcs": 4
+    },
+    {
+      "dll": "api-ms-win-core-winrt-error-l1-1-0.dll",
+      "funcs": 1
+    },
+    {
+      "dll": "ARE.dll",
+      "funcs": 2
+    },
+    {
+      "dll": "AXEDOMCore.dll",
+      "funcs": 2
+    },
+    {
+      "dll": "DWrite.dll",
+      "funcs": 1
+    }
+  ]
+}

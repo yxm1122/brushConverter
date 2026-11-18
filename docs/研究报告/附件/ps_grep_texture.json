@@ -1,0 +1,914 @@
+[
+  {
+    "section": ".rdata",
+    "va": "0x1483d1c40",
+    "file_offset": 138216512,
+    "text": "GPUUseFloatTextures"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14849a768",
+    "file_offset": 139038568,
+    "text": "gaussianTexture"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14849b1e8",
+    "file_offset": 139041256,
+    "text": "sharedTexture"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1484a26d0",
+    "file_offset": 139071184,
+    "text": "copyBrushTexture"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485907e0",
+    "file_offset": 140046304,
+    "text": "invertTexture"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485907f0",
+    "file_offset": 140046320,
+    "text": "protectTexture"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148590828",
+    "file_offset": 140046376,
+    "text": "useTexture"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485ccac0",
+    "file_offset": 140292800,
+    "text": "scribble_texture"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14860b000",
+    "file_offset": 140548096,
+    "text": "inTexture"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1486674c0",
+    "file_offset": 140926144,
+    "text": "protectTextureLock"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1486702c8",
+    "file_offset": 140962504,
+    "text": "inputTexture"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148670540",
+    "file_offset": 140963136,
+    "text": "m_textureDescriptor"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14868c510",
+    "file_offset": 141077776,
+    "text": "ganSourceTexture"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14868c560",
+    "file_offset": 141077856,
+    "text": "ganTargetTexture"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148734bd0",
+    "file_offset": 141767632,
+    "text": "pattern_texture"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1487f4cd0",
+    "file_offset": 142554320,
+    "text": "multipassTexture"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1487f4ce8",
+    "file_offset": 142554344,
+    "text": "clearTextures"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1488084b0",
+    "file_offset": 142634160,
+    "text": "baseColorTexture"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1488084c8",
+    "file_offset": 142634184,
+    "text": "metallicRoughnessTexture"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148808560",
+    "file_offset": 142634336,
+    "text": "normalTexture"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148808570",
+    "file_offset": 142634352,
+    "text": "occlusionTexture"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148808588",
+    "file_offset": 142634376,
+    "text": "emissiveTexture"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1488355f8",
+    "file_offset": 142818808,
+    "text": "key3DIBLTexturePath"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148835610",
+    "file_offset": 142818832,
+    "text": "key3DTextureData"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148835628",
+    "file_offset": 142818856,
+    "text": "key3DIBLTexture"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148ce6810",
+    "file_offset": 147738640,
+    "text": "aTexture"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148ce6988",
+    "file_offset": 147739016,
+    "text": "theTexture"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148ce8448",
+    "file_offset": 147745864,
+    "text": "parentTexture"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148ce8458",
+    "file_offset": 147745880,
+    "text": "m_texture"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148cea480",
+    "file_offset": 147754112,
+    "text": "targetTexture"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148ced118",
+    "file_offset": 147765528,
+    "text": "DrawingContext_V1_ColorTexturePipeline"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148ced868",
+    "file_offset": 147767400,
+    "text": "DrawingContext_ColorTexturePipeline"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d6e7f0",
+    "file_offset": 148295664,
+    "text": "GL_EXT_texture_buffer"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d6e808",
+    "file_offset": 148295688,
+    "text": "GL_EXT_texture_cube_map_array"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d6e8f0",
+    "file_offset": 148295920,
+    "text": "GL_OES_texture_buffer"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d6e908",
+    "file_offset": 148295944,
+    "text": "GL_OES_texture_cube_map_array"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d72498",
+    "file_offset": 148311192,
+    "text": "StandardColorTexturePhotoshopEffects"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d73dd8",
+    "file_offset": 148317656,
+    "text": "sourceTexture"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d755b8",
+    "file_offset": 148323768,
+    "text": "GL_AMD_texture_gather_bias_lod"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d75bc0",
+    "file_offset": 148325312,
+    "text": "SPV_AMD_texture_gather_bias_lod"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d76480",
+    "file_offset": 148327552,
+    "text": "GL_OES_texture_3D"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d76528",
+    "file_offset": 148327720,
+    "text": "GL_EXT_shader_texture_lod"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d76560",
+    "file_offset": 148327776,
+    "text": "GL_ARB_texture_rectangle"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d765b8",
+    "file_offset": 148327864,
+    "text": "GL_ARB_texture_gather"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d76658",
+    "file_offset": 148328024,
+    "text": "GL_ARB_texture_cube_map_array"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d76678",
+    "file_offset": 148328056,
+    "text": "GL_ARB_texture_multisample"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d76698",
+    "file_offset": 148328088,
+    "text": "GL_ARB_shader_texture_lod"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d767c8",
+    "file_offset": 148328392,
+    "text": "GL_ARB_shader_texture_image_samples"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d76850",
+    "file_offset": 148328528,
+    "text": "GL_ARB_sparse_texture2"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d76868",
+    "file_offset": 148328552,
+    "text": "GL_ARB_sparse_texture_clamp"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d769a8",
+    "file_offset": 148328872,
+    "text": "GL_ARB_texture_query_lod"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d76a28",
+    "file_offset": 148329000,
+    "text": "GL_ARB_bindless_texture"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d76ca0",
+    "file_offset": 148329632,
+    "text": "GL_EXT_samplerless_texture_functions"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d77250",
+    "file_offset": 148331088,
+    "text": "GL_NV_shader_texture_footprint"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d77398",
+    "file_offset": 148331416,
+    "text": "GL_OES_texture_storage_multisample_2d_array"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7ca10",
+    "file_offset": 148353552,
+    "text": "itexture2D"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7ca20",
+    "file_offset": 148353568,
+    "text": "itexture3D"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7ca30",
+    "file_offset": 148353584,
+    "text": "itextureCube"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7ca40",
+    "file_offset": 148353600,
+    "text": "itexture2DArray"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7ca50",
+    "file_offset": 148353616,
+    "text": "utexture2D"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7ca60",
+    "file_offset": 148353632,
+    "text": "utexture3D"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7ca70",
+    "file_offset": 148353648,
+    "text": "utextureCube"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7ca80",
+    "file_offset": 148353664,
+    "text": "utexture2DArray"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7cac8",
+    "file_offset": 148353736,
+    "text": "itextureCubeArray"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7cae0",
+    "file_offset": 148353760,
+    "text": "utextureCubeArray"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7cd08",
+    "file_offset": 148354312,
+    "text": "itexture1DArray"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7cd18",
+    "file_offset": 148354328,
+    "text": "utexture1D"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7cd28",
+    "file_offset": 148354344,
+    "text": "itexture1D"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7cd38",
+    "file_offset": 148354360,
+    "text": "utexture1DArray"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7cd58",
+    "file_offset": 148354392,
+    "text": "itexture2DRect"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7cd68",
+    "file_offset": 148354408,
+    "text": "utexture2DRect"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7cd78",
+    "file_offset": 148354424,
+    "text": "itextureBuffer"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7cd88",
+    "file_offset": 148354440,
+    "text": "utextureBuffer"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7cda8",
+    "file_offset": 148354472,
+    "text": "itexture2DMS"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7cdb8",
+    "file_offset": 148354488,
+    "text": "utexture2DMS"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7cde0",
+    "file_offset": 148354528,
+    "text": "itexture2DMSArray"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7cdf8",
+    "file_offset": 148354552,
+    "text": "utexture2DMSArray"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7d110",
+    "file_offset": 148355344,
+    "text": "f16texture1D"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7d120",
+    "file_offset": 148355360,
+    "text": "f16texture2D"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7d130",
+    "file_offset": 148355376,
+    "text": "f16texture3D"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7d140",
+    "file_offset": 148355392,
+    "text": "f16texture2DRect"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7d158",
+    "file_offset": 148355416,
+    "text": "f16textureCube"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7d168",
+    "file_offset": 148355432,
+    "text": "f16texture1DArray"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7d180",
+    "file_offset": 148355456,
+    "text": "f16texture2DArray"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7d198",
+    "file_offset": 148355480,
+    "text": "f16textureCubeArray"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7d1b0",
+    "file_offset": 148355504,
+    "text": "f16textureBuffer"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7d1c8",
+    "file_offset": 148355528,
+    "text": "f16texture2DMS"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d7d1d8",
+    "file_offset": 148355544,
+    "text": "f16texture2DMSArray"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d81120",
+    "file_offset": 148371744,
+    "text": "sparseTexture"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d81130",
+    "file_offset": 148371760,
+    "text": "sparseTextureOffset"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d81148",
+    "file_offset": 148371784,
+    "text": "sparseTextureLod"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d81160",
+    "file_offset": 148371808,
+    "text": "sparseTextureLodOffset"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d811a8",
+    "file_offset": 148371880,
+    "text": "sparseTextureGrad"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d811c0",
+    "file_offset": 148371904,
+    "text": "sparseTextureGradOffset"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d811d8",
+    "file_offset": 148371928,
+    "text": "sparseTextureGather"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d811f0",
+    "file_offset": 148371952,
+    "text": "sparseTextureGatherOffset"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d81210",
+    "file_offset": 148371984,
+    "text": "sparseTextureGatherOffsets"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d81240",
+    "file_offset": 148372032,
+    "text": "sparseTextureClamp"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d81258",
+    "file_offset": 148372056,
+    "text": "sparseTextureOffsetClamp"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d81278",
+    "file_offset": 148372088,
+    "text": "sparseTextureGradClamp"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d81290",
+    "file_offset": 148372112,
+    "text": "sparseTextureGradOffsetClam"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d812b0",
+    "file_offset": 148372144,
+    "text": "sparseTextureGatherLod"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d812c8",
+    "file_offset": 148372168,
+    "text": "sparseTextureGatherLodOffset"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d812e8",
+    "file_offset": 148372200,
+    "text": "sparseTextureGatherLodOffsets"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148d897b0",
+    "file_offset": 148406192,
+    "text": "gl_MaxTextureCoords"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148db4dd8",
+    "file_offset": 148583896,
+    "text": "sparseTextureARB"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148db4df0",
+    "file_offset": 148583920,
+    "text": "sparseTextureLodARB"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148db4e08",
+    "file_offset": 148583944,
+    "text": "sparseTextureOffsetARB"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148db4e58",
+    "file_offset": 148584024,
+    "text": "sparseTextureLodOffsetARB"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148db4e78",
+    "file_offset": 148584056,
+    "text": "sparseTextureGradARB"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148db4e90",
+    "file_offset": 148584080,
+    "text": "sparseTextureGradOffsetARB"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148db4eb0",
+    "file_offset": 148584112,
+    "text": "sparseTextureGatherARB"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148db4ec8",
+    "file_offset": 148584136,
+    "text": "sparseTextureGatherOffsetARB"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148db4ee8",
+    "file_offset": 148584168,
+    "text": "sparseTextureGatherOffsetsARB"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148db4f20",
+    "file_offset": 148584224,
+    "text": "sparseTextureClampARB"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148db4f38",
+    "file_offset": 148584248,
+    "text": "sparseTextureOffsetClampARB"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148db4f58",
+    "file_offset": 148584280,
+    "text": "sparseTextureGradClampARB"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148db4f78",
+    "file_offset": 148584312,
+    "text": "sparseTextureGradOffsetClampARB"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148db5138",
+    "file_offset": 148584760,
+    "text": "sparseTextureGatherLodAMD"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148db5158",
+    "file_offset": 148584792,
+    "text": "sparseTextureGatherLodOffsetAMD"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148db5178",
+    "file_offset": 148584824,
+    "text": "sparseTextureGatherLodOffsetsAMD"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148db55d0",
+    "file_offset": 148585936,
+    "text": "gl_MaxComputeTextureImageUnits"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148db6550",
+    "file_offset": 148589904,
+    "text": "RWTexture"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148dbbb30",
+    "file_offset": 148611888,
+    "text": "RWTexture1D"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148dbbb40",
+    "file_offset": 148611904,
+    "text": "RWTexture1DArray"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148dbbb58",
+    "file_offset": 148611928,
+    "text": "RWTexture2D"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148dbbb68",
+    "file_offset": 148611944,
+    "text": "RWTexture2DArray"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148dbbb80",
+    "file_offset": 148611968,
+    "text": "RWTexture3D"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148e11568",
+    "file_offset": 148962664,
+    "text": "WeightTextureQCOM"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148e11580",
+    "file_offset": 148962688,
+    "text": "BlockMatchTextureQCOM"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148e131d8",
+    "file_offset": 148969944,
+    "text": "BindlessTextureNV"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148e168f8",
+    "file_offset": 148984056,
+    "text": "SPV_NV_bindless_texture"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148e46d48",
+    "file_offset": 149181768,
+    "text": "GL_EXT_texture_query_lod"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148e46d68",
+    "file_offset": 149181800,
+    "text": "GL_ARB_texture_query_levels"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148e46e10",
+    "file_offset": 149181968,
+    "text": "GL_ARB_texture_query_samples"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148e47b58",
+    "file_offset": 149185368,
+    "text": "GL_EXT_texture_buffer_object"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148e47bd0",
+    "file_offset": 149185488,
+    "text": "GL_EXT_texture_array"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148e5a430",
+    "file_offset": 149261360,
+    "text": "unknown_depth_texture_type"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148e5a580",
+    "file_offset": 149261696,
+    "text": "unknown_texture_type"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148e61df8",
+    "file_offset": 149292536,
+    "text": "m_renderPassTextures"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148e66398",
+    "file_offset": 149310360,
+    "text": "m_maskTexture"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148f388b0",
+    "file_offset": 150171824,
+    "text": "GetGPUTextureName"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148f388c8",
+    "file_offset": 150171848,
+    "text": "AGMImageGetGPUTextureName"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148f4d0a8",
+    "file_offset": 150255784,
+    "text": "g3DTextureScale"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148f4d108",
+    "file_offset": 150255880,
+    "text": "g3DTextureOffset"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148f8fb08",
+    "file_offset": 150528776,
+    "text": "shaderOneTextureColorUniform"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148f8fb28",
+    "file_offset": 150528808,
+    "text": "shaderOneTextureColorAttribute"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148f8fb48",
+    "file_offset": 150528840,
+    "text": "shaderNoTextureColorUniform"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148f8fb68",
+    "file_offset": 150528872,
+    "text": "shaderNoTextureColorAttribute"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14a2c72d8",
+    "file_offset": 170679000,
+    "text": "tiledTextureCoordinate"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14a2c8d18",
+    "file_offset": 170685720,
+    "text": "m_outputTexture"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14b20103a",
+    "file_offset": 186644538,
+    "text": "GdipCreateTexture"
+  }
+]

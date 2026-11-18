@@ -1,0 +1,138 @@
+{
+  "artifact": {
+    "path": "<LOCAL_APP_DIR>\\PS2025\\Adobe Photoshop 2025\\Photoshop.exe",
+    "sha256": "05720af2cd207ead737b4c9ff422ffb7191f2d65cc0045b88735030cda76c953",
+    "bytes": 208456176
+  },
+  "format": "pe",
+  "images": [
+    {
+      "format": "pe",
+      "status": "parsed",
+      "reason": null,
+      "architecture": "x86_64",
+      "bits": 64,
+      "byte_order": "little",
+      "machine": 34404,
+      "slice": null,
+      "rows": [
+        {
+          "property": "dynamic_base",
+          "state": "enabled",
+          "confidence": "observed",
+          "basis": "DllCharacteristics bit 0x40 is set.",
+          "location": {
+            "offset": 494,
+            "bytes": 2
+          },
+          "note": null,
+          "next_probe": null
+        },
+        {
+          "property": "high_entropy_va",
+          "state": "enabled",
+          "confidence": "observed",
+          "basis": "DllCharacteristics bit 0x20 is set.",
+          "location": {
+            "offset": 494,
+            "bytes": 2
+          },
+          "note": "HIGH_ENTROPY_VA is defined for 64-bit images.",
+          "next_probe": null
+        },
+        {
+          "property": "nx_compat",
+          "state": "enabled",
+          "confidence": "observed",
+          "basis": "DllCharacteristics bit 0x100 is set.",
+          "location": {
+            "offset": 494,
+            "bytes": 2
+          },
+          "note": null,
+          "next_probe": null
+        },
+        {
+          "property": "force_integrity",
+          "state": "disabled",
+          "confidence": "observed",
+          "basis": "DllCharacteristics bit 0x80 is clear.",
+          "location": {
+            "offset": 494,
+            "bytes": 2
+          },
+          "note": null,
+          "next_probe": null
+        },
+        {
+          "property": "no_seh",
+          "state": "disabled",
+          "confidence": "observed",
+          "basis": "DllCharacteristics bit 0x400 is clear.",
+          "location": {
+            "offset": 494,
+            "bytes": 2
+          },
+          "note": null,
+          "next_probe": null
+        },
+        {
+          "property": "guard_cf",
+          "state": "enabled",
+          "confidence": "observed",
+          "basis": "DllCharacteristics bit 0x4000 is set.",
+          "location": {
+            "offset": 494,
+            "bytes": 2
+          },
+          "note": null,
+          "next_probe": null
+        },
+        {
+          "property": "cfg_instrumented",
+          "state": "enabled",
+          "confidence": "observed",
+          "basis": "GuardFlags bit IMAGE_GUARD_CF_INSTRUMENTED is set.",
+          "location": {
+            "offset": 155886448,
+            "bytes": 4
+          },
+          "note": "IMAGE_GUARD_CF_INSTRUMENTED is a linker claim, not a check that CFG checks run.",
+          "next_probe": null
+        },
+        {
+          "property": "authenticode_present",
+          "state": "enabled",
+          "confidence": "observed",
+          "basis": "IMAGE_DIRECTORY_ENTRY_SECURITY address and size are both nonzero. This is presence, not validity.",
+          "location": {
+            "offset": 568,
+            "bytes": 8
+          },
+          "note": null,
+          "next_probe": null
+        },
+        {
+          "property": "debug_record_present",
+          "state": "enabled",
+          "confidence": "observed",
+          "basis": "IMAGE_DIRECTORY_ENTRY_DEBUG address and size are both nonzero. This is presence, not validity.",
+          "location": {
+            "offset": 584,
+            "bytes": 8
+          },
+          "note": null,
+          "next_probe": null
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "This inspection reads headers, program tables, dynamic symbols, and imports. It does not execute the image or assess exploitability.",
+    "A missing stack-protector or fortify symbol does not establish that the protection is absent.",
+    "An undefined stack-protector or fortify symbol is a sign that some code uses the protection, not proof that all code does.",
+    "Authenticode and Mach-O code-signature rows report table or load-command presence, not signature validity.",
+    "PE control-flow guard state is the GuardFlags linker claim, not a check that CFG checks run.",
+    "Mach-O hardened runtime is not read here. inspect_signature owns CodeDirectory flags."
+  ]
+}

@@ -1,0 +1,30 @@
+# program	Photoshop.exe
+# image_base	140000000
+# language	x86:LE:64:default
+# compiler_spec	windows
+# function_count	418068
+# symbol_count	2969153
+# block	Headers	140000000	1400003ff	exec=false
+# block	.text	140001000	1481bdfff	exec=true
+# block	.rdata	1481be000	14b201fff	exec=false
+# block	.data	14b202000	14c0d2fff	exec=false
+# block	.pdata	14c0d3000	14c5d6fff	exec=false
+# block	.didat	14c5d7000	14c5d8fff	exec=false
+# block	.itt_not	14c5d9000	14c5d9fff	exec=false
+# block	_RDATA	14c5da000	14c5dafff	exec=false
+# block	.rsrc	14c5db000	14cf4efff	exec=false
+# block	.reloc	14cf4f000	14d0a9fff	exec=false
+# block	tdb	ff00000000	ff0000184f	exec=false
+#target_va	referer_va	ref_type	func_entry	func_name	func_size	func_ref_count
+0x1485907e0	<无引用>				0	0
+0x1485907f0	<无引用>				0	0
+0x148590800	<无引用>				0	0
+0x148590818	<无引用>				0	0
+0x148590828	<无引用>				0	0
+0x148590838	<无引用>				0	0
+0x148590848	<无引用>				0	0
+0x148590860	<无引用>				0	0
+0x1485a63a0	<无引用>				0	0
+0x1485a6338	14298c510	READ	14298c510	FUN_14298c510	3782	1
+0x1485a5158	<无引用>				0	0
+0x1485a5120	<无引用>				0	0

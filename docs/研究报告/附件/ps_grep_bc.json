@@ -1,0 +1,332 @@
+[
+  {
+    "section": ".rdata",
+    "va": "0x1483e3270",
+    "file_offset": 138287728,
+    "text": "Brightness_Contrast"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1483ee6d8",
+    "file_offset": 138333912,
+    "text": "uiBrightnessLevelEnumType"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1483ee6f8",
+    "file_offset": 138333944,
+    "text": "kuiBrightnessLevel"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1483ee728",
+    "file_offset": 138333992,
+    "text": "uiBrightnessChanged"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1483ef100",
+    "file_offset": 138336512,
+    "text": "high_contrast"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148470bb8",
+    "file_offset": 138867640,
+    "text": "P_AdjustBrightness_32x32"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148470da0",
+    "file_offset": 138868128,
+    "text": "autoContrast"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14849acf8",
+    "file_offset": 139039992,
+    "text": "CompositeContrastPipeline"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14849ad68",
+    "file_offset": 139040104,
+    "text": "m_compositeContrastShader"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1484e9018",
+    "file_offset": 139360280,
+    "text": "skyBrightness"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148590800",
+    "file_offset": 140046336,
+    "text": "textureBrightness"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148590818",
+    "file_offset": 140046360,
+    "text": "textureContrast"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485f4550",
+    "file_offset": 140455248,
+    "text": "CompositeContrast"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485ff718",
+    "file_offset": 140500760,
+    "text": "TBrightnessAdjustor"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14860b540",
+    "file_offset": 140549440,
+    "text": "ocio_exposure_contrast_exposureVal"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14860b568",
+    "file_offset": 140549480,
+    "text": "ocio_exposure_contrast_gammaVal"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1486822e0",
+    "file_offset": 141036256,
+    "text": "BrightnessContrast"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148682310",
+    "file_offset": 141036304,
+    "text": "BrightnessContrastNodeView"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1486e97c8",
+    "file_offset": 141459400,
+    "text": "TBrightnessView"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148752a70",
+    "file_offset": 141890160,
+    "text": "brightnessContrast"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1487eac18",
+    "file_offset": 142513176,
+    "text": "adjustments_brightness_contrast_dialog"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1487f4f78",
+    "file_offset": 142555000,
+    "text": "U_preContrast"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1487f4fa0",
+    "file_offset": 142555040,
+    "text": "V_preContrast2"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1487f4fc0",
+    "file_offset": 142555072,
+    "text": "W_PostContrast"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148858680",
+    "file_offset": 142962304,
+    "text": "kPanelBrightnessOriginal"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1488586a0",
+    "file_offset": 142962336,
+    "text": "kPanelBrightnessDarkGray"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1488586c0",
+    "file_offset": 142962368,
+    "text": "kPanelBrightnessMediumGray"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1488586e0",
+    "file_offset": 142962400,
+    "text": "kPanelBrightnessLightGray"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1488f8798",
+    "file_offset": 143617944,
+    "text": "ambientBrightness"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1488f9320",
+    "file_offset": 143620896,
+    "text": "crackBrightness"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1488f9810",
+    "file_offset": 143622160,
+    "text": "edgeBrightness"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1488fa0d8",
+    "file_offset": 143624408,
+    "text": "grainContrasty"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1488fb5d8",
+    "file_offset": 143629784,
+    "text": "paperBrightness"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14890ce20",
+    "file_offset": 143701536,
+    "text": "cafBrightness"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14890ce30",
+    "file_offset": 143701552,
+    "text": "cafContrast"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148912ca8",
+    "file_offset": 143725736,
+    "text": "smartBrushContrast"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148914260",
+    "file_offset": 143731296,
+    "text": "refineEdgeBorderContrast"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148b36738",
+    "file_offset": 145968952,
+    "text": "ExposureContrast"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148b3a3f8",
+    "file_offset": 145984504,
+    "text": "ExposureContrastTransform"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148b3a6c8",
+    "file_offset": 145985224,
+    "text": "s_contrast"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148b8be50",
+    "file_offset": 146318928,
+    "text": "ExposureContrast"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148b8c048",
+    "file_offset": 146319432,
+    "text": "SContrast"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148b8fdf0",
+    "file_offset": 146335216,
+    "text": "exposure_contrast"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148b972a8",
+    "file_offset": 146365096,
+    "text": "sContrast"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148b99010",
+    "file_offset": 146372624,
+    "text": "ExposureContrast"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148b991c0",
+    "file_offset": 146373056,
+    "text": "SContrast"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148b99ef8",
+    "file_offset": 146376440,
+    "text": "SContrast"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148f337d8",
+    "file_offset": 150151128,
+    "text": "GetFontContrast"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148f337e8",
+    "file_offset": 150151144,
+    "text": "CTFontDictGetFontContrastProc"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148f4b970",
+    "file_offset": 150249840,
+    "text": "hilite_stroke_color_contrast"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148f738d0",
+    "file_offset": 150413520,
+    "text": "hiliteStrokeColorContrast"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148f73ac0",
+    "file_offset": 150414016,
+    "text": "useHighContrast"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14b1cf55a",
+    "file_offset": 186441050,
+    "text": "OWLThemeGetUIBrightness"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14b1cf574",
+    "file_offset": 186441076,
+    "text": "OWLThemeChangeUIBrightness"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14b1cf60c",
+    "file_offset": 186441228,
+    "text": "OWLThemeGetBrightnessAdjustedColor"
+  }
+]

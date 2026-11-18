@@ -1,0 +1,203 @@
+
+================================================================
+$ "<LOCAL_APP_DIR>/anaconda3/envs/brushConverter/python.exe" tools/re_pipeline/pe_scan.py --exe "<LOCAL_APP_DIR>/PS2025/Adobe Photoshop 2025/Photoshop.exe" --needles 'Linear Height,Hard Mix,Linear Dodge,blend_linear_height,blend_hard_mix,textureBrightness,textureContrast,textureBlendMode' --out 'docs/研究报告/附件/ps_string_hits.json'
+----------------------------------------------------------------
+[pe_scan] 目标: <LOCAL_APP_DIR>/PS2025/Adobe Photoshop 2025/Photoshop.exe
+[pe_scan] 大小: 208456176 字节
+[pe_scan] 区段数: 9 镜像基址: 0x140000000
+[pe_scan] 字符串 'Linear Height' 命中 2 次
+[pe_scan] 字符串 'Hard Mix' 命中 5 次
+[pe_scan] 字符串 'Linear Dodge' 命中 4 次
+[pe_scan] 字符串 'blend_linear_height' 命中 1 次
+[pe_scan] 字符串 'blend_hard_mix' 命中 1 次
+[pe_scan] 字符串 'textureBrightness' 命中 1 次
+[pe_scan] 字符串 'textureContrast' 命中 1 次
+[pe_scan] 字符串 'textureBlendMode' 命中 1 次
+[pe_scan] 已写出: docs/研究报告/附件/ps_string_hits.json
+
+================================================================
+$ "<LOCAL_APP_DIR>/anaconda3/envs/brushConverter/python.exe" tools/re_pipeline/native_xref.py refs --exe "<LOCAL_APP_DIR>/PS2025/Adobe Photoshop 2025/Photoshop.exe" --needles 'Linear Height,Hard Mix,blend_linear_height,blend_hard_mix,blend_height,linearHeight,hardMix,linearDodge' --out 'docs/研究报告/附件/ps_xref_blend.json'
+----------------------------------------------------------------
+[xref] 字符串命中 19 条；.pdata 函数 438177 个
+[xref] 机器码预筛命中 12 条；capstone 校验通过 12 条
+[xref] 涉及函数 4 个；已写出 docs/研究报告/附件/ps_xref_blend.json
+  0x141b94750 size=670 labels=hardMix,linearDodge,linearHeight
+  none size=None labels=hardMix,linearDodge,linearHeight
+  0x14298d3e0 size=1324 labels=hardMix,linearDodge
+  0x14298c510 size=3783 labels=hardMix
+
+================================================================
+$ "<LOCAL_APP_DIR>/anaconda3/envs/brushConverter/python.exe" tools/re_pipeline/native_xref.py refs --exe "<LOCAL_APP_DIR>/PS2025/Adobe Photoshop 2025/Photoshop.exe" --needles 'textureBrightness,textureContrast,textureBlendMode,textureDepth,textureScale,invertTexture,protectTexture,useTexture,textureCoverage,minimumDepth,textureDepthDynamics' --out 'docs/研究报告/附件/ps_xref_texture.json'
+----------------------------------------------------------------
+[xref] 字符串命中 19 条；.pdata 函数 438177 个
+[xref] 机器码预筛命中 59 条；capstone 校验通过 59 条
+[xref] 涉及函数 13 个；已写出 docs/研究报告/附件/ps_xref_texture.json
+  0x141a8b470 size=921 labels=invertTexture,minimumDepth,protectTexture,textureBlendMode,textureBrightness,textureContrast,textureCoverage,textureDepth,textureDepthDynamics,textureScale,useTexture
+  0x141a8e060 size=3061 labels=invertTexture,minimumDepth,protectTexture,textureBlendMode,textureBrightness,textureContrast,textureCoverage,textureDepth,textureDepthDynamics,textureScale,useTexture
+  0x141a935f0 size=486 labels=minimumDepth,textureBlendMode,textureCoverage,textureDepth,textureDepthDynamics,useTexture
+  0x141a960c0 size=357 labels=minimumDepth,textureBlendMode,textureCoverage,textureDepth,textureDepthDynamics,useTexture
+  0x141a96230 size=332 labels=invertTexture,protectTexture,textureBrightness,textureContrast,textureScale
+  0x141a939d5 size=206 labels=invertTexture,protectTexture,textureBrightness,textureContrast
+  0x1438d2ae0 size=4422 labels=invertTexture,textureDepth,useTexture
+  0x1438dfcf0 size=2344 labels=invertTexture,textureDepth,useTexture
+  0x141a937fb size=474 labels=textureScale
+  0x141ef92e0 size=2502 labels=protectTexture#74c0
+  0x141efd020 size=2026 labels=protectTexture#74c0
+  0x142a62c30 size=896 labels=protectTexture#74c0
+  0x142a72a7a size=1223 labels=protectTexture#74c0
+
+================================================================
+$ "<LOCAL_APP_DIR>/anaconda3/envs/brushConverter/python.exe" tools/re_pipeline/native_xref.py range --exe "<LOCAL_APP_DIR>/PS2025/Adobe Photoshop 2025/Photoshop.exe" --start 0x141a93000 --end 0x141a96800
+----------------------------------------------------------------
+0x141a930b0 size=503
+0x141a932b0 size=819
+0x141a935f0 size=486
+0x141a937e0 size=27
+0x141a937fb size=474
+0x141a939d5 size=206
+0x141a93ab0 size=515
+0x141a93cc0 size=465
+0x141a93ea0 size=493
+0x141a94090 size=433
+0x141a94250 size=828
+0x141a94590 size=828
+0x141a94970 size=106
+0x141a94a20 size=36
+0x141a94a44 size=68
+0x141a94a88 size=38
+0x141a94ad0 size=179
+0x141a94b90 size=668
+0x141a94e30 size=852
+0x141a95190 size=363
+0x141a95300 size=225
+0x141a953f0 size=337
+0x141a95550 size=248
+0x141a95650 size=384
+0x141a95820 size=956
+0x141a95be0 size=418
+0x141a95d90 size=323
+0x141a95ee0 size=479
+0x141a960c0 size=357
+0x141a96230 size=332
+0x141a96380 size=328
+0x141a964d0 size=599
+0x141a96730 size=382
+[range] 区间内 .pdata 函数 33 个
+
+================================================================
+$ "<LOCAL_APP_DIR>/anaconda3/envs/brushConverter/python.exe" tools/re_pipeline/native_xref.py callers --exe "<LOCAL_APP_DIR>/PS2025/Adobe Photoshop 2025/Photoshop.exe" --funcs 0x141a935f0,0x141a96230,0x141a8b470,0x141a8e060
+----------------------------------------------------------------
+{
+  "0x141a935f0": [
+    {
+      "site_va": 5396560235,
+      "site_va_hex": "0x141a8f96b",
+      "caller_begin": "0x141a8f520",
+      "caller_end": "0x141a8fe0e",
+      "caller_size": 2286
+    },
+    {
+      "site_va": 5396563777,
+      "site_va_hex": "0x141a90741",
+      "caller_begin": "0x141a90410",
+      "caller_end": "0x141a90b05",
+      "caller_size": 1781
+    },
+    {
+      "site_va": 5401158178,
+      "site_va_hex": "0x141ef2222",
+      "caller_begin": "0x141ef1f90",
+      "caller_end": "0x141ef2817",
+      "caller_size": 2183
+    },
+    {
+      "site_va": 5401187456,
+      "site_va_hex": "0x141ef9480",
+      "caller_begin": "0x141ef92e0",
+      "caller_end": "0x141ef9ca6",
+      "caller_size": 2502
+    }
+  ],
+  "0x141a96230": [
+    {
+      "site_va": 5401155382,
+      "site_va_hex": "0x141ef1736",
+      "caller_begin": "0x141ef15c0",
+      "caller_end": "0x141ef1ee3",
+      "caller_size": 2339
+    },
+    {
+      "site_va": 5401202819,
+      "site_va_hex": "0x141efd083",
+      "caller_begin": "0x141efd020",
+      "caller_end": "0x141efd80a",
+      "caller_size": 2026
+    }
+  ],
+  "0x141a8b470": [
+    {
+      "site_va": 5396564235,
+      "site_va_hex": "0x141a9090b",
+      "caller_begin": "0x141a90410",
+      "caller_end": "0x141a90b05",
+      "caller_size": 1781
+    }
+  ],
+  "0x141a8e060": [
+    {
+      "site_va": 5396686833,
+      "site_va_hex": "0x141aae7f1",
+      "caller_begin": "0x141aae600",
+      "caller_end": "0x141aaeb92",
+      "caller_size": 1426
+    }
+  ]
+}
+
+================================================================
+$ "<LOCAL_APP_DIR>/anaconda3/envs/brushConverter/python.exe" tools/re_pipeline/native_xref.py disasm --exe "<LOCAL_APP_DIR>/PS2025/Adobe Photoshop 2025/Photoshop.exe" --func 0x141b94750 --limit 12
+----------------------------------------------------------------
+0x141b94750 sub rsp, 0x28
+0x141b94754 mov ecx, dword ptr [rip + 0x9e793c6] ; -> 0x14ba0db20
+0x141b9475a mov rax, qword ptr gs:[0x58]
+0x141b94763 mov edx, 0x400
+0x141b94768 mov rcx, qword ptr [rax + rcx*8]
+0x141b9476c mov eax, dword ptr [rdx + rcx]
+0x141b9476f cmp dword ptr [rip + 0x9d0f0ff], eax ; -> 0x14b8a3874
+0x141b94775 jg 0x141b94783
+0x141b94777 lea rax, [rip + 0x9685442] ; -> 0x14b219bc0
+0x141b9477e add rsp, 0x28
+0x141b94782 ret 
+0x141b94783 lea rcx, [rip + 0x9d0f0ea] ; -> 0x14b8a3874
+
+================================================================
+$ "<LOCAL_APP_DIR>/anaconda3/envs/brushConverter/python.exe" tools/re_pipeline/native_xref.py disasm --exe "<LOCAL_APP_DIR>/PS2025/Adobe Photoshop 2025/Photoshop.exe" --func 0x141a939d5 --limit 12
+----------------------------------------------------------------
+0x141a939d5 mov edx, eax
+0x141a939d7 call 0x142c52870
+0x141a939dc test al, al
+0x141a939de je 0x141a93a1e
+0x141a939e0 mov rcx, qword ptr [r14]
+0x141a939e3 test rcx, rcx
+0x141a939e6 je 0x141a93a86
+0x141a939ec xor r8d, r8d
+0x141a939ef mov edx, ebx
+0x141a939f1 call 0x142c4d220
+0x141a939f6 call 0x140c532a0
+0x141a939fb cmp eax, 1
+
+================================================================
+$ "<LOCAL_APP_DIR>/anaconda3/envs/brushConverter/python.exe" tools/re_pipeline/native_xref.py dump --exe "<LOCAL_APP_DIR>/PS2025/Adobe Photoshop 2025/Photoshop.exe" --start 140046240 --end 140046440
+----------------------------------------------------------------
+140046248 countDynamics
+140046264 scatterDynamics
+140046280 texture
+140046288 textureScale
+140046304 invertTexture
+140046320 protectTexture
+140046336 textureBrightness
+140046360 textureContrast
+140046376 useTexture
+140046392 textureCoverage
+140046408 textureBlendMode
+140046432 textureD

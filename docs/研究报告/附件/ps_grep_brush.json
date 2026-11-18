@@ -1,0 +1,1202 @@
+[
+  {
+    "section": ".rdata",
+    "va": "0x1483c26a8",
+    "file_offset": 138153640,
+    "text": "smartbrush"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1483e3628",
+    "file_offset": 138288680,
+    "text": "Single_Brush_Conversion"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1483e3688",
+    "file_offset": 138288776,
+    "text": "SpotHealingBrushTool"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1483e36a0",
+    "file_offset": 138288800,
+    "text": "HealingBrushTool"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1483ed218",
+    "file_offset": 138328600,
+    "text": "BrushShapeEditorBrushProfile"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1483ee478",
+    "file_offset": 138333304,
+    "text": "ModifiedBrushPresetSelected"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1483f7c38",
+    "file_offset": 138372152,
+    "text": "selection_brush_tool"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1483f7d88",
+    "file_offset": 138372488,
+    "text": "TSpotHealingBrushTool"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1483f7db0",
+    "file_offset": 138372528,
+    "text": "THealingBrushTool"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1483f7df8",
+    "file_offset": 138372600,
+    "text": "TPaintbrushTool"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1483f7e18",
+    "file_offset": 138372632,
+    "text": "TColorReplacementBrushTool"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1483f7e78",
+    "file_offset": 138372728,
+    "text": "THistoryBrushTool"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1483f7e90",
+    "file_offset": 138372752,
+    "text": "TArtHistoryBrushTool"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1483f7f40",
+    "file_offset": 138372928,
+    "text": "adj_brush_tool"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1483f8880",
+    "file_offset": 138375296,
+    "text": "TSelectionLabSmartBrushTool"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1483f88b8",
+    "file_offset": 138375352,
+    "text": "TSelectionLabDumbBrushTool"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1483f8948",
+    "file_offset": 138375496,
+    "text": "TPatchMatchWorkspaceSamplingBrushTool"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1483f8a30",
+    "file_offset": 138375728,
+    "text": "TNeuralGalleryWorkspaceSelectionBrushTool"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1483f8a60",
+    "file_offset": 138375776,
+    "text": "TNeuralGalleryWorkspaceSelectionRemovalBrushTool"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148407328",
+    "file_offset": 138435368,
+    "text": "smartbrush"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14840ffd0",
+    "file_offset": 138471376,
+    "text": "cxui_adj_brush_bar"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148410000",
+    "file_offset": 138471424,
+    "text": "cxui_adj_brush_mask_bar"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148434e10",
+    "file_offset": 138622480,
+    "text": "LogBrushMRU"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14847ac90",
+    "file_offset": 138908816,
+    "text": "adj_brush_options_bar"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14847b630",
+    "file_offset": 138911280,
+    "text": "ToolAdjustmentBrush"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14847b890",
+    "file_offset": 138911888,
+    "text": "adjBrushOverlayEnabled"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14847b8a8",
+    "file_offset": 138911912,
+    "text": "adjBrushSubtractFromAdj"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14847b8c0",
+    "file_offset": 138911936,
+    "text": "adjustmentBrushTool"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14847b900",
+    "file_offset": 138912000,
+    "text": "adj_brush_properties_once"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1484a0728",
+    "file_offset": 139063080,
+    "text": "toggleBrushPresetsPalette"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1484a0748",
+    "file_offset": 139063112,
+    "text": "toggleBrushStylerPalette"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1484a15f0",
+    "file_offset": 139066864,
+    "text": "newBrushGroup"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1484a1650",
+    "file_offset": 139066960,
+    "text": "toggleSearchInBrushesPanel"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1484a1670",
+    "file_offset": 139066992,
+    "text": "toggleShowMRUInBrushesPanel"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1484a16e0",
+    "file_offset": 139067104,
+    "text": "toggleBrushesExpandedView"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1484a1fe8",
+    "file_offset": 139069416,
+    "text": "closeBrushesPanel"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1484a2000",
+    "file_offset": 139069440,
+    "text": "closeBrushesPanelGroup"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1484a2018",
+    "file_offset": 139069464,
+    "text": "closeBrushPresetsPanel"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1484a2030",
+    "file_offset": 139069488,
+    "text": "closeBrushPresetsPanelGroup"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1484a25d8",
+    "file_offset": 139070936,
+    "text": "defineBrush"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1484a26b8",
+    "file_offset": 139071160,
+    "text": "clearBrushControls"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1484a26d0",
+    "file_offset": 139071184,
+    "text": "copyBrushTexture"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1484bb540",
+    "file_offset": 139173184,
+    "text": "toolSupportsBrushes"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1484bb558",
+    "file_offset": 139173208,
+    "text": "toolSupportsBrushPresets"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1484bbbe0",
+    "file_offset": 139174880,
+    "text": "cursorBrushTipOutlineStrokeWidth"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1484bed98",
+    "file_offset": 139187608,
+    "text": "ToolBrush"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1484bee88",
+    "file_offset": 139187848,
+    "text": "ToolAirbrush"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1484befe8",
+    "file_offset": 139188200,
+    "text": "ToolWetBrush"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1484cdcc0",
+    "file_offset": 139248832,
+    "text": "LogBrushStrokes"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1484ce8d0",
+    "file_offset": 139251920,
+    "text": "OldBehaviorPaintbrushTracker"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1484e9eb8",
+    "file_offset": 139364024,
+    "text": "TSkyMaskBrushTool"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14850e170",
+    "file_offset": 139512176,
+    "text": "colorReplacementBrushTool"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14850e1b0",
+    "file_offset": 139512240,
+    "text": "spotHealingBrushTool"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14850e1c8",
+    "file_offset": 139512264,
+    "text": "wetBrushTool"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14857b110",
+    "file_offset": 139958544,
+    "text": "MeasureBrushPresetsReadWrite"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148590898",
+    "file_offset": 140046488,
+    "text": "dualBrush"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148590910",
+    "file_offset": 140046608,
+    "text": "useBrushPose"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148590a98",
+    "file_offset": 140047000,
+    "text": "useDualBrush"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148590aa8",
+    "file_offset": 140047016,
+    "text": "useBrushSize"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148590af8",
+    "file_offset": 140047096,
+    "text": "useBrushGroup"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148591128",
+    "file_offset": 140048680,
+    "text": "computedBrush"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148591138",
+    "file_offset": 140048696,
+    "text": "dBrush"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148591148",
+    "file_offset": 140048712,
+    "text": "sampledBrush"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485928e8",
+    "file_offset": 140054760,
+    "text": "newBrushDialog"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485ed1a0",
+    "file_offset": 140425632,
+    "text": "adjustment_brush"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485ed1b8",
+    "file_offset": 140425656,
+    "text": "adj_brush_bar"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485ed1d8",
+    "file_offset": 140425688,
+    "text": "adjBrushAdjustmentsPopup"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485ed230",
+    "file_offset": 140425776,
+    "text": "cxui_avail_adj_brush"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485ed648",
+    "file_offset": 140426824,
+    "text": "adj_brush_mask_bar"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485ed680",
+    "file_offset": 140426880,
+    "text": "replaceAdjBrushAdjustmentsPopup"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1485ed740",
+    "file_offset": 140427072,
+    "text": "cxui_avail_adj_brush_mask"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148667520",
+    "file_offset": 140926240,
+    "text": "dualBrushLock"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148667690",
+    "file_offset": 140926608,
+    "text": "styleBrush"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148667768",
+    "file_offset": 140926824,
+    "text": "addBrushToLibrary"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1486c5708",
+    "file_offset": 141311752,
+    "text": "SlotBrush"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1486c5728",
+    "file_offset": 141311784,
+    "text": "SlotHistoryBrush"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1486f53e0",
+    "file_offset": 141507552,
+    "text": "spothealingbrush"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1486f53f8",
+    "file_offset": 141507576,
+    "text": "SpotHealingBrush"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1486f5470",
+    "file_offset": 141507696,
+    "text": "healingbrush"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1486f5480",
+    "file_offset": 141507712,
+    "text": "HealingBrush"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148716060",
+    "file_offset": 141641824,
+    "text": "ToolColorRepBrush"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1487558c8",
+    "file_offset": 141902024,
+    "text": "toggleBrushesFlyout"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148762ec0",
+    "file_offset": 141956800,
+    "text": "dtipsAirbrushCutoffAngle"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148762ee0",
+    "file_offset": 141956832,
+    "text": "dtipsAirbrushGranularity"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148762f00",
+    "file_offset": 141956864,
+    "text": "dtipsAirbrushStreakiness"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148762f20",
+    "file_offset": 141956896,
+    "text": "dtipsAirbrushSplatSize"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148762f38",
+    "file_offset": 141956920,
+    "text": "dtipsAirbrushSplatCount"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1487e7130",
+    "file_offset": 142498096,
+    "text": "cxui_brush_tip_flyout"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1488365f0",
+    "file_offset": 142822896,
+    "text": "RubylithBrush"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148845df8",
+    "file_offset": 142886392,
+    "text": "tool_brush_preview"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14884ab38",
+    "file_offset": 142906168,
+    "text": "decreaseBrushSize"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14884ab50",
+    "file_offset": 142906192,
+    "text": "increaseBrushSize"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14884ab68",
+    "file_offset": 142906216,
+    "text": "decreaseBrushHardness"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14884ab80",
+    "file_offset": 142906240,
+    "text": "increaseBrushHardness"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14884ab98",
+    "file_offset": 142906264,
+    "text": "previousBrush"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14884aba8",
+    "file_offset": 142906280,
+    "text": "nextBrush"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14884abb8",
+    "file_offset": 142906296,
+    "text": "firstBrush"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14884abc8",
+    "file_offset": 142906312,
+    "text": "lastBrush"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14884ac08",
+    "file_offset": 142906376,
+    "text": "wetBrushFill"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14884ac18",
+    "file_offset": 142906392,
+    "text": "wetBrushClean"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14884ac28",
+    "file_offset": 142906408,
+    "text": "toggleWetBrushAutofill"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14884ac40",
+    "file_offset": 142906432,
+    "text": "toggleWetBrushAutoclean"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14884ac58",
+    "file_offset": 142906456,
+    "text": "toggleWetBrushSampleAllLayers"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14884acb0",
+    "file_offset": 142906544,
+    "text": "toggleAirbrushMode"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14884fa88",
+    "file_offset": 142926472,
+    "text": "removeBrushTool"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14884fc90",
+    "file_offset": 142926992,
+    "text": "selectionBrushTool"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1488502b8",
+    "file_offset": 142928568,
+    "text": "selectionLabSmartBrushTool"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148850348",
+    "file_offset": 142928712,
+    "text": "selectionLabDumbBrushTool"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148850460",
+    "file_offset": 142928992,
+    "text": "patchMatchSamplingBrushTool"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1488506b8",
+    "file_offset": 142929592,
+    "text": "neuralGalleryBrushTool"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148850700",
+    "file_offset": 142929664,
+    "text": "neuralGallerySelectionBrushTool"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148850758",
+    "file_offset": 142929752,
+    "text": "neuralGallerySelectionRemovalBrushTool"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148850ef8",
+    "file_offset": 142931704,
+    "text": "adj_brush_tool_options"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148850f10",
+    "file_offset": 142931728,
+    "text": "TWetPaintBrushLoadPreview"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1488510e0",
+    "file_offset": 142932192,
+    "text": "TBrushVariantCluster"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148851110",
+    "file_offset": 142932240,
+    "text": "TBrushOptionsFlyout"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1488511a8",
+    "file_offset": 142932392,
+    "text": "TFocusMaskBrushOptions"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1488511c0",
+    "file_offset": 142932416,
+    "text": "TFocusMaskBrushFixedPoint"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1488511e0",
+    "file_offset": 142932448,
+    "text": "TRefineEdgeBrushOptions"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1488511f8",
+    "file_offset": 142932472,
+    "text": "TRefineEdgeBrushFixedPoint"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148851698",
+    "file_offset": 142933656,
+    "text": "TToolBrushPreview"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1488516b0",
+    "file_offset": 142933680,
+    "text": "TToolBrushPreviewNoArrow"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1488519c0",
+    "file_offset": 142934464,
+    "text": "TTempSkyMaskBrushToolSlot"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1488519e0",
+    "file_offset": 142934496,
+    "text": "TSkyMaskBrushOptions"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148851c70",
+    "file_offset": 142935152,
+    "text": "TCreateBrushInsteadDialog"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148851fa8",
+    "file_offset": 142935976,
+    "text": "TBrushListView"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148851fb8",
+    "file_offset": 142935992,
+    "text": "TBrushTipListView"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148851fd0",
+    "file_offset": 142936016,
+    "text": "TBrushGroupTipListView"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148851fe8",
+    "file_offset": 142936040,
+    "text": "TBrushNameDialog"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148852000",
+    "file_offset": 142936064,
+    "text": "TBrushStrokePreview"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1488521d0",
+    "file_offset": 142936528,
+    "text": "TBrushPreview"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1488524c0",
+    "file_offset": 142937280,
+    "text": "TBrushIconView"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148853330",
+    "file_offset": 142940976,
+    "text": "TSelectionLabBrushOptions"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1488533f0",
+    "file_offset": 142941168,
+    "text": "TSmartBrushPanel"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148853408",
+    "file_offset": 142941192,
+    "text": "TPatchMatchWorkspaceBrushOptions"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148853628",
+    "file_offset": 142941736,
+    "text": "TArtHistoryBrushOptions"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1488536c0",
+    "file_offset": 142941888,
+    "text": "TColorReplacementBrushOptions"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148853f90",
+    "file_offset": 142944144,
+    "text": "TBrushPresetsPanel"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148853fa8",
+    "file_offset": 142944168,
+    "text": "TBrushStylerView"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148853fc0",
+    "file_offset": 142944192,
+    "text": "TBrushStylerPanel"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148853fd8",
+    "file_offset": 142944216,
+    "text": "TBrushStylerListView"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148854100",
+    "file_offset": 142944512,
+    "text": "THistoryBrushOptions"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148854e50",
+    "file_offset": 142947920,
+    "text": "TSpotHealingBrushOptions"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148854e98",
+    "file_offset": 142947992,
+    "text": "TRemoveBrushToolOptions"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148855cf0",
+    "file_offset": 142951664,
+    "text": "TNeuralGalleryWorkspaceBrushOptions"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148855d18",
+    "file_offset": 142951704,
+    "text": "TNeuralGalleryWorkspaceSelectionBrushOptions"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148855e70",
+    "file_offset": 142952048,
+    "text": "selection_brush_tool_options"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148856d60",
+    "file_offset": 142955872,
+    "text": "applyBrushFile"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148856d70",
+    "file_offset": 142955888,
+    "text": "saveBrushFile"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14885ded8",
+    "file_offset": 142984920,
+    "text": "verticalMovementsBrushHUD"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14885def8",
+    "file_offset": 142984952,
+    "text": "arrowKeysRotateBrushTip"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14885f2e0",
+    "file_offset": 142990048,
+    "text": "nonDestructiveBrushTool"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148871680",
+    "file_offset": 143064704,
+    "text": "smartbrush"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1488f8708",
+    "file_offset": 143617800,
+    "text": "airbrushEraser"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1488f8718",
+    "file_offset": 143617816,
+    "text": "airbrushTool"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1488f8920",
+    "file_offset": 143618336,
+    "text": "artBrushTool"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1488f9790",
+    "file_offset": 143622032,
+    "text": "dryBrush"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1488fa3e0",
+    "file_offset": 143625184,
+    "text": "historyBrushSource"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1488fa3f8",
+    "file_offset": 143625208,
+    "text": "historyBrushTool"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1488fb560",
+    "file_offset": 143629664,
+    "text": "paintbrushEraser"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1488fb578",
+    "file_offset": 143629688,
+    "text": "paintbrushTool"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1488fc3f0",
+    "file_offset": 143633392,
+    "text": "smartBrushClearSelectionEvent"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1488fc410",
+    "file_offset": 143633424,
+    "text": "smartBrushResetSelectionEvent"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1488fc9c0",
+    "file_offset": 143634880,
+    "text": "toggleBrushesPalette"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14890cab0",
+    "file_offset": 143700656,
+    "text": "SamplingBrush"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x14890d860",
+    "file_offset": 143704160,
+    "text": "smartbrush"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1489118b0",
+    "file_offset": 143720624,
+    "text": "SmartBrush"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148912610",
+    "file_offset": 143724048,
+    "text": "smartBrushClass"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148912810",
+    "file_offset": 143724560,
+    "text": "smartBrushWorkspace"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1489128d0",
+    "file_offset": 143724752,
+    "text": "smartBrushSelectionMode"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148912c60",
+    "file_offset": 143725664,
+    "text": "smartBrushRadius"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148912c78",
+    "file_offset": 143725688,
+    "text": "smartBrushSmooth"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148912c90",
+    "file_offset": 143725712,
+    "text": "smartBrushFeather"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148912ca8",
+    "file_offset": 143725736,
+    "text": "smartBrushContrast"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148912cc0",
+    "file_offset": 143725760,
+    "text": "smartBrushShiftEdge"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148912cd8",
+    "file_offset": 143725784,
+    "text": "smartBrushUseSmartRadius"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148912cf8",
+    "file_offset": 143725816,
+    "text": "smartBrushUseDeepMatte"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148912d20",
+    "file_offset": 143725856,
+    "text": "smartBrushDecontaminate"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148912d38",
+    "file_offset": 143725880,
+    "text": "smartBrushDeconAmount"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148913aa8",
+    "file_offset": 143729320,
+    "text": "TSmartBrushTool"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1489140d8",
+    "file_offset": 143730904,
+    "text": "QuickSelectBrush"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1489140f0",
+    "file_offset": 143730928,
+    "text": "RefineBrush"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148914100",
+    "file_offset": 143730944,
+    "text": "DirectBrush"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148914160",
+    "file_offset": 143731040,
+    "text": "smartBrushShowRefineModeSettings"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148914188",
+    "file_offset": 143731080,
+    "text": "smartBrushShowEdgeDetectionSettings"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1489141b0",
+    "file_offset": 143731120,
+    "text": "smartBrushShowRefineEdgeSettings"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1489141d8",
+    "file_offset": 143731160,
+    "text": "smartBrushShowAdvancedSettings"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1489142d8",
+    "file_offset": 143731416,
+    "text": "smartBrushTool"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1489142e8",
+    "file_offset": 143731432,
+    "text": "smartBrushViewMode"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148914300",
+    "file_offset": 143731456,
+    "text": "smartBrushTransparency"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148914330",
+    "file_offset": 143731504,
+    "text": "smartBrushShowBorder"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148914348",
+    "file_offset": 143731528,
+    "text": "smartBrushRefineOnEdit"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148914360",
+    "file_offset": 143731552,
+    "text": "smartBrushShowOriginal"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148914378",
+    "file_offset": 143731576,
+    "text": "smartBrushHighResOnMouseDown"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148914398",
+    "file_offset": 143731608,
+    "text": "smartBrushRememberSettings"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1489143b8",
+    "file_offset": 143731640,
+    "text": "smartBrushUserSpecifiedOutput"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1489a91c0",
+    "file_offset": 144341440,
+    "text": "TNeuralGalleryWorkspaceSamplingBrushTool"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x1489d7da8",
+    "file_offset": 144532904,
+    "text": "createBrushInstead"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148a3db00",
+    "file_offset": 144950016,
+    "text": "TRemoveBrushTool"
+  },
+  {
+    "section": ".rdata",
+    "va": "0x148ae9c00",
+    "file_offset": 145654784,
+    "text": "quickSelectBrushSize"
+  }
+]

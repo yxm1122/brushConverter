@@ -1,0 +1,508 @@
+{
+  "exe": "<LOCAL_APP_DIR>/PS2025/Adobe Photoshop 2025/Photoshop.exe",
+  "needles": [
+    "textureBrightness",
+    "textureContrast",
+    "textureBlendMode",
+    "textureDepth",
+    "textureScale",
+    "invertTexture",
+    "protectTexture",
+    "useTexture",
+    "textureCoverage",
+    "minimumDepth",
+    "textureDepthDynamics"
+  ],
+  "string_hits": {
+    "0x148590800": "textureBrightness",
+    "0x148590818": "textureContrast",
+    "0x148590848": "textureBlendMode",
+    "0x148590860": "textureDepth",
+    "0x148590880": "textureDepthDynamics",
+    "0x1488c23a9": "textureDepth#23a9",
+    "0x1485907d0": "textureScale",
+    "0x148897cea": "textureScale#7cea",
+    "0x148897d20": "textureScale#7d20",
+    "0x148897ea1": "textureScale#7ea1",
+    "0x148897ed7": "textureScale#7ed7",
+    "0x1485907e0": "invertTexture",
+    "0x1488c2452": "invertTexture#2452",
+    "0x1485907f0": "protectTexture",
+    "0x1486674c0": "protectTexture#74c0",
+    "0x148590828": "useTexture",
+    "0x1488c22d2": "useTexture#22d2",
+    "0x148590838": "textureCoverage",
+    "0x148590870": "minimumDepth"
+  },
+  "pdata_function_count": 438177,
+  "raw_ref_sites": 59,
+  "verified_ref_sites": 59,
+  "functions": [
+    {
+      "func_begin": "0x141a8b470",
+      "func_size": 921,
+      "refs": [
+        {
+          "insn_va": "0x141a8b59d",
+          "label": "textureScale",
+          "text": "lea rax, [rip + 0x6b0522c]"
+        },
+        {
+          "insn_va": "0x141a8b5a8",
+          "label": "invertTexture",
+          "text": "lea rax, [rip + 0x6b05231]"
+        },
+        {
+          "insn_va": "0x141a8b5b3",
+          "label": "protectTexture",
+          "text": "lea rax, [rip + 0x6b05236]"
+        },
+        {
+          "insn_va": "0x141a8b5be",
+          "label": "textureBrightness",
+          "text": "lea rax, [rip + 0x6b0523b]"
+        },
+        {
+          "insn_va": "0x141a8b5c9",
+          "label": "textureContrast",
+          "text": "lea rax, [rip + 0x6b05248]"
+        },
+        {
+          "insn_va": "0x141a8b5d4",
+          "label": "useTexture",
+          "text": "lea rax, [rip + 0x6b0524d]"
+        },
+        {
+          "insn_va": "0x141a8b5df",
+          "label": "textureCoverage",
+          "text": "lea rax, [rip + 0x6b05252]"
+        },
+        {
+          "insn_va": "0x141a8b5f5",
+          "label": "textureBlendMode",
+          "text": "lea rax, [rip + 0x6b0524c]"
+        },
+        {
+          "insn_va": "0x141a8b600",
+          "label": "textureDepth",
+          "text": "lea rax, [rip + 0x6b05259]"
+        },
+        {
+          "insn_va": "0x141a8b60b",
+          "label": "minimumDepth",
+          "text": "lea rax, [rip + 0x6b0525e]"
+        },
+        {
+          "insn_va": "0x141a8b616",
+          "label": "textureDepthDynamics",
+          "text": "lea rax, [rip + 0x6b05263]"
+        }
+      ],
+      "labels": [
+        "invertTexture",
+        "minimumDepth",
+        "protectTexture",
+        "textureBlendMode",
+        "textureBrightness",
+        "textureContrast",
+        "textureCoverage",
+        "textureDepth",
+        "textureDepthDynamics",
+        "textureScale",
+        "useTexture"
+      ],
+      "label_count": 11
+    },
+    {
+      "func_begin": "0x141a8e060",
+      "func_size": 3061,
+      "refs": [
+        {
+          "insn_va": "0x141a8e549",
+          "label": "useTexture",
+          "text": "lea rdx, [rip + 0x6b022d8]"
+        },
+        {
+          "insn_va": "0x141a8e57d",
+          "label": "textureCoverage",
+          "text": "lea rdx, [rip + 0x6b022b4]"
+        },
+        {
+          "insn_va": "0x141a8e5b5",
+          "label": "textureBlendMode",
+          "text": "lea rdx, [rip + 0x6b0228c]"
+        },
+        {
+          "insn_va": "0x141a8e5ee",
+          "label": "textureDepth",
+          "text": "lea rdx, [rip + 0x6b0226b]"
+        },
+        {
+          "insn_va": "0x141a8e627",
+          "label": "minimumDepth",
+          "text": "lea rdx, [rip + 0x6b02242]"
+        },
+        {
+          "insn_va": "0x141a8e636",
+          "label": "textureDepthDynamics",
+          "text": "lea rcx, [rip + 0x6b02243]"
+        },
+        {
+          "insn_va": "0x141a8e6e1",
+          "label": "textureScale",
+          "text": "lea rdx, [rip + 0x6b020e8]"
+        },
+        {
+          "insn_va": "0x141a8e705",
+          "label": "invertTexture",
+          "text": "lea rdx, [rip + 0x6b020d4]"
+        },
+        {
+          "insn_va": "0x141a8e72e",
+          "label": "protectTexture",
+          "text": "lea rdx, [rip + 0x6b020bb]"
+        },
+        {
+          "insn_va": "0x141a8e751",
+          "label": "textureBrightness",
+          "text": "lea rdx, [rip + 0x6b020a8]"
+        },
+        {
+          "insn_va": "0x141a8e774",
+          "label": "textureContrast",
+          "text": "lea rdx, [rip + 0x6b0209d]"
+        }
+      ],
+      "labels": [
+        "invertTexture",
+        "minimumDepth",
+        "protectTexture",
+        "textureBlendMode",
+        "textureBrightness",
+        "textureContrast",
+        "textureCoverage",
+        "textureDepth",
+        "textureDepthDynamics",
+        "textureScale",
+        "useTexture"
+      ],
+      "label_count": 11
+    },
+    {
+      "func_begin": "0x141a935f0",
+      "func_size": 486,
+      "refs": [
+        {
+          "insn_va": "0x141a93622",
+          "label": "useTexture",
+          "text": "lea rdx, [rip + 0x6afd1ff]"
+        },
+        {
+          "insn_va": "0x141a9363e",
+          "label": "textureCoverage",
+          "text": "lea rdx, [rip + 0x6afd1f3]"
+        },
+        {
+          "insn_va": "0x141a93651",
+          "label": "textureBlendMode",
+          "text": "lea rdx, [rip + 0x6afd1f0]"
+        },
+        {
+          "insn_va": "0x141a9365d",
+          "label": "textureDepth",
+          "text": "lea rcx, [rip + 0x6afd1fc]"
+        },
+        {
+          "insn_va": "0x141a936c5",
+          "label": "minimumDepth",
+          "text": "lea rcx, [rip + 0x6afd1a4]"
+        },
+        {
+          "insn_va": "0x141a9371f",
+          "label": "textureDepthDynamics",
+          "text": "lea rcx, [rip + 0x6afd15a]"
+        }
+      ],
+      "labels": [
+        "minimumDepth",
+        "textureBlendMode",
+        "textureCoverage",
+        "textureDepth",
+        "textureDepthDynamics",
+        "useTexture"
+      ],
+      "label_count": 6
+    },
+    {
+      "func_begin": "0x141a960c0",
+      "func_size": 357,
+      "refs": [
+        {
+          "insn_va": "0x141a960ee",
+          "label": "useTexture",
+          "text": "lea rdx, [rip + 0x6afa733]"
+        },
+        {
+          "insn_va": "0x141a9611f",
+          "label": "textureCoverage",
+          "text": "lea rdx, [rip + 0x6afa712]"
+        },
+        {
+          "insn_va": "0x141a96159",
+          "label": "textureBlendMode",
+          "text": "lea rdx, [rip + 0x6afa6e8]"
+        },
+        {
+          "insn_va": "0x141a9617c",
+          "label": "textureDepth",
+          "text": "lea rdx, [rip + 0x6afa6dd]"
+        },
+        {
+          "insn_va": "0x141a961b2",
+          "label": "minimumDepth",
+          "text": "lea rdx, [rip + 0x6afa6b7]"
+        },
+        {
+          "insn_va": "0x141a961d8",
+          "label": "textureDepthDynamics",
+          "text": "lea rcx, [rip + 0x6afa6a1]"
+        }
+      ],
+      "labels": [
+        "minimumDepth",
+        "textureBlendMode",
+        "textureCoverage",
+        "textureDepth",
+        "textureDepthDynamics",
+        "useTexture"
+      ],
+      "label_count": 6
+    },
+    {
+      "func_begin": "0x141a96230",
+      "func_size": 332,
+      "refs": [
+        {
+          "insn_va": "0x141a962aa",
+          "label": "textureScale",
+          "text": "lea rdx, [rip + 0x6afa51f]"
+        },
+        {
+          "insn_va": "0x141a962d4",
+          "label": "invertTexture",
+          "text": "lea rdx, [rip + 0x6afa505]"
+        },
+        {
+          "insn_va": "0x141a962f9",
+          "label": "protectTexture",
+          "text": "lea rdx, [rip + 0x6afa4f0]"
+        },
+        {
+          "insn_va": "0x141a96319",
+          "label": "textureBrightness",
+          "text": "lea rdx, [rip + 0x6afa4e0]"
+        },
+        {
+          "insn_va": "0x141a96338",
+          "label": "textureContrast",
+          "text": "lea rdx, [rip + 0x6afa4d9]"
+        }
+      ],
+      "labels": [
+        "invertTexture",
+        "protectTexture",
+        "textureBrightness",
+        "textureContrast",
+        "textureScale"
+      ],
+      "label_count": 5
+    },
+    {
+      "func_begin": "0x141a939d5",
+      "func_size": 206,
+      "refs": [
+        {
+          "insn_va": "0x141a93a2a",
+          "label": "invertTexture",
+          "text": "lea rdx, [rip + 0x6afcdaf]"
+        },
+        {
+          "insn_va": "0x141a93a42",
+          "label": "protectTexture",
+          "text": "lea rdx, [rip + 0x6afcda7]"
+        },
+        {
+          "insn_va": "0x141a93a5a",
+          "label": "textureBrightness",
+          "text": "lea rdx, [rip + 0x6afcd9f]"
+        },
+        {
+          "insn_va": "0x141a93a72",
+          "label": "textureContrast",
+          "text": "lea rdx, [rip + 0x6afcd9f]"
+        }
+      ],
+      "labels": [
+        "invertTexture",
+        "protectTexture",
+        "textureBrightness",
+        "textureContrast"
+      ],
+      "label_count": 4
+    },
+    {
+      "func_begin": "0x1438d2ae0",
+      "func_size": 4422,
+      "refs": [
+        {
+          "insn_va": "0x1438d35bc",
+          "label": "useTexture",
+          "text": "lea rdx, [rip + 0x4cbd265]"
+        },
+        {
+          "insn_va": "0x1438d35d8",
+          "label": "useTexture",
+          "text": "lea rdx, [rip + 0x4cbd249]"
+        },
+        {
+          "insn_va": "0x1438d3651",
+          "label": "invertTexture",
+          "text": "lea rdx, [rip + 0x4cbd188]"
+        },
+        {
+          "insn_va": "0x1438d366d",
+          "label": "invertTexture",
+          "text": "lea rdx, [rip + 0x4cbd16c]"
+        },
+        {
+          "insn_va": "0x1438d377b",
+          "label": "textureDepth",
+          "text": "lea rdx, [rip + 0x4cbd0de]"
+        },
+        {
+          "insn_va": "0x1438d379a",
+          "label": "textureDepth",
+          "text": "lea rdx, [rip + 0x4cbd0bf]"
+        }
+      ],
+      "labels": [
+        "invertTexture",
+        "textureDepth",
+        "useTexture"
+      ],
+      "label_count": 3
+    },
+    {
+      "func_begin": "0x1438dfcf0",
+      "func_size": 2344,
+      "refs": [
+        {
+          "insn_va": "0x1438e02d7",
+          "label": "useTexture",
+          "text": "lea rdx, [rip + 0x4cb054a]"
+        },
+        {
+          "insn_va": "0x1438e035e",
+          "label": "invertTexture",
+          "text": "lea rdx, [rip + 0x4cb047b]"
+        },
+        {
+          "insn_va": "0x1438e0407",
+          "label": "textureDepth",
+          "text": "lea rdx, [rip + 0x4cb0452]"
+        }
+      ],
+      "labels": [
+        "invertTexture",
+        "textureDepth",
+        "useTexture"
+      ],
+      "label_count": 3
+    },
+    {
+      "func_begin": "0x141a937fb",
+      "func_size": 474,
+      "refs": [
+        {
+          "insn_va": "0x141a939ae",
+          "label": "textureScale",
+          "text": "lea rcx, [rip + 0x6afce1b]"
+        }
+      ],
+      "labels": [
+        "textureScale"
+      ],
+      "label_count": 1
+    },
+    {
+      "func_begin": "0x141ef92e0",
+      "func_size": 2502,
+      "refs": [
+        {
+          "insn_va": "0x141ef9401",
+          "label": "protectTexture#74c0",
+          "text": "lea rdx, [rip + 0x676e0b8]"
+        },
+        {
+          "insn_va": "0x141ef9420",
+          "label": "protectTexture#74c0",
+          "text": "lea rdx, [rip + 0x676e099]"
+        }
+      ],
+      "labels": [
+        "protectTexture#74c0"
+      ],
+      "label_count": 1
+    },
+    {
+      "func_begin": "0x141efd020",
+      "func_size": 2026,
+      "refs": [
+        {
+          "insn_va": "0x141efd4e2",
+          "label": "protectTexture#74c0",
+          "text": "lea rdx, [rip + 0x6769fd7]"
+        }
+      ],
+      "labels": [
+        "protectTexture#74c0"
+      ],
+      "label_count": 1
+    },
+    {
+      "func_begin": "0x142a62c30",
+      "func_size": 896,
+      "refs": [
+        {
+          "insn_va": "0x142a62d33",
+          "label": "protectTexture#74c0",
+          "text": "lea rdx, [rip + 0x5c04786]"
+        }
+      ],
+      "labels": [
+        "protectTexture#74c0"
+      ],
+      "label_count": 1
+    },
+    {
+      "func_begin": "0x142a72a7a",
+      "func_size": 1223,
+      "refs": [
+        {
+          "insn_va": "0x142a72bf2",
+          "label": "protectTexture#74c0",
+          "text": "lea rdx, [rip + 0x5bf48c7]"
+        },
+        {
+          "insn_va": "0x142a72c1f",
+          "label": "protectTexture#74c0",
+          "text": "lea rdx, [rip + 0x5bf489a]"
+        }
+      ],
+      "labels": [
+        "protectTexture#74c0"
+      ],
+      "label_count": 1
+    }
+  ]
+}
