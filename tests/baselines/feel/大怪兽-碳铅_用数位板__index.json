@@ -1,0 +1,81 @@
+{
+ "schema_version": 1,
+ "task": "14",
+ "kind": "feel-pressure-profile",
+ "preset": "006_大怪兽-碳铅_用数位板.kpp",
+ "brush": "大怪兽-碳铅_用数位板",
+ "stroke_length": 120,
+ "size": "200x200",
+ "pressure_profile": [
+  0.2,
+  0.5,
+  0.8,
+  1.0
+ ],
+ "pressure_injected": true,
+ "simulated": false,
+ "total_elapsed_s": 50.47,
+ "entries": [
+  {
+   "pressure": 0.2,
+   "file": "feel__大怪兽-碳铅_用数位板__p0.20__s200x200.png",
+   "path": "<REPO>\\tests\\baselines\\feel\\feel__大怪兽-碳铅_用数位板__p0.20__s200x200.png",
+   "stroke_length": 120,
+   "size": "200x200",
+   "ok": true,
+   "alpha_nonzero": 601,
+   "elapsed_s": 12.443,
+   "sha256": "38833a7b84342cfb18e0d964a834205b5d924d51dd79d86fdc143ebb3c07abb5",
+   "reason": null,
+   "curve_file": "大怪兽-碳铅_用数位板__p0.20__curve.json",
+   "max_width_px": 5.437500000000012,
+   "mean_opacity_01": 0.02671281403186276
+  },
+  {
+   "pressure": 0.5,
+   "file": "feel__大怪兽-碳铅_用数位板__p0.50__s200x200.png",
+   "path": "<REPO>\\tests\\baselines\\feel\\feel__大怪兽-碳铅_用数位板__p0.50__s200x200.png",
+   "stroke_length": 120,
+   "size": "200x200",
+   "ok": true,
+   "alpha_nonzero": 2479,
+   "elapsed_s": 12.177,
+   "sha256": "394a386490ba9f2ad2a80706650d00e06058664143dffe78cb93a873c036eae2",
+   "reason": null,
+   "curve_file": "大怪兽-碳铅_用数位板__p0.50__curve.json",
+   "max_width_px": 18.812499999999993,
+   "mean_opacity_01": 0.17109965767123417
+  },
+  {
+   "pressure": 0.8,
+   "file": "feel__大怪兽-碳铅_用数位板__p0.80__s200x200.png",
+   "path": "<REPO>\\tests\\baselines\\feel\\feel__大怪兽-碳铅_用数位板__p0.80__s200x200.png",
+   "stroke_length": 120,
+   "size": "200x200",
+   "ok": true,
+   "alpha_nonzero": 5282,
+   "elapsed_s": 12.41,
+   "sha256": "26328979fae36452d47d963db80274efca8382e6f97617d199712c0ad903bd94",
+   "reason": null,
+   "curve_file": "大怪兽-碳铅_用数位板__p0.80__curve.json",
+   "max_width_px": 45.75000000000001,
+   "mean_opacity_01": 0.2871726654795737
+  },
+  {
+   "pressure": 1.0,
+   "file": "feel__大怪兽-碳铅_用数位板__p1.00__s200x200.png",
+   "path": "<REPO>\\tests\\baselines\\feel\\feel__大怪兽-碳铅_用数位板__p1.00__s200x200.png",
+   "stroke_length": 120,
+   "size": "200x200",
+   "ok": true,
+   "alpha_nonzero": 8476,
+   "elapsed_s": 12.257,
+   "sha256": "67c8214967a40c1199c5e708a76889b9123b4b39e22047addc084fb7dada77bd",
+   "reason": null,
+   "curve_file": "大怪兽-碳铅_用数位板__p1.00__curve.json",
+   "max_width_px": 57.81250000000001,
+   "mean_opacity_01": 0.36686933487664225
+  }
+ ],
+ "note": "Krita 侧压感真实注入：不同档位的 Alpha 非零像素数与图像哈希均不同"
+}

@@ -5,6 +5,13 @@
 
 默认参数集严格取自用户手动转换的 Krita 5.x 参考预设（199 项参数，
 145 internal + 54 string），保证参数名与类型和 Krita 实际输出一致。
+
+纹理亮度/对比度有两条实现路径（见文件中部「纹理亮度/对比度：公式开关」一节）：
+  - calibrated （默认，v1.2.0 起）任务 12 拟合出的 PS 纹理前置变换的精确逆；
+  - legacy     （历史方案，v1.1.2 及更早）经验公式，可用环境变量一键回退：
+        BRUSHCONVERTER_TEXTURE_FORMULA=legacy python cli.py convert ...
+回退理由：新公式是研究产物，一旦退化必须能立刻回到旧行为。
+转正依据（A/B 掩码空间 70.75% → 0.00%）与限制见 docs/验收报告/13-报告.md。
 """
 
 from __future__ import annotations
@@ -12,7 +19,9 @@ from __future__ import annotations
 import base64
 import hashlib
 import math
+import os
 import re
+import sys
 from dataclasses import dataclass
 from xml.sax.saxutils import escape, quoteattr
 
@@ -206,6 +215,142 @@ def _resources_xml(resources: list[tuple[str, str, str, bytes]]) -> str:
         _resource_xml(res_type, name, filename, png)
         for res_type, name, filename, png in resources
     ) + "</resources>"
+
+
+# ---------------------------------------------------------------------------
+# 纹理亮度/对比度：公式开关与两条实现（任务 13）
+#
+# PS 侧真值来自任务 12（docs/研究报告/lut-拟合.md）：
+#   对比度中心 p = 127（0..255 尺度），因子 k = 1+C/100（C<0）或 1/(1-C/100)（C>=0）；
+#   顺序随对比度符号翻转：C>=0 先亮度后对比度，C<0 先对比度后亮度。
+# Krita 侧真值来自 KisTextureMaskInfo::recalculateMask()（tools/texture_mask.py 精确复刻）：
+#   mask -= brightness；mask = (mask-0.5)*contrast + 0.5；再 clamp 0..1。
+# calibrated 就是把「Krita 的亮度/对比度两个参数」反解成让 Krita 掩码等于 PS 前置掩码的值。
+# ---------------------------------------------------------------------------
+_TEXTURE_FORMULA_ENV = "BRUSHCONVERTER_TEXTURE_FORMULA"
+_TEXTURE_FORMULA_VALUES = ("legacy", "calibrated")
+#: 默认公式：v1.2.0 起转正为 calibrated（A/B 掩码空间 0.00% vs 旧公式 70.75%）
+_TEXTURE_FORMULA_DEFAULT = "calibrated"
+#: 已经警告过的非法环境变量值（同一个非法值只提示一次，避免批量转换刷屏）
+_TEXTURE_FORMULA_WARNED: set[str] = set()
+
+
+def _texture_formula() -> str:
+    """读取纹理亮度/对比度公式开关。
+
+    - 未设置环境变量 → calibrated（默认，v1.2.0 起转正）；
+    - legacy / calibrated（忽略大小写与首尾空白）→ 原样返回
+      （legacy 是 v1.1.2 历史方案，用 BRUSHCONVERTER_TEXTURE_FORMULA=legacy 回退）；
+    - 其它非法取值（含空字符串）→ 回退默认公式 calibrated，
+      并对同一个非法取值只打印一次警告（stderr）。
+    """
+    raw = os.environ.get(_TEXTURE_FORMULA_ENV)
+    if raw is None:
+        return _TEXTURE_FORMULA_DEFAULT
+    value = raw.strip().lower()
+    if value in _TEXTURE_FORMULA_VALUES:
+        return value
+    if raw not in _TEXTURE_FORMULA_WARNED:
+        _TEXTURE_FORMULA_WARNED.add(raw)
+        print(
+            f"[警告] 环境变量 {_TEXTURE_FORMULA_ENV}={raw!r} 非法"
+            f"（只接受 {'/'.join(_TEXTURE_FORMULA_VALUES)}），"
+            f"已回退默认公式 {_TEXTURE_FORMULA_DEFAULT}。",
+            file=sys.stderr,
+        )
+    return _TEXTURE_FORMULA_DEFAULT
+
+
+def _texture_contrast_factor(ps_contrast: float) -> float:
+    """Photoshop 纹理对比度 → 中心乘法因子 k（两条路径共用，未舍入）。
+
+    C < 0：k = 1 + C/100；C >= 0：k = 1/(1-C/100)；C >= 100 用 1e6 逼近完全二值化。
+    依据任务 12 拟合（docs/研究报告/lut-拟合.md 第 4.1 节：实测 k 与经验公式一致）。
+    """
+    c = max(-50.0, min(100.0, ps_contrast))
+    if c < 0.0:
+        return 1.0 + c / 100.0
+    if c >= 100.0:
+        return 1_000_000.0
+    return 1.0 / (1.0 - c / 100.0)
+
+
+def _texture_brightness_legacy(ps_brightness: float) -> float:
+    """历史方案（v1.1.2，勿改）：Krita 亮度 = 0.10 - PS亮度/250，两位小数，clamp [-1,1]。
+
+    保留此函数是任务 13 的硬性要求：开关必须能一键切回旧行为。
+    """
+    brightness = 0.10 - ps_brightness / 250.0
+    brightness = max(-1.0, min(1.0, round(brightness, 2)))
+    if brightness == 0:
+        return 0.0
+    return brightness
+
+
+def _texture_contrast_legacy(ps_contrast: float) -> float:
+    """历史方案（v1.1.2，勿改）：对比度直接取 PS 中心因子，两位小数，clamp [0,2]。"""
+    contrast = max(0.0, min(2.0, round(_texture_contrast_factor(ps_contrast), 2)))
+    return contrast
+
+
+def _texture_brightness_contrast_calibrated(
+    ps_brightness: float, ps_contrast: float
+) -> tuple[float, float]:
+    """现行方案（v1.2.0 起默认）：任务 12 拟合公式的精确逆，闭式推导见下。
+
+    记 PS 亮度值 b（-150..150，0..255 尺度）、对比度因子 k（0..2 可表达），
+    Krita 前置掩码（0..255 尺度）为
+        U_k = k*t - 255*k*b_k + 127.5*(1-k)          （唯一一次 clamp 在出口）
+    PS 前置掩码（0..255 尺度）按任务 12 的符号规则：
+        C >= 0（先亮度后对比度） U = k*clip(t+b) + 127*(1-k)
+        C <  0（先对比度后亮度） U = clip(k*t + 127*(1-k) + b)
+    在未截断区把两式逐项对齐，解出唯一一组 Krita 参数：
+        c_k = k
+        b_k = (1-k)/(510k) - b/(255k)   （C < 0，亮度在对比度之后 → 反解时要除以 k）
+        b_k = (1-k)/(510k) - b/255      （C >= 0，亮度在对比度之前）
+    截断区可证明两侧等价（k>=1 时 PS 的「先截断亮度」与 Krita 的「最后统一截断」
+    在饱和区给出相同的 0/255），因此该闭式在整个定义域内逐点等价，不需要数值搜索。
+
+    表达不了的两类参数（如实保留并写进文档，不做假补）：
+      1) C > 50 时 k > 2，超出 Krita Contrast 上限 2 → 按 2 截断，属结构性失真；
+      2) 反解出的 b_k 超出 Krita 亮度滑杆范围 [-1,1] 时按边界截断
+         （仅 C<0 且 |PS 亮度| 很大时出现，例如 C=-50 与 b=±150）。
+    精度：Krita 用 double 读取预设值（KisTextureOptionData::read 的 getDouble），
+    这里保留 3 位小数（Krita UI 显示两位，多留一位是为了让 k=2 时
+    亮度舍入误差不超过 1/255，保证掩码等价误差 <= 1 级）。
+    """
+    k = _texture_contrast_factor(ps_contrast)
+    c = max(-50.0, min(100.0, ps_contrast))
+    k_eff = max(0.0, min(2.0, k))
+    if k_eff <= 0.0:
+        # PS 对比度合法范围是 -50..100，k 恒 >= 0.5；这里只做防御性回退。
+        return (_texture_brightness_legacy(ps_brightness),
+                _texture_contrast_legacy(ps_contrast))
+    center_fix = (1.0 - k_eff) / (510.0 * k_eff)
+    if c < 0.0:
+        brightness = center_fix - ps_brightness / (255.0 * k_eff)
+    else:
+        brightness = center_fix - ps_brightness / 255.0
+    brightness = max(-1.0, min(1.0, round(brightness, 3)))
+    if brightness == 0:
+        brightness = 0.0
+    contrast = max(0.0, min(2.0, round(k_eff, 3)))
+    return brightness, contrast
+
+
+def texture_brightness_contrast(
+    ps_brightness: float, ps_contrast: float
+) -> tuple[float, float]:
+    """PS 纹理亮度/对比度 → Krita Texture/Pattern/Brightness、Contrast。
+
+    由环境变量 BRUSHCONVERTER_TEXTURE_FORMULA 选择实现：
+      - calibrated （默认，v1.2.0 起）任务 12 拟合公式的精确逆；
+      - legacy     （历史方案）v1.1.2 经验公式，显式设置环境变量即可回退。
+    非法取值回退默认公式（calibrated）并只警告一次。
+    """
+    if _texture_formula() == "calibrated":
+        return _texture_brightness_contrast_calibrated(ps_brightness, ps_contrast)
+    return _texture_brightness_legacy(ps_brightness), _texture_contrast_legacy(ps_contrast)
 
 
 @dataclass

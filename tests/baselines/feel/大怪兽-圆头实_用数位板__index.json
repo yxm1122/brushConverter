@@ -1,0 +1,81 @@
+{
+ "schema_version": 1,
+ "task": "14",
+ "kind": "feel-pressure-profile",
+ "preset": "004_大怪兽-圆头实_用数位板.kpp",
+ "brush": "大怪兽-圆头实_用数位板",
+ "stroke_length": 120,
+ "size": "200x200",
+ "pressure_profile": [
+  0.2,
+  0.5,
+  0.8,
+  1.0
+ ],
+ "pressure_injected": true,
+ "simulated": false,
+ "total_elapsed_s": 45.39,
+ "entries": [
+  {
+   "pressure": 0.2,
+   "file": "feel__大怪兽-圆头实_用数位板__p0.20__s200x200.png",
+   "path": "<REPO>\\tests\\baselines\\feel\\feel__大怪兽-圆头实_用数位板__p0.20__s200x200.png",
+   "stroke_length": 120,
+   "size": "200x200",
+   "ok": true,
+   "alpha_nonzero": 388,
+   "elapsed_s": 11.305,
+   "sha256": "f980b241ebf34dc77869d88c39b66da51ed8a72157047d767f012ee7e949f3e8",
+   "reason": null,
+   "curve_file": "大怪兽-圆头实_用数位板__p0.20__curve.json",
+   "max_width_px": 3.0,
+   "mean_opacity_01": 0.05651616115196078
+  },
+  {
+   "pressure": 0.5,
+   "file": "feel__大怪兽-圆头实_用数位板__p0.50__s200x200.png",
+   "path": "<REPO>\\tests\\baselines\\feel\\feel__大怪兽-圆头实_用数位板__p0.50__s200x200.png",
+   "stroke_length": 120,
+   "size": "200x200",
+   "ok": true,
+   "alpha_nonzero": 1382,
+   "elapsed_s": 11.123,
+   "sha256": "a6fbef429e09024277cde04757f0608d7106ddd9f447b55b53b00c78b723a332",
+   "reason": null,
+   "curve_file": "大怪兽-圆头实_用数位板__p0.50__curve.json",
+   "max_width_px": 11.562499999999998,
+   "mean_opacity_01": 0.2699603514464498
+  },
+  {
+   "pressure": 0.8,
+   "file": "feel__大怪兽-圆头实_用数位板__p0.80__s200x200.png",
+   "path": "<REPO>\\tests\\baselines\\feel\\feel__大怪兽-圆头实_用数位板__p0.80__s200x200.png",
+   "stroke_length": 120,
+   "size": "200x200",
+   "ok": true,
+   "alpha_nonzero": 2417,
+   "elapsed_s": 10.92,
+   "sha256": "428277388e17fe6f57ce8af61bbb64aba09f38548e7fc9bbce14408eda6cadbb",
+   "reason": null,
+   "curve_file": "大怪兽-圆头实_用数位板__p0.80__curve.json",
+   "max_width_px": 19.0,
+   "mean_opacity_01": 0.5052505454976554
+  },
+  {
+   "pressure": 1.0,
+   "file": "feel__大怪兽-圆头实_用数位板__p1.00__s200x200.png",
+   "path": "<REPO>\\tests\\baselines\\feel\\feel__大怪兽-圆头实_用数位板__p1.00__s200x200.png",
+   "stroke_length": 120,
+   "size": "200x200",
+   "ok": true,
+   "alpha_nonzero": 3348,
+   "elapsed_s": 10.892,
+   "sha256": "6613548de4a228529334d59397ad2ca2c4b86eff9bb32f66b014b55bd48917c2",
+   "reason": null,
+   "curve_file": "大怪兽-圆头实_用数位板__p1.00__curve.json",
+   "max_width_px": 24.0,
+   "mean_opacity_01": 0.6809218624417097
+  }
+ ],
+ "note": "Krita 侧压感真实注入：不同档位的 Alpha 非零像素数与图像哈希均不同"
+}

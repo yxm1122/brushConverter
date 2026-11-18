@@ -13,6 +13,7 @@ from PIL import Image
 from .abr import AbrFile
 from .mapping import BrushPreset, TextureSettings, map_presets, _TEXTURING_MODE
 from .kpp import TextureXml, build_preset_xml, write_kpp, write_bundle
+from .kpp.preset_xml import texture_brightness_contrast
 from .kpp.kpp_writer import render_tip_preview
 
 
@@ -66,34 +67,13 @@ def _texture_xml(bp: BrushPreset) -> TextureXml | None:
     # Krita 源码的 KisTextureMaskInfo 直接执行：
     #   maskValue -= brightness
     #   maskValue = ((maskValue - 0.5) * contrast) + 0.5
-    # Krita brightness 作用于 0..1 的 mask，源码先执行减法。
-    # 定量对照得到的最终合成标尺：以 0.10 为 PS=0 的 Krita 基线，
-    # 每 25 个 PS 亮度约对应 Krita 0.10 的反向变化。
-    # 所有模式统一使用该普通映射（Linear Height (Photoshop) 曾用
-    # 0.30 基线，实测效果不好，2026-08-27 确认取消特殊映射）。
-    brightness = 0.10 - tex.brightness / 250.0
-    # Krita UI/预设实际只保留两位小数。
-    brightness = max(-1.0, min(1.0, round(brightness, 2)))
-    if brightness == 0:
-        brightness = 0.0
-    # 定量测试显示 Photoshop 对比度是现代调整层的分段因子，
-    # 并且 Krita 的 Contrast 参数正好接收这个中心乘法因子：
-    #   C < 0: factor = 1 + C/100
-    #   C >= 0: factor = 1/(1 - C/100)
-    # 例如 -50→0.5、25→1.333...、50→2、75→4；+100
-    # 理论上趋于无穷，使用大值逼近其完全二值化效果。
-    c = max(-50.0, min(100.0, tex.contrast))
-    if c < 0.0:
-        ps_factor = 1.0 + c / 100.0
-    elif c >= 100.0:
-        ps_factor = 1_000_000.0
-    else:
-        ps_factor = 1.0 / (1.0 - c / 100.0)
-    # 所有模式统一使用 PS 中心因子（Linear Height (Photoshop) 曾用
-    # 其倒数，实测效果不好，2026-08-27 确认取消特殊映射）。
-    contrast = ps_factor
-    # Krita Contrast UI/配置精确到两位小数，且有效范围为 0..2。
-    contrast = max(0.0, min(2.0, round(contrast, 2)))
+    # 因此 PS 纹理亮度/对比度 → Krita 两个参数的换算集中在
+    # preset_xml.texture_brightness_contrast() 里，由环境变量
+    # BRUSHCONVERTER_TEXTURE_FORMULA 选择路径：
+    #   calibrated （默认，v1.2.0 起）任务 12 拟合公式的精确逆；
+    #   legacy     （历史方案）v1.1.2 经验公式（亮度 0.10 - PS/250，对比度 PS 中心因子）。
+    # 公式、推导与限制见 docs/parameter-mapping.md 第 7 节。
+    brightness, contrast = texture_brightness_contrast(tex.brightness, tex.contrast)
     return TextureXml(
         pattern_filename=filename,
         png_bytes=_texture_png(tex),

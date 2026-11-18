@@ -1,7 +1,8 @@
 # ABR → Krita 完整参数映射清单
 
 > 引擎：现阶段仅像素引擎（paintbrush）。源数据来自 `海怪笔刷…18支.abr`（v6.2，20 预设）。
-> ✅ = 已实现，⛔ = 不映射（原因见右侧），❓ = 待你确认。
+> ✅ = 已实现，⛔ = 不映射（原因见右侧），⚠️ = 已尽量映射但仍保留提示（如 `TxtC` / `protectTexture` 在 Krita 无对应）；
+> ❓ = 待确认（**历史记号**，本表现已无待确认项：早期两处已全部落地，见任务 16 的 `docs/文档对齐报告.md`）。
 
 ## 1. 笔尖与基础属性
 
@@ -100,14 +101,91 @@
 | `textureDepthDynamics.Mnm` | `Texture/Strength/commonCurve` | `0,{Mnm/100};1,1;`（仅 bVTy==2） | ✅ |
 | `InvT` | `Texture/Pattern/Invert` | 直接 | ✅ |
 | `textureBlendMode` | `Texture/Pattern/TexturingMode` | 优先使用 Krita `(Photoshop)` 模式：`linearHeight`→Linear Height (Photoshop)=15、`Hght`/`height`→Height (Photoshop)=14、`hardMix`→Hard Mix (Photoshop)=10；其余模式按 Krita 枚举映射（`Mul `→0、`Sbtr`→1、`Ovrl`→5 等）；未知回退 0 + 警告 | ✅ |
-| `textureBrightness`（PS -150..150） | `Texture/Pattern/Brightness` | 所有模式统一：`round(0.10-v/250,2)`；clamp [-1,1] | ✅ |
-| `textureContrast`（PS -50..100） | `Texture/Pattern/Contrast` | 所有模式统一使用 PS 中心因子；round 到 0.01 并 clamp [0,2] | ✅ |
+| `textureBrightness`（PS -150..150） | `Texture/Pattern/Brightness` | **默认（calibrated，v1.2.0 起）**：`b_k = (1-k)/(510k) - v/255`（C≥0）或 `(1-k)/(510k) - v/(255k)`（C<0），保留 3 位小数，clamp [-1,1]；**历史方案（legacy，v1.1.2，可回退）**：`round(0.10-v/250,2)`，clamp [-1,1] | ✅ / 🧪 |
+| `textureContrast`（PS -50..100） | `Texture/Pattern/Contrast` | 两条路径共用 PS 中心因子 `k`（C<0：1+C/100；C≥0：1/(1-C/100)），clamp [0,2]；calibrated（默认）保留 3 位小数，legacy 保留 2 位 | ✅ / 🧪 |
 | `TxtC` / `interpretation` | — | Krita 无对应，静默忽略（源文件默认值） | ⚠️ |
 | `protectTexture` | — | Krita 无对应，保留轻量警告 | ⚠️ |
 
 > 亮/对比度映射依据 Krita `KisTextureMaskInfo::recalculateMask()` 与 `research/测试结果2`、`research/krita结果`：
 > 所有模式统一使用普通校准（Linear Height (Photoshop) 曾用 0.30 基线/对比度倒数的特殊映射，实测效果不好，2026-08-27 确认取消）。
-> Krita UI 只能精确到两位小数，所有值必须先四舍五入到 0.01 再验证。
+> Krita UI 显示两位小数：legacy 严格按 0.01 舍入（v1.1.2 行为）；
+> calibrated 保留 3 位小数（Krita 用 `getDouble` 原样读取预设值，理由与风险见 §7.1 局限 5）。
+
+### 7.1 纹理亮度/对比度：两条公式与开关（v1.2.0 任务 13）
+
+**开关**：环境变量 `BRUSHCONVERTER_TEXTURE_FORMULA`，取值 `calibrated`（默认，v1.2.0 起转正）
+或 `legacy`（v1.1.2 历史方案）。读取集中在 `src/brush_converter/kpp/preset_xml.py::_texture_formula()`；
+非法取值回退**默认公式 calibrated** 并向 stderr 打印一次警告。两条路径的实现都保留在
+`preset_xml.py` 里，旧函数未删除。回退命令：
+
+```bash
+BRUSHCONVERTER_TEXTURE_FORMULA=legacy python cli.py convert tests/测试用.abr -o converted
+# GUI 同理：启动 GUI 前设置同一环境变量即可
+```
+
+**历史方案（legacy，v1.1.2 及更早；非默认，可用环境变量回退）**
+
+- 亮度 `b_k = round(0.10 - PS亮度/250, 2)`，clamp [-1,1]；
+- 对比度 `c_k = k`（PS 中心因子），round 两位，clamp [0,2]。
+- 问题（任务 10/12 实测）：它只是一个「经验标尺」，PS 纹理亮度为 0 时 Krita 仍写入 0.10
+  （掩码整体压暗约 26/255）；PS 亮度在整段范围上系统性偏移。掩码空间差异比例 70.75%（61 组可表达参数组）。
+
+**现行方案（calibrated，v1.2.0 起默认；A/B 掩码空间 0.00% vs 旧公式 70.75%）**
+
+PS 侧前置变换（任务 12 拟合，`docs/研究报告/lut-拟合.md` 第 4 节）：对比度中心 `p=127`（0..255），
+因子 `k`，且**顺序随对比度符号翻转**：
+
+```text
+C >= 0：先亮度（步内先截断到 0..255）后对比度   U = k·clip(t + b) + 127·(1-k)
+C <  0：先对比度后亮度                          U = clip(k·t + 127·(1-k) + b)
+```
+
+Krita 侧前置（`KisTextureMaskInfo::recalculateMask()`）：先 `mask -= brightness`，再
+`mask = (mask-0.5)*contrast + 0.5`，最后统一 clamp 0..1；换成 0..255 尺度即
+`U_k = k·t - 255·k·b_k + 127.5·(1-k)`。把两侧在未截断区逐项对齐，解出唯一闭式：
+
+```text
+c_k = k
+b_k = (1-k)/(510k) - b/255        （C >= 0，亮度在对比度之前）
+b_k = (1-k)/(510k) - b/(255k)     （C <  0，亮度在对比度之后 → 反解需除 k）
+```
+
+其中 `(1-k)/(510k)` 是「Krita 对比度中心 127.5」与「PS 中心 127」的半点修正。
+截断区可证明等价：C≥0 时 PS 的「先截断亮度」与 Krita 的「最后统一截断」在饱和区给出同样的 0/255。
+所以该闭式在整个可表达定义域内逐点等价，不需要数值搜索。
+
+**A/B 结论（掩码空间，tol=2，纹理 0..255 全取值；详见 `docs/验收报告/13-报告.md`）**
+
+| 范围 | legacy 差异比例 / 最大差 | calibrated 差异比例 / 最大差 |
+|---|---|---|
+| 参数网格中可表达的 61/81 组 | 70.75% / 最高 140 | **0.00% / ≤1** |
+| 真实纹理笔刷 15 支（测试用.abr 6 + 海怪…18支.abr 9） | 14 支 40.23%–100% | **14 支 0.00% / ≤1**（剩余 1 支 C=84 属结构性） |
+| 真实 PS 真值图 29 张（可表达参数，d100 正片叠底/减去） | 74.53% / 57 | **0.00% / 1** |
+
+**局限（如实记录，不回避）**
+
+1. **Krita 对比度硬上限 2**：PS 对比度 > 50 时 `k > 2`，无法表达（C=75 需 4、C=100 为二值化极限）；
+   本任务按 2 截断，属结构性失真。建议 PS 侧对比度控制在 ≤ 50。
+   实测「KYLE 的橡皮擦 - 自然边缘」C=84 就是这种情况。
+2. **Krita 亮度范围 [-1,1]**：C<0 且反解出的 `b_k` 越界时按边界截断。实测阈值约
+   `C=-50 且 PS 亮度 < -127 或 > 127`（参数网格中 b=±150 与 C=-50 的两组），属结构性。
+3. **Krita 纹理强度上限 1.0 与 PS 深度 > 83% 的冲突（任务 12 指出）**：PS 高度/线性高度用
+   `12·q`（`q = round(depth·2.55)`）加权，Krita 同一算子写 `10·s`（`s = Texture/Strength/Value`），
+   换算约 `strength ≈ 1.2·depth/100`；因此 PS 深度 > 约 83% 时 Krita 无法精确表达（会提前饱和）。
+   本任务不改深度映射，只在此记录；要精确表达需另开任务（例如改用非 Photoshop 版 Height 算子或拆分强度）。
+4. **C=+100 理论二值化边界**：允许 ±128 的单像素翻转（任务 12 第 5.4 节）。
+5. **判据口径**：本节的 A/B 是「掩码空间」同引擎判据——Krita 掩码复刻（`tools/texture_mask.py`，
+   对 Krita 真值渲染 23/23 张 ≤2%、最大差 1）vs PS 拟合掩码（任务 12 参数化公式 0.01%）。
+   「PS 图 vs Krita 图」整图比对 73.13%~100.00%（任务 09 组装验收；任务 10 的跨引擎基线最小
+   22.36%）结构性不可达，不能作为转正判据。
+6. **默认值与回退**：v1.2.0 起默认公式为 `calibrated`。旧公式完整保留，可一键回退：
+   `BRUSHCONVERTER_TEXTURE_FORMULA=legacy python cli.py convert ...`（GUI 同理，启动前设环境变量）。
+   非法取值回退默认 `calibrated` 并警告一次。转正依据与回归数字见
+   `docs/验收报告/13-报告.md` 的「转正执行」一节。
+7. **calibrated 的 3 位小数**：依据是 Krita `KisTextureOptionData::read` 用 `getDouble` 原样读取
+   （`research/krita_texture/KisTextureOptionData.cpp:17`）；2 位小数在 k=2 时舍入误差达 2.55 灰度级，
+   不满足 ≤2% 判据。若用户在 Krita 里打开「笔刷设置」编辑器，控件可能把值舍入到两位
+   （潜在 ≤3 灰度级偏差）——建议人工在 Krita 里抽查 1 支笔。
 
 ## 8. 控制源编码（bVTy → Krita 传感器）
 

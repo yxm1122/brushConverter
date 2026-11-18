@@ -101,8 +101,9 @@ def test_texture_disabled_by_default():
     assert DEFAULT_PARAMS["Texture/Pattern/TexturingMode"] == ("internal", "0")
 
 
-def test_convert_texture_xml_formulas():
+def test_convert_texture_xml_formulas(monkeypatch):
     # 亮/对比度/缩放换算 + 钳位；未知混合模式回退 Multiply(0)
+    # v1.2.0 起默认公式是 calibrated（任务 13 转正）；legacy 用环境变量回退。
     img = np.zeros((4, 4, 3), dtype=np.uint8)
     ts = TextureSettings(
         name="x",
@@ -120,56 +121,89 @@ def test_convert_texture_xml_formulas():
     tex = _texture_xml(BrushPreset(name="x", texture=ts))
     assert tex is not None
     assert tex.scale == 10.0
-    assert tex.brightness == 0.5
+    # calibrated：C=+100 → c_k 截到 2；b_k = (1-2)/1020 + 100/255 = 0.391
+    assert tex.brightness == 0.391
     assert tex.contrast == 2.0
     assert tex.texturing_mode == 0
     assert abs(tex.strength - 0.55) < 1e-9
     assert tex.strength_pressure is True
     assert tex.strength_curve == "0,0;1,1;"
+    # 显式回退 legacy 时仍是 v1.1.2 的 0.5 / 2.0
+    monkeypatch.setenv("BRUSHCONVERTER_TEXTURE_FORMULA", "legacy")
+    legacy = _texture_xml(BrushPreset(name="x", texture=ts))
+    assert legacy is not None
+    assert (legacy.brightness, legacy.contrast) == (0.5, 2.0)
 
 
-def test_photoshop_brightness_contrast_use_krita_native_ranges():
+def test_photoshop_brightness_contrast_use_krita_native_ranges(monkeypatch):
     img = np.zeros((2, 2, 3), dtype=np.uint8)
     ts = TextureSettings(name="x", uuid="x", brightness=-27, contrast=-17, image=img)
     tex = _texture_xml(BrushPreset(name="x", texture=ts))
     assert tex is not None
     # Krita KisTextureMaskInfo: brightness is subtracted in [−1,1],
     # contrast is a multiplier around 0.5 with neutral value 1.
-    assert tex.brightness == 0.21
+    # calibrated：(1-0.83)/(510*0.83) + 27/(255*0.83) = 0.128
+    assert tex.brightness == 0.128
     assert abs(tex.contrast - 0.83) < 1e-9
+    # 显式 legacy 回退仍是 v1.1.2 的 0.21 / 0.83
+    monkeypatch.setenv("BRUSHCONVERTER_TEXTURE_FORMULA", "legacy")
+    legacy = _texture_xml(BrushPreset(name="x", texture=ts))
+    assert legacy is not None
+    assert (legacy.brightness, legacy.contrast) == (0.21, 0.83)
 
 
-def test_photoshop_contrast_uses_modern_adjustment_factor():
+def test_photoshop_contrast_uses_modern_adjustment_factor(monkeypatch):
     img = np.zeros((2, 2, 3), dtype=np.uint8)
     from brush_converter.mapping import TextureSettings
-    for value, expected in [(-50, 0.5), (25, 4/3), (50, 2.0), (75, 2.0)]:
+    # calibrated 保留 3 位小数（2 位会让 k=2 的组超出掩码等价判据）
+    for value, expected in [(-50, 0.5), (25, 1.333), (50, 2.0), (75, 2.0)]:
         ts = TextureSettings(name="x", uuid="x", contrast=value, image=img)
         tex = _texture_xml(BrushPreset(name="x", texture=ts))
         assert tex is not None
-        assert abs(tex.contrast - round(expected, 2)) < 1e-9
+        assert abs(tex.contrast - expected) < 1e-9
     ts = TextureSettings(name="x", uuid="x", contrast=100, image=img)
     tex = _texture_xml(BrushPreset(name="x", texture=ts))
     assert tex is not None and tex.contrast == 2.0
+    # 显式 legacy 回退：仍是两位小数（25 → 1.33）
+    monkeypatch.setenv("BRUSHCONVERTER_TEXTURE_FORMULA", "legacy")
+    for value, expected in [(-50, 0.5), (25, 1.33), (50, 2.0), (75, 2.0)]:
+        ts = TextureSettings(name="x", uuid="x", contrast=value, image=img)
+        legacy = _texture_xml(BrushPreset(name="x", texture=ts))
+        assert legacy is not None
+        assert abs(legacy.contrast - expected) < 1e-9
 
 
-def test_linear_height_brightness_uses_common_mapping():
+def test_linear_height_brightness_uses_common_mapping(monkeypatch):
     # Linear Height (Photoshop) 不再使用 0.30 基线：所有模式统一普通映射
     img = np.zeros((2, 2, 3), dtype=np.uint8)
     from brush_converter.mapping import TextureSettings
     tex = _texture_xml(BrushPreset(name="x", texture=TextureSettings(name="x", uuid="x", brightness=30, image=img, blend_mode="linearHeight")))
     assert tex is not None
-    assert abs(tex.brightness - (0.10 - 30 / 250)) < 1e-9
+    # calibrated：C=0 → k=1 → b_k = -30/255 = -0.118
+    assert abs(tex.brightness - (-0.118)) < 1e-9
+    # 显式 legacy 回退：0.10 - 30/250 = -0.02
+    monkeypatch.setenv("BRUSHCONVERTER_TEXTURE_FORMULA", "legacy")
+    legacy = _texture_xml(BrushPreset(name="x", texture=TextureSettings(name="x", uuid="x", brightness=30, image=img, blend_mode="linearHeight")))
+    assert legacy is not None
+    assert abs(legacy.brightness - (0.10 - 30 / 250)) < 1e-9
 
 
-def test_linear_height_contrast_uses_common_mapping():
+def test_linear_height_contrast_uses_common_mapping(monkeypatch):
     # Linear Height (Photoshop) 不再反转对比度：所有模式统一 PS 中心因子
     img = np.zeros((2, 2, 3), dtype=np.uint8)
     from brush_converter.mapping import TextureSettings
-    for value, expected in [(-50, 0.5), (-25, 0.75), (25, 4/3), (50, 2.0), (75, 2.0), (100, 2.0)]:
+    for value, expected in [(-50, 0.5), (-25, 0.75), (25, 1.333), (50, 2.0), (75, 2.0), (100, 2.0)]:
         ts = TextureSettings(name="x", uuid="x", contrast=value, image=img, blend_mode="linearHeight")
         tex = _texture_xml(BrushPreset(name="x", texture=ts))
         assert tex is not None
-        assert abs(tex.contrast - round(expected, 2)) < 1e-9
+        assert abs(tex.contrast - expected) < 1e-9
+    # 显式 legacy 回退：两位小数
+    monkeypatch.setenv("BRUSHCONVERTER_TEXTURE_FORMULA", "legacy")
+    for value, expected in [(-50, 0.5), (-25, 0.75), (25, 1.33), (50, 2.0), (75, 2.0), (100, 2.0)]:
+        ts = TextureSettings(name="x", uuid="x", contrast=value, image=img, blend_mode="linearHeight")
+        legacy = _texture_xml(BrushPreset(name="x", texture=ts))
+        assert legacy is not None
+        assert abs(legacy.contrast - expected) < 1e-9
 
 
 def test_photoshop_texture_modes_use_krita_photoshop_variants():

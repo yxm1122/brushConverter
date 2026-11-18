@@ -1,3 +1,57 @@
+# 未发布（v1.2.0 开发中）
+
+纹理亮度/对比度公式转正（默认 calibrated）+ 精确校准公式（任务 13）。
+
+## 主要变化
+
+- **纹理亮度/对比度公式转正**：默认公式已从 v1.1.2 的经验公式切换为按任务 12 拟合公式反解的
+  `calibrated`（掩码空间差异 70.75% → 0.00%）。公式开关仍保留：环境变量
+  `BRUSHCONVERTER_TEXTURE_FORMULA`，取值 `calibrated`（默认）或 `legacy`（v1.1.2 历史行为）；
+  非法取值回退**默认 calibrated** 并打印一次警告。读取集中在
+  `src/brush_converter/kpp/preset_xml.py` 的 `_texture_formula()`，旧公式完整保留，可一键回退。
+- **新增 calibrated 公式**：按任务 12 黑盒拟合的 PS 纹理前置变换（对比度中心 127、因子表、
+  顺序随对比度符号翻转）反解出 Krita 亮度/对比度的闭式映射
+  （`b_k = (1-k)/(510k) - b/255`（C≥0）或 `- b/(255k)`（C<0），`c_k = k`）。
+  推导与局限见 `docs/parameter-mapping.md` 第 7.1 节。
+- **回退路径不变**：显式 `BRUSHCONVERTER_TEXTURE_FORMULA=legacy` 时输出与 v1.1.2 逐字节一致
+  （25 个 .kpp 与上一提交 sha256 全同）；不设变量时输出按 calibrated 变化（预期行为改变）。
+
+## 验证
+
+- A/B（掩码空间，纹理 0..255 全取值，tol=2，达标线 ≤2%）：
+  61 组可表达参数组上 legacy 差异比例 **70.75%** → calibrated **0.00%**（最大差 ≤1）；
+  真实 15 支纹理笔刷中 14 支 calibrated **0.00%**（最大差 ≤1），剩余 1 支（PS 对比度 84）属结构性限制；
+  真实 PS 真值图 29 张（可表达参数）legacy 74.53% / 最大差 57 → calibrated **0.00% / 最大差 1**。
+- `pytest -q`：**173 项通过**（新增 `tests/test_texture_formula_switch.py` 19 项）。
+
+## 已知限制（7 条，逐条如实记录）
+
+1. **Krita 纹理强度上限 1.0 与 PS 深度 > 约 83% 的冲突**：PS 高度/线性高度用 `12·q` 加权，
+   Krita 同一算子写 `10·s`，换算约 `strength ≈ 1.2·depth/100`；PS 深度 > 约 83% 时 Krita
+   会提前饱和、无法精确表达（本版未改深度映射）。
+2. **Krita 对比度硬上限 2**：PS 对比度 > 50 时 `k > 2` 无法表达（结构性失真；真实样本
+   「KYLE 的橡皮擦 - 自然边缘」C=84 即属此类），建议 PS 侧对比度控制在 ≤ 50。
+3. **Krita 亮度范围 [-1,1]**：C<0 且 PS 亮度绝对值很大（约 `|b|>127 且 C=-50`，如 b=±150）时
+   反解值越界，按边界截断。
+4. **calibrated 保留 3 位小数**：Krita 用 `getDouble` 原样读取预设值；若用户在 Krita 里打开
+   「笔刷设置」编辑器，控件可能把值舍入到两位小数（潜在 ≤3 灰度级偏差）。
+5. **PS↔Krita 整图比对仍不可达**（73.13%~100%，任务 09/10 已定）——本版只校准亮度/对比度，
+   模式/深度算子差异另属一项。
+6. **C=+100 理论二值化极限**允许 ±128 的单像素翻转（任务 12 已说明）。
+7. **GUI 提示文案**仍是「经验映射」，将在文档/文案任务（16）中同步更新。
+
+## 用法
+
+```bash
+# 默认：calibrated（v1.2.0 起）
+python cli.py convert tests/测试用.abr -o converted
+
+# 回退到 v1.1.2 历史公式
+BRUSHCONVERTER_TEXTURE_FORMULA=legacy python cli.py convert tests/测试用.abr -o converted
+```
+
+---
+
 # brushConverter v1.1.2
 
 代码审查修复版本：解析健壮性、纹理/预览参数正确性、GUI 稳定性与打包入口修复。
