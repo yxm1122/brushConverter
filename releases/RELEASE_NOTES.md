@@ -1,6 +1,6 @@
-# 未发布（v1.2.0 开发中）
+# brushConverter v1.2.0（2026-11-18）
 
-纹理亮度/对比度公式转正（默认 calibrated）+ 精确校准公式（任务 13）。
+自动验证体系 + PS/Krita 双端自动出图 + 纹理亮度/对比度 calibrated 转正 + 开源前隐私门。
 
 ## 主要变化
 
@@ -15,6 +15,24 @@
   推导与局限见 `docs/parameter-mapping.md` 第 7.1 节。
 - **回退路径不变**：显式 `BRUSHCONVERTER_TEXTURE_FORMULA=legacy` 时输出与 v1.1.2 逐字节一致
   （25 个 .kpp 与上一提交 sha256 全同）；不设变量时输出按 calibrated 变化（预期行为改变）。
+- **新增自动验证体系（参数 / 像素 / 手感三层）**：`python tools/verify_all.py --archive` 一次串行跑完三层
+  （参数 3 项 + 像素 34 项 + 手感 9 项 = **46 项**），输出与既定契约一致的总览行
+  `通过 46 项 ｜ 失败 0 项 ｜ 跳过 0 项`；`--archive` 写带时间戳的归档
+  （`docs/验收报告/归档/verify-*.md`，含总览表、失败明细、跳过原因、自动采集的 Python/Krita/Photoshop 三行环境）；
+  `--selftest-failure` 可演示「失败明细指到具体用例 + 退出码 1」。像素层基线清单合并手感来源后为
+  **341 条四源**（298 PS + 29 Krita + 2 手工 + 12 手感，对账 341 = 298 + 29 + 2 + 12），合并幂等（第二次新增 0）。
+- **PS / Krita 双端自动出图**：Photoshop 侧用 ExtendScript（JSX）自动出图 **20/20 成功**，入库
+  `tests/baselines/ps/`（另有人工真值 158 张，清单共 178 条）；Krita 侧 kritarunner 无头路线实测不可用
+  （证据保留），改走**真实 Krita GUI 进程 + PyKrita 启动插件**（路线 A），单笔 200×200 渲染 **11–14 秒**、
+  Alpha 非零像素 3348，同参数两次渲染 RGB 逐像素一致（Alpha 最大差 4–6）。整图 PS↔Krita 比对仍不可达，
+  见「已知限制 5」。
+- **文档与文案对齐**：GUI 的纹理提示改为 calibrated 说明（含两处结构性限制与 `legacy` 回退命令，中英文），
+  `docs/parameter-mapping.md` §7 与 `docs/developer-guide.md` 同步更新；`README.md` 的版本号与文档链接
+  留待发布任务统一改。
+- **开源前隐私门**：`python tools/privacy_scan.py --include-untracked --fail-on-block` → **block = 0**
+  （warn 551 条，逐条给出保留理由）；扫描范围为工作区受跟踪文件 + 未跟踪新文件 + 全部提交历史（双向），
+  五类（凭据 / 身份 / 路径 / 元数据 / 二进制图片）；361 张受跟踪图片经 Pillow 检查 **0 张**带内嵌文本或 EXIF。
+  发布前已重写本地未推送历史，工作区与全部提交历史双向扫描 **block = 0**（warn 551 条，逐条给出保留理由）。
 
 ## 验证
 
@@ -22,7 +40,14 @@
   61 组可表达参数组上 legacy 差异比例 **70.75%** → calibrated **0.00%**（最大差 ≤1）；
   真实 15 支纹理笔刷中 14 支 calibrated **0.00%**（最大差 ≤1），剩余 1 支（PS 对比度 84）属结构性限制；
   真实 PS 真值图 29 张（可表达参数）legacy 74.53% / 最大差 57 → calibrated **0.00% / 最大差 1**。
-- `pytest -q`：**173 项通过**（新增 `tests/test_texture_formula_switch.py` 19 项）。
+- **三层自动验收**：`python tools/verify_all.py --archive` 实跑 **通过 46 项 ｜ 失败 0 项 ｜ 跳过 0 项**，
+  退出码 0（归档 `docs/验收报告/归档/verify-20261118-232059.md`）。
+- `pytest -q`：**196 项通过 / 0 失败 / 0 跳过**（含新增 `tests/test_texture_formula_switch.py` 19 项、
+  `tests/test_full_verify.py` 7 项等）。
+- **打包自检（v1.2.0 发行包）**：打包后的 CLI 通过 `info` 与 `convert` 两个子命令（转出 6 个 `.kpp` +
+  1 个 `.bundle`）；其对纹理亮度/对比度的输出与开发版 calibrated 路径逐字段一致（例：`测试用.abr` 000 号
+  `-0.001 / 1.786`，同参数 legacy 为 `0.1 / 1.79`）；GUI 以 `QT_QPA_PLATFORM=offscreen` 离屏启动 13 秒
+  存活、无 stderr、无崩溃转储（**双击启动由人工验证**）。
 
 ## 已知限制（7 条，逐条如实记录）
 
@@ -38,7 +63,8 @@
 5. **PS↔Krita 整图比对仍不可达**（73.13%~100%，任务 09/10 已定）——本版只校准亮度/对比度，
    模式/深度算子差异另属一项。
 6. **C=+100 理论二值化极限**允许 ±128 的单像素翻转（任务 12 已说明）。
-7. **GUI 提示文案**仍是「经验映射」，将在文档/文案任务（16）中同步更新。
+7. **GUI 提示文案**在任务 13 时仍是「经验映射」；任务 16 已完成文案对齐，本版 GUI 提示已说明 calibrated、
+   两处结构性限制与 `legacy` 回退方式（本条为任务 13 时的记录，保留以便对照）。
 
 ## 用法
 
