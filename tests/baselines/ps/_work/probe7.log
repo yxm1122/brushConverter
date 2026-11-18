@@ -1,0 +1,10 @@
+cand moveTool sid=230 -> OK tool=moveTool
+cand paintbrushTool sid=1348621420 -> OK tool=paintbrushTool
+cand pencilTool sid=1348686956 -> OK tool=pencilTool
+cand eraserTool sid=1165120620 -> OK tool=eraserTool
+cand brushTool sid=4079 -> ERR 发生了常规 Photoshop 错误。该功能可能无法在这个版本的 Photoshop 中使用。 | - 命令"选择"当前不可用。 tool=eraserTool
+toSource len=4
+TOOL-OPTIONS-BEGIN
+({})
+TOOL-OPTIONS-END
+PROBE7-OK

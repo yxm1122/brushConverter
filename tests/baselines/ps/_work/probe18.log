@@ -1,0 +1,17 @@
+texture enabled, current mode=height
+cand str linearHeight -> linearHeight [storedId=2326 expectId=2326]
+cand str heightLinear -> height [storedId=1214736500 expectId=4128]
+cand str linear height -> height [storedId=1214736500 expectId=4129]
+cand char LHgt -> height [storedId=1214736500 expectId=1279813492]
+cand char HgtL -> height [storedId=1214736500 expectId=1214739532]
+cand char HLin -> height [storedId=1214736500 expectId=1212967278]
+cand char LnH  -> height [storedId=1214736500 expectId=1282295840]
+cand char Lnhg -> height [storedId=1214736500 expectId=1282304103]
+cand char LinH -> height [storedId=1214736500 expectId=1281977928]
+cand char Hgt2 -> height [storedId=1214736500 expectId=1214739506]
+cand char HtLr -> height [storedId=1214736500 expectId=1215581298]
+cand char Drkn -> darken [storedId=1148349294 expectId=1148349294]
+cand char LBrn -> height [storedId=1214736500 expectId=1279423086]
+cand char SftL -> softLight [storedId=1399223372 expectId=1399223372]
+cand char HrdL -> hardLight [storedId=1215456332 expectId=1215456332]
+PROBE18-OK

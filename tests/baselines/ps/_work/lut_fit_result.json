@@ -1,0 +1,5846 @@
+{
+  "schema": "brushconverter.lut_fit/v1",
+  "generated_by": "tools/lut_fit.py --fit",
+  "python": "3.12.13",
+  "numpy": "2.5.2",
+  "notes": [
+    "自动图配对：140 张（纹理已知，相位 (0,0)）",
+    "定量测试v2：用 ps__定量测试v2__正片叠底__d100_b0_c0.png 反推纹理图（恒等图，评估时剔除）"
+  ],
+  "params": {
+    "pivot": 127.0,
+    "k_fitted": {
+      "-50": 0.502947,
+      "-25": 0.753296,
+      "0": 1.0,
+      "25": 1.328681,
+      "50": 2.0,
+      "75": 4.0,
+      "100": 1000000.0,
+      "-10": 0.9,
+      "10": 1.111111
+    },
+    "order": "sign_c",
+    "order_scores": {
+      "M1": 25.4821,
+      "M1c": 24.8513,
+      "M2": 25.537,
+      "M2c": 50.1254,
+      "sign_c": 0.1254
+    },
+    "per_config_order": {
+      "b-150_c-50": "M2",
+      "b-150_c50": "M1",
+      "b-50_c-50": "M2",
+      "b-50_c50": "M1",
+      "b50_c-50": "M2",
+      "b50_c50": "M1",
+      "b150_c-50": "M2",
+      "b150_c50": "M1"
+    },
+    "height_weight": 12.0,
+    "depth_quant": "q = round(depth*255/100)（8bit percentUnit），s = q/255",
+    "version": "lut_fit/parametric/v2"
+  },
+  "evaluation": {
+    "samples": 201,
+    "skipped": [
+      "ps__自动纹理A__高度__d100_b0_c0.png",
+      "ps__自动纹理A__高度__d60_b0_c0.png",
+      "ps__自动纹理A__线性高度__d100_b0_c0.png",
+      "ps__自动纹理A__线性高度__d60_b0_c0.png",
+      "ps__拟合A__高度__d20_b0_c0.png",
+      "ps__拟合A__高度__d20_b50_c0.png",
+      "ps__拟合A__高度__d20_b-50_c0.png",
+      "ps__拟合A__高度__d20_b150_c0.png",
+      "ps__拟合A__高度__d20_b0_c50.png",
+      "ps__拟合A__高度__d20_b0_c-50.png",
+      "ps__拟合A__线性高度__d20_b0_c0.png",
+      "ps__拟合A__线性高度__d20_b50_c0.png",
+      "ps__拟合A__线性高度__d20_b-50_c0.png",
+      "ps__拟合A__线性高度__d20_b150_c0.png",
+      "ps__拟合A__线性高度__d20_b0_c50.png",
+      "ps__拟合A__线性高度__d20_b0_c-50.png",
+      "ps__拟合A__高度__d20_b-150_c0.png",
+      "ps__拟合A__线性高度__d20_b-150_c0.png",
+      "ps__定量测试v2__变暗__d100_b-100_c0.png",
+      "ps__定量测试v2__变暗__d100_b-150_c0.png",
+      "ps__定量测试v2__变暗__d100_b-25_c0.png",
+      "ps__定量测试v2__变暗__d100_b-50_c0.png",
+      "ps__定量测试v2__变暗__d100_b0_c-25.png",
+      "ps__定量测试v2__变暗__d100_b0_c-50.png",
+      "ps__定量测试v2__变暗__d100_b0_c0.png",
+      "ps__定量测试v2__变暗__d100_b0_c100.png",
+      "ps__定量测试v2__变暗__d100_b0_c25.png",
+      "ps__定量测试v2__变暗__d100_b0_c50.png",
+      "ps__定量测试v2__变暗__d100_b0_c75.png",
+      "ps__定量测试v2__变暗__d100_b100_c0.png",
+      "ps__定量测试v2__变暗__d100_b150_c0.png",
+      "ps__定量测试v2__变暗__d100_b25_c0.png",
+      "ps__定量测试v2__变暗__d100_b50_c0.png",
+      "ps__定量测试v2__正片叠底__d100_b0_c0.png",
+      "ps__定量测试v2__线性加深__d100_b-100_c0.png",
+      "ps__定量测试v2__线性加深__d100_b-150_c0.png",
+      "ps__定量测试v2__线性加深__d100_b-25_c0.png",
+      "ps__定量测试v2__线性加深__d100_b-50_c0.png",
+      "ps__定量测试v2__线性加深__d100_b0_c-25.png",
+      "ps__定量测试v2__线性加深__d100_b0_c-50.png",
+      "ps__定量测试v2__线性加深__d100_b0_c0.png",
+      "ps__定量测试v2__线性加深__d100_b0_c100.png",
+      "ps__定量测试v2__线性加深__d100_b0_c25.png",
+      "ps__定量测试v2__线性加深__d100_b0_c50.png",
+      "ps__定量测试v2__线性加深__d100_b0_c75.png",
+      "ps__定量测试v2__线性加深__d100_b100_c0.png",
+      "ps__定量测试v2__线性加深__d100_b150_c0.png",
+      "ps__定量测试v2__线性加深__d100_b25_c0.png",
+      "ps__定量测试v2__线性加深__d100_b50_c0.png"
+    ],
+    "overall": {
+      "lut": {
+        "pixels": 1005000,
+        "diff_pixels": 0,
+        "diff_ratio": 0.0,
+        "max_delta": 1,
+        "mae": 4.9751243781094526e-05
+      },
+      "param": {
+        "pixels": 1005000,
+        "diff_pixels": 108,
+        "diff_ratio": 0.00010746268656716417,
+        "max_delta": 128,
+        "mae": 0.021691542288557214
+      },
+      "baseline": {
+        "pixels": 1005000,
+        "diff_pixels": 738262,
+        "diff_ratio": 0.7345890547263682,
+        "max_delta": 250,
+        "mae": 43.982394029850745
+      }
+    },
+    "per_mode": {
+      "lut": {
+        "减去": {
+          "pixels": 245000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 1,
+          "mae": 4.0816326530612245e-05
+        },
+        "正片叠底": {
+          "pixels": 255000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 1,
+          "mae": 3.9215686274509805e-05
+        },
+        "高度": {
+          "pixels": 250000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 1,
+          "mae": 4e-05
+        },
+        "线性高度": {
+          "pixels": 255000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 1,
+          "mae": 7.843137254901961e-05
+        }
+      },
+      "param": {
+        "减去": {
+          "pixels": 245000,
+          "diff_pixels": 27,
+          "diff_ratio": 0.00011020408163265306,
+          "max_delta": 128,
+          "mae": 0.02262857142857143
+        },
+        "正片叠底": {
+          "pixels": 255000,
+          "diff_pixels": 27,
+          "diff_ratio": 0.00010588235294117647,
+          "max_delta": 128,
+          "mae": 0.021741176470588236
+        },
+        "高度": {
+          "pixels": 250000,
+          "diff_pixels": 27,
+          "diff_ratio": 0.000108,
+          "max_delta": 128,
+          "mae": 0.01606
+        },
+        "线性高度": {
+          "pixels": 255000,
+          "diff_pixels": 27,
+          "diff_ratio": 0.00010588235294117647,
+          "max_delta": 128,
+          "mae": 0.026262745098039216
+        }
+      },
+      "baseline": {
+        "减去": {
+          "pixels": 245000,
+          "diff_pixels": 211011,
+          "diff_ratio": 0.8612693877551021,
+          "max_delta": 250,
+          "mae": 76.3453469387755
+        },
+        "正片叠底": {
+          "pixels": 255000,
+          "diff_pixels": 212487,
+          "diff_ratio": 0.8332823529411765,
+          "max_delta": 232,
+          "mae": 71.60473333333333
+        },
+        "高度": {
+          "pixels": 250000,
+          "diff_pixels": 139757,
+          "diff_ratio": 0.559028,
+          "max_delta": 128,
+          "mae": 14.493052
+        },
+        "线性高度": {
+          "pixels": 255000,
+          "diff_pixels": 175007,
+          "diff_ratio": 0.6863019607843137,
+          "max_delta": 128,
+          "mae": 14.177356862745098
+        }
+      }
+    },
+    "per_config": [
+      {
+        "file": "ps__自动纹理A__减去__d100_b0_c0.png",
+        "mode": "减去",
+        "depth": 100,
+        "brightness": 0,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 4937,
+          "diff_ratio": 0.9874,
+          "max_delta": 26,
+          "mae": 24.177
+        }
+      },
+      {
+        "file": "ps__自动纹理A__减去__d100_b50_c0.png",
+        "mode": "减去",
+        "depth": 100,
+        "brightness": 50,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 4468,
+          "diff_ratio": 0.8936,
+          "max_delta": 25,
+          "mae": 20.8078
+        }
+      },
+      {
+        "file": "ps__自动纹理A__减去__d100_b-50_c0.png",
+        "mode": "减去",
+        "depth": 100,
+        "brightness": -50,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3997,
+          "diff_ratio": 0.7994,
+          "max_delta": 27,
+          "mae": 20.0366
+        }
+      },
+      {
+        "file": "ps__自动纹理A__减去__d100_b0_c50.png",
+        "mode": "减去",
+        "depth": 100,
+        "brightness": 0,
+        "contrast": 50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3052,
+          "diff_ratio": 0.6104,
+          "max_delta": 52,
+          "mae": 26.7614
+        }
+      },
+      {
+        "file": "ps__自动纹理A__减去__d100_b0_c-50.png",
+        "mode": "减去",
+        "depth": 100,
+        "brightness": 0,
+        "contrast": -50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 13,
+          "mae": 12.4466
+        }
+      },
+      {
+        "file": "ps__自动纹理A__减去__d60_b0_c0.png",
+        "mode": "减去",
+        "depth": 60,
+        "brightness": 0,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 148,
+          "mae": 117.3214
+        }
+      },
+      {
+        "file": "ps__自动纹理A__减去__d10_b0_c0.png",
+        "mode": "减去",
+        "depth": 10,
+        "brightness": 0,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 250,
+          "mae": 238.2948
+        }
+      },
+      {
+        "file": "ps__自动纹理A__正片叠底__d100_b0_c0.png",
+        "mode": "正片叠底",
+        "depth": 100,
+        "brightness": 0,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 4937,
+          "diff_ratio": 0.9874,
+          "max_delta": 26,
+          "mae": 24.2404
+        }
+      },
+      {
+        "file": "ps__自动纹理A__正片叠底__d100_b50_c0.png",
+        "mode": "正片叠底",
+        "depth": 100,
+        "brightness": 50,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 4468,
+          "diff_ratio": 0.8936,
+          "max_delta": 25,
+          "mae": 20.8214
+        }
+      },
+      {
+        "file": "ps__自动纹理A__正片叠底__d60_b0_c0.png",
+        "mode": "正片叠底",
+        "depth": 60,
+        "brightness": 0,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 118,
+          "mae": 116.4346
+        }
+      },
+      {
+        "file": "ps__自动纹理A__正片叠底__d10_b0_c0.png",
+        "mode": "正片叠底",
+        "depth": 10,
+        "brightness": 0,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 232,
+          "mae": 231.491
+        }
+      },
+      {
+        "file": "ps__自动纹理A__高度__d10_b0_c0.png",
+        "mode": "高度",
+        "depth": 10,
+        "brightness": 0,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 4363,
+          "diff_ratio": 0.8726,
+          "max_delta": 27,
+          "mae": 21.6978
+        }
+      },
+      {
+        "file": "ps__自动纹理A__高度__d10_b0_c50.png",
+        "mode": "高度",
+        "depth": 10,
+        "brightness": 0,
+        "contrast": 50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 1184,
+          "diff_ratio": 0.2368,
+          "max_delta": 52,
+          "mae": 9.811
+        }
+      },
+      {
+        "file": "ps__自动纹理A__高度__d10_b0_c-50.png",
+        "mode": "高度",
+        "depth": 10,
+        "brightness": 0,
+        "contrast": -50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 40,
+          "mae": 39.2558
+        }
+      },
+      {
+        "file": "ps__自动纹理A__线性高度__d10_b0_c0.png",
+        "mode": "线性高度",
+        "depth": 10,
+        "brightness": 0,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 4363,
+          "diff_ratio": 0.8726,
+          "max_delta": 27,
+          "mae": 21.6978
+        }
+      },
+      {
+        "file": "ps__自动纹理A__线性高度__d10_b0_c50.png",
+        "mode": "线性高度",
+        "depth": 10,
+        "brightness": 0,
+        "contrast": 50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 1184,
+          "diff_ratio": 0.2368,
+          "max_delta": 52,
+          "mae": 9.811
+        }
+      },
+      {
+        "file": "ps__拟合A__减去__d100_b0_c0.png",
+        "mode": "减去",
+        "depth": 100,
+        "brightness": 0,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 4937,
+          "diff_ratio": 0.9874,
+          "max_delta": 26,
+          "mae": 24.177
+        }
+      },
+      {
+        "file": "ps__拟合A__减去__d100_b50_c0.png",
+        "mode": "减去",
+        "depth": 100,
+        "brightness": 50,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 4468,
+          "diff_ratio": 0.8936,
+          "max_delta": 25,
+          "mae": 20.8078
+        }
+      },
+      {
+        "file": "ps__拟合A__减去__d100_b-50_c0.png",
+        "mode": "减去",
+        "depth": 100,
+        "brightness": -50,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3997,
+          "diff_ratio": 0.7994,
+          "max_delta": 27,
+          "mae": 20.0366
+        }
+      },
+      {
+        "file": "ps__拟合A__减去__d100_b150_c0.png",
+        "mode": "减去",
+        "depth": 100,
+        "brightness": 150,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 2465,
+          "diff_ratio": 0.493,
+          "max_delta": 23,
+          "mae": 10.4358
+        }
+      },
+      {
+        "file": "ps__拟合A__减去__d100_b-150_c0.png",
+        "mode": "减去",
+        "depth": 100,
+        "brightness": -150,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 1931,
+          "diff_ratio": 0.3862,
+          "max_delta": 28,
+          "mae": 9.616
+        }
+      },
+      {
+        "file": "ps__拟合A__减去__d100_b0_c50.png",
+        "mode": "减去",
+        "depth": 100,
+        "brightness": 0,
+        "contrast": 50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3052,
+          "diff_ratio": 0.6104,
+          "max_delta": 52,
+          "mae": 26.7614
+        }
+      },
+      {
+        "file": "ps__拟合A__减去__d100_b0_c-50.png",
+        "mode": "减去",
+        "depth": 100,
+        "brightness": 0,
+        "contrast": -50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 13,
+          "mae": 12.4466
+        }
+      },
+      {
+        "file": "ps__拟合A__减去__d100_b50_c50.png",
+        "mode": "减去",
+        "depth": 100,
+        "brightness": 50,
+        "contrast": 50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3011,
+          "diff_ratio": 0.6022,
+          "max_delta": 50,
+          "mae": 25.3628
+        }
+      },
+      {
+        "file": "ps__拟合A__减去__d100_b-50_c-50.png",
+        "mode": "减去",
+        "depth": 100,
+        "brightness": -50,
+        "contrast": -50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 13,
+          "mae": 12.0948
+        }
+      },
+      {
+        "file": "ps__拟合A__减去__d60_b0_c0.png",
+        "mode": "减去",
+        "depth": 60,
+        "brightness": 0,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 148,
+          "mae": 117.3214
+        }
+      },
+      {
+        "file": "ps__拟合A__减去__d60_b50_c0.png",
+        "mode": "减去",
+        "depth": 60,
+        "brightness": 50,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 148,
+          "mae": 119.931
+        }
+      },
+      {
+        "file": "ps__拟合A__减去__d60_b-50_c0.png",
+        "mode": "减去",
+        "depth": 60,
+        "brightness": -50,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 147,
+          "mae": 112.9672
+        }
+      },
+      {
+        "file": "ps__拟合A__减去__d60_b150_c0.png",
+        "mode": "减去",
+        "depth": 60,
+        "brightness": 150,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 149,
+          "mae": 113.4502
+        }
+      },
+      {
+        "file": "ps__拟合A__减去__d60_b-150_c0.png",
+        "mode": "减去",
+        "depth": 60,
+        "brightness": -150,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 115,
+          "mae": 100.4512
+        }
+      },
+      {
+        "file": "ps__拟合A__减去__d60_b0_c50.png",
+        "mode": "减去",
+        "depth": 60,
+        "brightness": 0,
+        "contrast": 50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 132,
+          "mae": 101.4048
+        }
+      },
+      {
+        "file": "ps__拟合A__减去__d60_b0_c-50.png",
+        "mode": "减去",
+        "depth": 60,
+        "brightness": 0,
+        "contrast": -50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 1,
+          "mae": 0.1312
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 155,
+          "mae": 137.6116
+        }
+      },
+      {
+        "file": "ps__拟合A__减去__d60_b50_c50.png",
+        "mode": "减去",
+        "depth": 60,
+        "brightness": 50,
+        "contrast": 50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 133,
+          "mae": 102.7736
+        }
+      },
+      {
+        "file": "ps__拟合A__减去__d60_b-50_c-50.png",
+        "mode": "减去",
+        "depth": 60,
+        "brightness": -50,
+        "contrast": -50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 1,
+          "mae": 0.1312
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 170,
+          "mae": 144.4438
+        }
+      },
+      {
+        "file": "ps__拟合A__减去__d30_b0_c0.png",
+        "mode": "减去",
+        "depth": 30,
+        "brightness": 0,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 224,
+          "mae": 197.655
+        }
+      },
+      {
+        "file": "ps__拟合A__减去__d30_b50_c0.png",
+        "mode": "减去",
+        "depth": 30,
+        "brightness": 50,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 224,
+          "mae": 197.8702
+        }
+      },
+      {
+        "file": "ps__拟合A__减去__d30_b-50_c0.png",
+        "mode": "减去",
+        "depth": 30,
+        "brightness": -50,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 224,
+          "mae": 195.2154
+        }
+      },
+      {
+        "file": "ps__拟合A__减去__d30_b150_c0.png",
+        "mode": "减去",
+        "depth": 30,
+        "brightness": 150,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 210,
+          "mae": 184.4484
+        }
+      },
+      {
+        "file": "ps__拟合A__减去__d30_b-150_c0.png",
+        "mode": "减去",
+        "depth": 30,
+        "brightness": -150,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 222,
+          "mae": 182.503
+        }
+      },
+      {
+        "file": "ps__拟合A__减去__d30_b0_c50.png",
+        "mode": "减去",
+        "depth": 30,
+        "brightness": 0,
+        "contrast": 50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 216,
+          "mae": 183.7686
+        }
+      },
+      {
+        "file": "ps__拟合A__减去__d30_b0_c-50.png",
+        "mode": "减去",
+        "depth": 30,
+        "brightness": 0,
+        "contrast": -50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 1,
+          "mae": 0.0634
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 228,
+          "mae": 214.0774
+        }
+      },
+      {
+        "file": "ps__拟合A__减去__d30_b50_c50.png",
+        "mode": "减去",
+        "depth": 30,
+        "brightness": 50,
+        "contrast": 50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 217,
+          "mae": 184.3444
+        }
+      },
+      {
+        "file": "ps__拟合A__减去__d30_b-50_c-50.png",
+        "mode": "减去",
+        "depth": 30,
+        "brightness": -50,
+        "contrast": -50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 1,
+          "mae": 0.0716
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 235,
+          "mae": 221.4566
+        }
+      },
+      {
+        "file": "ps__拟合A__正片叠底__d100_b0_c0.png",
+        "mode": "正片叠底",
+        "depth": 100,
+        "brightness": 0,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 4937,
+          "diff_ratio": 0.9874,
+          "max_delta": 26,
+          "mae": 24.2404
+        }
+      },
+      {
+        "file": "ps__拟合A__正片叠底__d100_b50_c0.png",
+        "mode": "正片叠底",
+        "depth": 100,
+        "brightness": 50,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 4468,
+          "diff_ratio": 0.8936,
+          "max_delta": 25,
+          "mae": 20.8214
+        }
+      },
+      {
+        "file": "ps__拟合A__正片叠底__d100_b-50_c0.png",
+        "mode": "正片叠底",
+        "depth": 100,
+        "brightness": -50,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3997,
+          "diff_ratio": 0.7994,
+          "max_delta": 27,
+          "mae": 20.1328
+        }
+      },
+      {
+        "file": "ps__拟合A__正片叠底__d100_b150_c0.png",
+        "mode": "正片叠底",
+        "depth": 100,
+        "brightness": 150,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 2465,
+          "diff_ratio": 0.493,
+          "max_delta": 23,
+          "mae": 10.4342
+        }
+      },
+      {
+        "file": "ps__拟合A__正片叠底__d100_b-150_c0.png",
+        "mode": "正片叠底",
+        "depth": 100,
+        "brightness": -150,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 1931,
+          "diff_ratio": 0.3862,
+          "max_delta": 28,
+          "mae": 9.616
+        }
+      },
+      {
+        "file": "ps__拟合A__正片叠底__d100_b0_c50.png",
+        "mode": "正片叠底",
+        "depth": 100,
+        "brightness": 0,
+        "contrast": 50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3052,
+          "diff_ratio": 0.6104,
+          "max_delta": 52,
+          "mae": 26.7576
+        }
+      },
+      {
+        "file": "ps__拟合A__正片叠底__d100_b0_c-50.png",
+        "mode": "正片叠底",
+        "depth": 100,
+        "brightness": 0,
+        "contrast": -50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 13,
+          "mae": 12.4538
+        }
+      },
+      {
+        "file": "ps__拟合A__正片叠底__d100_b50_c50.png",
+        "mode": "正片叠底",
+        "depth": 100,
+        "brightness": 50,
+        "contrast": 50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3011,
+          "diff_ratio": 0.6022,
+          "max_delta": 50,
+          "mae": 25.36
+        }
+      },
+      {
+        "file": "ps__拟合A__正片叠底__d100_b-50_c-50.png",
+        "mode": "正片叠底",
+        "depth": 100,
+        "brightness": -50,
+        "contrast": -50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 13,
+          "mae": 12.045
+        }
+      },
+      {
+        "file": "ps__拟合A__正片叠底__d60_b0_c0.png",
+        "mode": "正片叠底",
+        "depth": 60,
+        "brightness": 0,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 118,
+          "mae": 116.4346
+        }
+      },
+      {
+        "file": "ps__拟合A__正片叠底__d60_b50_c0.png",
+        "mode": "正片叠底",
+        "depth": 60,
+        "brightness": 50,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 117,
+          "mae": 114.5908
+        }
+      },
+      {
+        "file": "ps__拟合A__正片叠底__d60_b-50_c0.png",
+        "mode": "正片叠底",
+        "depth": 60,
+        "brightness": -50,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 118,
+          "mae": 113.9934
+        }
+      },
+      {
+        "file": "ps__拟合A__正片叠底__d60_b150_c0.png",
+        "mode": "正片叠底",
+        "depth": 60,
+        "brightness": 150,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 116,
+          "mae": 108.1554
+        }
+      },
+      {
+        "file": "ps__拟合A__正片叠底__d60_b-150_c0.png",
+        "mode": "正片叠底",
+        "depth": 60,
+        "brightness": -150,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 119,
+          "mae": 107.8296
+        }
+      },
+      {
+        "file": "ps__拟合A__正片叠底__d60_b0_c50.png",
+        "mode": "正片叠底",
+        "depth": 60,
+        "brightness": 0,
+        "contrast": 50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 133,
+          "mae": 118.0284
+        }
+      },
+      {
+        "file": "ps__拟合A__正片叠底__d60_b0_c-50.png",
+        "mode": "正片叠底",
+        "depth": 60,
+        "brightness": 0,
+        "contrast": -50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 1,
+          "mae": 0.1312
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 110,
+          "mae": 109.4416
+        }
+      },
+      {
+        "file": "ps__拟合A__正片叠底__d60_b50_c50.png",
+        "mode": "正片叠底",
+        "depth": 60,
+        "brightness": 50,
+        "contrast": 50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 132,
+          "mae": 117.2618
+        }
+      },
+      {
+        "file": "ps__拟合A__正片叠底__d60_b-50_c-50.png",
+        "mode": "正片叠底",
+        "depth": 60,
+        "brightness": -50,
+        "contrast": -50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 1,
+          "mae": 0.1312
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 95,
+          "mae": 94.7638
+        }
+      },
+      {
+        "file": "ps__拟合A__正片叠底__d30_b0_c0.png",
+        "mode": "正片叠底",
+        "depth": 30,
+        "brightness": 0,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 186,
+          "mae": 185.2748
+        }
+      },
+      {
+        "file": "ps__拟合A__正片叠底__d30_b50_c0.png",
+        "mode": "正片叠底",
+        "depth": 30,
+        "brightness": 50,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 186,
+          "mae": 184.3708
+        }
+      },
+      {
+        "file": "ps__拟合A__正片叠底__d30_b-50_c0.png",
+        "mode": "正片叠底",
+        "depth": 30,
+        "brightness": -50,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 186,
+          "mae": 184.0668
+        }
+      },
+      {
+        "file": "ps__拟合A__正片叠底__d30_b150_c0.png",
+        "mode": "正片叠底",
+        "depth": 30,
+        "brightness": 150,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 185,
+          "mae": 181.1216
+        }
+      },
+      {
+        "file": "ps__拟合A__正片叠底__d30_b-150_c0.png",
+        "mode": "正片叠底",
+        "depth": 30,
+        "brightness": -150,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 187,
+          "mae": 180.9464
+        }
+      },
+      {
+        "file": "ps__拟合A__正片叠底__d30_b0_c50.png",
+        "mode": "正片叠底",
+        "depth": 30,
+        "brightness": 0,
+        "contrast": 50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 194,
+          "mae": 186.0744
+        }
+      },
+      {
+        "file": "ps__拟合A__正片叠底__d30_b0_c-50.png",
+        "mode": "正片叠底",
+        "depth": 30,
+        "brightness": 0,
+        "contrast": -50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 1,
+          "mae": 0.0634
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 182,
+          "mae": 181.7472
+        }
+      },
+      {
+        "file": "ps__拟合A__正片叠底__d30_b50_c50.png",
+        "mode": "正片叠底",
+        "depth": 30,
+        "brightness": 50,
+        "contrast": 50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 193,
+          "mae": 185.6998
+        }
+      },
+      {
+        "file": "ps__拟合A__正片叠底__d30_b-50_c-50.png",
+        "mode": "正片叠底",
+        "depth": 30,
+        "brightness": -50,
+        "contrast": -50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 1,
+          "mae": 0.0716
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 175,
+          "mae": 174.3698
+        }
+      },
+      {
+        "file": "ps__拟合A__高度__d10_b0_c0.png",
+        "mode": "高度",
+        "depth": 10,
+        "brightness": 0,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 4363,
+          "diff_ratio": 0.8726,
+          "max_delta": 27,
+          "mae": 21.6978
+        }
+      },
+      {
+        "file": "ps__拟合A__高度__d10_b50_c0.png",
+        "mode": "高度",
+        "depth": 10,
+        "brightness": 50,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 52,
+          "mae": 30.2878
+        }
+      },
+      {
+        "file": "ps__拟合A__高度__d10_b-50_c0.png",
+        "mode": "高度",
+        "depth": 10,
+        "brightness": -50,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3382,
+          "diff_ratio": 0.6764,
+          "max_delta": 25,
+          "mae": 15.7136
+        }
+      },
+      {
+        "file": "ps__拟合A__高度__d10_b150_c0.png",
+        "mode": "高度",
+        "depth": 10,
+        "brightness": 150,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 52,
+          "mae": 41.4276
+        }
+      },
+      {
+        "file": "ps__拟合A__高度__d10_b0_c50.png",
+        "mode": "高度",
+        "depth": 10,
+        "brightness": 0,
+        "contrast": 50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 1184,
+          "diff_ratio": 0.2368,
+          "max_delta": 52,
+          "mae": 9.811
+        }
+      },
+      {
+        "file": "ps__拟合A__高度__d10_b0_c-50.png",
+        "mode": "高度",
+        "depth": 10,
+        "brightness": 0,
+        "contrast": -50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 40,
+          "mae": 39.2558
+        }
+      },
+      {
+        "file": "ps__拟合A__高度__d5_b0_c0.png",
+        "mode": "高度",
+        "depth": 5,
+        "brightness": 0,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 485,
+          "diff_ratio": 0.097,
+          "max_delta": 26,
+          "mae": 1.4896
+        }
+      },
+      {
+        "file": "ps__拟合A__高度__d5_b50_c0.png",
+        "mode": "高度",
+        "depth": 5,
+        "brightness": 50,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 1,
+          "mae": 0.4166
+        }
+      },
+      {
+        "file": "ps__拟合A__高度__d5_b-50_c0.png",
+        "mode": "高度",
+        "depth": 5,
+        "brightness": -50,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 1408,
+          "diff_ratio": 0.2816,
+          "max_delta": 26,
+          "mae": 6.7936
+        }
+      },
+      {
+        "file": "ps__拟合A__高度__d5_b150_c0.png",
+        "mode": "高度",
+        "depth": 5,
+        "brightness": 150,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 92,
+          "diff_ratio": 0.0184,
+          "max_delta": 3,
+          "mae": 0.0674
+        }
+      },
+      {
+        "file": "ps__拟合A__高度__d5_b0_c50.png",
+        "mode": "高度",
+        "depth": 5,
+        "brightness": 0,
+        "contrast": 50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3050,
+          "diff_ratio": 0.61,
+          "max_delta": 26,
+          "mae": 13.97
+        }
+      },
+      {
+        "file": "ps__拟合A__高度__d5_b0_c-50.png",
+        "mode": "高度",
+        "depth": 5,
+        "brightness": 0,
+        "contrast": -50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3562,
+          "diff_ratio": 0.7124,
+          "max_delta": 14,
+          "mae": 9.144
+        }
+      },
+      {
+        "file": "ps__拟合A__高度__d2_b0_c0.png",
+        "mode": "高度",
+        "depth": 2,
+        "brightness": 0,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 1312,
+          "diff_ratio": 0.2624,
+          "max_delta": 16,
+          "mae": 3.1806
+        }
+      },
+      {
+        "file": "ps__拟合A__高度__d2_b50_c0.png",
+        "mode": "高度",
+        "depth": 2,
+        "brightness": 50,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 421,
+          "diff_ratio": 0.0842,
+          "max_delta": 15,
+          "mae": 0.9784
+        }
+      },
+      {
+        "file": "ps__拟合A__高度__d2_b-50_c0.png",
+        "mode": "高度",
+        "depth": 2,
+        "brightness": -50,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 2378,
+          "diff_ratio": 0.4756,
+          "max_delta": 17,
+          "mae": 5.6176
+        }
+      },
+      {
+        "file": "ps__拟合A__高度__d2_b0_c50.png",
+        "mode": "高度",
+        "depth": 2,
+        "brightness": 0,
+        "contrast": 50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 2195,
+          "diff_ratio": 0.439,
+          "max_delta": 41,
+          "mae": 6.9118
+        }
+      },
+      {
+        "file": "ps__拟合A__线性高度__d10_b0_c0.png",
+        "mode": "线性高度",
+        "depth": 10,
+        "brightness": 0,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 4363,
+          "diff_ratio": 0.8726,
+          "max_delta": 27,
+          "mae": 21.6978
+        }
+      },
+      {
+        "file": "ps__拟合A__线性高度__d10_b50_c0.png",
+        "mode": "线性高度",
+        "depth": 10,
+        "brightness": 50,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 52,
+          "mae": 30.2878
+        }
+      },
+      {
+        "file": "ps__拟合A__线性高度__d10_b-50_c0.png",
+        "mode": "线性高度",
+        "depth": 10,
+        "brightness": -50,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3382,
+          "diff_ratio": 0.6764,
+          "max_delta": 25,
+          "mae": 15.7136
+        }
+      },
+      {
+        "file": "ps__拟合A__线性高度__d10_b150_c0.png",
+        "mode": "线性高度",
+        "depth": 10,
+        "brightness": 150,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 52,
+          "mae": 41.4276
+        }
+      },
+      {
+        "file": "ps__拟合A__线性高度__d10_b0_c50.png",
+        "mode": "线性高度",
+        "depth": 10,
+        "brightness": 0,
+        "contrast": 50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 1184,
+          "diff_ratio": 0.2368,
+          "max_delta": 52,
+          "mae": 9.811
+        }
+      },
+      {
+        "file": "ps__拟合A__线性高度__d10_b0_c-50.png",
+        "mode": "线性高度",
+        "depth": 10,
+        "brightness": 0,
+        "contrast": -50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 40,
+          "mae": 39.2558
+        }
+      },
+      {
+        "file": "ps__拟合A__线性高度__d5_b0_c0.png",
+        "mode": "线性高度",
+        "depth": 5,
+        "brightness": 0,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3991,
+          "diff_ratio": 0.7982,
+          "max_delta": 26,
+          "mae": 7.0354
+        }
+      },
+      {
+        "file": "ps__拟合A__线性高度__d5_b50_c0.png",
+        "mode": "线性高度",
+        "depth": 5,
+        "brightness": 50,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3412,
+          "diff_ratio": 0.6824,
+          "max_delta": 13,
+          "mae": 4.9694
+        }
+      },
+      {
+        "file": "ps__拟合A__线性高度__d5_b-50_c0.png",
+        "mode": "线性高度",
+        "depth": 5,
+        "brightness": -50,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 4055,
+          "diff_ratio": 0.811,
+          "max_delta": 26,
+          "mae": 10.0788
+        }
+      },
+      {
+        "file": "ps__拟合A__线性高度__d5_b150_c0.png",
+        "mode": "线性高度",
+        "depth": 5,
+        "brightness": 150,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 2079,
+          "diff_ratio": 0.4158,
+          "max_delta": 12,
+          "mae": 3.0736
+        }
+      },
+      {
+        "file": "ps__拟合A__线性高度__d5_b0_c50.png",
+        "mode": "线性高度",
+        "depth": 5,
+        "brightness": 0,
+        "contrast": 50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 4167,
+          "diff_ratio": 0.8334,
+          "max_delta": 26,
+          "mae": 15.2678
+        }
+      },
+      {
+        "file": "ps__拟合A__线性高度__d5_b0_c-50.png",
+        "mode": "线性高度",
+        "depth": 5,
+        "brightness": 0,
+        "contrast": -50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 1,
+          "mae": 0.1438
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 4075,
+          "diff_ratio": 0.815,
+          "max_delta": 14,
+          "mae": 6.6968
+        }
+      },
+      {
+        "file": "ps__拟合A__线性高度__d2_b0_c0.png",
+        "mode": "线性高度",
+        "depth": 2,
+        "brightness": 0,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 2476,
+          "diff_ratio": 0.4952,
+          "max_delta": 10,
+          "mae": 2.7158
+        }
+      },
+      {
+        "file": "ps__拟合A__线性高度__d2_b50_c0.png",
+        "mode": "线性高度",
+        "depth": 2,
+        "brightness": 50,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 1743,
+          "diff_ratio": 0.3486,
+          "max_delta": 5,
+          "mae": 1.9182
+        }
+      },
+      {
+        "file": "ps__拟合A__线性高度__d2_b-50_c0.png",
+        "mode": "线性高度",
+        "depth": 2,
+        "brightness": -50,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 2521,
+          "diff_ratio": 0.5042,
+          "max_delta": 10,
+          "mae": 3.867
+        }
+      },
+      {
+        "file": "ps__拟合A__线性高度__d2_b150_c0.png",
+        "mode": "线性高度",
+        "depth": 2,
+        "brightness": 150,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 1162,
+          "diff_ratio": 0.2324,
+          "max_delta": 5,
+          "mae": 1.171
+        }
+      },
+      {
+        "file": "ps__拟合A__线性高度__d2_b0_c50.png",
+        "mode": "线性高度",
+        "depth": 2,
+        "brightness": 0,
+        "contrast": 50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3867,
+          "diff_ratio": 0.7734,
+          "max_delta": 10,
+          "mae": 5.887
+        }
+      },
+      {
+        "file": "ps__拟合A__线性高度__d2_b0_c-50.png",
+        "mode": "线性高度",
+        "depth": 2,
+        "brightness": 0,
+        "contrast": -50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 1,
+          "mae": 0.0674
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 2596,
+          "diff_ratio": 0.5192,
+          "max_delta": 5,
+          "mae": 2.5902
+        }
+      },
+      {
+        "file": "ps__拟合A__高度__d10_b-150_c0.png",
+        "mode": "高度",
+        "depth": 10,
+        "brightness": -150,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 1325,
+          "diff_ratio": 0.265,
+          "max_delta": 23,
+          "mae": 5.108
+        }
+      },
+      {
+        "file": "ps__拟合A__高度__d5_b-150_c0.png",
+        "mode": "高度",
+        "depth": 5,
+        "brightness": -150,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 4870,
+          "diff_ratio": 0.974,
+          "max_delta": 26,
+          "mae": 17.8616
+        }
+      },
+      {
+        "file": "ps__拟合A__高度__d2_b-150_c0.png",
+        "mode": "高度",
+        "depth": 2,
+        "brightness": -150,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 4342,
+          "diff_ratio": 0.8684,
+          "max_delta": 18,
+          "mae": 9.7358
+        }
+      },
+      {
+        "file": "ps__拟合A__线性高度__d10_b-150_c0.png",
+        "mode": "线性高度",
+        "depth": 10,
+        "brightness": -150,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 1325,
+          "diff_ratio": 0.265,
+          "max_delta": 23,
+          "mae": 5.108
+        }
+      },
+      {
+        "file": "ps__拟合A__线性高度__d5_b-150_c0.png",
+        "mode": "线性高度",
+        "depth": 5,
+        "brightness": -150,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 4694,
+          "diff_ratio": 0.9388,
+          "max_delta": 26,
+          "mae": 18.9018
+        }
+      },
+      {
+        "file": "ps__拟合A__线性高度__d2_b-150_c0.png",
+        "mode": "线性高度",
+        "depth": 2,
+        "brightness": -150,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3925,
+          "diff_ratio": 0.785,
+          "max_delta": 10,
+          "mae": 7.2642
+        }
+      },
+      {
+        "file": "ps__拟合A__正片叠底__d100_b50_c-50.png",
+        "mode": "正片叠底",
+        "depth": 100,
+        "brightness": 50,
+        "contrast": -50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 38,
+          "mae": 36.9376
+        }
+      },
+      {
+        "file": "ps__拟合A__正片叠底__d100_b-50_c50.png",
+        "mode": "正片叠底",
+        "depth": 100,
+        "brightness": -50,
+        "contrast": 50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 2763,
+          "diff_ratio": 0.5526,
+          "max_delta": 54,
+          "mae": 25.753
+        }
+      },
+      {
+        "file": "ps__拟合A__正片叠底__d100_b150_c-50.png",
+        "mode": "正片叠底",
+        "depth": 100,
+        "brightness": 150,
+        "contrast": -50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 4888,
+          "diff_ratio": 0.9776,
+          "max_delta": 86,
+          "mae": 57.703
+        }
+      },
+      {
+        "file": "ps__拟合A__正片叠底__d100_b-150_c50.png",
+        "mode": "正片叠底",
+        "depth": 100,
+        "brightness": -150,
+        "contrast": 50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 733,
+          "diff_ratio": 0.1466,
+          "max_delta": 57,
+          "mae": 5.7138
+        }
+      },
+      {
+        "file": "ps__拟合A__正片叠底__d100_b150_c50.png",
+        "mode": "正片叠底",
+        "depth": 100,
+        "brightness": 150,
+        "contrast": 50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 1193,
+          "diff_ratio": 0.2386,
+          "max_delta": 46,
+          "mae": 9.186
+        }
+      },
+      {
+        "file": "ps__拟合A__正片叠底__d100_b-150_c-50.png",
+        "mode": "正片叠底",
+        "depth": 100,
+        "brightness": -150,
+        "contrast": -50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3912,
+          "diff_ratio": 0.7824,
+          "max_delta": 61,
+          "mae": 34.0644
+        }
+      },
+      {
+        "file": "ps__拟合A__高度__d4_b0_c0.png",
+        "mode": "高度",
+        "depth": 4,
+        "brightness": 0,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 2341,
+          "diff_ratio": 0.4682,
+          "max_delta": 20,
+          "mae": 2.9434
+        }
+      },
+      {
+        "file": "ps__拟合A__高度__d6_b0_c0.png",
+        "mode": "高度",
+        "depth": 6,
+        "brightness": 0,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3518,
+          "diff_ratio": 0.7036,
+          "max_delta": 30,
+          "mae": 4.347
+        }
+      },
+      {
+        "file": "ps__拟合A__高度__d12_b0_c0.png",
+        "mode": "高度",
+        "depth": 12,
+        "brightness": 0,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3397,
+          "diff_ratio": 0.6794,
+          "max_delta": 37,
+          "mae": 22.0474
+        }
+      },
+      {
+        "file": "ps__拟合A__线性高度__d4_b0_c0.png",
+        "mode": "线性高度",
+        "depth": 4,
+        "brightness": 0,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3638,
+          "diff_ratio": 0.7276,
+          "max_delta": 20,
+          "mae": 5.4118
+        }
+      },
+      {
+        "file": "ps__拟合A__线性高度__d6_b0_c0.png",
+        "mode": "线性高度",
+        "depth": 6,
+        "brightness": 0,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 4107,
+          "diff_ratio": 0.8214,
+          "max_delta": 30,
+          "mae": 8.1116
+        }
+      },
+      {
+        "file": "ps__拟合A__线性高度__d12_b0_c0.png",
+        "mode": "线性高度",
+        "depth": 12,
+        "brightness": 0,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3397,
+          "diff_ratio": 0.6794,
+          "max_delta": 37,
+          "mae": 22.0474
+        }
+      },
+      {
+        "file": "ps__定量测试v2__减去__d100_b-100_c0.png",
+        "mode": "减去",
+        "depth": 100,
+        "brightness": -100,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 2885,
+          "diff_ratio": 0.577,
+          "max_delta": 28,
+          "mae": 14.5446
+        }
+      },
+      {
+        "file": "ps__定量测试v2__减去__d100_b-150_c0.png",
+        "mode": "减去",
+        "depth": 100,
+        "brightness": -150,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 1942,
+          "diff_ratio": 0.3884,
+          "max_delta": 28,
+          "mae": 9.7292
+        }
+      },
+      {
+        "file": "ps__定量测试v2__减去__d100_b-25_c0.png",
+        "mode": "减去",
+        "depth": 100,
+        "brightness": -25,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 4487,
+          "diff_ratio": 0.8974,
+          "max_delta": 26,
+          "mae": 22.2206
+        }
+      },
+      {
+        "file": "ps__定量测试v2__减去__d100_b-50_c0.png",
+        "mode": "减去",
+        "depth": 100,
+        "brightness": -50,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3940,
+          "diff_ratio": 0.788,
+          "max_delta": 27,
+          "mae": 19.6566
+        }
+      },
+      {
+        "file": "ps__定量测试v2__减去__d100_b0_c-25.png",
+        "mode": "减去",
+        "depth": 100,
+        "brightness": 0,
+        "contrast": -25,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 1,
+          "mae": 0.0164
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 20,
+          "mae": 18.9882
+        }
+      },
+      {
+        "file": "ps__定量测试v2__减去__d100_b0_c-50.png",
+        "mode": "减去",
+        "depth": 100,
+        "brightness": 0,
+        "contrast": -50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 13,
+          "mae": 12.4462
+        }
+      },
+      {
+        "file": "ps__定量测试v2__减去__d100_b0_c0.png",
+        "mode": "减去",
+        "depth": 100,
+        "brightness": 0,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 4964,
+          "diff_ratio": 0.9928,
+          "max_delta": 26,
+          "mae": 24.292
+        }
+      },
+      {
+        "file": "ps__定量测试v2__减去__d100_b0_c100.png",
+        "mode": "减去",
+        "depth": 100,
+        "brightness": 0,
+        "contrast": 100,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 27,
+          "diff_ratio": 0.0054,
+          "max_delta": 128,
+          "mae": 0.6912
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 2469,
+          "diff_ratio": 0.4938,
+          "max_delta": 179,
+          "mae": 37.0208
+        }
+      },
+      {
+        "file": "ps__定量测试v2__减去__d100_b0_c25.png",
+        "mode": "减去",
+        "depth": 100,
+        "brightness": 0,
+        "contrast": 25,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 1,
+          "mae": 0.002
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 1,
+          "mae": 0.0038
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 4196,
+          "diff_ratio": 0.8392,
+          "max_delta": 35,
+          "mae": 25.8032
+        }
+      },
+      {
+        "file": "ps__定量测试v2__减去__d100_b0_c50.png",
+        "mode": "减去",
+        "depth": 100,
+        "brightness": 0,
+        "contrast": 50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3001,
+          "diff_ratio": 0.6002,
+          "max_delta": 52,
+          "mae": 25.9654
+        }
+      },
+      {
+        "file": "ps__定量测试v2__减去__d100_b0_c75.png",
+        "mode": "减去",
+        "depth": 100,
+        "brightness": 0,
+        "contrast": 75,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 2425,
+          "diff_ratio": 0.485,
+          "max_delta": 116,
+          "mae": 26.2618
+        }
+      },
+      {
+        "file": "ps__定量测试v2__减去__d100_b100_c0.png",
+        "mode": "减去",
+        "depth": 100,
+        "brightness": 100,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3464,
+          "diff_ratio": 0.6928,
+          "max_delta": 24,
+          "mae": 15.3876
+        }
+      },
+      {
+        "file": "ps__定量测试v2__减去__d100_b150_c0.png",
+        "mode": "减去",
+        "depth": 100,
+        "brightness": 150,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 2503,
+          "diff_ratio": 0.5006,
+          "max_delta": 23,
+          "mae": 10.7488
+        }
+      },
+      {
+        "file": "ps__定量测试v2__减去__d100_b25_c0.png",
+        "mode": "减去",
+        "depth": 100,
+        "brightness": 25,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 4914,
+          "diff_ratio": 0.9828,
+          "max_delta": 25,
+          "mae": 23.749
+        }
+      },
+      {
+        "file": "ps__定量测试v2__减去__d100_b50_c0.png",
+        "mode": "减去",
+        "depth": 100,
+        "brightness": 50,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 4506,
+          "diff_ratio": 0.9012,
+          "max_delta": 25,
+          "mae": 20.8298
+        }
+      },
+      {
+        "file": "ps__定量测试v2__正片叠底__d100_b-100_c0.png",
+        "mode": "正片叠底",
+        "depth": 100,
+        "brightness": -100,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 2885,
+          "diff_ratio": 0.577,
+          "max_delta": 27,
+          "mae": 14.5316
+        }
+      },
+      {
+        "file": "ps__定量测试v2__正片叠底__d100_b-150_c0.png",
+        "mode": "正片叠底",
+        "depth": 100,
+        "brightness": -150,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 1942,
+          "diff_ratio": 0.3884,
+          "max_delta": 28,
+          "mae": 9.7292
+        }
+      },
+      {
+        "file": "ps__定量测试v2__正片叠底__d100_b-25_c0.png",
+        "mode": "正片叠底",
+        "depth": 100,
+        "brightness": -25,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 4487,
+          "diff_ratio": 0.8974,
+          "max_delta": 26,
+          "mae": 22.2206
+        }
+      },
+      {
+        "file": "ps__定量测试v2__正片叠底__d100_b-50_c0.png",
+        "mode": "正片叠底",
+        "depth": 100,
+        "brightness": -50,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3940,
+          "diff_ratio": 0.788,
+          "max_delta": 27,
+          "mae": 19.762
+        }
+      },
+      {
+        "file": "ps__定量测试v2__正片叠底__d100_b0_c-25.png",
+        "mode": "正片叠底",
+        "depth": 100,
+        "brightness": 0,
+        "contrast": -25,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 1,
+          "mae": 0.0164
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 20,
+          "mae": 19.011
+        }
+      },
+      {
+        "file": "ps__定量测试v2__正片叠底__d100_b0_c-50.png",
+        "mode": "正片叠底",
+        "depth": 100,
+        "brightness": 0,
+        "contrast": -50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 1,
+          "mae": 0.002
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 13,
+          "mae": 12.4506
+        }
+      },
+      {
+        "file": "ps__定量测试v2__正片叠底__d100_b0_c100.png",
+        "mode": "正片叠底",
+        "depth": 100,
+        "brightness": 0,
+        "contrast": 100,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 27,
+          "diff_ratio": 0.0054,
+          "max_delta": 128,
+          "mae": 0.6912
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 2469,
+          "diff_ratio": 0.4938,
+          "max_delta": 179,
+          "mae": 37.0184
+        }
+      },
+      {
+        "file": "ps__定量测试v2__正片叠底__d100_b0_c25.png",
+        "mode": "正片叠底",
+        "depth": 100,
+        "brightness": 0,
+        "contrast": 25,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 1,
+          "mae": 0.0038
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 4196,
+          "diff_ratio": 0.8392,
+          "max_delta": 35,
+          "mae": 25.8008
+        }
+      },
+      {
+        "file": "ps__定量测试v2__正片叠底__d100_b0_c50.png",
+        "mode": "正片叠底",
+        "depth": 100,
+        "brightness": 0,
+        "contrast": 50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3001,
+          "diff_ratio": 0.6002,
+          "max_delta": 52,
+          "mae": 25.963
+        }
+      },
+      {
+        "file": "ps__定量测试v2__正片叠底__d100_b0_c75.png",
+        "mode": "正片叠底",
+        "depth": 100,
+        "brightness": 0,
+        "contrast": 75,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 2425,
+          "diff_ratio": 0.485,
+          "max_delta": 116,
+          "mae": 26.2594
+        }
+      },
+      {
+        "file": "ps__定量测试v2__正片叠底__d100_b100_c0.png",
+        "mode": "正片叠底",
+        "depth": 100,
+        "brightness": 100,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3464,
+          "diff_ratio": 0.6928,
+          "max_delta": 24,
+          "mae": 15.3834
+        }
+      },
+      {
+        "file": "ps__定量测试v2__正片叠底__d100_b150_c0.png",
+        "mode": "正片叠底",
+        "depth": 100,
+        "brightness": 150,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 2503,
+          "diff_ratio": 0.5006,
+          "max_delta": 23,
+          "mae": 10.7476
+        }
+      },
+      {
+        "file": "ps__定量测试v2__正片叠底__d100_b25_c0.png",
+        "mode": "正片叠底",
+        "depth": 100,
+        "brightness": 25,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 4914,
+          "diff_ratio": 0.9828,
+          "max_delta": 25,
+          "mae": 23.749
+        }
+      },
+      {
+        "file": "ps__定量测试v2__正片叠底__d100_b50_c0.png",
+        "mode": "正片叠底",
+        "depth": 100,
+        "brightness": 50,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 4506,
+          "diff_ratio": 0.9012,
+          "max_delta": 25,
+          "mae": 20.8374
+        }
+      },
+      {
+        "file": "ps__定量测试v2__线性高度__d10_b-100_c0.png",
+        "mode": "线性高度",
+        "depth": 10,
+        "brightness": -100,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 2291,
+          "diff_ratio": 0.4582,
+          "max_delta": 24,
+          "mae": 10.0776
+        }
+      },
+      {
+        "file": "ps__定量测试v2__线性高度__d10_b-150_c0.png",
+        "mode": "线性高度",
+        "depth": 10,
+        "brightness": -150,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 1298,
+          "diff_ratio": 0.2596,
+          "max_delta": 23,
+          "mae": 5.073
+        }
+      },
+      {
+        "file": "ps__定量测试v2__线性高度__d10_b-25_c0.png",
+        "mode": "线性高度",
+        "depth": 10,
+        "brightness": -25,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3836,
+          "diff_ratio": 0.7672,
+          "max_delta": 26,
+          "mae": 18.7512
+        }
+      },
+      {
+        "file": "ps__定量测试v2__线性高度__d10_b-50_c0.png",
+        "mode": "线性高度",
+        "depth": 10,
+        "brightness": -50,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3291,
+          "diff_ratio": 0.6582,
+          "max_delta": 25,
+          "mae": 15.4144
+        }
+      },
+      {
+        "file": "ps__定量测试v2__线性高度__d10_b0_c-25.png",
+        "mode": "线性高度",
+        "depth": 10,
+        "brightness": 0,
+        "contrast": -25,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 1,
+          "mae": 0.0164
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 34,
+          "mae": 31.2372
+        }
+      },
+      {
+        "file": "ps__定量测试v2__线性高度__d10_b0_c-50.png",
+        "mode": "线性高度",
+        "depth": 10,
+        "brightness": 0,
+        "contrast": -50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 1,
+          "mae": 0.002
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 40,
+          "mae": 39.2624
+        }
+      },
+      {
+        "file": "ps__定量测试v2__线性高度__d10_b0_c0.png",
+        "mode": "线性高度",
+        "depth": 10,
+        "brightness": 0,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 4369,
+          "diff_ratio": 0.8738,
+          "max_delta": 27,
+          "mae": 21.6016
+        }
+      },
+      {
+        "file": "ps__定量测试v2__线性高度__d10_b0_c100.png",
+        "mode": "线性高度",
+        "depth": 10,
+        "brightness": 0,
+        "contrast": 100,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 27,
+          "diff_ratio": 0.0054,
+          "max_delta": 128,
+          "mae": 0.6912
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3077,
+          "diff_ratio": 0.6154,
+          "max_delta": 128,
+          "mae": 29.9462
+        }
+      },
+      {
+        "file": "ps__定量测试v2__线性高度__d10_b0_c25.png",
+        "mode": "线性高度",
+        "depth": 10,
+        "brightness": 0,
+        "contrast": 25,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 1,
+          "mae": 0.0038
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3766,
+          "diff_ratio": 0.7532,
+          "max_delta": 52,
+          "mae": 15.4206
+        }
+      },
+      {
+        "file": "ps__定量测试v2__线性高度__d10_b0_c50.png",
+        "mode": "线性高度",
+        "depth": 10,
+        "brightness": 0,
+        "contrast": 50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 1185,
+          "diff_ratio": 0.237,
+          "max_delta": 52,
+          "mae": 9.7346
+        }
+      },
+      {
+        "file": "ps__定量测试v2__线性高度__d10_b0_c75.png",
+        "mode": "线性高度",
+        "depth": 10,
+        "brightness": 0,
+        "contrast": 75,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3024,
+          "diff_ratio": 0.6048,
+          "max_delta": 64,
+          "mae": 19.7698
+        }
+      },
+      {
+        "file": "ps__定量测试v2__线性高度__d10_b100_c0.png",
+        "mode": "线性高度",
+        "depth": 10,
+        "brightness": 100,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 52,
+          "mae": 36.075
+        }
+      },
+      {
+        "file": "ps__定量测试v2__线性高度__d10_b150_c0.png",
+        "mode": "线性高度",
+        "depth": 10,
+        "brightness": 150,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 52,
+          "mae": 41.126
+        }
+      },
+      {
+        "file": "ps__定量测试v2__线性高度__d10_b25_c0.png",
+        "mode": "线性高度",
+        "depth": 10,
+        "brightness": 25,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 4882,
+          "diff_ratio": 0.9764,
+          "max_delta": 52,
+          "mae": 26.3684
+        }
+      },
+      {
+        "file": "ps__定量测试v2__线性高度__d10_b50_c0.png",
+        "mode": "线性高度",
+        "depth": 10,
+        "brightness": 50,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 52,
+          "mae": 30.2928
+        }
+      },
+      {
+        "file": "ps__定量测试v2__线性高度__d2_b-10_c0.png",
+        "mode": "线性高度",
+        "depth": 2,
+        "brightness": -10,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 2477,
+          "diff_ratio": 0.4954,
+          "max_delta": 10,
+          "mae": 2.952
+        }
+      },
+      {
+        "file": "ps__定量测试v2__线性高度__d2_b0_c-10.png",
+        "mode": "线性高度",
+        "depth": 2,
+        "brightness": 0,
+        "contrast": -10,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 1,
+          "mae": 0.0616
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 2186,
+          "diff_ratio": 0.4372,
+          "max_delta": 7,
+          "mae": 2.3328
+        }
+      },
+      {
+        "file": "ps__定量测试v2__线性高度__d2_b0_c0.png",
+        "mode": "线性高度",
+        "depth": 2,
+        "brightness": 0,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 2545,
+          "diff_ratio": 0.509,
+          "max_delta": 10,
+          "mae": 2.7378
+        }
+      },
+      {
+        "file": "ps__定量测试v2__线性高度__d2_b0_c10.png",
+        "mode": "线性高度",
+        "depth": 2,
+        "brightness": 0,
+        "contrast": 10,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 1,
+          "mae": 0.0614
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 2724,
+          "diff_ratio": 0.5448,
+          "max_delta": 10,
+          "mae": 3.1922
+        }
+      },
+      {
+        "file": "ps__定量测试v2__线性高度__d2_b10_c0.png",
+        "mode": "线性高度",
+        "depth": 2,
+        "brightness": 10,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 2518,
+          "diff_ratio": 0.5036,
+          "max_delta": 8,
+          "mae": 2.5268
+        }
+      },
+      {
+        "file": "ps__定量测试v2__线性高度__d5_b-25_c0.png",
+        "mode": "线性高度",
+        "depth": 5,
+        "brightness": -25,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 4107,
+          "diff_ratio": 0.8214,
+          "max_delta": 26,
+          "mae": 8.5286
+        }
+      },
+      {
+        "file": "ps__定量测试v2__线性高度__d5_b0_c-25.png",
+        "mode": "线性高度",
+        "depth": 5,
+        "brightness": 0,
+        "contrast": -25,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 1,
+          "mae": 0.1614
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3712,
+          "diff_ratio": 0.7424,
+          "max_delta": 13,
+          "mae": 5.5936
+        }
+      },
+      {
+        "file": "ps__定量测试v2__线性高度__d5_b0_c0.png",
+        "mode": "线性高度",
+        "depth": 5,
+        "brightness": 0,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 1,
+          "mae": 0.002
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 4107,
+          "diff_ratio": 0.8214,
+          "max_delta": 26,
+          "mae": 7.099
+        }
+      },
+      {
+        "file": "ps__定量测试v2__线性高度__d5_b0_c25.png",
+        "mode": "线性高度",
+        "depth": 5,
+        "brightness": 0,
+        "contrast": 25,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 1,
+          "mae": 0.1324
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 4013,
+          "diff_ratio": 0.8026,
+          "max_delta": 26,
+          "mae": 10.2756
+        }
+      },
+      {
+        "file": "ps__定量测试v2__线性高度__d5_b25_c0.png",
+        "mode": "线性高度",
+        "depth": 5,
+        "brightness": 25,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3893,
+          "diff_ratio": 0.7786,
+          "max_delta": 13,
+          "mae": 5.8378
+        }
+      },
+      {
+        "file": "ps__定量测试v2__高度__d10_b-100_c0.png",
+        "mode": "高度",
+        "depth": 10,
+        "brightness": -100,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 2291,
+          "diff_ratio": 0.4582,
+          "max_delta": 24,
+          "mae": 10.0776
+        }
+      },
+      {
+        "file": "ps__定量测试v2__高度__d10_b-150_c0.png",
+        "mode": "高度",
+        "depth": 10,
+        "brightness": -150,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 1298,
+          "diff_ratio": 0.2596,
+          "max_delta": 23,
+          "mae": 5.073
+        }
+      },
+      {
+        "file": "ps__定量测试v2__高度__d10_b-25_c0.png",
+        "mode": "高度",
+        "depth": 10,
+        "brightness": -25,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3836,
+          "diff_ratio": 0.7672,
+          "max_delta": 26,
+          "mae": 18.7512
+        }
+      },
+      {
+        "file": "ps__定量测试v2__高度__d10_b-50_c0.png",
+        "mode": "高度",
+        "depth": 10,
+        "brightness": -50,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3291,
+          "diff_ratio": 0.6582,
+          "max_delta": 25,
+          "mae": 15.4144
+        }
+      },
+      {
+        "file": "ps__定量测试v2__高度__d10_b0_c-25.png",
+        "mode": "高度",
+        "depth": 10,
+        "brightness": 0,
+        "contrast": -25,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 1,
+          "mae": 0.0164
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 34,
+          "mae": 31.2372
+        }
+      },
+      {
+        "file": "ps__定量测试v2__高度__d10_b0_c-50.png",
+        "mode": "高度",
+        "depth": 10,
+        "brightness": 0,
+        "contrast": -50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 1,
+          "mae": 0.002
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 40,
+          "mae": 39.2624
+        }
+      },
+      {
+        "file": "ps__定量测试v2__高度__d10_b0_c0.png",
+        "mode": "高度",
+        "depth": 10,
+        "brightness": 0,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 4369,
+          "diff_ratio": 0.8738,
+          "max_delta": 27,
+          "mae": 21.6016
+        }
+      },
+      {
+        "file": "ps__定量测试v2__高度__d10_b0_c100.png",
+        "mode": "高度",
+        "depth": 10,
+        "brightness": 0,
+        "contrast": 100,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 27,
+          "diff_ratio": 0.0054,
+          "max_delta": 128,
+          "mae": 0.6912
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3077,
+          "diff_ratio": 0.6154,
+          "max_delta": 128,
+          "mae": 29.9462
+        }
+      },
+      {
+        "file": "ps__定量测试v2__高度__d10_b0_c25.png",
+        "mode": "高度",
+        "depth": 10,
+        "brightness": 0,
+        "contrast": 25,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 1,
+          "mae": 0.0038
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3766,
+          "diff_ratio": 0.7532,
+          "max_delta": 52,
+          "mae": 15.4206
+        }
+      },
+      {
+        "file": "ps__定量测试v2__高度__d10_b0_c50.png",
+        "mode": "高度",
+        "depth": 10,
+        "brightness": 0,
+        "contrast": 50,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 1185,
+          "diff_ratio": 0.237,
+          "max_delta": 52,
+          "mae": 9.7346
+        }
+      },
+      {
+        "file": "ps__定量测试v2__高度__d10_b0_c75.png",
+        "mode": "高度",
+        "depth": 10,
+        "brightness": 0,
+        "contrast": 75,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3024,
+          "diff_ratio": 0.6048,
+          "max_delta": 64,
+          "mae": 19.7698
+        }
+      },
+      {
+        "file": "ps__定量测试v2__高度__d10_b100_c0.png",
+        "mode": "高度",
+        "depth": 10,
+        "brightness": 100,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 52,
+          "mae": 36.075
+        }
+      },
+      {
+        "file": "ps__定量测试v2__高度__d10_b150_c0.png",
+        "mode": "高度",
+        "depth": 10,
+        "brightness": 150,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 52,
+          "mae": 41.126
+        }
+      },
+      {
+        "file": "ps__定量测试v2__高度__d10_b25_c0.png",
+        "mode": "高度",
+        "depth": 10,
+        "brightness": 25,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 4882,
+          "diff_ratio": 0.9764,
+          "max_delta": 52,
+          "mae": 26.3684
+        }
+      },
+      {
+        "file": "ps__定量测试v2__高度__d10_b50_c0.png",
+        "mode": "高度",
+        "depth": 10,
+        "brightness": 50,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 5000,
+          "diff_ratio": 1.0,
+          "max_delta": 52,
+          "mae": 30.2928
+        }
+      },
+      {
+        "file": "ps__定量测试v2__高度__d2_b-10_c0.png",
+        "mode": "高度",
+        "depth": 2,
+        "brightness": -10,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 1581,
+          "diff_ratio": 0.3162,
+          "max_delta": 16,
+          "mae": 3.9424
+        }
+      },
+      {
+        "file": "ps__定量测试v2__高度__d2_b0_c-10.png",
+        "mode": "高度",
+        "depth": 2,
+        "brightness": 0,
+        "contrast": -10,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 1,
+          "mae": 0.0298
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 1286,
+          "diff_ratio": 0.2572,
+          "max_delta": 13,
+          "mae": 2.8584
+        }
+      },
+      {
+        "file": "ps__定量测试v2__高度__d2_b0_c0.png",
+        "mode": "高度",
+        "depth": 2,
+        "brightness": 0,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 1373,
+          "diff_ratio": 0.2746,
+          "max_delta": 16,
+          "mae": 3.4242
+        }
+      },
+      {
+        "file": "ps__定量测试v2__高度__d2_b0_c10.png",
+        "mode": "高度",
+        "depth": 2,
+        "brightness": 0,
+        "contrast": 10,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 1,
+          "mae": 0.0496
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 1518,
+          "diff_ratio": 0.3036,
+          "max_delta": 19,
+          "mae": 4.1906
+        }
+      },
+      {
+        "file": "ps__定量测试v2__高度__d2_b10_c0.png",
+        "mode": "高度",
+        "depth": 2,
+        "brightness": 10,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 1198,
+          "diff_ratio": 0.2396,
+          "max_delta": 15,
+          "mae": 3.0468
+        }
+      },
+      {
+        "file": "ps__定量测试v2__高度__d5_b-25_c0.png",
+        "mode": "高度",
+        "depth": 5,
+        "brightness": -25,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 938,
+          "diff_ratio": 0.1876,
+          "max_delta": 26,
+          "mae": 3.7794
+        }
+      },
+      {
+        "file": "ps__定量测试v2__高度__d5_b0_c-25.png",
+        "mode": "高度",
+        "depth": 5,
+        "brightness": 0,
+        "contrast": -25,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 1,
+          "mae": 0.0104
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 3236,
+          "diff_ratio": 0.6472,
+          "max_delta": 8,
+          "mae": 4.5272
+        }
+      },
+      {
+        "file": "ps__定量测试v2__高度__d5_b0_c0.png",
+        "mode": "高度",
+        "depth": 5,
+        "brightness": 0,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 455,
+          "diff_ratio": 0.091,
+          "max_delta": 26,
+          "mae": 1.3632
+        }
+      },
+      {
+        "file": "ps__定量测试v2__高度__d5_b0_c25.png",
+        "mode": "高度",
+        "depth": 5,
+        "brightness": 0,
+        "contrast": 25,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 1,
+          "mae": 0.0018
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 2981,
+          "diff_ratio": 0.5962,
+          "max_delta": 26,
+          "mae": 7.2742
+        }
+      },
+      {
+        "file": "ps__定量测试v2__高度__d5_b25_c0.png",
+        "mode": "高度",
+        "depth": 5,
+        "brightness": 25,
+        "contrast": 0,
+        "lut": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "param": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 0,
+          "mae": 0.0
+        },
+        "baseline": {
+          "pixels": 5000,
+          "diff_pixels": 0,
+          "diff_ratio": 0.0,
+          "max_delta": 1,
+          "mae": 0.5244
+        }
+      }
+    ],
+    "tol": 2,
+    "ratio_threshold": 0.02
+  }
+}

@@ -1,0 +1,7 @@
+tool=paintbrushTool
+toolOptions count=48 len=4
+TOOL-OPTIONS-BEGIN
+({})
+TOOL-OPTIONS-END
+strokePath ERR undefined 不是对象
+PROBE8-OK

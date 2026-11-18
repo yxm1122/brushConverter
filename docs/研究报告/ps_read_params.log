@@ -1,0 +1,49 @@
+=== ps_read_params.jsx（任务 10 参数交叉核对） ===
+PS 版本: 26.9.0 / Adobe Photoshop
+启动时间: Wed Nov 18 2026 22:26:46 GMT+0800
+选中画笔工具: OK，currentTool=paintbrushTool
+临时图案已定义: ps_read_params_tex
+已启用纹理并写入中性值
+
+--- 纹理参数读取（PS 自己读回的值） ---
+useTexture          = true
+textureScale        = 100
+textureBrightness   = 0
+textureContrast     = 0
+textureDepth        = 100
+textureBlendMode    = height
+纹理图案名          = ps_read_params_tex
+
+--- 写入本项目 ABR 实测范围内的值，再读回 ---
+写 b=-27 c=-17 depth=41 scale=53（软铅实测值） -> 写入成功，读回: brightness=-27 contrast=-17 depth=41 scale=53
+写 b=40 c=6 depth=55 scale=73（样本上界） -> 写入成功，读回: brightness=40 contrast=6 depth=55 scale=73
+
+--- 量程探测：亮度 / 对比度 / 深度 ---
+  textureBrightness = 0 -> 接受，读回=0
+  textureBrightness = 100 -> 接受，读回=100
+  textureBrightness = 150 -> 接受，读回=150
+  textureBrightness = 151 -> 接受，读回=151
+  textureBrightness = -150 -> 接受，读回=-150
+  textureBrightness = -151 -> 接受，读回=-151
+  textureContrast = 0 -> 接受，读回=0
+  textureContrast = 50 -> 接受，读回=50
+  textureContrast = 100 -> 接受，读回=100
+  textureContrast = 101 -> 接受，读回=101
+  textureContrast = -50 -> 接受，读回=-50
+  textureContrast = -51 -> 接受，读回=-51
+  textureDepth = 0 -> 接受，读回=0
+  textureDepth = 1 -> 接受，读回=1
+  textureDepth = 100 -> 接受，读回=100
+  textureDepth = 101 -> 接受，读回=100
+  textureScale = 1 -> 接受，读回=1
+  textureScale = 100 -> 接受，读回=100
+  textureScale = 1000 -> 接受，读回=1000
+
+--- 混合模式写入/读回（ABR 里的取值） ---
+  Sbtr（减去）-> 读回=subtract
+  Mltp（正片叠底）-> 读回=multiply
+  Hght（高度）-> 读回=height
+  LnHt（线性高度）-> 读回=height
+  HrdM（强光混合(Hard Mix)）-> 读回=height
+
+READ_PARAMS_DONE

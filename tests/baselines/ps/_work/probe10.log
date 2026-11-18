@@ -1,0 +1,19 @@
+texDoc opened 64 pxx64 px
+definePattern OK
+get pattern ERR 非法参数 - 参数 3
+- 缺少必需值
+tool=paintbrushTool
+BEFORE keys(48)=flow,smooth,prVr,opVr,mode,opacity,brush,useTipDynamics,flipX,flipY,brushProjection,minimumDiameter,minimumRoundness,tiltScale,szVr,angleDynamics,roundnessDynamics,useScatter,spacing,count,bothAxes,countDynamics,scatterDynamics,texture,textureScale,invertTexture,protectTexture,textureBrightness,textureContrast,useTexture,dualBrush,useColorDynamics,wetEdges,noise,usePaintDynamics,useBrushPose,repeat,smoothing,smoothingValue,smoothingRadiusMode,smoothingCatchup,smoothingCatchupAtEnd,smoothingZoomCompensation,pressureSmoothing,foregroundColor,usePressureOverridesSize,usePressureOverridesOpacity,useLegacy
+brush params set
+applyOptions ERR 发生了常规 Photoshop 错误。该功能可能无法在这个版本的 Photoshop 中使用。
+- 命令"设置"当前不可用。
+AFTER keys(48)=flow,smooth,prVr,opVr,mode,opacity,brush,useTipDynamics,flipX,flipY,brushProjection,minimumDiameter,minimumRoundness,tiltScale,szVr,angleDynamics,roundnessDynamics,useScatter,spacing,count,bothAxes,countDynamics,scatterDynamics,texture,textureScale,invertTexture,protectTexture,textureBrightness,textureContrast,useTexture,dualBrush,useColorDynamics,wetEdges,noise,usePaintDynamics,useBrushPose,repeat,smoothing,smoothingValue,smoothingRadiusMode,smoothingCatchup,smoothingCatchupAtEnd,smoothingZoomCompensation,pressureSmoothing,foregroundColor,usePressureOverridesSize,usePressureOverridesOpacity,useLegacy
+after.useTexture=false
+after.textureBrightness=0
+after.textureContrast=0
+after.textureScale=50
+after.brush.diameter=25 hardness=84
+after.texture.name=R. Melentyev's Art Texture
+strokePath OK
+export OK
+PROBE10-OK

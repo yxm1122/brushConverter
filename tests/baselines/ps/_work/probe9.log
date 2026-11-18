@@ -1,0 +1,96 @@
+tool=paintbrushTool
+toolOptions count=48
+OPTIONS-BEGIN
+flow (type=DescValueType.INTEGERTYPE) = 100
+smooth (type=DescValueType.INTEGERTYPE) = 32
+prVr (type=DescValueType.OBJECTTYPE) objClass=brVr
+  bVTy (type=DescValueType.INTEGERTYPE) = 0
+  fStp (type=DescValueType.INTEGERTYPE) = 25
+  jitter (type=DescValueType.UNITDOUBLE) = 0 unit=percentUnit
+  minimum (type=DescValueType.UNITDOUBLE) = 0 unit=percentUnit
+opVr (type=DescValueType.OBJECTTYPE) objClass=brVr
+  bVTy (type=DescValueType.INTEGERTYPE) = 2
+  fStp (type=DescValueType.INTEGERTYPE) = 25
+  jitter (type=DescValueType.UNITDOUBLE) = 0 unit=percentUnit
+  minimum (type=DescValueType.UNITDOUBLE) = 9 unit=percentUnit
+mode (type=DescValueType.ENUMERATEDTYPE) = normal
+opacity (type=DescValueType.INTEGERTYPE) = 100
+brush (type=DescValueType.OBJECTTYPE) objClass=computedBrush
+  diameter (type=DescValueType.UNITDOUBLE) = 25 unit=pixelsUnit
+  hardness (type=DescValueType.UNITDOUBLE) = 84 unit=percentUnit
+  angle (type=DescValueType.UNITDOUBLE) = -33 unit=angleUnit
+  roundness (type=DescValueType.UNITDOUBLE) = 100 unit=percentUnit
+  spacing (type=DescValueType.UNITDOUBLE) = 5 unit=percentUnit
+  interfaceIconFrameDimmed (type=DescValueType.BOOLEANTYPE) = true
+  flipX (type=DescValueType.BOOLEANTYPE) = false
+  flipY (type=DescValueType.BOOLEANTYPE) = false
+useTipDynamics (type=DescValueType.BOOLEANTYPE) = true
+flipX (type=DescValueType.BOOLEANTYPE) = false
+flipY (type=DescValueType.BOOLEANTYPE) = false
+brushProjection (type=DescValueType.BOOLEANTYPE) = false
+minimumDiameter (type=DescValueType.UNITDOUBLE) = 0 unit=percentUnit
+minimumRoundness (type=DescValueType.UNITDOUBLE) = 30 unit=percentUnit
+tiltScale (type=DescValueType.UNITDOUBLE) = 200 unit=percentUnit
+szVr (type=DescValueType.OBJECTTYPE) objClass=brVr
+  bVTy (type=DescValueType.INTEGERTYPE) = 2
+  fStp (type=DescValueType.INTEGERTYPE) = 25
+  jitter (type=DescValueType.UNITDOUBLE) = 0 unit=percentUnit
+  minimum (type=DescValueType.UNITDOUBLE) = 0 unit=percentUnit
+angleDynamics (type=DescValueType.OBJECTTYPE) objClass=brVr
+  bVTy (type=DescValueType.INTEGERTYPE) = 6
+  fStp (type=DescValueType.INTEGERTYPE) = 25
+  jitter (type=DescValueType.UNITDOUBLE) = 6 unit=percentUnit
+  minimum (type=DescValueType.UNITDOUBLE) = 0 unit=percentUnit
+roundnessDynamics (type=DescValueType.OBJECTTYPE) objClass=brVr
+  bVTy (type=DescValueType.INTEGERTYPE) = 2
+  fStp (type=DescValueType.INTEGERTYPE) = 25
+  jitter (type=DescValueType.UNITDOUBLE) = 0 unit=percentUnit
+  minimum (type=DescValueType.UNITDOUBLE) = 0 unit=percentUnit
+useScatter (type=DescValueType.BOOLEANTYPE) = true
+spacing (type=DescValueType.UNITDOUBLE) = 100 unit=percentUnit
+count (type=DescValueType.DOUBLETYPE) = 1
+bothAxes (type=DescValueType.BOOLEANTYPE) = false
+countDynamics (type=DescValueType.OBJECTTYPE) objClass=brVr
+  bVTy (type=DescValueType.INTEGERTYPE) = 0
+  fStp (type=DescValueType.INTEGERTYPE) = 25
+  jitter (type=DescValueType.UNITDOUBLE) = 0 unit=percentUnit
+  minimum (type=DescValueType.UNITDOUBLE) = 0 unit=percentUnit
+scatterDynamics (type=DescValueType.OBJECTTYPE) objClass=brVr
+  bVTy (type=DescValueType.INTEGERTYPE) = 2
+  fStp (type=DescValueType.INTEGERTYPE) = 25
+  jitter (type=DescValueType.UNITDOUBLE) = 0 unit=percentUnit
+  minimum (type=DescValueType.UNITDOUBLE) = 0 unit=percentUnit
+texture (type=DescValueType.OBJECTTYPE) objClass=pattern
+  name (type=DescValueType.STRINGTYPE) = R. Melentyev's Art Texture
+  ID (type=DescValueType.STRINGTYPE) = 438c2948-d232-11e5-b988-9ff33e1af9cd
+textureScale (type=DescValueType.UNITDOUBLE) = 50 unit=percentUnit
+invertTexture (type=DescValueType.BOOLEANTYPE) = false
+protectTexture (type=DescValueType.BOOLEANTYPE) = false
+textureBrightness (type=DescValueType.INTEGERTYPE) = 0
+textureContrast (type=DescValueType.INTEGERTYPE) = 0
+useTexture (type=DescValueType.BOOLEANTYPE) = false
+dualBrush (type=DescValueType.OBJECTTYPE) objClass=dualBrush
+  useDualBrush (type=DescValueType.BOOLEANTYPE) = false
+useColorDynamics (type=DescValueType.BOOLEANTYPE) = false
+wetEdges (type=DescValueType.BOOLEANTYPE) = false
+noise (type=DescValueType.BOOLEANTYPE) = false
+usePaintDynamics (type=DescValueType.BOOLEANTYPE) = false
+useBrushPose (type=DescValueType.BOOLEANTYPE) = false
+repeat (type=DescValueType.BOOLEANTYPE) = false
+smoothing (type=DescValueType.BOOLEANTYPE) = true
+smoothingValue (type=DescValueType.DOUBLETYPE) = 82
+smoothingRadiusMode (type=DescValueType.BOOLEANTYPE) = false
+smoothingCatchup (type=DescValueType.BOOLEANTYPE) = true
+smoothingCatchupAtEnd (type=DescValueType.BOOLEANTYPE) = false
+smoothingZoomCompensation (type=DescValueType.BOOLEANTYPE) = true
+pressureSmoothing (type=DescValueType.BOOLEANTYPE) = false
+foregroundColor (type=DescValueType.OBJECTTYPE) objClass=RGBColor
+  red (type=DescValueType.DOUBLETYPE) = 255
+  grain (type=DescValueType.DOUBLETYPE) = 0
+  blue (type=DescValueType.DOUBLETYPE) = 0
+usePressureOverridesSize (type=DescValueType.BOOLEANTYPE) = false
+usePressureOverridesOpacity (type=DescValueType.BOOLEANTYPE) = false
+useLegacy (type=DescValueType.BOOLEANTYPE) = false
+OPTIONS-END total=90
+strokePath OK
+PROBE9-OK

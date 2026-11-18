@@ -1,0 +1,16 @@
+job loaded, count=12
+texture opened 64 pxx64 px
+pattern defined: bc_texture_noise64
+tool=paintbrushTool foreground=black
+OK ps__拟合A__正片叠底__d100_b50_c-50.png mode=multiply
+OK ps__拟合A__正片叠底__d100_b-50_c50.png mode=multiply
+OK ps__拟合A__正片叠底__d100_b150_c-50.png mode=multiply
+OK ps__拟合A__正片叠底__d100_b-150_c50.png mode=multiply
+OK ps__拟合A__正片叠底__d100_b150_c50.png mode=multiply
+OK ps__拟合A__正片叠底__d100_b-150_c-50.png mode=multiply
+OK ps__拟合A__高度__d4_b0_c0.png mode=height
+OK ps__拟合A__高度__d6_b0_c0.png mode=height
+OK ps__拟合A__高度__d12_b0_c0.png mode=height
+OK ps__拟合A__线性高度__d4_b0_c0.png mode=linearHeight
+OK ps__拟合A__线性高度__d6_b0_c0.png mode=linearHeight
+OK ps__拟合A__线性高度__d12_b0_c0.png mode=linearHeight
