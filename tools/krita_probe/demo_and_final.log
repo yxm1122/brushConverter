@@ -1,0 +1,30 @@
+=== 演示1: 含一支坏路径 ===
+<REPO>\tools\krita_batch.py:67: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  return sum(1 for value in rgba.getchannel("A").getdata() if value > 0)
+[通过] 003_大怪兽-圆头虚_用数位板.kpp → krita__大怪兽-圆头虚_用数位板__plain__s200x200_p1.0.png（11.74s，alpha非零=3348）
+[通过] 004_大怪兽-圆头实_用数位板.kpp → krita__大怪兽-圆头实_用数位板__plain__s200x200_p1.0.png（11.50s，alpha非零=3348）
+[失败] 999_故意改坏路径的笔.kpp（0.00s）：预设文件不存在：<REPO>\converted\kpp\999_故意改坏路径的笔.kpp
+总计 3 支 / 成功 2 / 失败 1 / 平均 34.10 秒/支 / 总耗时 102.3 秒
+清单已写 tests\baselines\krita\manifest.json：渲染成功 2 / 失败 1 / 历史真值图 23（共 26 条）
+DEMO1_EXIT=0
+=== 演示2: only-failed 只重跑失败项 ===
+<REPO>\tools\krita_batch.py:67: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  return sum(1 for value in rgba.getchannel("A").getdata() if value > 0)
+[错误] 本批全部失败，详见 render_attempts.json
+[信息] --only-failed：筛出上次失败 1 支
+[失败] 999_故意改坏路径的笔.kpp（0.00s）：预设文件不存在：<REPO>\converted\kpp\999_故意改坏路径的笔.kpp
+总计 1 支 / 成功 0 / 失败 1 / 平均 0.00 秒/支 / 总耗时 0.0 秒
+清单已写 tests\baselines\krita\manifest.json：渲染成功 0 / 失败 1 / 历史真值图 23（共 24 条）
+DEMO2_EXIT=1
+=== 最终: 全量重跑 6 支，恢复最终清单 ===
+<REPO>\tools\krita_batch.py:67: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  return sum(1 for value in rgba.getchannel("A").getdata() if value > 0)
+[通过] 001_勾线笔_用数位板.kpp → krita__勾线笔_用数位板__plain__s200x200_p1.0.png（12.83s，alpha非零=40000）
+[通过] 003_大怪兽-圆头虚_用数位板.kpp → krita__大怪兽-圆头虚_用数位板__plain__s200x200_p1.0.png（11.59s，alpha非零=3348）
+[通过] 004_大怪兽-圆头实_用数位板.kpp → krita__大怪兽-圆头实_用数位板__plain__s200x200_p1.0.png（11.68s，alpha非零=3348）
+[通过] 006_大怪兽-碳铅_用数位板.kpp → krita__大怪兽-碳铅_用数位板__plain__s200x200_p1.0.png（13.14s，alpha非零=8201）
+[通过] 012_大怪兽-喷枪_用数位板.kpp → krita__大怪兽-喷枪_用数位板__plain__s200x200_p1.0.png（11.64s，alpha非零=40000）
+[通过] 017_砖墙.kpp → krita__砖墙__plain__s200x200_p1.0.png（11.53s，alpha非零=39701）
+总计 6 支 / 成功 6 / 失败 0 / 平均 12.40 秒/支 / 总耗时 74.4 秒
+清单已写 tests\baselines\krita\manifest.json：渲染成功 6 / 失败 0 / 历史真值图 23（共 29 条）
+FINAL_EXIT=0

@@ -1,0 +1,53 @@
+{
+  "generated_at": "2026-11-18T22:49:36",
+  "route": "gui",
+  "total": 6,
+  "ok": 6,
+  "failed": 0,
+  "average_s": 12.404,
+  "total_s": 74.424,
+  "attempts": [
+    {
+      "preset_file": "001_勾线笔_用数位板.kpp",
+      "status": "rendered",
+      "elapsed_s": 12.828,
+      "reason": null,
+      "timeout": false
+    },
+    {
+      "preset_file": "003_大怪兽-圆头虚_用数位板.kpp",
+      "status": "rendered",
+      "elapsed_s": 11.585,
+      "reason": null,
+      "timeout": false
+    },
+    {
+      "preset_file": "004_大怪兽-圆头实_用数位板.kpp",
+      "status": "rendered",
+      "elapsed_s": 11.679,
+      "reason": null,
+      "timeout": false
+    },
+    {
+      "preset_file": "006_大怪兽-碳铅_用数位板.kpp",
+      "status": "rendered",
+      "elapsed_s": 13.142,
+      "reason": null,
+      "timeout": false
+    },
+    {
+      "preset_file": "012_大怪兽-喷枪_用数位板.kpp",
+      "status": "rendered",
+      "elapsed_s": 11.638,
+      "reason": null,
+      "timeout": false
+    },
+    {
+      "preset_file": "017_砖墙.kpp",
+      "status": "rendered",
+      "elapsed_s": 11.533,
+      "reason": null,
+      "timeout": false
+    }
+  ]
+}

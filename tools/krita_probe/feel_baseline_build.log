@@ -1,0 +1,30 @@
+=== converted/kpp/003_大怪兽-圆头虚_用数位板.kpp ===
+[档位 0.20] ok=True alpha=541 elapsed=11.05s
+[档位 0.50] ok=True alpha=1415 elapsed=10.76s
+[档位 0.80] ok=True alpha=2419 elapsed=10.73s
+[档位 1.00] ok=True alpha=3348 elapsed=10.93s
+[通过] 压感真实注入（四档图哈希不同）
+索引已写：tests/baselines/feel\大怪兽-圆头虚_用数位板__index.json
+清单已合并：tests/baselines/feel\manifest.json（现有 4 条）
+总计 4 档 / 成功 4 / 压感真实注入=True / 总耗时 44.7s
+EXIT=0
+=== converted/kpp/004_大怪兽-圆头实_用数位板.kpp ===
+[档位 0.20] ok=True alpha=388 elapsed=11.30s
+[档位 0.50] ok=True alpha=1382 elapsed=11.12s
+[档位 0.80] ok=True alpha=2417 elapsed=10.92s
+[档位 1.00] ok=True alpha=3348 elapsed=10.89s
+[通过] 压感真实注入（四档图哈希不同）
+索引已写：tests/baselines/feel\大怪兽-圆头实_用数位板__index.json
+清单已合并：tests/baselines/feel\manifest.json（现有 8 条）
+总计 4 档 / 成功 4 / 压感真实注入=True / 总耗时 45.4s
+EXIT=0
+=== converted/kpp/006_大怪兽-碳铅_用数位板.kpp ===
+[档位 0.20] ok=True alpha=601 elapsed=12.44s
+[档位 0.50] ok=True alpha=2479 elapsed=12.18s
+[档位 0.80] ok=True alpha=5282 elapsed=12.41s
+[档位 1.00] ok=True alpha=8476 elapsed=12.26s
+[通过] 压感真实注入（四档图哈希不同）
+索引已写：tests/baselines/feel\大怪兽-碳铅_用数位板__index.json
+清单已合并：tests/baselines/feel\manifest.json（现有 12 条）
+总计 4 档 / 成功 4 / 压感真实注入=True / 总耗时 50.5s
+EXIT=0

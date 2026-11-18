@@ -1,0 +1,12 @@
+<REPO>\tools\krita_batch.py:67: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  return sum(1 for value in rgba.getchannel("A").getdata() if value > 0)
+[错误] 本批全部失败，详见 render_attempts.json
+[失败] 001_勾线笔_用数位板.kpp（2.50s）：插件未写结果文件（可能未加载/启动失败）；日志尾部：<空>
+[失败] 003_大怪兽-圆头虚_用数位板.kpp（1.94s）：插件未写结果文件（可能未加载/启动失败）；日志尾部：<空>
+[失败] 004_大怪兽-圆头实_用数位板.kpp（1.86s）：插件未写结果文件（可能未加载/启动失败）；日志尾部：<空>
+[失败] 006_大怪兽-碳铅_用数位板.kpp（1.89s）：插件未写结果文件（可能未加载/启动失败）；日志尾部：<空>
+[失败] 012_大怪兽-喷枪_用数位板.kpp（1.88s）：插件未写结果文件（可能未加载/启动失败）；日志尾部：<空>
+[失败] 017_砖墙.kpp（1.97s）：插件未写结果文件（可能未加载/启动失败）；日志尾部：<空>
+总计 6 支 / 成功 0 / 失败 6 / 平均 6.53 秒/支 / 总耗时 39.2 秒
+清单已写 tests\baselines\krita\manifest.json：渲染成功 0 / 失败 6 / 历史真值图 23（共 29 条）
+EXIT=1

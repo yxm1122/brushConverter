@@ -1,0 +1,15 @@
+[22:31:37] 插件模块加载，注册 Extension
+[22:31:37] 插件 BCAutoRender.__init__ 被调用
+[22:31:37] Extension 已注册
+[22:31:37] setup() 被调用
+[22:31:40] createActions() 被调用
+[22:31:40] BEGIN size=200x200 stroke=120 out='<REPO>\\tools\\krita_probe\\route_a_out.png' preset_hint='圆头虚'
+[22:31:40] createDocument=<PyKrita.krita.Document object at 0x000001C2B504DEB0>
+[22:31:41] addView=<PyKrita.krita.View object at 0x000001C2B504FAD0> activeView=<PyKrita.krita.View object at 0x000001C2B504DE20>
+[22:31:41] 移除默认图层 name='Background' type=paintlayer
+[22:31:41] 落笔前 alpha_nonzero=0（应为 0）
+[22:31:41] 资源库预设数=341
+[22:31:41] 预设清单已写 <REPO>\tools\krita_probe\presets_dump.json（341 条）
+[22:31:41] 文档已关闭（不保存）
+[22:31:41] file_quit action=<PyQt5.QtWidgets.QWidgetAction object at 0x000001C2B504DFD0>
+[22:31:41] 插件结束

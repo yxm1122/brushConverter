@@ -1,0 +1,13 @@
+{
+ "ok": true,
+ "stage": "done",
+ "out_path": "<REPO>\\tools\\krita_probe\\pressure_test_1_0.png",
+ "width": 200,
+ "height": 200,
+ "alpha_nonzero": 3348,
+ "preset": "大怪兽-圆头虚【用数位板】",
+ "preset_file": "003_大怪兽-圆头虚_用数位板.kpp",
+ "pressure": 1.0,
+ "stroke": 120,
+ "elapsed_s": 1.038
+}

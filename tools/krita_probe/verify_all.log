@@ -1,0 +1,128 @@
+....................F.........FFFF...................................... [ 53%]
+...............................................................          [100%]
+================================== FAILURES ===================================
+_______________ test_two_runs_alpha_identical_within_tolerance ________________
+
+tmp_path = WindowsPath('%USERPROFILE%/AppData/Local/Temp/pytest-of-<user>/pytest-30/test_two_runs_alpha_identical_0')
+
+    def test_two_runs_alpha_identical_within_tolerance(tmp_path):
+        """确定性：同参数连跑两次，Alpha 逐像素差异不得超过 ALPHA_TOL。"""
+        _require_gui()
+        first = tmp_path / "run1.png"
+        second = tmp_path / "run2.png"
+        r1 = runner.render_one(str(PRESET_003), str(first), route="gui", timeout=GUI_TIMEOUT)
+        r2 = runner.render_one(str(PRESET_003), str(second), route="gui", timeout=GUI_TIMEOUT)
+>       assert r1["ok"] and r2["ok"], (r1.get("reason"), r2.get("reason"))
+E       AssertionError: ('插件未写结果文件（可能未加载/启动失败）；日志尾部：<空>', '插件未写结果文件（可能未加载/启动失败）；日志尾部：<空>')
+E       assert (False)
+
+tests\test_krita_render.py:84: AssertionError
+_____________________ test_bc_transform_contrast_centered _____________________
+
+        assert contrast_factor(25) == pytest.approx(4.0 / 3.0, abs=1e-9)
+        assert contrast_factor(50) == pytest.approx(2.0)
+        assert contrast_factor(100) > 1000  # 用极大值逼近二值化
+    
+    
+    def test_bc_transform_identity_and_shift():
+>       t = np.arange(256, dtype=np.int16)
+E       assert np.float64(127.75) == 128.0 ± 1.3e-04
+E         
+E         comparison failed
+E         Obtained: 127.75
+E         Expected: 128.0 ± 1.3e-04
+
+tests\test_lut_fit.py:146: AssertionError
+____________________ test_fit_bc_recovers_synthetic_slope _____________________
+
+    
+    
+    def test_bc_transform_contrast_centered():
+        """对比度以中心 p 缩放：c=-50 -> factor 0.5，c=+50 -> factor 2。"""
+        t = np.arange(256, dtype=np.int16)
+        params = {"pivot": 127.5, "k_fitted": {"-50": 0.5, "50": 2.0}, "order": "M1"}
+        low = bc_transform(t, 0, -50, params)
+        high = bc_transform(t, 0, 50, params)
+        assert low[128] == pytest.approx(127.75)  # 中心附近几乎不动
+>       assert low[0] == pytest.approx(63.75) and low[255] == pytest.approx(191.25)
+               ^^^^^^^^^^^^^^^
+E       KeyError: 'model'
+
+tests\test_lut_fit.py:161: KeyError
+_______________ test_parametric_recovers_synthetic_linear_truth _______________
+
+    """
+    t = _synthetic_texture()
+    cases = [(50, 50), (-50, -50), (50, -50), (-50, 50), (150, 50), (-150, -50)]
+>   records = []
+             ^^^^
+
+tests\test_lut_fit.py:173: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tools\lut_fit.py:627: in fit_parametric
+    params = fit_bc(records, verbose=verbose)
+                              ^^^^^^^^^^^^^^^^
+tools\lut_fit.py:518: in fit_height_weight
+    sel = (a > 0.5) & (a < 254.5)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+depth = 10
+
+    
+    def depth_strength(depth: float):
+        """PS 纹理深度的 8bit 量化：深度 percentUnit 存成 round(depth*255/100)。
+    
+        实测（b0 c0，输入纹理 t=0 处的输出）：
+            高度 d2/d4/d5/d6/d10/d12 -> 60/120/156/180/312/372
+        恰好等于 12 * round(depth*2.55)，说明深度先量化成 0..255 的整数 q，再进入合成。
+        返回 (q, s)，s = q/255 是 0..1 的强度（与 Krita 的 8bit 强度量化同构）。
+>       """
+            
+E       NameError: name 'math' is not defined. Did you forget to import 'math'
+
+tools\lut_fit.py:467: NameError
+________________________ test_mode_predict_known_laws _________________________
+
+            assert m["max_delta"] <= 2, f"b={rec['b']} c={rec['c']} 最大差 {m['max_delta']}"
+    
+    
+    def test_fit_bc_recovers_synthetic_slope():
+        """用合成数据（正片叠底 d100、c=+50/-50、pivot=127）拟合，斜率应约为 2.0 / 0.5。"""
+        t_map = _synthetic_texture()
+        records = []
+>       for c in (0, 50, -50):
+              ^^^^^^^^^^^^^^^^^
+
+tests\test_lut_fit.py:191: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tools\lut_fit.py:482: in mode_predict
+    w = float(params.get("height_weight", HEIGHT_WEIGHT))
+           ^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+depth = 100
+
+    
+    def depth_strength(depth: float):
+        """PS 纹理深度的 8bit 量化：深度 percentUnit 存成 round(depth*255/100)。
+    
+        实测（b0 c0，输入纹理 t=0 处的输出）：
+            高度 d2/d4/d5/d6/d10/d12 -> 60/120/156/180/312/372
+        恰好等于 12 * round(depth*2.55)，说明深度先量化成 0..255 的整数 q，再进入合成。
+        返回 (q, s)，s = q/255 是 0..1 的强度（与 Krita 的 8bit 强度量化同构）。
+>       """
+            
+E       NameError: name 'math' is not defined. Did you forget to import 'math'
+
+tools\lut_fit.py:467: NameError
+------------------------------------ 验证摘要 -------------------------------------
+通过 130 项 ｜ 失败 5 项 ｜ 跳过 0 项
+=========================== short test summary info ===========================
+FAILED tests/test_krita_render.py::test_two_runs_alpha_identical_within_tolerance
+FAILED tests/test_lut_fit.py::test_bc_transform_contrast_centered - assert np...
+FAILED tests/test_lut_fit.py::test_fit_bc_recovers_synthetic_slope - KeyError...
+FAILED tests/test_lut_fit.py::test_parametric_recovers_synthetic_linear_truth
+FAILED tests/test_lut_fit.py::test_mode_predict_known_laws - NameError: name ...
+5 failed, 130 passed in 61.28s (0:01:01)
+EXIT=1

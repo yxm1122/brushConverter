@@ -1,0 +1,13 @@
+{
+ "ok": true,
+ "stage": "done",
+ "out_path": "<REPO>\\tools\\krita_probe\\det_004_2.png",
+ "width": 200,
+ "height": 200,
+ "alpha_nonzero": 3348,
+ "preset": "大怪兽-圆头实【用数位板】",
+ "preset_file": "004_大怪兽-圆头实_用数位板.kpp",
+ "pressure": 1.0,
+ "stroke": 120,
+ "elapsed_s": 1.015
+}
