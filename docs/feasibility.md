@@ -1,5 +1,7 @@
 # ABR → KPP 笔刷转换器 — 可行性报告与项目结构
 
+> 说明：本文档里的本机实测路径已占位化（`<LOCAL_APP_DIR>` = 本机软件安装目录，`<REPO>` = 仓库根），复现时请改成你自己的安装路径与仓库路径。
+
 > 阶段 1 交付物 | 调研日期：2026-08-24
 > 结论：**可行**，针对采样笔尖（sampled tips）可做到高保真转换；参数化笔刷动态需近似映射。
 
@@ -95,7 +97,7 @@
 
 ## 5. 已验证的环境
 
-- conda 环境：`D:\program\anaconda3\envs\brushConverter`，Python **3.12.13** ✅
+- conda 环境：`<LOCAL_APP_DIR>\anaconda3\envs\brushConverter`，Python **3.12.13** ✅
 - 依赖规划（均成熟、纯 pip 安装）：
   - `numpy`（位图数组运算）
   - `Pillow`（PNG 读写、预览图生成；PNG 文本块可自写以控制 zTXt 压缩格式）
