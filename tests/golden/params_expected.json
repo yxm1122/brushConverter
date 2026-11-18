@@ -1,0 +1,103 @@
+{
+  "_doc": "任务 02 参数级比对期望值表。期望值一律由「tests/测试用.abr 的 desc 源参数 + docs/parameter-mapping.md 公式」算出，禁止抄当前转换产物。字段口径：spacing=Spcn/100；angle_deg=Brsh.Angl（度，比对时由产物里的弧度转回度）；scale=Dmtr/max(笔尖宽,高)；size=Dmtr（px）；散布三件套只对有散布的笔刷记录。",
+  "source_file": "tests/测试用.abr",
+  "tolerance": {
+    "spacing": 0.001,
+    "numeric_default": 0.001,
+    "note": "spacing 按任务书 ±0.001；其余数值统一 1e-3，理由见 tools/kpp_params.py 的 DEFAULT_TOL 注释（XML 用 %g 6 位有效数字输出）"
+  },
+  "brushes": [
+    {
+      "name": "KYLE 终极硬心铅笔",
+      "spacing": 0.18,
+      "angle_deg": 74,
+      "scale": 0.21621621621621623,
+      "size": 8,
+      "_source": "参数表公式",
+      "_source_detail": {
+        "spacing": "Spcn=18 → 18/100 = 0.18",
+        "angle_deg": "Brsh.Angl=74（度，Krita 存弧度 1.29154）",
+        "scale": "Dmtr=8 ÷ max(笔尖宽37, 高34)=37 → 8/37",
+        "size": "Dmtr=8 px"
+      }
+    },
+    {
+      "name": "Kyle 的绘画盒 - 快乐 HB",
+      "spacing": 0.09,
+      "angle_deg": 0,
+      "scale": 0.5263157894736842,
+      "size": 10,
+      "_source": "参数表公式",
+      "_source_detail": {
+        "spacing": "Spcn=9 → 9/100 = 0.09",
+        "angle_deg": "Brsh.Angl=0",
+        "scale": "Dmtr=10 ÷ max(18,19)=19 → 10/19",
+        "size": "Dmtr=10 px"
+      }
+    },
+    {
+      "name": "KYLE 终极炭笔 25 像素中等 2",
+      "spacing": 0.04,
+      "angle_deg": 0,
+      "scale": 0.78125,
+      "size": 25,
+      "_source": "参数表公式",
+      "_source_detail": {
+        "spacing": "Spcn=4 → 4/100 = 0.04",
+        "angle_deg": "Brsh.Angl=0",
+        "scale": "Dmtr=25 ÷ max(32,26)=32 → 25/32",
+        "size": "Dmtr=25 px"
+      }
+    },
+    {
+      "name": "KYLE 额外厚实炭笔",
+      "spacing": 0.04,
+      "angle_deg": 0,
+      "scale": 0.6120218579234973,
+      "size": 112,
+      "scatter_value": 0,
+      "scatter_use_curve": false,
+      "axis_x": true,
+      "axis_y": true,
+      "_source": "参数表公式",
+      "_source_detail": {
+        "spacing": "Spcn=4 → 4/100 = 0.04",
+        "angle_deg": "Brsh.Angl=0",
+        "scale": "Dmtr=112 ÷ max(183,143)=183 → 112/183",
+        "size": "Dmtr=112 px",
+        "scatter_value": "scatterDynamics.jitter=0 → 0/400 = 0（见参数表第 5 节散布换算）",
+        "scatter_use_curve": "scatterDynamics.bVTy=0（恒定散布）→ UseCurve=false",
+        "axis_x": "bothAxes=true → AxisX=true",
+        "axis_y": "Krita 散布固定 AxisY=true"
+      }
+    },
+    {
+      "name": "Kyle 的终极粉彩派对",
+      "spacing": 0.08,
+      "angle_deg": 0,
+      "scale": 0.6976744186046512,
+      "size": 60,
+      "_source": "参数表公式",
+      "_source_detail": {
+        "spacing": "Spcn=8 → 8/100 = 0.08",
+        "angle_deg": "Brsh.Angl=0",
+        "scale": "Dmtr=60 ÷ max(86,84)=86 → 60/86",
+        "size": "Dmtr=60 px"
+      }
+    },
+    {
+      "name": "Kyle 的橡皮擦 - 自然边缘",
+      "spacing": 0.01,
+      "angle_deg": 0,
+      "scale": 0.6024096385542169,
+      "size": 50,
+      "_source": "参数表公式",
+      "_source_detail": {
+        "spacing": "Spcn=1 → 1/100 = 0.01",
+        "angle_deg": "Brsh.Angl=0",
+        "scale": "Dmtr=50 ÷ max(83,58)=83 → 50/83",
+        "size": "Dmtr=50 px"
+      }
+    }
+  ]
+}

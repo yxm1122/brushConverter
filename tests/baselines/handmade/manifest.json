@@ -1,0 +1,28 @@
+{
+  "_doc": "tests/baselines/handmade 子目录清单（任务 03）。顶层 tests/baselines/manifest.json 按团队规则由任务 09/15 维护合并，本任务只登记 handmade 两条。",
+  "source": "handmade",
+  "entries": [
+    {
+      "file": "handmade__渐变圆__正片叠底__b0_c0.png",
+      "source": "handmade",
+      "size": "64x64",
+      "mode": "正片叠底（MULTIPLY，Krita TexturingMode 0）",
+      "brightness": 0,
+      "contrast": 1,
+      "sha256": "51f8dbe3ecbe31f45c143c7432d9c832fc15025fc5b1e24e9936ebf039af2dad",
+      "bytes": 188,
+      "note": "Alpha 水平线性渐变（0→255），RGB 全黑；验证差分器对渐变的 1 像素级定位"
+    },
+    {
+      "file": "handmade__实心圆__正片叠底__b0.10_c1.33.png",
+      "source": "handmade",
+      "size": "64x64",
+      "mode": "正片叠底（MULTIPLY，Krita TexturingMode 0）",
+      "brightness": 0.1,
+      "contrast": 1.33,
+      "sha256": "2e8a795dfeb7efdbebd24b87313db9590cf6ff512eba8eaf94d3fc3bce42f321",
+      "bytes": 488,
+      "note": "Alpha 实心圆（半径 24，1px 抗锯齿），RGB 全黑；验证差分器对实心区域的边界像素识别"
+    }
+  ]
+}
