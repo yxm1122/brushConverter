@@ -2,3 +2,4 @@
 *.png
 *.kpp
 _work/
+*.result.json
