@@ -460,3 +460,154 @@ PYTHONIOENCODING=utf-8 "$PY" tools/exp_krita_params.py --manifest
 
 环境核对（fixA 渲染结束后实测）：无 `krita.exe` 进程；`pykrita` 仅 `preset_groups`；`kritarc` 的 `enable_bc_auto_render=0`；
 `paintoppresets` 无 `exp__krita` 残留；`%TEMP%\bc_krita_gui_*` 为 0。
+
+---
+
+## 十八、v1.2.1 渲染回归（2026-11-19，追加任务）
+
+### 18.1 目标与做法
+
+验证 v1.2.1 工作区（未提交）的两处源码修复，用**真实 Krita 渲染**（路线 A）对拍 v1.2.0：
+
+1. 高度系纹理 Strength = min(1.0, 1.2 × depth/100)（依据：PS W=12 vs Krita W=10，见 §17 fixA 实测）；
+2. 内嵌纹理 PNG 追加 tEXt 标记（keyword=`brushconverter`、值=像素 sha256）+ 资源名改为 `tex_<内嵌PNG sha256前12位>.png`
+   （规避 §8 的两个静默坑：同 md5 → 纹理被禁用；同名 → 串用库内图案）。
+
+做法：
+
+```bash
+cd <REPO>
+PY="<LOCAL_APP_DIR>/anaconda3/envs/brushConverter/python.exe"
+# 旧代码（v1.2.0）：只读 git 操作取出 HEAD 的 src（HEAD = e0f4f61，版本号仍是 1.2.0）
+git archive HEAD src | tar -x -C "$TEMP/bc_v120_src"
+# 两套 .kpp + 13 张真实渲染 + 指标 + 清单（串行渲染）
+PYTHONIOENCODING=utf-8 "$PY" tests/baselines/exp/regress/run_regress.py
+```
+
+产物都在 `tests/baselines/exp/regress/`（`kpp/`、`png/`、`manifest.json`）；
+命名区分：`old__*.kpp`（v1.2.0 转换）/ `new__*.kpp`（v1.2.1 转换）。
+渲染口径与实验矩阵完全一致：100×100、stroke=60、压感 1.0（单 dab、圆心 (20,50)），串行。
+
+5 个用例（每个 old/new 各一张，共 13 张渲染，单张 14.76–16.00 秒、总计 195.45 秒 ≈ 15.03 秒/张）：
+
+| 用例 | 来源 | 说明 |
+|---|---|---|
+| `height_real` | `tests/测试用.abr` 的 **Hght** 预设「Kyle 的绘画盒 - 快乐 HB」（depth=11、scale=42、b=-55、c=37） | 真实预设原样转换 |
+| `height_s100` | 同上，仅纹理 scale 改 100% | 去掉图案缩放，便于精确预测 |
+| `multiply_mul` | `tests/测试用.abr` 的真实预设「KYLE 终极硬心铅笔」，仅混合模式改成 `'Mul '` | 仓库内 ABR **没有** multiply 纹理预设，故只改混合模式 |
+| `multiply_calc` | `tests/定量测试专用.abr`（计算笔刷=渲染确定性），仅混合模式改成 `'Mul '` | multiply 回归的**主判据** |
+| `height_calc_s100` | `tests/定量测试专用.abr`（linearHeight、depth=6），仅纹理 scale 改 100% | 高度系回归的**主判据**（计算笔刷覆盖整画布、base=1、可逐像素预测） |
+
+### 18.2 高度系回归（主判据 `height_calc_s100`，确定性）
+
+strength：**old=0.060 → new=0.072**（=min(1.0, 1.2×6%)）。
+
+| 对比 | 超阈比例(|Δ|>2) | mean|Δ| | max|Δ| |
+|---|---|---|---|
+| old 渲染 vs new 渲染 | 82.23% | 5.11 | 19 |
+| **new 渲染 vs new 预测**（texture_mask，depth=0.072） | **0.00%** | **0.47** | **1** |
+| old 渲染 vs old 预测（texture_mask，depth=0.060） | 0.00% | 0.48 | 1 |
+| old 渲染 vs **PS 参考**（同纹理/参数，PS 拟合 W=12） | 88.70% | 5.58 | 20 |
+| **new 渲染 vs PS 参考** | **0.00%** | **0.47** | **1** |
+
+结论：**修法 1 实测成立**。new 渲染与 new 预测、以及与应用 W=12 的 PS 参考都只差 ≤1 个灰度级（8-bit 量化残差）；
+old 与 PS 参考差 mean 5.58 / max 20 / 88.70% 超阈，正是少乘 1.2 的 2q 量级偏差。
+（注：本用例纹理是 1920×1920 的 Shape 2、depth=6、scale=100%、b=c=0；与 §17 的 64×64 实验纹理/depth=10 不同，
+但 PS 参考用的是同一套 PS 拟合公式 `tools/ps_texture_reference.ps_mask`（高度系 W=12），量级结论一致：
+§17 里 PS vs conv 43.31 → 修法后 1.39，这里 5.58 → 0.47。）
+
+**真实 Hght 采样笔刷（`height_real` / `height_s100`）**：strength 0.11 → 0.132。
+
+| 用例/口径 | old vs new 超阈 | mean|Δ| | max|Δ| | 噪声基线（同 kpp 两次渲染） |
+|---|---|---|---|---|
+| `height_s100` 全画布（10000 px） | 2.21% | 0.51 | 121 | max 37 / mean 0.12 |
+| `height_s100` 有笔迹像素（583 px） | 37.91% | 8.73 | 121 | mean 2.09 / max 37 |
+| `height_real` 有笔迹像素（605 px） | 41.82% | 8.98 | 79 | —（同源几何） |
+
+该预设是**采样笔刷**，Krita 每次渲染本身带随机性（同一 kpp 两次渲染 max 差 37），因此不作为逐像素判据；
+但 old/new 差（max 121 / 有笔迹 mean 8.73）明显大于渲染噪声（max 37 / mean 2.09），方向与「new 更强」一致。
+
+### 18.3 multiply 回归（必须 0）
+
+| 用例 | old vs new 超阈 | mean|Δ| | max|Δ| | 判定 |
+|---|---|---|---|---|
+| **`multiply_calc`（确定性，strength 两版都是 0.06）** | **0.00%** | **0.00** | **0** | **通过：10000/10000 像素相同** |
+| `multiply_mul`（采样笔刷，对照） 全画布 | 3.83% | 0.90 | 104 | 见下（渲染噪声） |
+| `multiply_mul` 有笔迹像素（595 px） | 64.37% | 15.06 | 104 | 同 kpp 噪声基线：mean 9.42 / max 88 |
+
+**结论**：multiply 路径的修复（只改内嵌纹理字节与资源名，strength 路径不动）**实测 max|Δ| = 0**，满足「0 或 ≤1」。
+采样笔刷 `multiply_mul` 的差异与「同一 kpp 连续渲染两次」的噪声同量级（max 104 vs 88、有笔迹 mean 15.06 vs 9.42），
+属 Krita 对采样笔刷的渲染随机性，不是代码差异（确定性用例已排除）。
+
+### 18.4 纹理是否真生效（最关键）
+
+判据：Alpha **不是恒 255**，即 `unique > 1 且 min < 255`（若被静默禁用，纹理不参与，Alpha 会退化成笔尖自身的恒定值）。
+
+| new .kpp | Alpha min | Alpha max | unique | 非零占比 | 判定 |
+|---|---|---|---|---|---|
+| `height_calc_s100` | 1 | 113 | 106 | 1.0000 | **纹理生效** |
+| `height_real` | 0 | 255 | 95 | 0.0604 | **纹理生效** |
+| `multiply_calc` | 246 | 255 | 10 | 1.0000 | **纹理生效**（multiply d6 + 反相亮纹理，接近不透明但仍有 10 级变化） |
+
+命名/标记证据（manifest `metrics.texture_resources` / `textmarkers`）：
+
+| 版本 | 图案资源名 | 内嵌 PNG 文本块 |
+|---|---|---|
+| new | `tex_287b7eaa3880.png`（Hght）、`tex_3ff43c49f112.png`（multiply）、`tex_bb586e4480d4.png`（calc 两例） | tEXt：`brushconverter` + `sha256=…`（逐张列在 manifest） |
+| old | `tex_c02fddff.png`、`tex_2ab8ff79.png`、`tex_66e2987f.png` | 无 |
+
+（注意 old 版 `multiply_calc`/`height_calc_s100` 的图案名正是 §8 撞过的 `tex_66e2987f.png`——旧代码仍用 uuid 命名；
+本次因为库内同名图案内容恰好与源纹理同像素（同一 ABR 的 Shape 2），old 渲染内容没变形，但这是运气不是保证。）
+
+**「图案库里仍有同内容图案」前提下的坑 A/B**（库内 `测试用纹理.png` md5 `5e748763…` 仍在，`in_krita_library=true`）：
+
+| 用例（同一份源纹理字节、multiply depth=0.6） | Alpha min/max | unique | 判定 |
+|---|---|---|---|
+| old：**唯一名字 + 逐字节原文**（无 tEXt） | 255 / 255 | 1 | **纹理被静默禁用** → 复现 md5 坑 |
+| old：**旧命名 `tex_66e2987f.png` + 逐字节原文** | 1 / 97 | 91 | 纹理“生效”但**串用了库内同名图案**（复现名字坑） |
+| **new：tEXt 标记 + `tex_41da8e73cc0e.png`（sha 命名）** | 0 / 153 | 147 | **正常生效**，不受库内同内容图案影响 |
+
+结论：**修法 2 实测成立**——md5 撞车（静默禁用）与文件名撞车（串用库内图案）两个坑都被 tEXt 标记 + 内容哈希命名规避。
+
+### 18.5 回归结论
+
+1. **高度系修复通过**：new 渲染与「W=12 的 PS 参考/掩码预测」一致（0.00% 超阈、max 1）；old 的 2q 偏差（88.70% 超阈、max 20）被消除。
+2. **multiply 修复通过**：确定性用例 old vs new **max|Δ|=0（10000 像素全同）**；采样笔刷用例的差异落在 Krita 渲染噪声内。
+3. **纹理生效通过**：新 .kpp 的 Alpha 不再恒 255（unique 10–106），且在图案库仍持有同内容图案的环境下，
+   「原字节 + 旧命名」会禁用或串味，「tEXt + sha 命名」正常生效——两个静默坑均被覆盖。
+
+可比性边界：
+
+- `tests/baselines/exp/ps/exp__ps__linearHeight__*` 中最接近的参数是 `d10_s100_b0_c0`，但那是 64×64 实验纹理 + 200px 计算笔刷 + b=c=0；
+  本节 `height_calc_s100` 是 1920×1920 Shape 2 纹理 + depth=6，`height_real` 更是采样小笔刷 + b=-55/c=37 → **不能与 PS 实验图逐像素比**；
+  因此本节用「同一纹理、同一参数」的 PS 拟合实现（W=12）做参考，并援引 §17 同参数实测（43.31 → 1.39）作为趋势佐证。
+- Krita 对**采样笔刷**的渲染不是逐次确定的（本次实测同 kpp 两次渲染 max 差 37–88）；
+  凡是需要「逐像素相同」的回归，必须用计算笔刷（`定量测试专用.abr`）或按噪声基线判定。
+
+### 18.6 环境清理核对（本次实测）
+
+```text
+tasklist /FI "IMAGENAME eq krita.exe" /NH   → No tasks are running which match the specified criteria.
+ls "$APPDATA/krita/pykrita"                  → preset_groups  preset_groups.desktop（无 bc_auto_render）
+grep -c enable_bc_auto_render "$LOCALAPPDATA/kritarc" → 0
+grep -n sessionOnStartup "$LOCALAPPDATA/kritarc"      → sessionOnStartup=0
+```
+
+如实记录一次环境意外：本任务中有一轮 `run_regress.py` 被执行超时的外层工具中断（渲染进行中），
+导致 `kritarc` 残留 `enable_bc_auto_render=true` 与 `sessionOnStartup=2`；已用脚本还原为
+`sessionOnStartup=0` 并删除该项，复核为 0（上面输出）。未发现 paintoppresets / patterns / TEMP 残留。
+
+### 18.7 本次新增/修改的文件
+
+| 文件 | 说明 |
+|---|---|
+| `tests/baselines/exp/regress/make_kpp.py` | 双版本转换（old/new）：5 个用例的 .kpp |
+| `tests/baselines/exp/regress/make_pit.py` | 纹理 md5/命名坑的字节级 A/B .kpp |
+| `tests/baselines/exp/regress/run_regress.py` | 串行渲染 + 指标 + manifest 的主控脚本 |
+| `tests/baselines/exp/regress/probe_abrs.py`、`diag_*.py`、`_fix_kritarc.py`、`_fill_manifest_elapsed.py` | 选材探针/诊断/环境修复脚本（保留作证据） |
+| `tests/baselines/exp/regress/kpp/` | `old__*.kpp` / `new__*.kpp` 共 13 个 |
+| `tests/baselines/exp/regress/png/` | 13 张渲染图 + 3 张重复渲染噪声基线（`*__rerun2.png`） |
+| `tests/baselines/exp/regress/manifest.json` | 产物、版本、strength、差异、噪声基线、预测、PS 参考、纹理资源/标记、pit A/B 全记录 |
+| `docs/验收报告/实验-Krita侧-报告.md` | 本节（追加，前面各节未改动） |
+
+未修改 `src/`（只读使用工作区与 `git archive` 的旧版）、既有 baselines、其他代理报告；无 git 写操作。

@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
+import hashlib
 import io
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
 import numpy as np
-from PIL import Image
+from PIL import Image, PngImagePlugin
 
 from .abr import AbrFile
 from .mapping import BrushPreset, TextureSettings, map_presets, _TEXTURING_MODE
@@ -43,14 +44,84 @@ def _square_tip(gray: np.ndarray) -> np.ndarray:
     return canvas
 
 
+# ---------------------------------------------------------------------------
+# 高度系纹理强度增益（v1.2.1）
+#
+# 依据 docs/验收报告/实验-归因-报告.md §4.2/§4.3 与
+# docs/验收报告/实验-Krita侧-报告.md §17（fixA 实测，2026-11-19）：
+# PS 的「高度 / 线性高度」系纹理掩码按 12*q 加权（q = round(2.55*depth)），
+# Krita 对应的 Photoshop 算子写 10*s（s = Texture/Strength/Value），
+# 归一化后两侧固定相差 2q：d10 实测 PS vs Krita mean|Δ|=43.31 / max=52 /
+# 95.36% 像素超阈。把高度系强度乘 W 比 12/10 = 1.2 后实测（scale=100%）：
+# mean|Δ| 43.31 → 1.39、max 52 → 2、超阈 95.36% → 0.00%。
+# 非高度系（multiply/subtract/hardMix）实测已 0.00%，一律不加增益：
+# 动了会反过来引入 2q 的正偏差，属于「修好一个、弄坏一个」。
+# 封顶 1.0：PS depth > 83% 时 Krita 强度上限 1.0 会提前饱和，这是既有的
+# 结构性限制（docs/parameter-mapping.md §7.1 局限 3），本修复不改变它。
+_HEIGHT_BLEND_MODES = frozenset({
+    "Hght", "height", "HghtPS",
+    "linearHeight", "linearHeightPhotoshop", "linearHeightPS",
+})
+
+#: 高度系强度增益 = PS 权重 12 / Krita 权重 10；出处见上方注释与 §7.1。
+HEIGHT_STRENGTH_GAIN = 1.2
+
+#: 内嵌纹理 PNG 的 tEXt 元数据关键字（Krita 5.3.3 md5 去重坑的规避标记）。
+_TEXTURE_TEXT_KEYWORD = "brushconverter"
+
+
+def _texture_strength(depth: float, blend_mode: str) -> float:
+    """PS 纹理深度（0..100）→ Krita Texture/Strength/Value。
+
+    高度系（见 _HEIGHT_BLEND_MODES）先乘 HEIGHT_STRENGTH_GAIN 再封顶 1.0，
+    用于抵消 PS W=12 vs Krita W=10 的权重差（实测数字见上方注释）；
+    其余模式原样返回 depth/100，不做任何改动。
+    """
+    d = max(0.0, min(100.0, float(depth)))
+    strength = d / 100.0
+    if blend_mode in _HEIGHT_BLEND_MODES:
+        return min(1.0, HEIGHT_STRENGTH_GAIN * strength)
+    return strength
+
+
+def _texture_strength_min(depth_min: float, blend_mode: str) -> float:
+    """PS 压感→深度曲线最小值（textureDepthDynamics.Mnm）→ 曲线 0 端点强度。
+
+    压感路径必须与恒定路径用同一套换算（含高度系 ×1.2 与封顶），否则曲线
+    两端口径不一致：0 端点会低估强度，渲染结果与 §17 的实测对不上。
+    """
+    return _texture_strength(depth_min, blend_mode)
+
+
 def _texture_png(texture: TextureSettings) -> bytes:
-    """纹理位图 → PNG 字节（RGB 或灰度，原样像素）。"""
-    buf = io.BytesIO()
+    """纹理位图 → 内嵌 PNG 字节（RGB 或灰度，像素数据逐字节不变）。
+
+    保存时追加一个只含元数据的 tEXt 块（keyword=brushconverter，
+    内容=sha256=<像素数组 sha256 hex>），像素数据一字不动。两个实测坑：
+    1) md5 撞车：Krita 5.3.3 会按 md5 把内嵌图案与已安装图案库去重，内嵌纹理
+       与库内文件同 md5 时该纹理解析失败 → 纹理被**静默禁用**（预设加载正常、
+       Enabled=true、字段回读全对，但落笔 Alpha 恒 255，无任何报错）。追加元数据
+       块让内嵌字节 md5 与源文件必然不同，实测即恢复正常（§8.2）。
+    2) 文件名撞车（见 _texture_xml 的命名注释）：只改字节名不改文件名仍会串用
+       库内同名图案，所以两件事必须一起做。
+    为什么每次都加、而不是只在「撞车时」加：转换器不知道接收方 Krita 图案库里
+    有什么文件，无法提前判断是否会撞；固定加标记才能保证产物可复现、
+    「重名 ⇒ 同内容」，也便于事后用 tEXt 里的像素哈希核对同一纹理。
+    """
     img = texture.image
+    if img is None:
+        raise ValueError("纹理位图不能为空")
+    pixels = np.ascontiguousarray(img)
+    png_info = PngImagePlugin.PngInfo()
+    png_info.add_text(
+        _TEXTURE_TEXT_KEYWORD,
+        f"sha256={hashlib.sha256(pixels.tobytes()).hexdigest()}",
+    )
+    buf = io.BytesIO()
     if img.ndim == 3 and img.shape[2] == 3:
-        Image.fromarray(img, mode="RGB").save(buf, format="PNG")
+        Image.fromarray(img, mode="RGB").save(buf, format="PNG", pnginfo=png_info)
     else:
-        Image.fromarray(img, mode="L").save(buf, format="PNG")
+        Image.fromarray(img, mode="L").save(buf, format="PNG", pnginfo=png_info)
     return buf.getvalue()
 
 
@@ -59,11 +130,24 @@ def _texture_xml(bp: BrushPreset) -> TextureXml | None:
 
     映射目标是 Krita 模式合成后的最终效果；校准常数来自
     research/测试结果2 与 research/krita结果，而不是 Photoshop 中间纹理值。
+
+    v1.2.1 两处修复（依据 docs/验收报告/实验-Krita侧-报告.md §8/§17）：
+    - 高度系强度 ×1.2（抵消 PS W=12 vs Krita W=10，见 _texture_strength()）；
+    - 图案资源名由内嵌字节的 sha256 派生 + 内嵌 PNG 追加 tEXt 标记
+      （Krita 5.3.3 的「同名串用」与「同 md5 静默禁用」两个静默坑）。
     """
     tex = bp.texture
     if tex is None or tex.image is None:
         return None
-    filename = f"tex_{tex.uuid[:8]}.png" if tex.uuid else "texture.png"
+    # 图案资源名由「内嵌字节的 sha256」派生，而不是 PS 的 uuid：
+    # Krita 5.3.3 遇到与图案库同名的资源时会**串用别人的图案**（实测：
+    # tex_<uuid8>.png 与库内同名图案撞车，不同字节渲染出同一张错图，
+    # 见实验-Krita侧-报告 §8.2）。用内容哈希命名可以保证「重名 ⇒ 同内容」，
+    # 且同一输入两次转换得到同一名字与同一字节（确定性）。
+    # 为什么不能只改名字：md5 去重坑仍然存在（同 md5 内嵌纹理被静默禁用），
+    # 必须同时给内嵌字节加 tEXt 标记，见 _texture_png()。
+    png_bytes = _texture_png(tex)
+    filename = f"tex_{hashlib.sha256(png_bytes).hexdigest()[:12]}.png"
     # Krita 源码的 KisTextureMaskInfo 直接执行：
     #   maskValue -= brightness
     #   maskValue = ((maskValue - 0.5) * contrast) + 0.5
@@ -76,7 +160,7 @@ def _texture_xml(bp: BrushPreset) -> TextureXml | None:
     brightness, contrast = texture_brightness_contrast(tex.brightness, tex.contrast)
     return TextureXml(
         pattern_filename=filename,
-        png_bytes=_texture_png(tex),
+        png_bytes=png_bytes,
         scale=max(0.01, min(10.0, tex.scale / 100.0)),
         brightness=brightness,
         contrast=contrast,
@@ -84,13 +168,14 @@ def _texture_xml(bp: BrushPreset) -> TextureXml | None:
         texturing_mode=_TEXTURING_MODE.get(tex.blend_mode, 0),
         # Krita 文档明确指出：除 Height/Linear Height 外，Soft Texturing
         # 更接近 Photoshop；PS 专用 Height 模式本身不启用该优化。
-        use_soft_texturing=(tex.blend_mode not in {
-            "Hght", "height", "HghtPS", "linearHeight",
-            "linearHeightPhotoshop", "linearHeightPS",
-        }),
-        strength=max(0.0, min(100.0, tex.depth)) / 100.0,
-        strength_curve=f"0,{max(0.0, min(100.0, tex.depth_min)) / 100.0:g};1,1;"
-        if tex.pressure else None,
+        use_soft_texturing=(tex.blend_mode not in _HEIGHT_BLEND_MODES),
+        # v1.2.1：高度系 ×1.2 且封顶 1.0；非高度系保持 depth/100 不动。
+        strength=_texture_strength(tex.depth, tex.blend_mode),
+        # 压感路径同样用 _texture_strength_min（高度系 ×1.2），否则两端口径不一。
+        strength_curve=(
+            f"0,{_texture_strength_min(tex.depth_min, tex.blend_mode):g};1,1;"
+            if tex.pressure else None
+        ),
         strength_pressure=tex.pressure,
     )
 
@@ -221,7 +306,6 @@ def convert_presets(abr: AbrFile, presets: list[BrushPreset], out_dir: str,
 
 def _sampled_brush_def(res_name: str, tip_png: bytes, bp: BrushPreset) -> str:
     """生成采样笔尖的 png_brush <Brush> 定义（filename + md5sum 引用内嵌 PNG）。"""
-    import hashlib
     from .kpp.preset_xml import sampled_brush_definition
     md5 = hashlib.md5(tip_png).hexdigest()
     return sampled_brush_definition(res_name + ".png", md5, bp.spacing, bp.angle, bp.scale)

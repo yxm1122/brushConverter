@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+import re
 import sys
 from pathlib import Path
 
@@ -228,11 +229,15 @@ def test_texture_xml_end_to_end():
     line = next(p for p in presets if "大怪兽-勾线笔" in p.name)
     _, xml, _ = _render_preset(line, 0)
     assert 'type="patterns"' in xml
-    assert "tex_438c2948.png" in xml
+    # v1.2.1：资源名由内嵌字节 sha256 派生，不再是 tex_<uuid8>.png
+    assert re.search(r"tex_[0-9a-f]{12}\.png", xml)
+    assert "tex_438c2948.png" not in xml
     assert "Texture/Pattern/Enabled\" type=\"internal\">true" in xml
     assert "Texture/Pattern/TexturingMode\" type=\"internal\">15" in xml
     assert "Texture/Pattern/Brightness\" type=\"internal\">0" in xml
     assert "Texture/Pattern/Contrast\" type=\"internal\">1" in xml
-    assert "Texture/Strength/Value\" type=\"internal\">0.55" in xml
+    # 勾线笔是 linearHeight（高度系），depth=55 → min(1, 1.2×0.55) = 0.66
+    # （v1.2.1 高度系强度 ×1.2；旧值 0.55 是未加增益的 depth/100）
+    assert "Texture/Strength/Value\" type=\"internal\">0.66" in xml
     assert "PressureTexture/Strength/\" type=\"internal\">true" in xml
 

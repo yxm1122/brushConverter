@@ -223,10 +223,14 @@ Krita 5.x 用 `embedded_resources="2"`，笔尖 PNG 以 **base64 内嵌**在预�
 纹理与笔尖一样内嵌在 `<resources>` 里，但 `type="patterns"`，PNG base64：
 
 ```xml
-<resource name="tex_66e2987f.png" filename="tex_66e2987f.png"
+<resource name="tex_0123456789ab.png" filename="tex_0123456789ab.png"
          type="patterns" md5sum="...">
   <![CDATA[ base64(PNG) ]]></resource>
 ```
+
+资源名由**内嵌 PNG 字节的 sha256 前 12 位**派生（v1.2.1 起；旧版为与内容无关的
+`tex_<uuid8>.png`），且内嵌 PNG 追加只含元数据的 tEXt 块——两个 Krita 5.3.3
+静默坑的规避方式与证据见 §7.6。
 
 预设参数（`preset_xml.py` 的 `TextureXml` / `_apply_texture`）：
 `Texture/Pattern/{Enabled,Name,PatternFileName,PatternMD5Sum,Scale,Brightness,
@@ -236,9 +240,16 @@ Contrast,Invert,TexturingMode}`、`Texture/Strength/{Value,UseCurve,commonCurve}
 `PressureTexture/Strength/` 是 Krita「效果强度」选项的启用开关（`isChecked`，
 见 `KisKritaSensorPack::read` 的 `getBool("Pressure"+id)`），与压感无关：
 PS 纹理深度无论是否接传感器都要设为 `true`；深度随压感（`bVTy==2`）时再设
-`Texture/Strength/UseCurve=true` 并写 `commonCurve`（最小值为 `Mnm/100`），
+`Texture/Strength/UseCurve=true` 并写 `commonCurve`（0 端点 = 同口径的深度最小值），
 `bVTy==0`（无传感器）时设 `Texture/Strength/UseCurve=false`，由
-`Texture/Strength/Value`（=`textureDepth/100`）提供恒定强度。
+`Texture/Strength/Value` 提供恒定强度。
+
+强度换算（v1.2.1 起）：高度系（`Hght`/`height`/`HghtPS`/`linearHeight`/
+`linearHeightPhotoshop`/`linearHeightPS`）一律
+`min(1.0, 1.2 × depth/100)`，压感曲线 0 端点用
+`min(1.0, 1.2 × depth_min/100)`；其余模式保持 `depth/100` 与 `depth_min/100`。
+常数与函数在 `convert.py`（`HEIGHT_STRENGTH_GAIN`、`_texture_strength`、
+`_texture_strength_min`），依据见 §7.6 第 23 条。
 
 注意：
 - **`PatternMD5Sum` 存 hex md5**；`PatternMD5` 留空——Krita 5.0 曾在该字段写原始
@@ -317,6 +328,32 @@ paintoppresets/*.kpp          自包含笔刷预设
     （GUI 同理：启动 GUI 前设同一环境变量）：`BRUSHCONVERTER_TEXTURE_FORMULA=legacy python cli.py convert tests/测试用.abr -o converted`。
     **改默认值会改变产物字节**：默认路径下 15/25 个 `.kpp` 与 v1.1.2 不同（恰为 15 支带纹理笔刷），显式 `legacy` 下 25/25 与 v1.1.2 的 sha256 全同。
     回归用例 `tests/test_texture_formula_switch.py` 同时断言两条路径的具体数值。公式、A/B 数字与 7 条局限见 `docs/parameter-mapping.md` §7.1 与 `docs/验收报告/13-报告.md`。
+
+### 7.6 纹理深度与资源命名层面（v1.2.1 新增）
+
+22. **Krita 5.3.3 的内嵌纹理有两个静默坑：同 md5 会被静默禁用、同名会串用别人的图案**。
+    前者：内嵌纹理与用户图案库里某文件 md5 相同时，Krita 解析该内嵌资源失败 → 纹理被**静默禁用**
+    （预设加载正常、`Enabled=true`、字段回读全对，但落笔 Alpha 恒 255，无任何报错）。
+    后者：资源名与库内图案同名时被遮蔽，不同字节也渲染出库内那张错图——实测旧命名
+    `tex_<uuid8>.png`（如 `tex_66e2987f.png`）撞车后 Alpha 均值 211.6。
+    修法（v1.2.1）：内嵌 PNG 追加只含元数据的 tEXt 块（keyword `brushconverter`，内容
+    `sha256=<像素 sha256>`，像素逐字节不变）让 md5 必然不同；资源名改为
+    `tex_<sha256(内嵌PNG)前12>.png` 保证「重名 ⇒ 同内容」。**两件事必须一起做**：
+    只改名避不开 md5 去重坑，只加标记避不开同名遮蔽坑；也**不能只在撞车时才加标记**，
+    因为转换器不知道接收方 Krita 图案库里有什么。回归用例 `tests/test_texture_v121_fixes.py`
+    断言「解码像素与源数组逐像素相同」「内嵌 md5 ≠ 源文件 md5」「资源名形如 `tex_[0-9a-f]{12}.png`」。
+    证据：`docs/验收报告/实验-Krita侧-报告.md` §8.2。
+
+23. **高度系纹理强度必须 ×1.2（PS 权重 12 vs Krita 权重 10）**。PS 高度/线性高度算子按 `12·q`
+    加权（`q=round(2.55·depth)`），Krita 写 `10·s`，归一化后固定差 `2q`：d10/scale=100 实测
+    PS vs Krita mean\|Δ\|=43.31、max=52、95.36% 像素超阈。修法是把高度系
+    `Texture/Strength/Value` 改成 `min(1.0, 1.2×depth/100)`（压感曲线 0 端点同样 ×1.2），
+    实测 mean 43.31→**1.39**、max 52→**2**、超阈 95.36%→**0.00%**。
+    注意：**非高度系（multiply/subtract/hardMix）不加增益**（实测已 0.00%，动了会引入新偏差）；
+    系数不要为了 scale≠100% 的残差继续上调——那部分残差是缩放重采样（PS vs Krita Qt 平滑），
+    调系数会破坏 s100 已取得的 0.00%。常数集中在 `convert.py`：
+    `HEIGHT_STRENGTH_GAIN`、`_HEIGHT_BLEND_MODES`、`_texture_strength()`。
+    证据：`docs/验收报告/实验-归因-报告.md` §4.2/§4.3、`docs/验收报告/实验-Krita侧-报告.md` §17。
 
 ## 8. 参考实现与样本
 

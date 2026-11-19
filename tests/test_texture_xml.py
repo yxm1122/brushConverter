@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import re
 import sys
 from pathlib import Path
 
@@ -218,10 +219,22 @@ def test_photoshop_texture_modes_use_krita_photoshop_variants():
     assert _TEXTURING_MODE["Sbtr"] == 1
 
 
-def test_convert_texture_filename_from_uuid():
+def test_convert_texture_filename_derived_from_content():
+    # v1.2.1：图案资源名由内嵌字节的 sha256 前 12 位派生，不再用与内容无关的
+    # tex_<uuid8>.png（旧做法会与用户图案库同名不同内容撞车 → 串用别人的图案，
+    # 见 docs/验收报告/实验-Krita侧-报告.md §8.2）。
     img = np.zeros((4, 4, 3), dtype=np.uint8)
     ts = TextureSettings(name="x", uuid="66e2987f-d47b-fa49-9e36-3ffa8b78533a",
                          image=img)
     tex = _texture_xml(BrushPreset(name="x", texture=ts))
     assert tex is not None
-    assert tex.pattern_filename == "tex_66e2987f.png"
+    assert re.fullmatch(r"tex_[0-9a-f]{12}\.png", tex.pattern_filename)
+    # 与旧的 uuid 命名不同：名字必须由内容决定
+    assert tex.pattern_filename != "tex_66e2987f.png"
+    assert tex.pattern_filename == (
+        f"tex_{hashlib.sha256(tex.png_bytes).hexdigest()[:12]}.png")
+    # 确定性：同一输入两次转换 → 同一名字、同一字节
+    again = _texture_xml(BrushPreset(name="x", texture=ts))
+    assert again is not None
+    assert again.pattern_filename == tex.pattern_filename
+    assert again.png_bytes == tex.png_bytes

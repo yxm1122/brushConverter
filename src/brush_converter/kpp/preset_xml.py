@@ -357,7 +357,9 @@ def texture_brightness_contrast(
 class TextureXml:
     """Krita 纹理选项所需的数据（由 convert 从 TextureSettings 组装）。"""
 
-    pattern_filename: str   # 内嵌资源文件名（如 tex_66e2987f.png）
+    # 内嵌资源文件名：v1.2.1 起由内嵌 PNG 字节的 sha256 前 12 位派生
+    # （如 tex_0123456789ab.png，保证「重名 ⇒ 同内容」；旧版是 tex_<uuid8>.png）
+    pattern_filename: str
     png_bytes: bytes
     scale: float = 1.0      # 0.01..10，1=100%
     brightness: float = 0.0

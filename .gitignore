@@ -63,3 +63,5 @@ docs/工作流程/
 
 # ---- 实验脚手架（探针脚本/日志，证据结论已进报告；不入库）----
 tests/baselines/exp/**/_work/
+# ---- v1.2.1 渲染回归脚手架（结论与数字已进报告；脚本改过本机 kritarc，不入库）----
+tests/baselines/exp/regress/

@@ -1,3 +1,52 @@
+# brushConverter v1.2.1（2026-11-19）
+
+两处实验已实测证实的修复：高度系纹理强度 ×1.2（PS W=12 vs Krita W=10）
+与纹理资源命名/内嵌字节防撞车（Krita 5.3.3 两个静默坑）。
+
+## 主要变化
+
+- **高度系纹理强度 ×1.2（修准深度）**：Photoshop 的「高度 / 线性高度」系纹理掩码按
+  `12·q` 加权（`q=round(2.55·depth)`），Krita 同名 Photoshop 算子写 `10·s`
+  （`s = Texture/Strength/Value`），归一化后固定差 `2q`。v1.2.1 起高度系写
+  `Texture/Strength/Value = min(1.0, 1.2 × depth/100)`，压感曲线路径的 0 端点同样用
+  `min(1.0, 1.2 × depth_min/100)`。**非高度系（multiply / subtract / hardMix）一律不动**。
+  常数集中在 `src/brush_converter/convert.py`（`HEIGHT_STRENGTH_GAIN`、`_HEIGHT_BLEND_MODES`、
+  `_texture_strength()` / `_texture_strength_min()`），不散落魔法数。
+- **纹理资源名由内容哈希派生**：`tex_<sha256(内嵌PNG)前12>.png`（旧版 `tex_<uuid前8>.png`
+  与内容无关，会与用户图案库同名不同内容撞车 → 串用别人的图案）。同一输入两次转换得到同一名字
+  与同一字节，保证「重名 ⇒ 同内容」。
+- **内嵌纹理 PNG 追加 tEXt 元数据标记**：keyword=`brushconverter`，
+  内容=`sha256=<像素数组 sha256 hex>`，**像素数据逐字节不变**（IDAT 与源 PNG 相同，
+  有逐像素断言）。作用是避开 Krita 5.3.3 的「内嵌纹理与图案库同 md5 → 纹理被静默禁用
+  （Alpha 恒 255，无报错）」坑；`PatternMD5Sum` 仍是内嵌字节的 md5。
+- **版本号**：`src/brush_converter/__init__.py` → `1.2.1`。
+
+## 验证
+
+- **fixA 实测（`docs/验收报告/实验-Krita侧-报告.md` §17，PS 真值对照 d10/scale=100）**：
+  mean\|Δ\| **43.31 → 1.39**、max **52 → 2**、超阈像素 **95.36% → 0.00%**；
+  d60/d100 两侧本就饱和，加增益后不变（d100 被 1.0 封顶）。
+- **纹理撞车实测（同报告 §8.2）**：源文件逐字节内嵌（md5 与图案库同）→ 静默禁用、Alpha 恒 255；
+  追加 tEXt 元数据块改变 md5 后恢复正常（与掩码预测逐像素一致）；旧命名 `tex_66e2987f.png`
+  与库内同名图案撞车 → 不同字节渲染出同一张错图（Alpha 均值 211.6）。
+- **新增回归用例 `tests/test_texture_v121_fixes.py`（挂 verify 标记）**：高度系 6 个别名 ×
+  depth∈{0,10,60,83,100} 逐值断言实际 XML 的 `Texture/Strength/Value`；非高度系 2 个模式
+  同表断言「不变」；压感曲线 0 端点逐值断言；内嵌 PNG 逐像素相等 + tEXt 值 = 像素 sha256 +
+  内嵌 md5 ≠ 源文件 md5；资源名正则 `^tex_[0-9a-f]{12}\.png$` + 确定性 + 不同内容不同名。
+- `pytest -q`：**251 项通过 / 0 失败 / 0 跳过**（v1.2.1 施工实测；含新增
+  `tests/test_texture_v121_fixes.py` 55 项）。
+
+## 与 v1.2.0 的行为差异
+
+1. **只有高度系、且 depth < 约 83% 的预设**的 `Texture/Strength/Value` 变大（×1.2）：
+   d<83% 变化、d≥83% 因 1.0 封顶与旧行为相同；
+   非高度系预设（multiply / subtract / hardMix）的渲染参数**完全不变**。
+2. **所有带纹理的预设**：内嵌 PNG 字节多一个 tEXt 块（像素不变）、图案资源名从
+   `tex_<uuid8>.png` 变为 `tex_<sha256(内嵌PNG)前12>.png`、`PatternMD5Sum` 随内嵌字节变化。
+3. 笔尖资源、非纹理参数、.bundle 结构均不变。
+
+---
+
 # brushConverter v1.2.0（2026-11-18）
 
 自动验证体系 + PS/Krita 双端自动出图 + 纹理亮度/对比度 calibrated 转正 + 开源前隐私门。

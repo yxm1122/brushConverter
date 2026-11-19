@@ -92,13 +92,13 @@
 |--------|--------------|----------|------|
 | `useTexture` | `Texture/Pattern/Enabled` | `true` | ✅ |
 | `Txtr.Idnt` | 资源查找 | patt 记录按 UUID 匹配，PNG 内嵌 | ✅ |
-| `Txtr.Nm` | `Name` / `PatternFileName` | 安全文件名 `tex_<uuid前8>.png` | ✅ |
+| `Txtr.Nm` | `Name` / `PatternFileName` | 资源名由内嵌字节派生：`tex_<sha256(内嵌PNG)前12>.png`（v1.2.1；旧版 `tex_<uuid前8>.png` 与内容无关，会与用户图案库撞名） | ✅ |
 | PNG 字节 | `PatternMD5Sum` | md5 hex（`PatternMD5` 留空，绕开 Krita 5.0 写二进制 bug） | ✅ |
 | `textureScale`（%） | `Texture/Pattern/Scale` | `textureScale/100`，clamp [0.01, 10] | ✅（用户已确认一致） |
-| `textureDepth`（%） | `Texture/Strength/Value` | `textureDepth/100`（0..1） | ✅ |
+| `textureDepth`（%） | `Texture/Strength/Value` | 高度系 `min(1, 1.2×textureDepth/100)`；非高度系 `textureDepth/100`（0..1，v1.2.1） | ✅ |
 | `textureDepthDynamics.bVTy==2` | `PressureTexture/Strength/` + `Texture/Strength/UseCurve` | `true` + `true`（压感曲线，最小值见下） | ✅ |
 | `textureDepthDynamics.bVTy==0` | `PressureTexture/Strength/` + `Texture/Strength/UseCurve` | `true` + `false`（效果强度开启、无传感器，恒定用 Value） | ✅ |
-| `textureDepthDynamics.Mnm` | `Texture/Strength/commonCurve` | `0,{Mnm/100};1,1;`（仅 bVTy==2） | ✅ |
+| `textureDepthDynamics.Mnm` | `Texture/Strength/commonCurve` | 高度系 `0,min(1,1.2×Mnm/100);1,1;`；非高度系 `0,Mnm/100;1,1;`（仅 bVTy==2，v1.2.1） | ✅ |
 | `InvT` | `Texture/Pattern/Invert` | 直接 | ✅ |
 | `textureBlendMode` | `Texture/Pattern/TexturingMode` | 优先使用 Krita `(Photoshop)` 模式：`linearHeight`→Linear Height (Photoshop)=15、`Hght`/`height`→Height (Photoshop)=14、`hardMix`→Hard Mix (Photoshop)=10；其余模式按 Krita 枚举映射（`Mul `→0、`Sbtr`→1、`Ovrl`→5 等）；未知回退 0 + 警告 | ✅ |
 | `textureBrightness`（PS -150..150） | `Texture/Pattern/Brightness` | **默认（calibrated，v1.2.0 起）**：`b_k = (1-k)/(510k) - v/255`（C≥0）或 `(1-k)/(510k) - v/(255k)`（C<0），保留 3 位小数，clamp [-1,1]；**历史方案（legacy，v1.1.2，可回退）**：`round(0.10-v/250,2)`，clamp [-1,1] | ✅ / 🧪 |
@@ -186,6 +186,40 @@ b_k = (1-k)/(510k) - b/(255k)     （C <  0，亮度在对比度之后 → 反�
    （`research/krita_texture/KisTextureOptionData.cpp:17`）；2 位小数在 k=2 时舍入误差达 2.55 灰度级，
    不满足 ≤2% 判据。若用户在 Krita 里打开「笔刷设置」编辑器，控件可能把值舍入到两位
    （潜在 ≤3 灰度级偏差）——建议人工在 Krita 里抽查 1 支笔。
+
+**v1.2.1 追加的两条（均由实验实测证实，不是理论推测）**
+
+8. **高度系纹理强度增益 ×1.2（PS W=12 vs Krita W=10）**。Photoshop 的「高度 / 线性高度」系算子
+   按 `12·q` 加权（`q = round(2.55·depth)`），Krita 同名 Photoshop 算子写 `10·s`
+   （`s = Texture/Strength/Value`），归一化后两侧固定相差 `2q`，与量化无关
+   （d10 时两侧 q 同为 26，量化阶差最多 2 灰度级）。修法：高度系
+   `Texture/Strength/Value = min(1.0, 1.2 × depth/100)`，压感曲线路径的 0 端点同样用
+   `min(1.0, 1.2 × depth_min/100)`；**非高度系（multiply / subtract / hardMix）一律不动**。
+   - 依据：`docs/验收报告/实验-归因-报告.md` §4.2/§4.3（根因 `PS=12q−u` vs `Krita=10q−u`，差 2q）；
+     `docs/验收报告/实验-Krita侧-报告.md` §17（2026-11-19 fixA 实测）。
+   - 实测（d10/scale=100，PS 真值对照）：mean\|Δ\| **43.31 → 1.39**、max **52 → 2**、
+     超阈像素 **95.36% → 0.00%**，与模型预测完全一致。
+   - d60/d100 两侧本就饱和（Alpha 恒 255），加增益后不变（d100 被 1.0 封顶，与旧行为相同）。
+   - 常数集中在 `src/brush_converter/convert.py` 的 `HEIGHT_STRENGTH_GAIN = 1.2`
+     与 `_HEIGHT_BLEND_MODES`，换算函数 `_texture_strength()` / `_texture_strength_min()`。
+   - 不覆盖：scale≠100% 的残差属缩放重采样（PS vs Krita Qt 平滑），**不应再调 1.2 系数**
+     （调系数会破坏 s100 已取得的 0.00%，见 §17.4）。
+
+9. **纹理资源命名与内嵌字节 tEXt 标记（Krita 5.3.3 两个静默坑）**。v1.2.1 起：
+   - 内嵌纹理 PNG 在 IEND 前追加一个只含元数据的 **tEXt 块**（keyword=`brushconverter`，
+     内容=`sha256=<像素数组 sha256 hex>`），**像素数据逐字节不变**（IDAT 与源 PNG 相同）；
+   - 图案资源名改为 `tex_<sha256(内嵌PNG字节)前12>.png`（旧版 `tex_<uuid前8>.png` 与内容无关）；
+   - `Texture/Pattern/PatternMD5Sum` 仍是**内嵌字节**的 md5（含元数据块），与资源
+     `md5sum` 一致。
+   - 坑 1（**同 md5 → 静默禁用**）：内嵌纹理与用户图案库里的文件 md5 相同时，Krita 5.3.3
+     解析该内嵌资源失败，纹理被静默禁用——预设加载正常、字段回读全对，但落笔 Alpha 恒 255，
+     无任何报错（首轮 52 张实验图全部作废）。追加 tEXt 块后内嵌字节 md5 必然不同，实测恢复正常。
+   - 坑 2（**同名 → 串用图案**）：资源名与库内图案同名时会被遮蔽，不同字节也渲染出库内那张
+     错图（实测 `tex_66e2987f.png` 撞车，Alpha 均值 211.6）。内容哈希命名保证「重名 ⇒ 同内容」。
+   - 为什么不能只改名字：md5 去重坑还在；为什么不能只在撞车时才加标记：转换器不知道接收方
+     Krita 图案库里有什么文件，无法预判撞车。所以两件事必须一起做、且每次都做。
+   - 依据：`docs/验收报告/实验-Krita侧-报告.md` §8.2；修复回归用例
+     `tests/test_texture_v121_fixes.py`。
 
 ## 8. 控制源编码（bVTy → Krita 传感器）
 
