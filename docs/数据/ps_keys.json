@@ -1,0 +1,5089 @@
+[
+ {
+  "key": "Angl",
+  "form": "4cc_immediate",
+  "group": "ABR/4CC 键",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "imm32_insn",
+    "value": "0x140f9dcb1",
+    "detail": "键以 32 位立即数 0x416e676c（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x140fa9d66",
+    "detail": "键以 32 位立即数 0x416e676c（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x140fa9d83",
+    "detail": "键以 32 位立即数 0x416e676c（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x141348c05",
+    "detail": "键以 32 位立即数 0x416e676c（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   }
+  ],
+  "imm32": "0x416e676c",
+  "in_repo_parser": true,
+  "in_abr_samples": true,
+  "note": "4CC 形态；PS 以内部 id 传递，本任务未定位结构体偏移"
+ },
+ {
+  "key": "BlnM",
+  "form": "4cc_immediate",
+  "group": "ABR/4CC 键",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "imm32_insn",
+    "value": "0x14154d2c0",
+    "detail": "键以 32 位立即数 0x426c6e4d（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x14154d2bf",
+    "detail": "键以 32 位立即数 0x426c6e4d（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x141b935f5",
+    "detail": "键以 32 位立即数 0x426c6e4d（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x141b935f4",
+    "detail": "键以 32 位立即数 0x426c6e4d（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   }
+  ],
+  "imm32": "0x426c6e4d",
+  "in_repo_parser": false,
+  "in_abr_samples": true,
+  "note": "4CC 形态；PS 以内部 id 传递，本任务未定位结构体偏移"
+ },
+ {
+  "key": "Brgh",
+  "form": "4cc_immediate",
+  "group": "ABR/4CC 键",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "imm32_insn",
+    "value": "0x140f01998",
+    "detail": "键以 32 位立即数 0x42726768（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x140f06605",
+    "detail": "键以 32 位立即数 0x42726768（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x140f06621",
+    "detail": "键以 32 位立即数 0x42726768（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x1415cd6b4",
+    "detail": "键以 32 位立即数 0x42726768（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   }
+  ],
+  "imm32": "0x42726768",
+  "in_repo_parser": false,
+  "in_abr_samples": true,
+  "note": "4CC 形态；PS 以内部 id 传递，本任务未定位结构体偏移"
+ },
+ {
+  "key": "Brsh",
+  "form": "4cc_immediate",
+  "group": "ABR/4CC 键",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "imm32_insn",
+    "value": "0x140eef3a6",
+    "detail": "键以 32 位立即数 0x42727368（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x140eef3a5",
+    "detail": "键以 32 位立即数 0x42727368（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x141a92b02",
+    "detail": "键以 32 位立即数 0x42727368（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x141a92b36",
+    "detail": "键以 32 位立即数 0x42727368（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   }
+  ],
+  "imm32": "0x42727368",
+  "in_repo_parser": true,
+  "in_abr_samples": true,
+  "note": "4CC 形态；PS 以内部 id 传递，本任务未定位结构体偏移"
+ },
+ {
+  "key": "Cnt ",
+  "form": "4cc_immediate",
+  "group": "ABR/4CC 键",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "imm32_insn",
+    "value": "0x1410a32f0",
+    "detail": "键以 32 位立即数 0x436e7420（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x1410a4a71",
+    "detail": "键以 32 位立即数 0x436e7420（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x1413532a2",
+    "detail": "键以 32 位立即数 0x436e7420（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x1413532a1",
+    "detail": "键以 32 位立即数 0x436e7420（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   }
+  ],
+  "imm32": "0x436e7420",
+  "in_repo_parser": false,
+  "in_abr_samples": true,
+  "note": "4CC 形态；PS 以内部 id 传递，本任务未定位结构体偏移"
+ },
+ {
+  "key": "Dmtr",
+  "form": "4cc_immediate",
+  "group": "ABR/4CC 键",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "imm32_insn",
+    "value": "0x142021b3e",
+    "detail": "键以 32 位立即数 0x446d7472（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x1420232a1",
+    "detail": "键以 32 位立即数 0x446d7472（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x1420232c1",
+    "detail": "键以 32 位立即数 0x446d7472（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x14253ca78",
+    "detail": "键以 32 位立即数 0x446d7472（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   }
+  ],
+  "imm32": "0x446d7472",
+  "in_repo_parser": true,
+  "in_abr_samples": true,
+  "note": "4CC 形态；PS 以内部 id 传递，本任务未定位结构体偏移"
+ },
+ {
+  "key": "ErsB",
+  "form": "4cc_immediate",
+  "group": "ABR/4CC 键",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "imm32_insn",
+    "value": "0x1422bfddd",
+    "detail": "键以 32 位立即数 0x45727342（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x1422c00c4",
+    "detail": "键以 32 位立即数 0x45727342（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x1422c00e1",
+    "detail": "键以 32 位立即数 0x45727342（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x1422c022f",
+    "detail": "键以 32 位立即数 0x45727342（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   }
+  ],
+  "imm32": "0x45727342",
+  "in_repo_parser": false,
+  "in_abr_samples": true,
+  "note": "4CC 形态；PS 以内部 id 传递，本任务未定位结构体偏移"
+ },
+ {
+  "key": "Flip",
+  "form": "4cc_immediate",
+  "group": "ABR/4CC 键",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "imm32_insn",
+    "value": "0x1415a4573",
+    "detail": "键以 32 位立即数 0x466c6970（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x1415a4572",
+    "detail": "键以 32 位立即数 0x466c6970（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x1415a4a92",
+    "detail": "键以 32 位立即数 0x466c6970（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x1415a4a91",
+    "detail": "键以 32 位立即数 0x466c6970（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   }
+  ],
+  "imm32": "0x466c6970",
+  "in_repo_parser": false,
+  "in_abr_samples": true,
+  "note": "4CC 形态；PS 以内部 id 传递，本任务未定位结构体偏移"
+ },
+ {
+  "key": "H   ",
+  "form": "4cc_immediate",
+  "group": "ABR/4CC 键",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "imm32_insn",
+    "value": "0x140f0190e",
+    "detail": "键以 32 位立即数 0x48202020（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x140f0657a",
+    "detail": "键以 32 位立即数 0x48202020（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x140f06599",
+    "detail": "键以 32 位立即数 0x48202020（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x141e63ca7",
+    "detail": "键以 32 位立即数 0x48202020（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   }
+  ],
+  "imm32": "0x48202020",
+  "in_repo_parser": false,
+  "in_abr_samples": true,
+  "note": "4CC 形态；PS 以内部 id 传递，本任务未定位结构体偏移"
+ },
+ {
+  "key": "Hrdn",
+  "form": "4cc_immediate",
+  "group": "ABR/4CC 键",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "imm32_insn",
+    "value": "0x142021b7f",
+    "detail": "键以 32 位立即数 0x4872646e（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x1420232e2",
+    "detail": "键以 32 位立即数 0x4872646e（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x14202330c",
+    "detail": "键以 32 位立即数 0x4872646e（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   }
+  ],
+  "imm32": "0x4872646e",
+  "in_repo_parser": true,
+  "in_abr_samples": true,
+  "note": "4CC 形态；PS 以内部 id 传递，本任务未定位结构体偏移"
+ },
+ {
+  "key": "Idnt",
+  "form": "4cc_immediate",
+  "group": "ABR/4CC 键",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "imm32_insn",
+    "value": "0x140ee185f",
+    "detail": "键以 32 位立即数 0x49646e74（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x1410a3450",
+    "detail": "键以 32 位立即数 0x49646e74（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x1410a4dfe",
+    "detail": "键以 32 位立即数 0x49646e74（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x14134fcc2",
+    "detail": "键以 32 位立即数 0x49646e74（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   }
+  ],
+  "imm32": "0x49646e74",
+  "in_repo_parser": true,
+  "in_abr_samples": true,
+  "note": "4CC 形态；PS 以内部 id 传递，本任务未定位结构体偏移"
+ },
+ {
+  "key": "Intr",
+  "form": "4cc_immediate",
+  "group": "ABR/4CC 键",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "imm32_insn",
+    "value": "0x140d91d58",
+    "detail": "键以 32 位立即数 0x496e7472（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x140d91d72",
+    "detail": "键以 32 位立即数 0x496e7472（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x140d9636c",
+    "detail": "键以 32 位立即数 0x496e7472（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x14126e684",
+    "detail": "键以 32 位立即数 0x496e7472（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   }
+  ],
+  "imm32": "0x496e7472",
+  "in_repo_parser": false,
+  "in_abr_samples": true,
+  "note": "4CC 形态；PS 以内部 id 传递，本任务未定位结构体偏移"
+ },
+ {
+  "key": "Md  ",
+  "form": "4cc_immediate",
+  "group": "ABR/4CC 键",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "imm32_insn",
+    "value": "0x140b0e704",
+    "detail": "键以 32 位立即数 0x4d642020（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x140f09f1a",
+    "detail": "键以 32 位立即数 0x4d642020（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x141348bb0",
+    "detail": "键以 32 位立即数 0x4d642020（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x1413494ff",
+    "detail": "键以 32 位立即数 0x4d642020（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   }
+  ],
+  "imm32": "0x4d642020",
+  "in_repo_parser": false,
+  "in_abr_samples": true,
+  "note": "4CC 形态；PS 以内部 id 传递，本任务未定位结构体偏移"
+ },
+ {
+  "key": "MgcE",
+  "form": "4cc_immediate",
+  "group": "ABR/4CC 键",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "imm32_insn",
+    "value": "0x1422bfdbc",
+    "detail": "键以 32 位立即数 0x4d676345（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x1422c0112",
+    "detail": "键以 32 位立即数 0x4d676345（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x1422c012b",
+    "detail": "键以 32 位立即数 0x4d676345（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x1422c021a",
+    "detail": "键以 32 位立即数 0x4d676345（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   }
+  ],
+  "imm32": "0x4d676345",
+  "in_repo_parser": false,
+  "in_abr_samples": true,
+  "note": "4CC 形态；PS 以内部 id 传递，本任务未定位结构体偏移"
+ },
+ {
+  "key": "Mnm ",
+  "form": "4cc_immediate",
+  "group": "ABR/4CC 键",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "imm32_insn",
+    "value": "0x141d7d0bd",
+    "detail": "键以 32 位立即数 0x4d6e6d20（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x141d80184",
+    "detail": "键以 32 位立即数 0x4d6e6d20（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x14347c1f4",
+    "detail": "键以 32 位立即数 0x4d6e6d20（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x1434818cd",
+    "detail": "键以 32 位立即数 0x4d6e6d20（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   }
+  ],
+  "imm32": "0x4d6e6d20",
+  "in_repo_parser": true,
+  "in_abr_samples": true,
+  "note": "4CC 形态；PS 以内部 id 传递，本任务未定位结构体偏移"
+ },
+ {
+  "key": "Nm  ",
+  "form": "4cc_immediate",
+  "group": "ABR/4CC 键",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "imm32_insn",
+    "value": "0x140b0e6d5",
+    "detail": "键以 32 位立即数 0x4e6d2020（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x140f09de4",
+    "detail": "键以 32 位立即数 0x4e6d2020（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x140fa0f26",
+    "detail": "键以 32 位立即数 0x4e6d2020（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x140fa0f44",
+    "detail": "键以 32 位立即数 0x4e6d2020（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   }
+  ],
+  "imm32": "0x4e6d2020",
+  "in_repo_parser": false,
+  "in_abr_samples": true,
+  "note": "4CC 形态；PS 以内部 id 传递，本任务未定位结构体偏移"
+ },
+ {
+  "key": "Nose",
+  "form": "4cc_immediate",
+  "group": "ABR/4CC 键",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "imm32_insn",
+    "value": "0x143465f85",
+    "detail": "键以 32 位立即数 0x4e6f7365（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x14347c724",
+    "detail": "键以 32 位立即数 0x4e6f7365（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x143489f75",
+    "detail": "键以 32 位立即数 0x4e6f7365（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x1434905bf",
+    "detail": "键以 32 位立即数 0x4e6f7365（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   }
+  ],
+  "imm32": "0x4e6f7365",
+  "in_repo_parser": true,
+  "in_abr_samples": true,
+  "note": "4CC 形态；PS 以内部 id 传递，本任务未定位结构体偏移"
+ },
+ {
+  "key": "Opct",
+  "form": "4cc_immediate",
+  "group": "ABR/4CC 键",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "imm32_insn",
+    "value": "0x140f01dc5",
+    "detail": "键以 32 位立即数 0x4f706374（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x140f020e3",
+    "detail": "键以 32 位立即数 0x4f706374（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x140f06ade",
+    "detail": "键以 32 位立即数 0x4f706374（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x140f06af7",
+    "detail": "键以 32 位立即数 0x4f706374（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   }
+  ],
+  "imm32": "0x4f706374",
+  "in_repo_parser": false,
+  "in_abr_samples": true,
+  "note": "4CC 形态；PS 以内部 id 传递，本任务未定位结构体偏移"
+ },
+ {
+  "key": "Rndn",
+  "form": "4cc_immediate",
+  "group": "ABR/4CC 键",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "imm32_insn",
+    "value": "0x141a92933",
+    "detail": "键以 32 位立即数 0x526e646e（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x141a92960",
+    "detail": "键以 32 位立即数 0x526e646e（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x141a95931",
+    "detail": "键以 32 位立即数 0x526e646e（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x142021bcf",
+    "detail": "键以 32 位立即数 0x526e646e（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   }
+  ],
+  "imm32": "0x526e646e",
+  "in_repo_parser": true,
+  "in_abr_samples": true,
+  "note": "4CC 形态；PS 以内部 id 传递，本任务未定位结构体偏移"
+ },
+ {
+  "key": "Rpt ",
+  "form": "4cc_immediate",
+  "group": "ABR/4CC 键",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "imm32_insn",
+    "value": "0x14346731a",
+    "detail": "键以 32 位立即数 0x52707420（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   }
+  ],
+  "imm32": "0x52707420",
+  "in_repo_parser": false,
+  "in_abr_samples": true,
+  "note": "4CC 形态；PS 以内部 id 传递，本任务未定位结构体偏移"
+ },
+ {
+  "key": "Smoo",
+  "form": "4cc_immediate",
+  "group": "ABR/4CC 键",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "imm32_insn",
+    "value": "0x142b4c1b1",
+    "detail": "键以 32 位立即数 0x536d6f6f（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x14355a0ca",
+    "detail": "键以 32 位立即数 0x536d6f6f（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x14355e9fa",
+    "detail": "键以 32 位立即数 0x536d6f6f（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x14355ea24",
+    "detail": "键以 32 位立即数 0x536d6f6f（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   }
+  ],
+  "imm32": "0x536d6f6f",
+  "in_repo_parser": false,
+  "in_abr_samples": true,
+  "note": "4CC 形态；PS 以内部 id 传递，本任务未定位结构体偏移"
+ },
+ {
+  "key": "Spcn",
+  "form": "4cc_immediate",
+  "group": "ABR/4CC 键",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "imm32_insn",
+    "value": "0x141a8b558",
+    "detail": "键以 32 位立即数 0x5370636e（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x141a928d5",
+    "detail": "键以 32 位立即数 0x5370636e（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x141a92902",
+    "detail": "键以 32 位立即数 0x5370636e（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x141a93136",
+    "detail": "键以 32 位立即数 0x5370636e（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   }
+  ],
+  "imm32": "0x5370636e",
+  "in_repo_parser": true,
+  "in_abr_samples": true,
+  "note": "4CC 形态；PS 以内部 id 传递，本任务未定位结构体偏移"
+ },
+ {
+  "key": "Strt",
+  "form": "4cc_immediate",
+  "group": "ABR/4CC 键",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "imm32_insn",
+    "value": "0x140f0195e",
+    "detail": "键以 32 位立即数 0x53747274（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x140f065bf",
+    "detail": "键以 32 位立即数 0x53747274（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x140f065e3",
+    "detail": "键以 32 位立即数 0x53747274（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x141e63cd2",
+    "detail": "键以 32 位立即数 0x53747274（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   }
+  ],
+  "imm32": "0x53747274",
+  "in_repo_parser": false,
+  "in_abr_samples": true,
+  "note": "4CC 形态；PS 以内部 id 传递，本任务未定位结构体偏移"
+ },
+ {
+  "key": "bVTy",
+  "form": "4cc_immediate",
+  "group": "ABR/4CC 键",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "imm32_insn",
+    "value": "0x141a93f0e",
+    "detail": "键以 32 位立即数 0x62565479（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x141a96777",
+    "detail": "键以 32 位立即数 0x62565479（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   }
+  ],
+  "imm32": "0x62565479",
+  "in_repo_parser": true,
+  "in_abr_samples": true,
+  "note": "4CC 形态；PS 以内部 id 传递，本任务未定位结构体偏移"
+ },
+ {
+  "key": "clVr",
+  "form": "4cc_immediate",
+  "group": "ABR/4CC 键",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "imm32_insn",
+    "value": "0x141a8b637",
+    "detail": "键以 32 位立即数 0x636c5672（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x141a8e843",
+    "detail": "键以 32 位立即数 0x636c5672（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x141a8e842",
+    "detail": "键以 32 位立即数 0x636c5672（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x141a93ac0",
+    "detail": "键以 32 位立即数 0x636c5672（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   }
+  ],
+  "imm32": "0x636c5672",
+  "in_repo_parser": false,
+  "in_abr_samples": true,
+  "note": "4CC 形态；PS 以内部 id 传递，本任务未定位结构体偏移"
+ },
+ {
+  "key": "fStp",
+  "form": "4cc_immediate",
+  "group": "ABR/4CC 键",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "imm32_insn",
+    "value": "0x141a93f2b",
+    "detail": "键以 32 位立即数 0x66537470（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x141a967a1",
+    "detail": "键以 32 位立即数 0x66537470（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   }
+  ],
+  "imm32": "0x66537470",
+  "in_repo_parser": false,
+  "in_abr_samples": true,
+  "note": "4CC 形态；PS 以内部 id 传递，本任务未定位结构体偏移"
+ },
+ {
+  "key": "flow",
+  "form": "4cc_immediate",
+  "group": "ABR/4CC 键",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "imm32_insn",
+    "value": "0x14143a903",
+    "detail": "键以 32 位立即数 0x666c6f77（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x14143a9fd",
+    "detail": "键以 32 位立即数 0x666c6f77（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x14143acf4",
+    "detail": "键以 32 位立即数 0x666c6f77（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x141ef51c3",
+    "detail": "键以 32 位立即数 0x666c6f77（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   }
+  ],
+  "imm32": "0x666c6f77",
+  "in_repo_parser": false,
+  "in_abr_samples": true,
+  "note": "4CC 形态；PS 以内部 id 传递，本任务未定位结构体偏移"
+ },
+ {
+  "key": "mxVr",
+  "form": "4cc_immediate",
+  "group": "ABR/4CC 键",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "imm32_insn",
+    "value": "0x141a8b6de",
+    "detail": "键以 32 位立即数 0x6d785672（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x141a8e7fa",
+    "detail": "键以 32 位立即数 0x6d785672（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x141a8e7f9",
+    "detail": "键以 32 位立即数 0x6d785672（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x141a8f9cf",
+    "detail": "键以 32 位立即数 0x6d785672（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   }
+  ],
+  "imm32": "0x6d785672",
+  "in_repo_parser": false,
+  "in_abr_samples": true,
+  "note": "4CC 形态；PS 以内部 id 传递，本任务未定位结构体偏移"
+ },
+ {
+  "key": "opVr",
+  "form": "4cc_immediate",
+  "group": "ABR/4CC 键",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "imm32_insn",
+    "value": "0x141a8b6bc",
+    "detail": "键以 32 位立即数 0x6f705672（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x141a8e7d0",
+    "detail": "键以 32 位立即数 0x6f705672（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x141a8e7cf",
+    "detail": "键以 32 位立即数 0x6f705672（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x141a8f9a5",
+    "detail": "键以 32 位立即数 0x6f705672（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   }
+  ],
+  "imm32": "0x6f705672",
+  "in_repo_parser": true,
+  "in_abr_samples": true,
+  "note": "4CC 形态；PS 以内部 id 传递，本任务未定位结构体偏移"
+ },
+ {
+  "key": "prVr",
+  "form": "4cc_immediate",
+  "group": "ABR/4CC 键",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "imm32_insn",
+    "value": "0x141a8b6ab",
+    "detail": "键以 32 位立即数 0x70725672（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x141a8e7bb",
+    "detail": "键以 32 位立即数 0x70725672（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x141a8e7ba",
+    "detail": "键以 32 位立即数 0x70725672（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x141a8f997",
+    "detail": "键以 32 位立即数 0x70725672（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   }
+  ],
+  "imm32": "0x70725672",
+  "in_repo_parser": true,
+  "in_abr_samples": true,
+  "note": "4CC 形态；PS 以内部 id 传递，本任务未定位结构体偏移"
+ },
+ {
+  "key": "szVr",
+  "form": "4cc_immediate",
+  "group": "ABR/4CC 键",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "imm32_insn",
+    "value": "0x141a8b528",
+    "detail": "键以 32 位立即数 0x737a5672（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x141a8e33f",
+    "detail": "键以 32 位立即数 0x737a5672（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x141a8e33e",
+    "detail": "键以 32 位立即数 0x737a5672（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x141a933aa",
+    "detail": "键以 32 位立即数 0x737a5672（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   }
+  ],
+  "imm32": "0x737a5672",
+  "in_repo_parser": true,
+  "in_abr_samples": true,
+  "note": "4CC 形态；PS 以内部 id 传递，本任务未定位结构体偏移"
+ },
+ {
+  "key": "wtVr",
+  "form": "4cc_immediate",
+  "group": "ABR/4CC 键",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "imm32_insn",
+    "value": "0x141a8b6cd",
+    "detail": "键以 32 位立即数 0x77745672（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x141a8e7e5",
+    "detail": "键以 32 位立即数 0x77745672（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x141a8e7e4",
+    "detail": "键以 32 位立即数 0x77745672（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   },
+   {
+    "kind": "imm32_insn",
+    "value": "0x141a8f9c1",
+    "detail": "键以 32 位立即数 0x77745672（大端字符序）作为参数；不是字符串，因此字符串扫描看不到"
+   }
+  ],
+  "imm32": "0x77745672",
+  "in_repo_parser": false,
+  "in_abr_samples": true,
+  "note": "4CC 形态；PS 以内部 id 传递，本任务未定位结构体偏移"
+ },
+ {
+  "key": "angleDynamics",
+  "form": "string",
+  "group": "笔尖动态",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [
+   {
+    "kind": "out_param",
+    "insn": "0x141a8e337",
+    "disp": "0x98",
+    "base": "rsi"
+   }
+  ],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b537",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 0x142c90190"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8e34c",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c90280"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a933bb",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a932b0-141a935e3；紧随的键消费者 0x142c90280"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a96057",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a95ee0-141a960bf；紧随的键消费者 0x142c90280"
+   }
+  ],
+  "in_repo_parser": true,
+  "in_abr_samples": true
+ },
+ {
+  "key": "backgroundColor",
+  "form": "string",
+  "group": "颜色动态",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef1d80",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef15c0-141ef1ee3；紧随的键消费者 0x142c5c0b0"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": false
+ },
+ {
+  "key": "blendMode",
+  "form": "string",
+  "group": "混合/翻转",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [
+   {
+    "kind": "out_param",
+    "insn": "0x141a93dd1",
+    "disp": "0x18",
+    "base": "rbx"
+   },
+   {
+    "kind": "store",
+    "insn": "0x141a93dec",
+    "disp": "0x18",
+    "base": "rbx"
+   }
+  ],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a93dd5",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a93cc0-141a93e91；紧随的键消费者 0x141b94090"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a96589",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a964d0-141a96727；紧随的键消费者 0x141b952c0"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": false
+ },
+ {
+  "key": "bothAxes",
+  "form": "string",
+  "group": "散布",
+  "offset": "0x0c",
+  "offset_struct": "scatter子对象",
+  "offset_candidates": [
+   {
+    "kind": "out_param",
+    "insn": "0x141a931e2",
+    "disp": "0xc",
+    "base": "rbx"
+   }
+  ],
+  "type": "bool",
+  "width": "byte",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b571",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 lea-rax"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a931e6",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a930b0-141a932a7；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a95e5c",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a95d90-141a95ed3；紧随的键消费者 0x142c57a90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a9665f",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a964d0-141a96727；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": true,
+  "in_abr_samples": true
+ },
+ {
+  "key": "brightness",
+  "form": "string",
+  "group": "颜色动态",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b65b",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 lea-rax"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8e8e6",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c5ed90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a93ba4",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a93ab0-141a93cb3；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a96424",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a96380-141a964c8；紧随的键消费者 0x142c5ed90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": false
+ },
+ {
+  "key": "brush",
+  "form": "string",
+  "group": "预设/元数据",
+  "offset": "0x00",
+  "offset_struct": "brush子对象",
+  "offset_candidates": [
+   {
+    "kind": "store",
+    "insn": "0x141ef5f7c",
+    "disp": "0x0",
+    "base": "rax"
+   }
+  ],
+  "type": "descriptor子对象",
+  "width": "struct",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b4bc",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 lea-rax"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef5f3f",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef5e60-141ef60a3；紧随的键消费者 0x142c4f280"
+   }
+  ],
+  "in_repo_parser": true,
+  "in_abr_samples": false
+ },
+ {
+  "key": "brushGroup",
+  "form": "string",
+  "group": "预设/元数据",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b4c8",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 lea-rax"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": true
+ },
+ {
+  "key": "brushPoseAngle",
+  "form": "string",
+  "group": "画笔姿态",
+  "offset": "0x0c",
+  "offset_struct": "pose子对象",
+  "offset_candidates": [
+   {
+    "kind": "store",
+    "insn": "0x141a8b7a5",
+    "disp": "0x0",
+    "base": "rsi"
+   },
+   {
+    "kind": "store",
+    "insn": "0x141a92f94",
+    "disp": "0xc",
+    "base": "rdi"
+   }
+  ],
+  "type": "int32",
+  "width": "dword",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b75f",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 0x142c49de0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8eb57",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c5b3f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a92f34",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a92d50-141a930a1；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a92f44",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a92d50-141a930a1；紧随的键消费者 0x142c90280"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a95d42",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a95be0-141a95d82；紧随的键消费者 0x142c5b3f0"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": true
+ },
+ {
+  "key": "brushPoseLock",
+  "form": "string",
+  "group": "画笔姿态",
+  "offset": "0x43a",
+  "offset_struct": "笔刷预设标志块",
+  "offset_candidates": [
+   {
+    "kind": "store",
+    "insn": "0x141ef9c0f",
+    "disp": "0x43a",
+    "base": "rbx"
+   }
+  ],
+  "type": "bool",
+  "width": "byte",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef9be8",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef9c03",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141efd6dd",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141efd020-141efd80a；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": false
+ },
+ {
+  "key": "brushPosePressure",
+  "form": "string",
+  "group": "画笔姿态",
+  "offset": "0x10",
+  "offset_struct": "pose子对象",
+  "offset_candidates": [
+   {
+    "kind": "store",
+    "insn": "0x141a92e3a",
+    "disp": "0x10",
+    "base": "rdi"
+   }
+  ],
+  "type": "int32",
+  "width": "dword",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b735",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 lea-rax"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8eae5",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c5ed90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a92dcb",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a92d50-141a930a1；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a92ddb",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a92d50-141a930a1；紧随的键消费者 0x142c90280"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a95cca",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a95be0-141a95d82；紧随的键消费者 0x142c5ed90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": true
+ },
+ {
+  "key": "brushPoseTiltX",
+  "form": "string",
+  "group": "画笔姿态",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b743",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 lea-rax"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8eb0b",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c5b3f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a92e49",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a92d50-141a930a1；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a92e5e",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a92d50-141a930a1；紧随的键消费者 0x142c90280"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a95d04",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a95be0-141a95d82；紧随的键消费者 0x142c5b3f0"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": true
+ },
+ {
+  "key": "brushPoseTiltY",
+  "form": "string",
+  "group": "画笔姿态",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b751",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 0x142c49de0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8eb31",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c5b3f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a92ec2",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a92d50-141a930a1；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a92ed2",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a92d50-141a930a1；紧随的键消费者 0x142c90280"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a95d23",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a95be0-141a95d82；紧随的键消费者 0x142c5b3f0"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": true
+ },
+ {
+  "key": "brushPreset",
+  "form": "string",
+  "group": "预设/元数据",
+  "offset": "0x436",
+  "offset_struct": "笔刷预设标志块",
+  "offset_candidates": [
+   {
+    "kind": "store",
+    "insn": "0x141ef2071",
+    "disp": "0x436",
+    "base": "rbx"
+   }
+  ],
+  "type": "descriptor子对象/指针",
+  "width": "qword",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b4ad",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 0x142c57a90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8e09f",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c55710"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8f670",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8f520-141a8fe0e；紧随的键消费者 0x142c90280"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef1ff3",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef1f90-141ef2817；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef2012",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef1f90-141ef2817；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef9aa2",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef9ac5",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c51d40"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141efd73c",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141efd020-141efd80a；紧随的键消费者 0x142c5e740"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": true
+ },
+ {
+  "key": "brushProjection",
+  "form": "string",
+  "group": "笔尖动态",
+  "offset": "0x4e",
+  "offset_struct": "tipDynamics子对象",
+  "offset_candidates": [
+   {
+    "kind": "out_param",
+    "insn": "0x141a93529",
+    "disp": "0x4e",
+    "base": "rbx"
+   },
+   {
+    "kind": "store",
+    "insn": "0x141a9353b",
+    "disp": "0x4e",
+    "base": "rbx"
+   }
+  ],
+  "type": "bool",
+  "width": "byte",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b4f8",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 0x142c90190"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8e27d",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c57a90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a9350d",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a932b0-141a935e3；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a9352d",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a932b0-141a935e3；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a95f87",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a95ee0-141a960bf；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": true
+ },
+ {
+  "key": "brushTipDynamicsLock",
+  "form": "string",
+  "group": "锁定标志",
+  "offset": "0x43f",
+  "offset_struct": "笔刷预设标志块",
+  "offset_candidates": [
+   {
+    "kind": "store",
+    "insn": "0x141ef94c3",
+    "disp": "0x43f",
+    "base": "rbx"
+   }
+  ],
+  "type": "bool",
+  "width": "byte",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef9498",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef94b7",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141efd509",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141efd020-141efd80a；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": false
+ },
+ {
+  "key": "brushType",
+  "form": "string",
+  "group": "预设/元数据",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141aa0399",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141aa0320-141aa04a7；紧随的键消费者 0x142c4e820"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef5ef6",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef5e60-141ef60a3；紧随的键消费者 0x142c4e820"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": false
+ },
+ {
+  "key": "chroma",
+  "form": "string",
+  "group": "颜色动态",
+  "offset": "0x14",
+  "offset_struct": "colorDynamics子对象",
+  "offset_candidates": [
+   {
+    "kind": "store",
+    "insn": "0x141a93b4b",
+    "disp": "0x14",
+    "base": "rdi"
+   }
+  ],
+  "type": "int32",
+  "width": "dword",
+  "range": "无 clamp",
+  "range_evidence": "0x141a93b2c 键名到 0x141a93b4b mov [rdi+0x14],eax 之间无 cmp/cmov",
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a93b10",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a93ab0-141a93cb3；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a93b2c",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a93ab0-141a93cb3；紧随的键消费者 0x142c4d280"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": false
+ },
+ {
+  "key": "colorDynamicsLock",
+  "form": "string",
+  "group": "锁定标志",
+  "offset": "0x441",
+  "offset_struct": "笔刷预设标志块",
+  "offset_candidates": [
+   {
+    "kind": "store",
+    "insn": "0x141ef9667",
+    "disp": "0x441",
+    "base": "rbx"
+   }
+  ],
+  "type": "bool",
+  "width": "byte",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef963c",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef965b",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141efd5cc",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141efd020-141efd80a；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": false
+ },
+ {
+  "key": "colorDynamicsPerTip",
+  "form": "string",
+  "group": "颜色动态",
+  "offset": "0x24",
+  "offset_struct": "colorDynamics子对象",
+  "offset_candidates": [
+   {
+    "kind": "store",
+    "insn": "0x141a93c78",
+    "disp": "0x24",
+    "base": "rdi"
+   }
+  ],
+  "type": "bool",
+  "width": "byte",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b671",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 0x142c90190"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8e940",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c57a90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a93c51",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a93ab0-141a93cb3；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a93c6c",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a93ab0-141a93cb3；紧随的键消费者 0x142c4a8f0"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": true
+ },
+ {
+  "key": "computedBrush",
+  "form": "string",
+  "group": "预设/元数据",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a9f8d9",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a9f8a0-141a9fa23；紧随的键消费者 0x142c90280"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": false
+ },
+ {
+  "key": "count",
+  "form": "string",
+  "group": "散布",
+  "offset": "0x08",
+  "offset_struct": "scatter子对象",
+  "offset_candidates": [],
+  "type": "int32",
+  "width": "dword",
+  "range": "有 clamp [1,10]",
+  "range_evidence": "0x141a931c3 cmp eax,ebp(1) / 0x141a931c7 mov ecx,0xa + 0x141a931d0 cmovg ebp,ecx；0x141a931d3 mov [rbx+8],ebp",
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b566",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 lea-rax"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a93180",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a930b0-141a932a7；紧随的键消费者 0x142c90280"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": false
+ },
+ {
+  "key": "countDynamics",
+  "form": "string",
+  "group": "散布",
+  "offset": "0x10",
+  "offset_struct": "scatter子对象",
+  "offset_candidates": [
+   {
+    "kind": "out_param",
+    "insn": "0x141a931e2",
+    "disp": "0xc",
+    "base": "rbx"
+   }
+  ],
+  "type": "dynamics子结构",
+  "width": "struct",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b57c",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 lea-rax"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a931f2",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a930b0-141a932a7；紧随的键消费者 0x142c90280"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a95e70",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a95d90-141a95ed3；紧随的键消费者 0x142c90280"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a9666f",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a964d0-141a96727；紧随的键消费者 0x142c90280"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": true
+ },
+ {
+  "key": "dBrush",
+  "form": "string",
+  "group": "预设/元数据",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a9f8ed",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a9f8a0-141a9fa23；紧随的键消费者 0x142c90280"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": false
+ },
+ {
+  "key": "dTips",
+  "form": "string",
+  "group": "预设/元数据",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a9f8fd",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a9f8a0-141a9fa23；紧随的键消费者 0x142c90280"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": false
+ },
+ {
+  "key": "dualBrush",
+  "form": "string",
+  "group": "双重画笔",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b621",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 0x142c90190"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a93cdc",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a93cc0-141a93e91；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a93d08",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a93cc0-141a93e91；紧随的键消费者 0x142c4f280"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a964f9",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a964d0-141a96727；紧随的键消费者 0x142c55710"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a966b7",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a964d0-141a96727；紧随的键消费者 0x142c5c0b0"
+   }
+  ],
+  "in_repo_parser": true,
+  "in_abr_samples": true
+ },
+ {
+  "key": "dualBrushLock",
+  "form": "string",
+  "group": "锁定标志",
+  "offset": "0x43b",
+  "offset_struct": "笔刷预设标志块",
+  "offset_candidates": [
+   {
+    "kind": "store",
+    "insn": "0x141ef9569",
+    "disp": "0x43b",
+    "base": "rbx"
+   },
+   {
+    "kind": "store",
+    "insn": "0x141ef9bc4",
+    "disp": "0x43b",
+    "base": "rbx"
+   }
+  ],
+  "type": "bool",
+  "width": "byte",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef953e",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef955d",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef9b99",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef9bb8",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141efd57e",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141efd020-141efd80a；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": false
+ },
+ {
+  "key": "flip",
+  "form": "string",
+  "group": "混合/翻转",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a93d5c",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a93cc0-141a93e91；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a93d8c",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a93cc0-141a93e91；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a96559",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a964d0-141a96727；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": false
+ },
+ {
+  "key": "flipX",
+  "form": "string",
+  "group": "笔尖动态",
+  "offset": "0x4c",
+  "offset_struct": "tipDynamics子对象",
+  "offset_candidates": [
+   {
+    "kind": "out_param",
+    "insn": "0x141a934ad",
+    "disp": "0x4c",
+    "base": "rbx"
+   },
+   {
+    "kind": "store",
+    "insn": "0x141a934bf",
+    "disp": "0x4c",
+    "base": "rbx"
+   }
+  ],
+  "type": "bool",
+  "width": "byte",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b4e0",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 lea-rax"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8e22f",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c57a90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a93491",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a932b0-141a935e3；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a934b1",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a932b0-141a935e3；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a95f3f",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a95ee0-141a960bf；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": true
+ },
+ {
+  "key": "flipY",
+  "form": "string",
+  "group": "笔尖动态",
+  "offset": "0x4d",
+  "offset_struct": "tipDynamics子对象",
+  "offset_candidates": [
+   {
+    "kind": "out_param",
+    "insn": "0x141a934eb",
+    "disp": "0x4d",
+    "base": "rbx"
+   },
+   {
+    "kind": "store",
+    "insn": "0x141a934fd",
+    "disp": "0x4d",
+    "base": "rbx"
+   }
+  ],
+  "type": "bool",
+  "width": "byte",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b4ec",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 0x142c90190"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8e256",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c57a90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a934cf",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a932b0-141a935e3；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a934ef",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a932b0-141a935e3；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a95f63",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a95ee0-141a960bf；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": true
+ },
+ {
+  "key": "foregroundColor",
+  "form": "string",
+  "group": "颜色动态",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef1d1e",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef15c0-141ef1ee3；紧随的键消费者 0x142c5c0b0"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": false
+ },
+ {
+  "key": "hue",
+  "form": "string",
+  "group": "颜色动态",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b645",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 lea-rax"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8e87a",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c5ed90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a93ae1",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a93ab0-141a93cb3；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a963b4",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a96380-141a964c8；紧随的键消费者 0x142c5ed90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": false
+ },
+ {
+  "key": "interpretation",
+  "form": "string",
+  "group": "预设/元数据",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [
+   {
+    "kind": "store",
+    "insn": "0x141a9376b",
+    "disp": "0xc",
+    "base": "rbx"
+   }
+  ],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b5ea",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 lea-rax"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8e59f",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c57a90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a93742",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a935f0-141a937d6；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a96143",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a960c0-141a96225；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": true
+ },
+ {
+  "key": "invertTexture",
+  "form": "string",
+  "group": "纹理",
+  "offset": "0x20",
+  "offset_struct": "texture子对象",
+  "offset_candidates": [
+   {
+    "kind": "out_param",
+    "insn": "0x141a93a26",
+    "disp": "0x20",
+    "base": "rdi"
+   }
+  ],
+  "type": "bool",
+  "width": "byte",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b5a8",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 lea-rax"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8e705",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c57a90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a93a2a",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a939d5-141a93aa3；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a962d4",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a96230-141a9637c；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": false
+ },
+ {
+  "key": "jitter",
+  "form": "string",
+  "group": "笔尖动态",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a93f46",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a93ea0-141a9408d；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a93f72",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a93ea0-141a9408d；紧随的键消费者 0x142c4d280"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a967e6",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a96730-141a968ae；紧随的键消费者 0x142c5ed90"
+   }
+  ],
+  "in_repo_parser": true,
+  "in_abr_samples": true,
+  "note": "dynamics 子结构键；0x141a93ea0 是 dynamics 子描述符解析器（被 0x141a930b0/0x141a932b0 调用）"
+ },
+ {
+  "key": "lightness",
+  "form": "string",
+  "group": "颜色动态",
+  "offset": "0x1c",
+  "offset_struct": "colorDynamics子对象",
+  "offset_candidates": [
+   {
+    "kind": "store",
+    "insn": "0x141a93c04",
+    "disp": "0x1c",
+    "base": "rdi"
+   }
+  ],
+  "type": "int32",
+  "width": "dword",
+  "range": "无 clamp",
+  "range_evidence": "0x141a93be5 键名到 0x141a93c04 mov [rdi+0x1c],eax 之间无 cmp/cmov",
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a93bc9",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a93ab0-141a93cb3；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a93be5",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a93ab0-141a93cb3；紧随的键消费者 0x142c4d280"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": false
+ },
+ {
+  "key": "minimumDepth",
+  "form": "string",
+  "group": "纹理",
+  "offset": "0x0c",
+  "offset_struct": "texture子对象",
+  "offset_candidates": [
+   {
+    "kind": "store",
+    "insn": "0x141a9371c",
+    "disp": "0xc",
+    "base": "rbx"
+   }
+  ],
+  "type": "int32",
+  "width": "dword",
+  "range": "有 clamp [0,100]",
+  "range_evidence": "H3 内与 textureDepth 同一段 clamp 代码 0x141a936e1~0x141a9371c",
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b60b",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 0x142c90190"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8e627",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c5ed90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a936c5",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a935f0-141a937d6；紧随的键消费者 0x142c90280"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a961b2",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a960c0-141a96225；紧随的键消费者 0x142c5ed90"
+   }
+  ],
+  "in_repo_parser": true,
+  "in_abr_samples": true
+ },
+ {
+  "key": "minimumDiameter",
+  "form": "string",
+  "group": "笔尖动态",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b504",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 0x142c90190"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8e2b6",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c5ed90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a932d4",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a932b0-141a935e3；紧随的键消费者 0x142c90280"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a95faf",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a95ee0-141a960bf；紧随的键消费者 0x142c5ed90"
+   }
+  ],
+  "in_repo_parser": true,
+  "in_abr_samples": true
+ },
+ {
+  "key": "minimumRoundness",
+  "form": "string",
+  "group": "笔尖动态",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [
+   {
+    "kind": "store",
+    "insn": "0x141a93462",
+    "disp": "0xc",
+    "base": "rbx"
+   }
+  ],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b510",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 0x142c90190"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8e2ef",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c5ed90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a933fd",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a932b0-141a935e3；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a9340d",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a932b0-141a935e3；紧随的键消费者 0x142c90280"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a95fe9",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a95ee0-141a960bf；紧随的键消费者 0x142c5ed90"
+   }
+  ],
+  "in_repo_parser": true,
+  "in_abr_samples": true
+ },
+ {
+  "key": "name",
+  "form": "string",
+  "group": "预设/元数据",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8e0fd",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c5e740"
+   }
+  ],
+  "in_repo_parser": true,
+  "in_abr_samples": false
+ },
+ {
+  "key": "noise",
+  "form": "string",
+  "group": "工具选项",
+  "offset": "0x293",
+  "offset_struct": "批量IO结构",
+  "offset_candidates": [
+   {
+    "kind": "out_param",
+    "insn": "0x141a8fa18",
+    "disp": "0x293",
+    "base": "rsi"
+   },
+   {
+    "kind": "store",
+    "insn": "0x141a8fa42",
+    "disp": "0x0",
+    "base": "r8"
+   },
+   {
+    "kind": "out_param",
+    "insn": "0x141a907de",
+    "disp": "0x293",
+    "base": "rbx"
+   }
+  ],
+  "type": "bool",
+  "width": "byte",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b687",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 0x142c90190"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8e98e",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c57a90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8fa2f",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8f520-141a8fe0e；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a907f5",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a90410-141a90b05；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef1943",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef15c0-141ef1ee3；紧随的键消费者 0x142c57a90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef2381",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef1f90-141ef2817；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef97ad",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141efd1f9",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141efd020-141efd80a；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": false
+ },
+ {
+  "key": "noiseLock",
+  "form": "string",
+  "group": "锁定标志",
+  "offset": "0x444",
+  "offset_struct": "笔刷预设标志块",
+  "offset_candidates": [
+   {
+    "kind": "store",
+    "insn": "0x141ef9784",
+    "disp": "0x444",
+    "base": "rbx"
+   }
+  ],
+  "type": "bool",
+  "width": "byte",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef9759",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef9778",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141efd61a",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141efd020-141efd80a；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": false
+ },
+ {
+  "key": "overridePoseAngle",
+  "form": "string",
+  "group": "画笔姿态",
+  "offset": "0x15",
+  "offset_struct": "pose子对象",
+  "offset_candidates": [
+   {
+    "kind": "out_param",
+    "insn": "0x141a92fbf",
+    "disp": "0x15",
+    "base": "rdi"
+   }
+  ],
+  "type": "int32",
+  "width": "dword",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b6fd",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 lea-rax"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8ea37",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c57a90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a92fa3",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a92d50-141a930a1；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a92fc3",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a92d50-141a930a1；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a95c3a",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a95be0-141a95d82；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": true
+ },
+ {
+  "key": "overridePosePressure",
+  "form": "string",
+  "group": "画笔姿态",
+  "offset": "0x14",
+  "offset_struct": "pose子对象",
+  "offset_candidates": [
+   {
+    "kind": "out_param",
+    "insn": "0x141a93057",
+    "disp": "0x14",
+    "base": "rdi"
+   }
+  ],
+  "type": "int32",
+  "width": "dword",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b727",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 lea-rax"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8eaac",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c57a90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a9303f",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a92d50-141a930a1；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a9305b",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a92d50-141a930a1；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a95ca6",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a95be0-141a95d82；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": true
+ },
+ {
+  "key": "overridePoseTiltX",
+  "form": "string",
+  "group": "画笔姿态",
+  "offset": "0x17",
+  "offset_struct": "pose子对象",
+  "offset_candidates": [
+   {
+    "kind": "out_param",
+    "insn": "0x141a92ff7",
+    "disp": "0x17",
+    "base": "rdi"
+   }
+  ],
+  "type": "int32",
+  "width": "dword",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b70b",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 lea-rax"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8ea5e",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c57a90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a92fdb",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a92d50-141a930a1；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a92ffb",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a92d50-141a930a1；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a95c5e",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a95be0-141a95d82；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": true
+ },
+ {
+  "key": "overridePoseTiltY",
+  "form": "string",
+  "group": "画笔姿态",
+  "offset": "0x16",
+  "offset_struct": "pose子对象",
+  "offset_candidates": [
+   {
+    "kind": "out_param",
+    "insn": "0x141a93027",
+    "disp": "0x16",
+    "base": "rdi"
+   }
+  ],
+  "type": "int32",
+  "width": "dword",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b719",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 lea-rax"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8ea85",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c57a90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a9300f",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a92d50-141a930a1；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a9302b",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a92d50-141a930a1；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a95c82",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a95be0-141a95d82；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": true
+ },
+ {
+  "key": "paintDynamicsLock",
+  "form": "string",
+  "group": "锁定标志",
+  "offset": "0x440",
+  "offset_struct": "笔刷预设标志块",
+  "offset_candidates": [
+   {
+    "kind": "store",
+    "insn": "0x141ef9623",
+    "disp": "0x440",
+    "base": "rbx"
+   }
+  ],
+  "type": "bool",
+  "width": "byte",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef95f8",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef9617",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141efd5a5",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141efd020-141efd80a；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": false
+ },
+ {
+  "key": "pressureSmoothing",
+  "form": "string",
+  "group": "平滑/兼容",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef1c9b",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef15c0-141ef1ee3；紧随的键消费者 0x142c57a90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141efd3a7",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141efd020-141efd80a；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": true
+ },
+ {
+  "key": "protectTexture",
+  "form": "string",
+  "group": "纹理",
+  "offset": "0x21",
+  "offset_struct": "texture子对象",
+  "offset_candidates": [
+   {
+    "kind": "out_param",
+    "insn": "0x141a93a3e",
+    "disp": "0x21",
+    "base": "rdi"
+   }
+  ],
+  "type": "bool",
+  "width": "byte",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b5b3",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 lea-rax"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8e72e",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c57a90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a93a42",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a939d5-141a93aa3；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a962f9",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a96230-141a9637c；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": true,
+  "in_abr_samples": true
+ },
+ {
+  "key": "protectTextureLock",
+  "form": "string",
+  "group": "锁定标志",
+  "offset": "0x43c",
+  "offset_struct": "笔刷预设标志块",
+  "offset_candidates": [
+   {
+    "kind": "store",
+    "insn": "0x141ef942c",
+    "disp": "0x43c",
+    "base": "rbx"
+   }
+  ],
+  "type": "bool",
+  "width": "byte",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef9401",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef9420",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141efd4e2",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141efd020-141efd80a；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": false
+ },
+ {
+  "key": "purity",
+  "form": "string",
+  "group": "颜色动态",
+  "offset": "0x20",
+  "offset_struct": "colorDynamics子对象",
+  "offset_candidates": [
+   {
+    "kind": "store",
+    "insn": "0x141a93c46",
+    "disp": "0x20",
+    "base": "rdi"
+   }
+  ],
+  "type": "int32",
+  "width": "dword",
+  "range": "无 clamp",
+  "range_evidence": "0x141a93c2e 键名到 0x141a93c46 mov [rdi+0x20],esi 之间无 cmp/cmov",
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b666",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 lea-rax"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8e91c",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c5ed90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a93c13",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a93ab0-141a93cb3；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a93c2e",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a93ab0-141a93cb3；紧随的键消费者 0x142c4d280"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a96456",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a96380-141a964c8；紧随的键消费者 0x142c5ed90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": true
+ },
+ {
+  "key": "repeat",
+  "form": "string",
+  "group": "工具选项",
+  "offset": "0x294",
+  "offset_struct": "批量IO结构",
+  "offset_candidates": [
+   {
+    "kind": "out_param",
+    "insn": "0x141a8fa3b",
+    "disp": "0x294",
+    "base": "rsi"
+   },
+   {
+    "kind": "store",
+    "insn": "0x141a8fab3",
+    "disp": "0x0",
+    "base": "r8"
+   },
+   {
+    "kind": "out_param",
+    "insn": "0x141a90801",
+    "disp": "0x294",
+    "base": "rbx"
+   }
+  ],
+  "type": "bool",
+  "width": "byte",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b692",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 0x142c90190"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8e9b5",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c57a90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8fa52",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8f520-141a8fe0e；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a90818",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a90410-141a90b05；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef1a50",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef15c0-141ef1ee3；紧随的键消费者 0x142c57a90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef252b",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef1f90-141ef2817；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef9a02",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141efd4bb",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141efd020-141efd80a；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": false
+ },
+ {
+  "key": "repeatLock",
+  "form": "string",
+  "group": "锁定标志",
+  "offset": "0x443",
+  "offset_struct": "笔刷预设标志块",
+  "offset_candidates": [
+   {
+    "kind": "store",
+    "insn": "0x141ef99dc",
+    "disp": "0x443",
+    "base": "rbx"
+   }
+  ],
+  "type": "bool",
+  "width": "byte",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef99b1",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef99d0",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141efd668",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141efd020-141efd80a；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": false
+ },
+ {
+  "key": "roundnessDynamics",
+  "form": "string",
+  "group": "笔尖动态",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [
+   {
+    "kind": "out_param",
+    "insn": "0x141a8e35e",
+    "disp": "0xac",
+    "base": "rsi"
+   },
+   {
+    "kind": "store",
+    "insn": "0x141a8e4c5",
+    "disp": "0x0",
+    "base": "rax"
+   },
+   {
+    "kind": "out_param",
+    "insn": "0x141a933ca",
+    "disp": "0x24",
+    "base": "rbx"
+   }
+  ],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b542",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 0x142c90190"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8e36a",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c90280"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a933d6",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a932b0-141a935e3；紧随的键消费者 0x142c90280"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a96072",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a95ee0-141a960bf；紧随的键消费者 0x142c90280"
+   }
+  ],
+  "in_repo_parser": true,
+  "in_abr_samples": true
+ },
+ {
+  "key": "sampledBrush",
+  "form": "string",
+  "group": "预设/元数据",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [
+   {
+    "kind": "store",
+    "insn": "0x141a9f960",
+    "disp": "0x0",
+    "base": "rbx"
+   }
+  ],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a9f90d",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a9f8a0-141a9fa23；紧随的键消费者 0x142c90280"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": false
+ },
+ {
+  "key": "saturation",
+  "form": "string",
+  "group": "颜色动态",
+  "offset": "0x18",
+  "offset_struct": "colorDynamics子对象",
+  "offset_candidates": [
+   {
+    "kind": "store",
+    "insn": "0x141a93b95",
+    "disp": "0x18",
+    "base": "rdi"
+   }
+  ],
+  "type": "int32",
+  "width": "dword",
+  "range": "无 clamp",
+  "range_evidence": "0x141a93b79 键名到 0x141a93b95 mov [rdi+0x18],eax 之间无 cmp/cmov",
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b650",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 lea-rax"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8e8b0",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c5ed90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a93b5a",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a93ab0-141a93cb3；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a93b79",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a93ab0-141a93cb3；紧随的键消费者 0x142c4d280"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a963ee",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a96380-141a964c8；紧随的键消费者 0x142c5ed90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": false
+ },
+ {
+  "key": "scatter",
+  "form": "string",
+  "group": "散布",
+  "offset": "0x2c",
+  "offset_struct": "scatter子对象",
+  "offset_candidates": [
+   {
+    "kind": "store",
+    "insn": "0x141a93127",
+    "disp": "0x2c",
+    "base": "rbx"
+   }
+  ],
+  "type": "int32",
+  "width": "dword",
+  "range": "有 clamp [0,1000]",
+  "range_evidence": "0x141a93118 test eax,eax / 0x141a9311c mov eax,esi(0)；0x141a93120 cmp eax,r14d(0x3e8) + 0x141a93123 cmovg；0x141a93127 mov [rbx+0x2c],eax",
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a930d0",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a930b0-141a932a7；紧随的键消费者 0x142c90280"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": false
+ },
+ {
+  "key": "scatterDynamics",
+  "form": "string",
+  "group": "散布",
+  "offset": "0x24",
+  "offset_struct": "scatter子对象",
+  "offset_candidates": [
+   {
+    "kind": "out_param",
+    "insn": "0x141a93201",
+    "disp": "0x10",
+    "base": "rbx"
+   },
+   {
+    "kind": "out_param",
+    "insn": "0x141a95e7f",
+    "disp": "0x10",
+    "base": "rdi"
+   },
+   {
+    "kind": "out_param",
+    "insn": "0x141a96682",
+    "disp": "0x2c",
+    "base": "rdi"
+   }
+  ],
+  "type": "dynamics子结构",
+  "width": "struct",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b587",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 lea-rax"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a9320d",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a930b0-141a932a7；紧随的键消费者 0x142c90280"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a95e8b",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a95d90-141a95ed3；紧随的键消费者 0x142c90280"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a9668b",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a964d0-141a96727；紧随的键消费者 0x142c90280"
+   }
+  ],
+  "in_repo_parser": true,
+  "in_abr_samples": true
+ },
+ {
+  "key": "scatterDynamicsLock",
+  "form": "string",
+  "group": "锁定标志",
+  "offset": "0x43e",
+  "offset_struct": "笔刷预设标志块",
+  "offset_candidates": [
+   {
+    "kind": "store",
+    "insn": "0x141ef9516",
+    "disp": "0x43e",
+    "base": "rbx"
+   }
+  ],
+  "type": "bool",
+  "width": "byte",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef94eb",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef950a",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141efd530",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141efd020-141efd80a；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": false
+ },
+ {
+  "key": "smoothing",
+  "form": "string",
+  "group": "平滑/兼容",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [
+   {
+    "kind": "store",
+    "insn": "0x141ef9833",
+    "disp": "0x0",
+    "base": "r8"
+   }
+  ],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef1b25",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef15c0-141ef1ee3；紧随的键消费者 0x142c57a90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef23c8",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef1f90-141ef2817；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef9820",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141efd232",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141efd020-141efd80a；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": true
+ },
+ {
+  "key": "smoothingCatchup",
+  "form": "string",
+  "group": "平滑/兼容",
+  "offset": "0x44b",
+  "offset_struct": "笔刷预设标志块",
+  "offset_candidates": [
+   {
+    "kind": "out_param",
+    "insn": "0x141ef2417",
+    "disp": "0x44b",
+    "base": "rbx"
+   },
+   {
+    "kind": "store",
+    "insn": "0x141ef2441",
+    "disp": "0x0",
+    "base": "r8"
+   },
+   {
+    "kind": "out_param",
+    "insn": "0x141ef984f",
+    "disp": "0x44b",
+    "base": "rbx"
+   }
+  ],
+  "type": "bool",
+  "width": "byte",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef1bd7",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef15c0-141ef1ee3；紧随的键消费者 0x142c57a90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef242e",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef1f90-141ef2817；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef9866",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141efd2e4",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141efd020-141efd80a；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": true
+ },
+ {
+  "key": "smoothingCatchupAtEnd",
+  "form": "string",
+  "group": "平滑/兼容",
+  "offset": "0x44c",
+  "offset_struct": "笔刷预设标志块",
+  "offset_candidates": [
+   {
+    "kind": "out_param",
+    "insn": "0x141ef243a",
+    "disp": "0x44c",
+    "base": "rbx"
+   },
+   {
+    "kind": "store",
+    "insn": "0x141ef2464",
+    "disp": "0x0",
+    "base": "r8"
+   },
+   {
+    "kind": "out_param",
+    "insn": "0x141ef9872",
+    "disp": "0x44c",
+    "base": "rbx"
+   }
+  ],
+  "type": "bool",
+  "width": "byte",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef1c10",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef15c0-141ef1ee3；紧随的键消费者 0x142c57a90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef2451",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef1f90-141ef2817；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef9889",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141efd31d",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141efd020-141efd80a；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": true
+ },
+ {
+  "key": "smoothingLock",
+  "form": "string",
+  "group": "锁定标志",
+  "offset": "0x445",
+  "offset_struct": "笔刷预设标志块",
+  "offset_candidates": [
+   {
+    "kind": "store",
+    "insn": "0x141ef97f7",
+    "disp": "0x445",
+    "base": "rbx"
+   }
+  ],
+  "type": "bool",
+  "width": "byte",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef97cc",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef97eb",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141efd641",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141efd020-141efd80a；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": false
+ },
+ {
+  "key": "smoothingRadiusMode",
+  "form": "string",
+  "group": "平滑/兼容",
+  "offset": "0x44a",
+  "offset_struct": "笔刷预设标志块",
+  "offset_candidates": [
+   {
+    "kind": "store",
+    "insn": "0x141ef241e",
+    "disp": "0x0",
+    "base": "r8"
+   },
+   {
+    "kind": "out_param",
+    "insn": "0x141ef982c",
+    "disp": "0x44a",
+    "base": "rbx"
+   },
+   {
+    "kind": "store",
+    "insn": "0x141ef9856",
+    "disp": "0x0",
+    "base": "r8"
+   }
+  ],
+  "type": "int32/enum",
+  "width": "dword",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef1b9e",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef15c0-141ef1ee3；紧随的键消费者 0x142c57a90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef240b",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef1f90-141ef2817；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef9843",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141efd2ab",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141efd020-141efd80a；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": true
+ },
+ {
+  "key": "smoothingValue",
+  "form": "string",
+  "group": "平滑/兼容",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [
+   {
+    "kind": "store",
+    "insn": "0x141ef23fb",
+    "disp": "0x0",
+    "base": "r8"
+   }
+  ],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef23e0",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef1f90-141ef2817；紧随的键消费者 0x142c528d0"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": true
+ },
+ {
+  "key": "smoothingZoomCompensation",
+  "form": "string",
+  "group": "平滑/兼容",
+  "offset": "0x44d",
+  "offset_struct": "笔刷预设标志块",
+  "offset_candidates": [
+   {
+    "kind": "out_param",
+    "insn": "0x141ef245d",
+    "disp": "0x44d",
+    "base": "rbx"
+   },
+   {
+    "kind": "store",
+    "insn": "0x141ef2480",
+    "disp": "0x44e",
+    "base": "rbx"
+   },
+   {
+    "kind": "out_param",
+    "insn": "0x141ef9895",
+    "disp": "0x44d",
+    "base": "rbx"
+   }
+  ],
+  "type": "bool",
+  "width": "byte",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef1c49",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef15c0-141ef1ee3；紧随的键消费者 0x142c57a90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef2474",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef1f90-141ef2817；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef98ac",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141efd356",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141efd020-141efd80a；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": true
+ },
+ {
+  "key": "style",
+  "form": "string",
+  "group": "预设/元数据",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8f871",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8f520-141a8fe0e；紧随的键消费者 0x142c4a8f0"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": false
+ },
+ {
+  "key": "styleBrush",
+  "form": "string",
+  "group": "预设/元数据",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef5e99",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef5e60-141ef60a3；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef5ec1",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef5e60-141ef60a3；紧随的键消费者 0x142c4f280"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": false
+ },
+ {
+  "key": "texture",
+  "form": "string",
+  "group": "纹理",
+  "offset": "0x00",
+  "offset_struct": "texture子对象",
+  "offset_candidates": [
+   {
+    "kind": "store",
+    "insn": "0x141a9383c",
+    "disp": "0x0",
+    "base": "rax"
+   }
+  ],
+  "type": "descriptor子对象",
+  "width": "struct",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b592",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 lea-rax"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8e6a8",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x140faecf0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a93800",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a937fb-141a939d5；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a9381c",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a937fb-141a939d5；紧随的键消费者 0x140fa6790"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a96270",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a96230-141a9637c；紧随的键消费者 0x140faecf0"
+   }
+  ],
+  "in_repo_parser": true,
+  "in_abr_samples": false
+ },
+ {
+  "key": "textureBlendMode",
+  "form": "string",
+  "group": "纹理",
+  "offset": "0x04",
+  "offset_struct": "texture子对象",
+  "offset_candidates": [],
+  "type": "enum(int32)",
+  "width": "dword",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b5f5",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 lea-rax"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8e5b5",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x141b952c0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a93651",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a935f0-141a937d6；紧随的键消费者 0x141b94090"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a96159",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a960c0-141a96225；紧随的键消费者 0x141b952c0"
+   }
+  ],
+  "in_repo_parser": true,
+  "in_abr_samples": true
+ },
+ {
+  "key": "textureBrightness",
+  "form": "string",
+  "group": "纹理",
+  "offset": "0x1c",
+  "offset_struct": "texture子对象",
+  "offset_candidates": [
+   {
+    "kind": "out_param",
+    "insn": "0x141a93a56",
+    "disp": "0x1c",
+    "base": "rdi"
+   }
+  ],
+  "type": "int32",
+  "width": "dword",
+  "range": "无 clamp（原样透传）",
+  "range_evidence": "0x141a93a56 lea r8,[rdi+0x1c] 与 0x141a93a61 call 0x142c4e820 之间无任何 cmp/cmov/区间指令；11A 动态 +-150 逐位透传",
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b5be",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 lea-rax"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8e751",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c5b3f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a93a5a",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a939d5-141a93aa3；紧随的键消费者 0x142c4e820"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a96319",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a96230-141a9637c；紧随的键消费者 0x142c5b3f0"
+   }
+  ],
+  "in_repo_parser": true,
+  "in_abr_samples": true
+ },
+ {
+  "key": "textureContrast",
+  "form": "string",
+  "group": "纹理",
+  "offset": "0x18",
+  "offset_struct": "texture子对象",
+  "offset_candidates": [],
+  "type": "int32",
+  "width": "dword",
+  "range": "无 clamp（原样透传）",
+  "range_evidence": "0x141a93a6e lea r8,[rdi+0x18] 与 0x141a93a81 jmp 0x142c4e820（尾调用）之间无区间指令；11A 动态 +-100 逐位透传",
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b5c9",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 lea-rax"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8e774",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c5b3f0"
+   }
+  ],
+  "in_repo_parser": true,
+  "in_abr_samples": true
+ },
+ {
+  "key": "textureCoverage",
+  "form": "string",
+  "group": "纹理",
+  "offset": "0x01",
+  "offset_struct": "texture子对象",
+  "offset_candidates": [],
+  "type": "bool",
+  "width": "byte",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b5df",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 lea-rax"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8e57d",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c57a90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a9363e",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a935f0-141a937d6；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a9611f",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a960c0-141a96225；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": false
+ },
+ {
+  "key": "textureDepth",
+  "form": "string",
+  "group": "纹理",
+  "offset": "0x08",
+  "offset_struct": "texture子对象",
+  "offset_candidates": [],
+  "type": "int32",
+  "width": "dword",
+  "range": "有 clamp [0,100]",
+  "range_evidence": "0x141a936bb cmp eax,0x64 + 0x141a936be cmovg + 0x141a936b7 mov eax,esi(0)；11A 动态：请求 101 存成 100",
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b600",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 0x142c90190"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8e5ee",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c5ed90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a9365d",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a935f0-141a937d6；紧随的键消费者 0x142c90280"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a9617c",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a960c0-141a96225；紧随的键消费者 0x142c5ed90"
+   }
+  ],
+  "in_repo_parser": true,
+  "in_abr_samples": true
+ },
+ {
+  "key": "textureDepthDynamics",
+  "form": "string",
+  "group": "纹理",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b616",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 0x142c90190"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8e636",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c90280"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a9371f",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a935f0-141a937d6；紧随的键消费者 0x142c90280"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a961d8",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a960c0-141a96225；紧随的键消费者 0x142c90280"
+   }
+  ],
+  "in_repo_parser": true,
+  "in_abr_samples": true
+ },
+ {
+  "key": "textureInteractionLock",
+  "form": "string",
+  "group": "纹理",
+  "offset": "0x43d",
+  "offset_struct": "笔刷预设标志块",
+  "offset_candidates": [
+   {
+    "kind": "store",
+    "insn": "0x141ef9470",
+    "disp": "0x43d",
+    "base": "rbx"
+   }
+  ],
+  "type": "bool",
+  "width": "byte",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef9445",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef9464",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141efd557",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141efd020-141efd80a；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": false
+ },
+ {
+  "key": "textureScale",
+  "form": "string",
+  "group": "纹理",
+  "offset": "0x10",
+  "offset_struct": "texture子对象",
+  "offset_candidates": [],
+  "type": "double",
+  "width": "qword(8B)",
+  "range": "有 clamp [1,1000]",
+  "range_evidence": "0x141a939fb cmp eax,1 / 0x141a93a00 mov eax,1；0x141a93a07 mov ecx,0x3e8 + 0x141a93a0e cmovg；0x141a93a15 cvtdq2pd；0x141a93a19 movsd [rdi+0x10]",
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b59d",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 lea-rax"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8e6e1",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c5ed90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a939ae",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a937fb-141a939d5；紧随的键消费者 0x142c90280"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a962aa",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a96230-141a9637c；紧随的键消费者 0x142c5ed90"
+   }
+  ],
+  "in_repo_parser": true,
+  "in_abr_samples": true
+ },
+ {
+  "key": "tiltScale",
+  "form": "string",
+  "group": "笔尖动态",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b51c",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 0x142c90190"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8e328",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c5ed90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a93351",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a932b0-141a935e3；紧随的键消费者 0x142c90280"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a9601f",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a95ee0-141a960bf；紧随的键消费者 0x142c5ed90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": true
+ },
+ {
+  "key": "toolOptions",
+  "form": "string",
+  "group": "工具选项",
+  "offset": "0x00",
+  "offset_struct": "批量IO结构",
+  "offset_candidates": [
+   {
+    "kind": "store",
+    "insn": "0x141a8fbf6",
+    "disp": "0x0",
+    "base": "rdi"
+   }
+  ],
+  "type": "descriptor子对象",
+  "width": "struct",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8eb7f",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c5c0b0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8fbb0",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8f520-141a8fe0e；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8fbd8",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8f520-141a8fe0e；紧随的键消费者 0x142c4f280"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": true
+ },
+ {
+  "key": "useBrushGroup",
+  "form": "string",
+  "group": "预设/元数据",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a92856",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a927e0-141a92d44；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a92882",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a927e0-141a92d44；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a95872",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a95820-141a95bdc；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": true,
+  "note": "0x141a927e0 笔刷组读写；write 侧 0x141a95820"
+ },
+ {
+  "key": "useBrushPose",
+  "form": "string",
+  "group": "画笔姿态",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b6ef",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 lea-rax"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8ea03",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c57a90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a92d94",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a92d50-141a930a1；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a92db3",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a92d50-141a930a1；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a95c09",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a95be0-141a95d82；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": true,
+  "in_abr_samples": true
+ },
+ {
+  "key": "useBrushSize",
+  "form": "string",
+  "group": "工具选项",
+  "offset": "0x295",
+  "offset_struct": "批量IO结构",
+  "offset_candidates": [
+   {
+    "kind": "out_param",
+    "insn": "0x141a8fb67",
+    "disp": "0x295",
+    "base": "rsi"
+   }
+  ],
+  "type": "bool",
+  "width": "byte",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8e9dc",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c57a90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8fb4b",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8f520-141a8fe0e；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8fb6e",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8f520-141a8fe0e；紧随的键消费者 0x142c4a8f0"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": true
+ },
+ {
+  "key": "useColorDynamics",
+  "form": "string",
+  "group": "颜色动态",
+  "offset": "0x291",
+  "offset_struct": "批量IO结构",
+  "offset_candidates": [
+   {
+    "kind": "out_param",
+    "insn": "0x141a8fb25",
+    "disp": "0x291",
+    "base": "rsi"
+   },
+   {
+    "kind": "store",
+    "insn": "0x141a8fb38",
+    "disp": "0x295",
+    "base": "rsi"
+   },
+   {
+    "kind": "store",
+    "insn": "0x141a908d7",
+    "disp": "0x291",
+    "base": "rbx"
+   }
+  ],
+  "type": "bool",
+  "width": "byte",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b62c",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 0x142c90190"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8e81f",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c57a90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8fb09",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8f520-141a8fe0e；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8fb2c",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8f520-141a8fe0e；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a908cb",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a90410-141a90b05；紧随的键消费者 0x142c4a920"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef182d",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef15c0-141ef1ee3；紧随的键消费者 0x142c57a90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef25e2",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef1f90-141ef2817；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef260c",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef1f90-141ef2817；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef9954",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef997e",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141efd481",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141efd020-141efd80a；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": true,
+  "in_abr_samples": true
+ },
+ {
+  "key": "useDualBrush",
+  "form": "string",
+  "group": "双重画笔",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [
+   {
+    "kind": "store",
+    "insn": "0x141a8f988",
+    "disp": "0x1e1",
+    "base": "rsi"
+   },
+   {
+    "kind": "store",
+    "insn": "0x141a9061c",
+    "disp": "0x110",
+    "base": "rbx"
+   }
+  ],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8f8d9",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8f520-141a8fe0e；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a905fe",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a90410-141a90b05；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a93d34",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a93cc0-141a93e91；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a96523",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a964d0-141a96727；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": true,
+  "in_abr_samples": true
+ },
+ {
+  "key": "useLegacy",
+  "form": "string",
+  "group": "平滑/兼容",
+  "offset": "0x446",
+  "offset_struct": "笔刷预设标志块",
+  "offset_candidates": [
+   {
+    "kind": "store",
+    "insn": "0x141ef272c",
+    "disp": "0x446",
+    "base": "rbx"
+   },
+   {
+    "kind": "store",
+    "insn": "0x141ef9b80",
+    "disp": "0x446",
+    "base": "rbx"
+   }
+  ],
+  "type": "bool",
+  "width": "byte",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef1e27",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef15c0-141ef1ee3；紧随的键消费者 0x142c57a90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef2701",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef1f90-141ef2817；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef2720",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef1f90-141ef2817；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef9b55",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef9b74",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141efd75f",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141efd020-141efd80a；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": true
+ },
+ {
+  "key": "usePaintDynamics",
+  "form": "string",
+  "group": "工具选项",
+  "offset": "0x290",
+  "offset_struct": "批量IO结构",
+  "offset_candidates": [
+   {
+    "kind": "out_param",
+    "insn": "0x141a8faac",
+    "disp": "0x290",
+    "base": "rsi"
+   },
+   {
+    "kind": "store",
+    "insn": "0x141a8faf7",
+    "disp": "0x291",
+    "base": "rsi"
+   },
+   {
+    "kind": "out_param",
+    "insn": "0x141a90872",
+    "disp": "0x290",
+    "base": "rbx"
+   }
+  ],
+  "type": "bool",
+  "width": "byte",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b69d",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 0x142c90190"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8e79b",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c57a90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8fac2",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8f520-141a8fe0e；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a90888",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a90410-141a90b05；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef1999",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef15c0-141ef1ee3；紧随的键消费者 0x142c57a90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef2550",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef1f90-141ef2817；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef2577",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef1f90-141ef2817；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef98cb",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef98f2",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141efd429",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141efd020-141efd80a；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": true
+ },
+ {
+  "key": "usePressureOverridesOpacity",
+  "form": "string",
+  "group": "平滑/兼容",
+  "offset": "0x448",
+  "offset_struct": "笔刷预设标志块",
+  "offset_candidates": [
+   {
+    "kind": "store",
+    "insn": "0x141ef26e8",
+    "disp": "0x448",
+    "base": "rbx"
+   },
+   {
+    "kind": "store",
+    "insn": "0x141ef9a90",
+    "disp": "0x448",
+    "base": "rbx"
+   }
+  ],
+  "type": "bool",
+  "width": "byte",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef1e04",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef15c0-141ef1ee3；紧随的键消费者 0x142c57a90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef26bd",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef1f90-141ef2817；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef26dc",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef1f90-141ef2817；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef9a65",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef9a84",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141efd6b6",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141efd020-141efd80a；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": true
+ },
+ {
+  "key": "usePressureOverridesSize",
+  "form": "string",
+  "group": "平滑/兼容",
+  "offset": "0x447",
+  "offset_struct": "笔刷预设标志块",
+  "offset_candidates": [
+   {
+    "kind": "store",
+    "insn": "0x141ef26a4",
+    "disp": "0x447",
+    "base": "rbx"
+   },
+   {
+    "kind": "store",
+    "insn": "0x141ef9a4c",
+    "disp": "0x447",
+    "base": "rbx"
+   }
+  ],
+  "type": "bool",
+  "width": "byte",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef1de1",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef15c0-141ef1ee3；紧随的键消费者 0x142c57a90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef2679",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef1f90-141ef2817；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef2698",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef1f90-141ef2817；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef9a21",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef9a40",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141efd68f",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141efd020-141efd80a；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": true
+ },
+ {
+  "key": "useScatter",
+  "form": "string",
+  "group": "散布",
+  "offset": "0x00",
+  "offset_struct": "scatter子对象",
+  "offset_candidates": [
+   {
+    "kind": "store",
+    "insn": "0x141a93280",
+    "disp": "0x0",
+    "base": "rbx"
+   }
+  ],
+  "type": "bool",
+  "width": "byte",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b54d",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 0x142c90190"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a93230",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a930b0-141a932a7；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a9324b",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a930b0-141a932a7；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a95db9",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a95d90-141a95ed3；紧随的键消费者 0x142c57a90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a965b3",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a964d0-141a96727；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": true,
+  "in_abr_samples": true
+ },
+ {
+  "key": "useTexture",
+  "form": "string",
+  "group": "纹理",
+  "offset": "0x00",
+  "offset_struct": "texture子对象",
+  "offset_candidates": [],
+  "type": "bool",
+  "width": "byte",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b5d4",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 lea-rax"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8e549",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c57a90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a93622",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a935f0-141a937d6；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a960ee",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a960c0-141a96225；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": true,
+  "in_abr_samples": true
+ },
+ {
+  "key": "useTipDynamics",
+  "form": "string",
+  "group": "笔尖动态",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [
+   {
+    "kind": "store",
+    "insn": "0x141a935bc",
+    "disp": "0x0",
+    "base": "rbx"
+   }
+  ],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b4d4",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 lea-rax"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8e1f3",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c57a90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a93547",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a932b0-141a935e3；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a93562",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a932b0-141a935e3；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a95f0e",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a95ee0-141a960bf；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": true
+ },
+ {
+  "key": "wetEdges",
+  "form": "string",
+  "group": "工具选项",
+  "offset": "0x292",
+  "offset_struct": "批量IO结构",
+  "offset_candidates": [
+   {
+    "kind": "out_param",
+    "insn": "0x141a8f9f5",
+    "disp": "0x292",
+    "base": "rsi"
+   },
+   {
+    "kind": "store",
+    "insn": "0x141a8fa1f",
+    "disp": "0x0",
+    "base": "r8"
+   },
+   {
+    "kind": "out_param",
+    "insn": "0x141a907bb",
+    "disp": "0x292",
+    "base": "rbx"
+   }
+  ],
+  "type": "bool",
+  "width": "byte",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8b67c",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 0x142c90190"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8e967",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c57a90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8fa0c",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8f520-141a8fe0e；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a907d2",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a90410-141a90b05；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef18da",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef15c0-141ef1ee3；紧随的键消费者 0x142c57a90"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef2349",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef1f90-141ef2817；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef973a",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141efd1bf",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141efd020-141efd80a；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": false
+ },
+ {
+  "key": "wetEdgesLock",
+  "form": "string",
+  "group": "锁定标志",
+  "offset": "0x442",
+  "offset_struct": "笔刷预设标志块",
+  "offset_candidates": [
+   {
+    "kind": "store",
+    "insn": "0x141ef9714",
+    "disp": "0x442",
+    "base": "rbx"
+   }
+  ],
+  "type": "bool",
+  "width": "byte",
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef96e9",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141ef9708",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141ef92e0-141ef9ca6；紧随的键消费者 0x142c4a8f0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141efd5f3",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141efd020-141efd80a；紧随的键消费者 0x142c57a90"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": false
+ },
+ {
+  "key": "zuid",
+  "form": "string",
+  "group": "预设/元数据",
+  "offset": null,
+  "offset_struct": null,
+  "offset_candidates": [],
+  "type": null,
+  "width": null,
+  "range": null,
+  "range_evidence": null,
+  "evidence": [
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8e165",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8e060-141a8ec55；紧随的键消费者 0x142c5e740"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8f72e",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8f520-141a8fe0e；紧随的键消费者 0x142c528d0"
+   },
+   {
+    "kind": "ref_insn",
+    "value": "0x141a8f751",
+    "detail": "capstone 校验的键名引用指令；所属 .pdata 函数 141a8f520-141a8fe0e；紧随的键消费者 0x142c51d40"
+   }
+  ],
+  "in_repo_parser": false,
+  "in_abr_samples": false
+ }
+]
