@@ -1,0 +1,141 @@
+{
+ "schema": "brushconverter.causal/v1",
+ "seq": "causal-006",
+ "experiment": "multiply 模式：反向改值，+0x18（contrast）0 改成 -100",
+ "time": "2026-11-20T03:34:24",
+ "ps_version": "26.9.0.15 (Adobe Photoshop 2025)",
+ "debugger": {
+  "implementation": "ctypes DEBUG_EVENT + INT3 单步重插（与任务30 同一套 hwdbg.py，等价 x64dbg 的 ba r4/软件断点）",
+  "x64dbg_path": "<LOCAL_APP_DIR>\\x64dbg\\release\\x64\\x64dbg.exe",
+  "x64dbg_commithash": "9c8ca1cae0b6d56cc44f31fddcb10e3b02ffbb87",
+  "x64dbg_in_PATH": false,
+  "note": "x64dbg 本体无 headless 脚本入口（任务30 §1.2），本任务沿用等价的 ctypes 调试器"
+ },
+ "mode": "multiply",
+ "field": "+0x18",
+ "field_semantics": "contrast",
+ "value_before": 0,
+ "value_after": -100,
+ "jsx_params": {
+  "texture_brightness": 0,
+  "texture_contrast": 0,
+  "texture_scale": 100,
+  "texture_depth": 100,
+  "opacity": 100,
+  "flow": 100,
+  "invert_texture": true,
+  "brush": "tests/定量测试专用.abr / 定量测试用（Dmtr=200 硬笔）",
+  "canvas": "100x100 RGB 透明",
+  "stroke": "单 dab：路径 (50,50)->(50.4,50.4)"
+ },
+ "env_extra": null,
+ "anchor": {
+  "function": "K60 0x141ef62b3（纹理结构体拷贝层，任务30 §3.1 实测 47 次读）",
+  "instr_rva": "0x1ef62c0",
+  "instr_text": "mov eax, dword ptr [rbx + 0x18]",
+  "how": "INT3 打在读指令本身；命中后 rbx 即源纹理结构体，直接 WriteProcessMemory 改写 [rbx+0x18]/[rbx+0x1c]，单步重插",
+  "struct_layout_ref": "docs/研究报告/静态-纹理.md §5.2：+0x18=contrast、+0x1c=brightness（int32）；本次实测独立确认"
+ },
+ "ps_module_base": "0x7ff7b8630000",
+ "bp_addr": "0x7ff7ba5262c0",
+ "patch_hits": 5,
+ "patch_writes": 5,
+ "hit_tids": [
+  30228
+ ],
+ "first_hit": {
+  "t_rel": 9.22,
+  "tid": 30228,
+  "rbx": "0x2ba4db13d20",
+  "v18_before": 0,
+  "v1c_before": 0,
+  "sane": true,
+  "go_written": true,
+  "write": [
+   [
+    "+0x18",
+    true,
+    -100
+   ]
+  ],
+  "v18_after": -100,
+  "v1c_after": 0
+ },
+ "crash_event": {
+  "code": "0xe06d7363",
+  "addr": "0x7ffc1c8f408a",
+  "tid": 30228,
+  "first_chance": 1,
+  "t_rel": 9.31
+ },
+ "ps_alive_after": true,
+ "images": {
+  "control": {
+   "file": "%USERPROFILE%\\AppData\\Local\\Temp\\bcdyn30a\\imgs\\mult_b0_c0.png",
+   "sha256": "1756377bf09820bf4977072b20b9a968259f08b7c7e5e05451d144b7a02c080b",
+   "idat_sha256": "1d14a8b9e0b87fbfd3cdc97f74be218ede7a09d679302965d289accae795c537",
+   "bytes": 41687
+  },
+  "patched": {
+   "file": "%USERPROFILE%\\AppData\\Local\\Temp\\bcdyn30a\\imgs\\patch_mult_p18_m100.png",
+   "sha256": "4f8c9d140d2297121d1362c6b935fbbe747a1e3ce2ab25c049f1db40026efe2b",
+   "idat_sha256": "a2358b5abb0c65e692ed50e91a31ef7efd56ad66b40a0cd3587b50a226d6e662",
+   "bytes": 41687
+  },
+  "blackbox_same_ui_param": {
+   "file": "%USERPROFILE%\\AppData\\Local\\Temp\\bcdyn30a\\imgs\\mult_b0_cm100.png",
+   "sha256": "136c6676ea3364db4a77921e6523e373c3ec2d1d53f650c80644b5ea024c1e81",
+   "idat_sha256": "a2358b5abb0c65e692ed50e91a31ef7efd56ad66b40a0cd3587b50a226d6e662",
+   "bytes": 41687
+  }
+ },
+ "diff_patched_vs_control": {
+  "diff_pixels": 9804,
+  "diff_ratio": 0.9804,
+  "max_delta": 128,
+  "sha256_a": "1756377bf09820bf4977072b20b9a968259f08b7c7e5e05451d144b7a02c080b",
+  "sha256_b": "4f8c9d140d2297121d1362c6b935fbbe747a1e3ce2ab25c049f1db40026efe2b",
+  "sha256_different": true,
+  "alpha_a_mean": 104.791,
+  "alpha_b_mean": 128.0,
+  "alpha_a_nonzero": 9897,
+  "alpha_b_nonzero": 10000,
+  "width": 100,
+  "height": 100,
+  "mean_delta_a_minus_b": -23.2087,
+  "diff_pixels_outside_stroke": 0,
+  "idat_equal": false
+ },
+ "conclusion": "成立",
+ "diff_patched_vs_blackbox": {
+  "diff_pixels": 0,
+  "diff_ratio": 0.0,
+  "max_delta": 0,
+  "sha256_a": "136c6676ea3364db4a77921e6523e373c3ec2d1d53f650c80644b5ea024c1e81",
+  "sha256_b": "4f8c9d140d2297121d1362c6b935fbbe747a1e3ce2ab25c049f1db40026efe2b",
+  "sha256_different": true,
+  "alpha_a_mean": 128.0,
+  "alpha_b_mean": 128.0,
+  "alpha_a_nonzero": 10000,
+  "alpha_b_nonzero": 10000,
+  "width": 100,
+  "height": 100,
+  "mean_delta_a_minus_b": 0.0,
+  "diff_pixels_outside_stroke": 0,
+  "idat_equal": true
+ },
+ "conclusion_basis": "改值图 vs 对照图：差异 98.04%（diff_pixels=9804, max_delta=128, 均值 -23.21）；改值图 vs 同一参数下 UI 改值的黑盒图：差异 0.00%（diff_pixels=0, max_delta=0，逐像素一致）→ 在该命中点改这块内存 = 改 UI 参数本身，值确实被像素消费",
+ "method_note": "file_sha256 会被 PNG 的 iTXt/XMP（时间戳 + InstanceID GUID）影响：像素完全一致的两张图 file_sha256 也不同。因此本文件同时给 idat_sha256（只哈希 IDAT 像素流），idat_equal=true 才是\"像素逐字节一致\"的硬证据。",
+ "step_log_tail": [
+  "1795116873432 pattern defined bc30a_tex",
+  "1795116873701 doc created 100 pxx100 px",
+  "1795116874001 go received after 50ms",
+  "1795116874727 APPLIED | useTexture=true;invert=true;pattern=bc30a_tex;scale=100;depth=100;opacity=100;depth2=100;brightness=0;contrast=-100;blend=multiply",
+  "1795116874990 stroke done",
+  "1795116875136 saved %USERPROFILE%/AppData/Local/Temp/bcdyn30a/imgs/patch_mult_p18_m100.png"
+ ],
+ "raw_records": {
+  "run_record": "%USERPROFILE%\\AppData\\Local\\Temp\\bcdyn30a\\work\\patch_mult_p18_m100\\patch_mult_p18_m100.json",
+  "cmp_record": "%USERPROFILE%\\AppData\\Local\\Temp\\bcdyn30a\\cmp\\M_x18_m100_vs_ctl.json"
+ }
+}

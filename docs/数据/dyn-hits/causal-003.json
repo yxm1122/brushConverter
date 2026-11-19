@@ -1,0 +1,157 @@
+{
+ "schema": "brushconverter.causal/v1",
+ "seq": "causal-003",
+ "experiment": "linearHeight 模式（depth=10）：运行时把 +0x18（contrast）0 改成 +100",
+ "time": "2026-11-20T03:32:30",
+ "ps_version": "26.9.0.15 (Adobe Photoshop 2025)",
+ "debugger": {
+  "implementation": "ctypes DEBUG_EVENT + INT3 单步重插（与任务30 同一套 hwdbg.py，等价 x64dbg 的 ba r4/软件断点）",
+  "x64dbg_path": "<LOCAL_APP_DIR>\\x64dbg\\release\\x64\\x64dbg.exe",
+  "x64dbg_commithash": "9c8ca1cae0b6d56cc44f31fddcb10e3b02ffbb87",
+  "x64dbg_in_PATH": false,
+  "note": "x64dbg 本体无 headless 脚本入口（任务30 §1.2），本任务沿用等价的 ctypes 调试器"
+ },
+ "mode": "linearHeight",
+ "field": "+0x18",
+ "field_semantics": "contrast",
+ "value_before": 0,
+ "value_after": 100,
+ "jsx_params": {
+  "texture_brightness": 0,
+  "texture_contrast": 0,
+  "texture_scale": 100,
+  "texture_depth": 10,
+  "opacity": 100,
+  "flow": 100,
+  "invert_texture": true,
+  "brush": "tests/定量测试专用.abr / 定量测试用（Dmtr=200 硬笔）",
+  "canvas": "100x100 RGB 透明",
+  "stroke": "单 dab：路径 (50,50)->(50.4,50.4)"
+ },
+ "env_extra": "BC30A_DEPTH=10",
+ "anchor": {
+  "function": "K60 0x141ef62b3（纹理结构体拷贝层，任务30 §3.1 实测 47 次读）",
+  "instr_rva": "0x1ef62c0",
+  "instr_text": "mov eax, dword ptr [rbx + 0x18]",
+  "how": "INT3 打在读指令本身；命中后 rbx 即源纹理结构体，直接 WriteProcessMemory 改写 [rbx+0x18]/[rbx+0x1c]，单步重插",
+  "struct_layout_ref": "docs/研究报告/静态-纹理.md §5.2：+0x18=contrast、+0x1c=brightness（int32）；本次实测独立确认"
+ },
+ "ps_module_base": "0x7ff7b8630000",
+ "bp_addr": "0x7ff7ba5262c0",
+ "patch_hits": 5,
+ "patch_writes": 5,
+ "hit_tids": [
+  29740
+ ],
+ "first_hit": {
+  "t_rel": 9.44,
+  "tid": 29740,
+  "rbx": "0x2081c28da60",
+  "v18_before": 0,
+  "v1c_before": 0,
+  "sane": true,
+  "go_written": true,
+  "write": [
+   [
+    "+0x18",
+    true,
+    100
+   ]
+  ],
+  "v18_after": 100,
+  "v1c_after": 0
+ },
+ "crash_event": {
+  "code": "0xe06d7363",
+  "addr": "0x7ffc1c8f408a",
+  "tid": 29740,
+  "first_chance": 1,
+  "t_rel": 9.54
+ },
+ "ps_alive_after": true,
+ "images": {
+  "control": {
+   "file": "%USERPROFILE%\\AppData\\Local\\Temp\\bcdyn30a\\imgs\\lh10_b0_c0.png",
+   "sha256": "ae5e94a7b2a7f6342bedbd72b99eb2ef8d28a9f4473b7b4505abc6a000ca61dc",
+   "idat_sha256": "87eb76e288ecdc2207963af5d5097dfcb771dbdf8f9838872dc434fbda29d9cb",
+   "bytes": 41687
+  },
+  "patched": {
+   "file": "%USERPROFILE%\\AppData\\Local\\Temp\\bcdyn30a\\imgs\\patch_lh10_p18_100.png",
+   "sha256": "bada65e6f9d1570d454bfcc2fb98cd95a65ef7e56113d48053f58ff9b0f57b25",
+   "idat_sha256": "f6bb4772e14e085b397bac272d1b2458f93fd5f8f2cfe7cdc6fa15e297e5c676",
+   "bytes": 41687
+  },
+  "blackbox_same_ui_param": {
+   "file": "%USERPROFILE%\\AppData\\Local\\Temp\\bcdyn30a\\imgs\\lh10_b0_c100.png",
+   "sha256": "3b06f71642fb84d626efa78358adc6d96f01c0812c51e225572d5e73b029cde4",
+   "idat_sha256": "f6bb4772e14e085b397bac272d1b2458f93fd5f8f2cfe7cdc6fa15e297e5c676",
+   "bytes": 41687
+  }
+ },
+ "diff_patched_vs_control": {
+  "diff_pixels": 6731,
+  "diff_ratio": 0.6731,
+  "max_delta": 126,
+  "sha256_a": "ae5e94a7b2a7f6342bedbd72b99eb2ef8d28a9f4473b7b4505abc6a000ca61dc",
+  "sha256_b": "bada65e6f9d1570d454bfcc2fb98cd95a65ef7e56113d48053f58ff9b0f57b25",
+  "sha256_different": true,
+  "alpha_a_mean": 198.413,
+  "alpha_b_mean": 183.542,
+  "alpha_a_nonzero": 10000,
+  "alpha_b_nonzero": 10000,
+  "width": 100,
+  "height": 100,
+  "mean_delta_a_minus_b": 14.871,
+  "diff_pixels_outside_stroke": 0,
+  "idat_equal": false
+ },
+ "conclusion": "成立",
+ "diff_patched_vs_blackbox": {
+  "diff_pixels": 0,
+  "diff_ratio": 0.0,
+  "max_delta": 0,
+  "sha256_a": "3b06f71642fb84d626efa78358adc6d96f01c0812c51e225572d5e73b029cde4",
+  "sha256_b": "bada65e6f9d1570d454bfcc2fb98cd95a65ef7e56113d48053f58ff9b0f57b25",
+  "sha256_different": true,
+  "alpha_a_mean": 183.542,
+  "alpha_b_mean": 183.542,
+  "alpha_a_nonzero": 10000,
+  "alpha_b_nonzero": 10000,
+  "width": 100,
+  "height": 100,
+  "mean_delta_a_minus_b": 0.0,
+  "diff_pixels_outside_stroke": 0,
+  "idat_equal": true
+ },
+ "diff_control_vs_blackbox": {
+  "diff_pixels": 6731,
+  "diff_ratio": 0.6731,
+  "max_delta": 126,
+  "sha256_a": "ae5e94a7b2a7f6342bedbd72b99eb2ef8d28a9f4473b7b4505abc6a000ca61dc",
+  "sha256_b": "3b06f71642fb84d626efa78358adc6d96f01c0812c51e225572d5e73b029cde4",
+  "sha256_different": true,
+  "alpha_a_mean": 198.413,
+  "alpha_b_mean": 183.542,
+  "alpha_a_nonzero": 10000,
+  "alpha_b_nonzero": 10000,
+  "width": 100,
+  "height": 100,
+  "mean_delta_a_minus_b": 14.871,
+  "diff_pixels_outside_stroke": 0
+ },
+ "conclusion_basis": "改值图 vs 对照图：差异 67.31%（diff_pixels=6731, max_delta=126, 均值 +14.87）；改值图 vs 同一参数下 UI 改值的黑盒图：差异 0.00%（diff_pixels=0, max_delta=0，逐像素一致）→ 在该命中点改这块内存 = 改 UI 参数本身，值确实被像素消费",
+ "method_note": "file_sha256 会被 PNG 的 iTXt/XMP（时间戳 + InstanceID GUID）影响：像素完全一致的两张图 file_sha256 也不同。因此本文件同时给 idat_sha256（只哈希 IDAT 像素流），idat_equal=true 才是\"像素逐字节一致\"的硬证据。",
+ "step_log_tail": [
+  "1795116759339 pattern defined bc30a_tex",
+  "1795116759621 doc created 100 pxx100 px",
+  "1795116760209 go received after 300ms",
+  "1795116760920 APPLIED | useTexture=true;invert=true;pattern=bc30a_tex;scale=100;depth=10;opacity=100;depth2=10;brightness=0;contrast=100;blend=linearHeight",
+  "1795116761187 stroke done",
+  "1795116761332 saved %USERPROFILE%/AppData/Local/Temp/bcdyn30a/imgs/patch_lh10_p18_100.png"
+ ],
+ "raw_records": {
+  "run_record": "%USERPROFILE%\\AppData\\Local\\Temp\\bcdyn30a\\work\\patch_lh10_p18_100\\patch_lh10_p18_100.json",
+  "cmp_record": "%USERPROFILE%\\AppData\\Local\\Temp\\bcdyn30a\\cmp\\L_x18_vs_ctl.json"
+ }
+}
