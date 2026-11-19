@@ -1,0 +1,1466 @@
+[
+ {
+  "key": "Angl",
+  "semantics": "笔尖角度（度，可负；PS 侧以 4CC 立即数 id 传递）",
+  "range": "PS 逆向未取到 clamp；ABR 实测 −33..90°",
+  "sources": [
+   "re",
+   "abr",
+   "krita",
+   "parser"
+  ],
+  "krita_target": "brush_definition 的 angle 属性（度→弧度，UI [0,360)）",
+  "verdict": "可映射"
+ },
+ {
+  "key": "BlnM",
+  "semantics": "双笔刷混合模式（与纹理共用 BlnM 枚举类，语义不同）",
+  "range": "enum；ABR 实测 Mltp 26、CBrn 9、Drkn 4、hardMix 2、CDdg 1、Ovrl 1、linearBurn 1（共 44）",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "Brgh",
+  "semantics": "颜色动态亮度（%，4CC）",
+  "range": "ABR 实测 0..4",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定"
+ },
+ {
+  "key": "Brsh",
+  "semantics": "笔尖对象容器（Dmtr/Spcn/Angl/Rndn/Hrdn/flipX/flipY 所在）",
+  "range": "容器（无自身取值）",
+  "sources": [
+   "re",
+   "abr",
+   "krita",
+   "parser"
+  ],
+  "krita_target": "笔尖资源（png_brush 内嵌 PNG 或 auto_brush）",
+  "verdict": "可映射"
+ },
+ {
+  "key": "Cnt ",
+  "semantics": "数量（双笔刷/散布「数量」，doub）",
+  "range": "ABR 实测 1..5",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "Dmtr",
+  "semantics": "画笔主直径（px）；PS 存于笔尖对象",
+  "range": "PS 逆向未见 clamp；ABR 实测 1..1920 px",
+  "sources": [
+   "re",
+   "abr",
+   "krita",
+   "parser"
+  ],
+  "krita_target": "png_brush 的 scale 属性 = Dmtr/max(笔尖宽,高)；计算笔刷 → auto_brush diameter",
+  "verdict": "可映射"
+ },
+ {
+  "key": "ErsB",
+  "semantics": "橡皮擦标记（工具选项）",
+  "range": "ABR 实测 1..1",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "Flip",
+  "semantics": "双笔刷翻转（4CC，位于 dualBrush 子对象）",
+  "range": "bool",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "H   ",
+  "semantics": "色相（颜色动态，4CC 空格补齐）",
+  "range": "ABR 实测 0..5",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定"
+ },
+ {
+  "key": "Hrdn",
+  "semantics": "笔尖硬度（%）",
+  "range": "PS 逆向未见 clamp；ABR 实测 0..100",
+  "sources": [
+   "re",
+   "abr",
+   "krita",
+   "parser"
+  ],
+  "krita_target": "auto_brush 的 hfade/vfade = Hrdn/100；采样笔刷无独立承载（固化在位图）",
+  "verdict": "需校准"
+ },
+ {
+  "key": "Idnt",
+  "semantics": "图案 UUID（Txtr.Idnt，用于匹配 patt 区段位图）",
+  "range": "TEXT（UUID 串）",
+  "sources": [
+   "re",
+   "abr",
+   "krita",
+   "parser"
+  ],
+  "krita_target": "Texture/Pattern/PatternMD5Sum 资源查找（按 UUID 取 patt 位图）",
+  "verdict": "可映射"
+ },
+ {
+  "key": "Intr",
+  "semantics": "内部标记（ABR 每个预设都有，含义未在仓库文档/逆向证据中给出）",
+  "range": "bool",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定"
+ },
+ {
+  "key": "InvT",
+  "semantics": "纹理反相（ABR 容器键；逆向未定位，按语义判反相）",
+  "range": "bool",
+  "sources": [
+   "abr",
+   "krita",
+   "parser"
+  ],
+  "krita_target": "Texture/Pattern/Invert",
+  "verdict": "可映射"
+ },
+ {
+  "key": "Md  ",
+  "semantics": "工具选项-混合模式（4CC，实测全为 BlnM:Nrml=正常）",
+  "range": "enum；ABR 实测 Nrml×19",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "MgcE",
+  "semantics": "魔术橡皮擦标记（工具选项）",
+  "range": "bool",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "Mnm ",
+  "semantics": "动态最小值（%）",
+  "range": "ABR 实测 0..100%",
+  "sources": [
+   "re",
+   "abr",
+   "krita",
+   "parser"
+  ],
+  "krita_target": "SizecommonCurve/OpacitycommonCurve/FlowcommonCurve/RatiocommonCurve 的 0 端点 = Mnm/100",
+  "verdict": "需校准"
+ },
+ {
+  "key": "Nm  ",
+  "semantics": "预设/笔尖名称（4CC，空格补齐）",
+  "range": "TEXT（无范围）",
+  "sources": [
+   "re",
+   "abr",
+   "krita",
+   "parser"
+  ],
+  "krita_target": "preset name（.kpp 预设名）",
+  "verdict": "可映射"
+ },
+ {
+  "key": "Nose",
+  "semantics": "喷嘴（喷枪特性）",
+  "range": "bool",
+  "sources": [
+   "re",
+   "abr",
+   "parser"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "Opct",
+  "semantics": "静态不透明度（工具选项，long）",
+  "range": "ABR 实测 100..100（20 次全为 100）",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "Rndn",
+  "semantics": "笔尖圆度（%）",
+  "range": "PS 逆向未见 clamp；ABR 实测 20..100",
+  "sources": [
+   "re",
+   "abr",
+   "krita",
+   "parser"
+  ],
+  "krita_target": "auto_brush 的 ratio = Rndn/100；采样笔刷无独立承载（固化在位图）",
+  "verdict": "需校准"
+ },
+ {
+  "key": "Rpt ",
+  "semantics": "重复（喷枪特性，4CC 空格补齐）",
+  "range": "bool",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "Smoo",
+  "semantics": "平滑强度（工具选项，long；与 smoothingValue 是两个键）",
+  "range": "ABR 实测 0..35",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "Spcn",
+  "semantics": "笔刷间距（%，直径占比；顶层 Spcn 是间距不是散布量）",
+  "range": "ABR 实测 1..1000%；逆向未取到顶层 clamp",
+  "sources": [
+   "re",
+   "abr",
+   "krita",
+   "parser"
+  ],
+  "krita_target": "brush_definition 的 spacing 属性 = Spcn/100",
+  "verdict": "可映射"
+ },
+ {
+  "key": "Strt",
+  "semantics": "饱和度/起始值（颜色动态，4CC）",
+  "range": "ABR 实测 0..3",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定"
+ },
+ {
+  "key": "TxtC",
+  "semantics": "Texture Each Tip（每个笔尖独立取纹理）；ABR 专有键",
+  "range": "bool",
+  "sources": [
+   "abr"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "Txtr",
+  "semantics": "纹理对象容器（Txtr.Idnt / Txtr.Nm）；逆向未定位",
+  "range": "Objc 容器（无自身取值）",
+  "sources": [
+   "abr",
+   "krita",
+   "parser"
+  ],
+  "krita_target": "Texture/Pattern/*（整组纹理选项）",
+  "verdict": "可映射"
+ },
+ {
+  "key": "Wtdg",
+  "semantics": "湿边（ABR 专有键；逆向未定位）",
+  "range": "bool",
+  "sources": [
+   "abr",
+   "parser"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "angleDynamics",
+  "semantics": "角度动态对象（bVTy / jitter / Mnm ）",
+  "range": "Objc（字段见 bVTy/jitter/Mnm ）",
+  "sources": [
+   "re",
+   "abr",
+   "krita",
+   "parser"
+  ],
+  "krita_target": "RotationSensor + RotationValue",
+  "verdict": "可映射"
+ },
+ {
+  "key": "bVTy",
+  "semantics": "动态控制源枚举（0关 / 1渐隐 / 2压力 / 3倾斜 / 4转轮 / 5旋转 / 6方向 / 7初始方向）",
+  "range": "int32；ABR 实测 0×327、2×106、5×1、6×12（1/3/4/7 样本未出现）",
+  "sources": [
+   "re",
+   "abr",
+   "krita",
+   "parser"
+  ],
+  "krita_target": "sensor XML @id（pressure / drawingangle / fuzzy / fade / rotation / xtilt / ytilt 均有候选）",
+  "verdict": "需校准"
+ },
+ {
+  "key": "backgroundColor",
+  "semantics": "背景色（颜色动态底色）",
+  "range": "颜色值（无范围）",
+  "sources": [
+   "re"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定"
+ },
+ {
+  "key": "blendMode",
+  "semantics": "混合模式（预设级，语义未定：与纹理/双笔刷枚举的关系未证）",
+  "range": "enum",
+  "sources": [
+   "re"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定"
+ },
+ {
+  "key": "bothAxes",
+  "semantics": "散布两轴",
+  "range": "bool",
+  "sources": [
+   "re",
+   "abr",
+   "krita",
+   "parser"
+  ],
+  "krita_target": "Scattering/AxisX = bothAxes；AxisY 恒 true",
+  "verdict": "可映射"
+ },
+ {
+  "key": "brightness",
+  "semantics": "亮度抖动（颜色动态，与纹理 textureBrightness 不同键）",
+  "range": "逆向无 clamp 证据；ABR 样本无该键",
+  "sources": [
+   "re"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定"
+ },
+ {
+  "key": "brush",
+  "semantics": "笔刷子对象容器（逆向定位到 brush 子对象）",
+  "range": "descriptor 子对象",
+  "sources": [
+   "re",
+   "parser"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定"
+ },
+ {
+  "key": "brushGroup",
+  "semantics": "笔刷组对象（PS 预设分组）",
+  "range": "Objc",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定"
+ },
+ {
+  "key": "brushPoseAngle",
+  "semantics": "笔刷姿态-角度",
+  "range": "ABR 实测 0..0（int32）",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "brushPoseLock",
+  "semantics": "笔刷姿态锁定标志",
+  "range": "bool",
+  "sources": [
+   "re"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "brushPosePressure",
+  "semantics": "笔刷姿态-压感",
+  "range": "ABR 实测 100..100",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "brushPoseTiltX",
+  "semantics": "笔刷姿态-倾角 X",
+  "range": "ABR 实测 0..0（int32）",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "brushPoseTiltY",
+  "semantics": "笔刷姿态-倾角 Y",
+  "range": "ABR 实测 0..0（int32）",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "brushPreset",
+  "semantics": "工具选项里的预设标记（逆向定位为 descriptor 指针/子对象）",
+  "range": "bool",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "brushProjection",
+  "semantics": "笔刷投影（笔尖投影开关）",
+  "range": "bool",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "brushTipDynamicsLock",
+  "semantics": "笔尖动态锁定标志（PS 笔刷预设标志块的 bool 槽位）",
+  "range": "bool",
+  "sources": [
+   "re"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "brushType",
+  "semantics": "笔刷类型标记（预设元数据）",
+  "range": "未见类型证据",
+  "sources": [
+   "re"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定"
+ },
+ {
+  "key": "chroma",
+  "semantics": "色度抖动（颜色动态）",
+  "range": "逆向无 clamp 证据；ABR 样本无该键",
+  "sources": [
+   "re"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定"
+ },
+ {
+  "key": "clVr",
+  "semantics": "颜色变化对象（颜色动态，4CC）",
+  "range": "Objc",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定"
+ },
+ {
+  "key": "colorDynamicsLock",
+  "semantics": "颜色动态锁定标志（PS 笔刷预设标志块的 bool 槽位）",
+  "range": "bool",
+  "sources": [
+   "re"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "colorDynamicsPerTip",
+  "semantics": "每笔尖颜色动态（bool）",
+  "range": "bool",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定"
+ },
+ {
+  "key": "computedBrush",
+  "semantics": "计算笔刷标记（预设元数据）",
+  "range": "bool",
+  "sources": [
+   "re"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定"
+ },
+ {
+  "key": "count",
+  "semantics": "数量（scatter 子对象，PS 侧 clamp [1,10]）",
+  "range": "PS 逆向 clamp [1,10]",
+  "sources": [
+   "re"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "countDynamics",
+  "semantics": "数量动态对象（双笔刷/散布「数量」）",
+  "range": "Objc",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "dBrush",
+  "semantics": "动态笔刷元数据（预设元数据）",
+  "range": "未见类型证据",
+  "sources": [
+   "re"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定"
+ },
+ {
+  "key": "dTips",
+  "semantics": "动态笔尖元数据（预设元数据）",
+  "range": "未见类型证据",
+  "sources": [
+   "re"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定"
+ },
+ {
+  "key": "dualBrush",
+  "semantics": "双笔刷对象（画笔叠加第二种笔尖）",
+  "range": "Objc",
+  "sources": [
+   "re",
+   "abr",
+   "parser"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "dualBrushLock",
+  "semantics": "双笔刷锁定标志（PS 笔刷预设标志块的 bool 槽位）",
+  "range": "bool",
+  "sources": [
+   "re"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "fStp",
+  "semantics": "抖动步进/分布参数（与 jitter 成对出现，语义未定）",
+  "range": "ABR 实测 1..100（1×116、25×316、100×14）",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定"
+ },
+ {
+  "key": "flip",
+  "semantics": "翻转（预设级，语义未定：与 dualBrush.Flip 的关系未证）",
+  "range": "bool",
+  "sources": [
+   "re"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定"
+ },
+ {
+  "key": "flipX",
+  "semantics": "笔尖 X 翻转",
+  "range": "bool",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定"
+ },
+ {
+  "key": "flipY",
+  "semantics": "笔尖 Y 翻转",
+  "range": "bool",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定"
+ },
+ {
+  "key": "flow",
+  "semantics": "静态流量（工具选项，long）",
+  "range": "ABR 实测 38..100",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "foregroundColor",
+  "semantics": "前景色（颜色动态底色）",
+  "range": "颜色值（无范围）",
+  "sources": [
+   "re"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定"
+ },
+ {
+  "key": "hue",
+  "semantics": "色相抖动（颜色动态）",
+  "range": "未见 clamp 证据；ABR 样本无该键",
+  "sources": [
+   "re"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定"
+ },
+ {
+  "key": "interpretation",
+  "semantics": "纹理解释标记（PS 内部字段）",
+  "range": "bool",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "invertTexture",
+  "semantics": "纹理反相（PS 键名 invertTexture；ABR 容器写 InvT）",
+  "range": "bool",
+  "sources": [
+   "re",
+   "krita"
+  ],
+  "krita_target": "Texture/Pattern/Invert",
+  "verdict": "可映射"
+ },
+ {
+  "key": "jitter",
+  "semantics": "抖动幅度（%，动态对象通用；散布量真正来源）",
+  "range": "ABR 实测 0..533%",
+  "sources": [
+   "re",
+   "abr",
+   "krita",
+   "parser"
+  ],
+  "krita_target": "ScatterValue（散布，÷400 经验系数）；RotationValue（旋转，÷100）",
+  "verdict": "需校准"
+ },
+ {
+  "key": "lightness",
+  "semantics": "明度抖动（颜色动态）",
+  "range": "逆向无 clamp 证据；ABR 样本无该键",
+  "sources": [
+   "re"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定"
+ },
+ {
+  "key": "minimumDepth",
+  "semantics": "纹理最小深度（%），纹理深度动态曲线下端点",
+  "range": "PS 逆向 clamp [0,100]；ABR 实测 0..100",
+  "sources": [
+   "re",
+   "abr",
+   "krita",
+   "parser"
+  ],
+  "krita_target": "Texture/Strength/commonCurve 的 0 端点（高度系再 ×1.2 并封顶 1.0）",
+  "verdict": "需校准"
+ },
+ {
+  "key": "minimumDiameter",
+  "semantics": "大小动态最小直径（%）",
+  "range": "ABR 实测 0..94%",
+  "sources": [
+   "re",
+   "abr",
+   "krita",
+   "parser"
+  ],
+  "krita_target": "SizecommonCurve = 0,{minD/100};1,1;",
+  "verdict": "可映射"
+ },
+ {
+  "key": "minimumRoundness",
+  "semantics": "圆度动态最小圆度（%）",
+  "range": "ABR 实测 1..50%",
+  "sources": [
+   "re",
+   "abr",
+   "krita",
+   "parser"
+  ],
+  "krita_target": "RatiocommonCurve = 0,{minR/100};1,1;",
+  "verdict": "可映射"
+ },
+ {
+  "key": "mxVr",
+  "semantics": "混合动态对象（Transfer 的 mix，4CC）",
+  "range": "Objc；ABR 14 次",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "name",
+  "semantics": "预设名称（字符串形态；ABR 容器写 Nm  ）",
+  "range": "TEXT（无范围）",
+  "sources": [
+   "re",
+   "krita",
+   "parser"
+  ],
+  "krita_target": "preset name（.kpp 预设名）",
+  "verdict": "可映射"
+ },
+ {
+  "key": "noise",
+  "semantics": "噪点（喷枪特性）",
+  "range": "bool",
+  "sources": [
+   "re"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "noiseLock",
+  "semantics": "噪点锁定标志（PS 笔刷预设标志块的 bool 槽位）",
+  "range": "bool",
+  "sources": [
+   "re"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "opVr",
+  "semantics": "不透明度动态对象（bVTy / Mnm ）",
+  "range": "Objc（字段见 bVTy/Mnm ）",
+  "sources": [
+   "re",
+   "abr",
+   "krita",
+   "parser"
+  ],
+  "krita_target": "PressureOpacity + OpacitycommonCurve",
+  "verdict": "可映射"
+ },
+ {
+  "key": "overridePoseAngle",
+  "semantics": "姿态覆盖-角度",
+  "range": "bool",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "overridePosePressure",
+  "semantics": "姿态覆盖-压感",
+  "range": "bool",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "overridePoseTiltX",
+  "semantics": "姿态覆盖-倾角 X",
+  "range": "bool",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "overridePoseTiltY",
+  "semantics": "姿态覆盖-倾角 Y",
+  "range": "bool",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "paintDynamicsLock",
+  "semantics": "绘制动态锁定标志（PS 笔刷预设标志块的 bool 槽位）",
+  "range": "bool",
+  "sources": [
+   "re"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "prVr",
+  "semantics": "流量动态对象（bVTy / Mnm ）",
+  "range": "Objc（字段见 bVTy/Mnm ）",
+  "sources": [
+   "re",
+   "abr",
+   "krita",
+   "parser"
+  ],
+  "krita_target": "PressureFlow + FlowcommonCurve",
+  "verdict": "可映射"
+ },
+ {
+  "key": "pressureSmoothing",
+  "semantics": "压感平滑（工具选项）",
+  "range": "bool",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "protectTexture",
+  "semantics": "保护纹理（缩放时锁定图案坐标）",
+  "range": "bool",
+  "sources": [
+   "re",
+   "abr",
+   "parser"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "protectTextureLock",
+  "semantics": "保护纹理锁定标志（PS 笔刷预设标志块的 bool 槽位）",
+  "range": "bool",
+  "sources": [
+   "re"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "purity",
+  "semantics": "纯度（%）",
+  "range": "逆向无 clamp 证据；ABR 实测 0..0",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定"
+ },
+ {
+  "key": "repeat",
+  "semantics": "重复（喷枪特性）",
+  "range": "bool",
+  "sources": [
+   "re"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "repeatLock",
+  "semantics": "重复锁定标志（PS 笔刷预设标志块的 bool 槽位）",
+  "range": "bool",
+  "sources": [
+   "re"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "roundnessDynamics",
+  "semantics": "圆度动态对象（bVTy / Mnm ）",
+  "range": "Objc（字段见 bVTy/Mnm ）",
+  "sources": [
+   "re",
+   "abr",
+   "krita",
+   "parser"
+  ],
+  "krita_target": "PressureRatio + RatiocommonCurve",
+  "verdict": "可映射"
+ },
+ {
+  "key": "sampledBrush",
+  "semantics": "采样笔刷标记（预设元数据；与 ABR sampledData 是不同键）",
+  "range": "未见类型证据",
+  "sources": [
+   "re"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定"
+ },
+ {
+  "key": "sampledData",
+  "semantics": "采样笔尖 UUID（ABR 容器专有键，逆向未定位）",
+  "range": "TEXT（UUID 串）",
+  "sources": [
+   "abr",
+   "krita",
+   "parser"
+  ],
+  "krita_target": "png_brush 内嵌笔尖的查找键（samp 区段）",
+  "verdict": "可映射"
+ },
+ {
+  "key": "saturation",
+  "semantics": "饱和度抖动（颜色动态）",
+  "range": "逆向无 clamp 证据；ABR 样本无该键",
+  "sources": [
+   "re"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定"
+ },
+ {
+  "key": "scatter",
+  "semantics": "散布量原始槽位（scatter 子对象，PS 侧 clamp [0,1000]）",
+  "range": "PS 逆向 clamp [0,1000]；ABR 侧对应键为 scatterDynamics.jitter（实测 0..533）",
+  "sources": [
+   "re",
+   "krita"
+  ],
+  "krita_target": "ScatterValue（0..5）",
+  "verdict": "需校准"
+ },
+ {
+  "key": "scatterDynamics",
+  "semantics": "散布动态对象（bVTy / jitter）",
+  "range": "Objc（jitter 实测 0..533%）",
+  "sources": [
+   "re",
+   "abr",
+   "krita",
+   "parser"
+  ],
+  "krita_target": "PressureScatter + ScatterSensor + ScatterValue（÷400 校准）",
+  "verdict": "需校准"
+ },
+ {
+  "key": "scatterDynamicsLock",
+  "semantics": "散布动态锁定标志（PS 笔刷预设标志块的 bool 槽位）",
+  "range": "bool",
+  "sources": [
+   "re"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "smoothing",
+  "semantics": "平滑（工具选项开关）",
+  "range": "bool",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "smoothingCatchup",
+  "semantics": "平滑追赶（工具选项）",
+  "range": "bool",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "smoothingCatchupAtEnd",
+  "semantics": "平滑终点追赶（工具选项）",
+  "range": "bool",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "smoothingLock",
+  "semantics": "平滑锁定标志（PS 笔刷预设标志块的 bool 槽位）",
+  "range": "bool",
+  "sources": [
+   "re"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "smoothingRadiusMode",
+  "semantics": "平滑半径模式（工具选项）",
+  "range": "int32/enum",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "smoothingValue",
+  "semantics": "平滑强度（工具选项）",
+  "range": "ABR 实测 0..89（doub）",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "smoothingZoomCompensation",
+  "semantics": "平滑缩放补偿（工具选项）",
+  "range": "bool",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "style",
+  "semantics": "预设样式字段（语义未定）",
+  "range": "未见类型证据",
+  "sources": [
+   "re"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定"
+ },
+ {
+  "key": "styleBrush",
+  "semantics": "预设样式笔刷字段（语义未定）",
+  "range": "未见类型证据",
+  "sources": [
+   "re"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定"
+ },
+ {
+  "key": "szVr",
+  "semantics": "大小动态对象（bVTy）",
+  "range": "Objc（字段见 bVTy）",
+  "sources": [
+   "re",
+   "abr",
+   "krita",
+   "parser"
+  ],
+  "krita_target": "PressureSize + SizecommonCurve",
+  "verdict": "可映射"
+ },
+ {
+  "key": "texture",
+  "semantics": "纹理子描述符容器（逆向定位到 texture 子对象）",
+  "range": "descriptor 指针（无自身取值）",
+  "sources": [
+   "re",
+   "krita",
+   "parser"
+  ],
+  "krita_target": "Texture/Pattern/*（整组纹理选项）",
+  "verdict": "可映射"
+ },
+ {
+  "key": "textureBlendMode",
+  "semantics": "纹理混合模式（BlnM 枚举成员）；Mltp 未登记进 mapping._TEXTURING_MODE，现状静默回退 Multiply 并多打警告，需补别名",
+  "range": "enum；ABR 实测 Mltp 17、linearHeight 10、Hght 4、CBrn 3、Sbtr 2、CDdg 1、hardMix 1（共 38）",
+  "sources": [
+   "re",
+   "abr",
+   "krita",
+   "parser"
+  ],
+  "krita_target": "Texture/Pattern/TexturingMode（0..15，Krita 16 成员）",
+  "verdict": "需校准"
+ },
+ {
+  "key": "textureBrightness",
+  "semantics": "纹理亮度（PS 单位）",
+  "range": "PS 逆向无 clamp（原样透传）；ABR 实测 −55..53；PS 文档 ±150",
+  "sources": [
+   "re",
+   "abr",
+   "krita",
+   "parser"
+  ],
+  "krita_target": "Texture/Pattern/Brightness（-1..1，掩码阶段再 clamp 0..1）",
+  "verdict": "需校准"
+ },
+ {
+  "key": "textureContrast",
+  "semantics": "纹理对比度（PS 单位）",
+  "range": "PS 逆向无 clamp（原样透传）；ABR 实测 −50..84；PS 文档 −50..100",
+  "sources": [
+   "re",
+   "abr",
+   "krita",
+   "parser"
+  ],
+  "krita_target": "Texture/Pattern/Contrast（0..2；C>50 结构性不可表达）",
+  "verdict": "需校准"
+ },
+ {
+  "key": "textureCoverage",
+  "semantics": "纹理覆盖（texture 子对象 bool 槽位，语义未定）",
+  "range": "bool",
+  "sources": [
+   "re"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定"
+ },
+ {
+  "key": "textureDepth",
+  "semantics": "纹理深度（%）",
+  "range": "PS 逆向 clamp [0,100]；ABR 实测 4..100",
+  "sources": [
+   "re",
+   "abr",
+   "krita",
+   "parser"
+  ],
+  "krita_target": "Texture/Strength/Value（高度系 min(1.0, 1.2×d/100)，>83% 提前饱和）",
+  "verdict": "需校准"
+ },
+ {
+  "key": "textureDepthDynamics",
+  "semantics": "纹理深度动态对象（bVTy / Mnm ）",
+  "range": "Objc（字段见 bVTy/Mnm ）",
+  "sources": [
+   "re",
+   "abr",
+   "krita",
+   "parser"
+  ],
+  "krita_target": "PressureTexture/Strength/ 启用位 + Texture/Strength/UseCurve",
+  "verdict": "可映射"
+ },
+ {
+  "key": "textureInteractionLock",
+  "semantics": "纹理交互锁定标志（PS 面板锁定状态）",
+  "range": "bool",
+  "sources": [
+   "re"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "textureScale",
+  "semantics": "纹理缩放（%）",
+  "range": "PS 逆向 clamp [1,1000]；ABR 实测 16..280（超 Krita UI 滑块 200%）；转换器写 clamp [0.01,10]",
+  "sources": [
+   "re",
+   "abr",
+   "krita",
+   "parser"
+  ],
+  "krita_target": "Texture/Pattern/Scale（读取无 clamp；UI 滑块 0..2，>2.0 可否编辑待人工实测）",
+  "verdict": "需校准"
+ },
+ {
+  "key": "tiltScale",
+  "semantics": "倾斜缩放（%）",
+  "range": "ABR 实测 200..200（恒定值，仅 1 种取值）",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定"
+ },
+ {
+  "key": "toolOptions",
+  "semantics": "工具选项子树（不透明度/流量/平滑/橡皮标记等）",
+  "range": "Objc 容器",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "useBrushGroup",
+  "semantics": "启用笔刷组",
+  "range": "bool",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定"
+ },
+ {
+  "key": "useBrushPose",
+  "semantics": "启用笔刷姿态（PS 2023+ 3D 笔刷姿态）",
+  "range": "bool",
+  "sources": [
+   "re",
+   "abr",
+   "parser"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "useBrushSize",
+  "semantics": "笔刷组-使用大小",
+  "range": "bool",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "useColorDynamics",
+  "semantics": "启用颜色动态",
+  "range": "bool",
+  "sources": [
+   "re",
+   "abr",
+   "parser"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定"
+ },
+ {
+  "key": "useDualBrush",
+  "semantics": "启用双笔刷",
+  "range": "bool",
+  "sources": [
+   "re",
+   "abr",
+   "parser"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "useLegacy",
+  "semantics": "兼容旧版（工具选项）",
+  "range": "bool",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "usePaintDynamics",
+  "semantics": "启用绘制动态（PS 面板总开关）",
+  "range": "bool",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "usePressureOverridesOpacity",
+  "semantics": "压感覆盖不透明度（工具级开关）",
+  "range": "bool",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "usePressureOverridesSize",
+  "semantics": "压感覆盖画笔大小（工具级开关）",
+  "range": "bool",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "useScatter",
+  "semantics": "启用散布",
+  "range": "bool",
+  "sources": [
+   "re",
+   "abr",
+   "krita",
+   "parser"
+  ],
+  "krita_target": "PressureScatter（Krita 里是散布选项启用位）",
+  "verdict": "可映射"
+ },
+ {
+  "key": "useTexture",
+  "semantics": "启用纹理",
+  "range": "bool",
+  "sources": [
+   "re",
+   "abr",
+   "krita",
+   "parser"
+  ],
+  "krita_target": "Texture/Pattern/Enabled",
+  "verdict": "可映射"
+ },
+ {
+  "key": "useTipDynamics",
+  "semantics": "启用笔尖动态（PS 面板总开关）",
+  "range": "bool",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "wetEdges",
+  "semantics": "湿边（工具选项/批量 IO 结构）",
+  "range": "bool",
+  "sources": [
+   "re"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "wetEdgesLock",
+  "semantics": "湿边锁定标志（PS 笔刷预设标志块的 bool 槽位）",
+  "range": "bool",
+  "sources": [
+   "re"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "wtVr",
+  "semantics": "湿度动态对象（湿边关联，4CC）",
+  "range": "Objc；ABR 14 次",
+  "sources": [
+   "re",
+   "abr"
+  ],
+  "krita_target": "无对应",
+  "verdict": "无对应"
+ },
+ {
+  "key": "zuid",
+  "semantics": "预设唯一 id（PS 内部标识）",
+  "range": "未见类型证据",
+  "sources": [
+   "re"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定"
+ }
+]
