@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0",
+  "description": "任务 22 外部公开 ABR 样本登记。只有 URL 与 sha256 入仓库；.abr 文件本身不入库（下载到 %TEMP%/brushconverter-team/abr-samples/ 使用，用完即可删）。",
+  "fetched_at": "2026-11-19",
+  "source_pages": [
+    "https://loony-archivist.com/temp/stuff/Brushes/Adobe%20Photoshop%20Only/  （公开开放目录，2026-11-19 抓取时列出 4 个 .abr）"
+  ],
+  "download_recipe": [
+    "mkdir -p \"$TEMP/brushconverter-team/abr-samples\" && cd \"$TEMP/brushconverter-team/abr-samples\"",
+    "curl -fsSL '<url>' -o '<file_name>'   # 对下表每个样本各执行一次",
+    "sha256sum *.abr                      # 与下表 sha256 对齐后才可用于扫描"
+  ],
+  "samples": [
+    {
+      "file_name": "Dry Media Brushes.abr",
+      "url": "https://loony-archivist.com/temp/stuff/Brushes/Adobe%20Photoshop%20Only/Dry%20Media%20Brushes.abr",
+      "sha256": "d8ccece6780a8c5ae2dacd6aa8094eb3d94001dbafe786c565475de850ec9f69",
+      "bytes": 1092651,
+      "abr_version": "6.1",
+      "presets": 21,
+      "desc_keys": 45
+    },
+    {
+      "file_name": "Special Effect Brushes.abr",
+      "url": "https://loony-archivist.com/temp/stuff/Brushes/Adobe%20Photoshop%20Only/Special%20Effect%20Brushes.abr",
+      "sha256": "3b59dd196a1dbec3c502b42f153baad62328ab081f149f74355c23d7b8247329",
+      "bytes": 1974272,
+      "abr_version": "6.1",
+      "presets": 0,
+      "desc_keys": 0,
+      "note": "无 desc 区段（只有采样笔尖，属无预设的旧式文件），无法提供 desc 键"
+    },
+    {
+      "file_name": "Thick Heavy Brushes.abr",
+      "url": "https://loony-archivist.com/temp/stuff/Brushes/Adobe%20Photoshop%20Only/Thick%20Heavy%20Brushes.abr",
+      "sha256": "4c6faa5d791375bad27441770b5e146605145ea0c75e36d1ca38b32e0bc58310",
+      "bytes": 231856,
+      "abr_version": "6.1",
+      "presets": 5,
+      "desc_keys": 35
+    },
+    {
+      "file_name": "Wet Media Brushes.abr",
+      "url": "https://loony-archivist.com/temp/stuff/Brushes/Adobe%20Photoshop%20Only/Wet%20Media%20Brushes.abr",
+      "sha256": "f413eaa368560c8f453f8b17e4f8ca2995892ac4fe1ea62da9b6b260693a4e19",
+      "bytes": 1057987,
+      "abr_version": "6.1",
+      "presets": 26,
+      "desc_keys": 50
+    }
+  ]
+}

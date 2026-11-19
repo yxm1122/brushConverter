@@ -1,0 +1,2609 @@
+{
+ "schema_version": "1.0",
+ "tool": "tools/scan_abr_keys.py",
+ "description": "ABR desc 键实测集合（任务 22）。每个键含 key/count/type/samples/in_repo_parser。",
+ "in_repo_parser_rule": "该键是否作为字符串字面量出现在 src/brush_converter/**/*.py（ast 精确匹配，含尾空格；如 'Mnm '）。命中位置见该键的 repo_refs。",
+ "inputs": {
+  "dirs": [
+   "tests",
+   "%TEMP%/brushconverter-team/abr-samples"
+  ],
+  "external_label": "%TEMP%/brushconverter-team/abr-samples",
+  "repo_src": "src/brush_converter",
+  "max_samples": 8
+ },
+ "totals": {
+  "files": 7,
+  "files_repo": 3,
+  "files_external": 4,
+  "files_ok": 6,
+  "files_failed": 1,
+  "presets": 79,
+  "keys_total": 91,
+  "keys_in_repo_parser": 39,
+  "keys_not_in_repo_parser": 52,
+  "occurrences": 5240
+ },
+ "files": [
+  {
+   "name": "tests/定量测试专用.abr",
+   "source": "repo",
+   "sha256": "8feb07d3b844f2c48470af1878f3ff18488e8462137e35d7b096195341be768b",
+   "bytes": 11061688,
+   "version": 6,
+   "subversion": 2,
+   "presets": 1,
+   "desc_bytes": 2093,
+   "keys": 64,
+   "occurrences": 80,
+   "parse_ok": true,
+   "error": null,
+   "diagnostics": [
+    "samp 区为空，未包含任何采样笔尖"
+   ]
+  },
+  {
+   "name": "tests/测试用.abr",
+   "source": "repo",
+   "sha256": "781176f69d3567e14847adb743c2243699044a92db50b4a810bc4d7e00be6bdc",
+   "bytes": 691524,
+   "version": 6,
+   "subversion": 2,
+   "presets": 6,
+   "desc_bytes": 16241,
+   "keys": 76,
+   "occurrences": 621,
+   "parse_ok": true,
+   "error": null,
+   "diagnostics": []
+  },
+  {
+   "name": "tests/海怪笔刷-详情展示的勾线笔套装组18支.abr",
+   "source": "repo",
+   "sha256": "24c05a0caacb75914d1ead2167f285ac31066f6e052c9d564a9ce35ce7445f5b",
+   "bytes": 42150208,
+   "version": 6,
+   "subversion": 2,
+   "presets": 20,
+   "desc_bytes": 42616,
+   "keys": 89,
+   "occurrences": 1659,
+   "parse_ok": true,
+   "error": null,
+   "diagnostics": []
+  },
+  {
+   "name": "Dry Media Brushes.abr",
+   "source": "external",
+   "sha256": "d8ccece6780a8c5ae2dacd6aa8094eb3d94001dbafe786c565475de850ec9f69",
+   "bytes": 1092651,
+   "version": 6,
+   "subversion": 1,
+   "presets": 21,
+   "desc_bytes": 33267,
+   "keys": 45,
+   "occurrences": 1218,
+   "parse_ok": true,
+   "error": null,
+   "diagnostics": []
+  },
+  {
+   "name": "Special Effect Brushes.abr",
+   "source": "external",
+   "sha256": "3b59dd196a1dbec3c502b42f153baad62328ab081f149f74355c23d7b8247329",
+   "bytes": 1974272,
+   "version": 6,
+   "subversion": 1,
+   "presets": 0,
+   "desc_bytes": 0,
+   "keys": 0,
+   "occurrences": 0,
+   "parse_ok": false,
+   "error": "无 desc 区段（v1/v2 旧格式或非预设型 ABR）",
+   "diagnostics": [
+    "区段 'patt' 声明长度 2586672B 超出文件（仅剩 1933592B），已按剩余长度截断",
+    "patt 区解析失败：图案记录越界: @1499136 len=1087529 超出区段"
+   ]
+  },
+  {
+   "name": "Thick Heavy Brushes.abr",
+   "source": "external",
+   "sha256": "4c6faa5d791375bad27441770b5e146605145ea0c75e36d1ca38b32e0bc58310",
+   "bytes": 231856,
+   "version": 6,
+   "subversion": 1,
+   "presets": 5,
+   "desc_bytes": 6528,
+   "keys": 35,
+   "occurrences": 234,
+   "parse_ok": true,
+   "error": null,
+   "diagnostics": []
+  },
+  {
+   "name": "Wet Media Brushes.abr",
+   "source": "external",
+   "sha256": "f413eaa368560c8f453f8b17e4f8ca2995892ac4fe1ea62da9b6b260693a4e19",
+   "bytes": 1057987,
+   "version": 6,
+   "subversion": 1,
+   "presets": 26,
+   "desc_bytes": 39059,
+   "keys": 50,
+   "occurrences": 1428,
+   "parse_ok": true,
+   "error": null,
+   "diagnostics": []
+  }
+ ],
+ "keys": [
+  {
+   "key": "Angl",
+   "count": 123,
+   "type": "UntF",
+   "types": [
+    "UntF"
+   ],
+   "samples": [
+    "0 #Ang",
+    "74 #Ang",
+    "-33 #Ang",
+    "88 #Ang",
+    "27 #Ang",
+    "90 #Ang",
+    "13 #Ang",
+    "8 #Ang"
+   ],
+   "in_repo_parser": true,
+   "repo_refs": [
+    "src/brush_converter/mapping.py:215"
+   ],
+   "count_files": 6,
+   "paths": [
+    "Brsh[].Brsh.Angl (×79)",
+    "Brsh[].dualBrush.Brsh.Angl (×44)"
+   ],
+   "depths": [
+    2,
+    3
+   ],
+   "value_range": {
+    "min": -33.0,
+    "max": 90.0
+   },
+   "units": [
+    "#Ang"
+   ]
+  },
+  {
+   "key": "BlnM",
+   "count": 44,
+   "type": "enum",
+   "types": [
+    "enum"
+   ],
+   "samples": [
+    "BlnM:CBrn",
+    "BlnM:hardMix",
+    "BlnM:Mltp",
+    "BlnM:CDdg",
+    "BlnM:Ovrl",
+    "BlnM:linearBurn",
+    "BlnM:Drkn"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 5,
+   "paths": [
+    "Brsh[].dualBrush.BlnM (×44)"
+   ],
+   "depths": [
+    2
+   ],
+   "value_counts": {
+    "BlnM:Mltp": 26,
+    "BlnM:CBrn": 9,
+    "BlnM:Drkn": 4,
+    "BlnM:hardMix": 2,
+    "BlnM:CDdg": 1,
+    "BlnM:Ovrl": 1,
+    "BlnM:linearBurn": 1
+   }
+  },
+  {
+   "key": "Brgh",
+   "count": 2,
+   "type": "UntF",
+   "types": [
+    "UntF"
+   ],
+   "samples": [
+    "4 #Prc",
+    "0 #Prc"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 2,
+   "paths": [
+    "Brsh[].Brgh (×2)"
+   ],
+   "depths": [
+    1
+   ],
+   "value_range": {
+    "min": 0.0,
+    "max": 4.0
+   },
+   "units": [
+    "#Prc"
+   ]
+  },
+  {
+   "key": "Brsh",
+   "count": 129,
+   "type": "Objc|VlLs",
+   "types": [
+    "Objc",
+    "VlLs"
+   ],
+   "samples": [
+    "<VlLs n=1>",
+    "<Objc computedBrush n=8>",
+    "<VlLs n=6>",
+    "<Objc sampledBrush n=9>",
+    "<VlLs n=20>",
+    "<VlLs n=21>",
+    "<Objc sampledBrush n=7>",
+    "<Objc computedBrush n=6>"
+   ],
+   "in_repo_parser": true,
+   "repo_refs": [
+    "src/brush_converter/abr/descriptors.py:254",
+    "src/brush_converter/mapping.py:211"
+   ],
+   "count_files": 6,
+   "paths": [
+    "Brsh[].Brsh (×79)",
+    "Brsh[].dualBrush.Brsh (×44)",
+    "Brsh (×6)"
+   ],
+   "depths": [
+    0,
+    1,
+    2
+   ]
+  },
+  {
+   "key": "Cnt ",
+   "count": 77,
+   "type": "doub",
+   "types": [
+    "doub"
+   ],
+   "samples": [
+    "1",
+    "4",
+    "5",
+    "2",
+    "3"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 5,
+   "paths": [
+    "Brsh[].dualBrush.Cnt  (×44)",
+    "Brsh[].Cnt  (×33)"
+   ],
+   "depths": [
+    1,
+    2
+   ],
+   "value_range": {
+    "min": 1.0,
+    "max": 5.0
+   },
+   "value_counts": {
+    "1": 60,
+    "4": 6,
+    "3": 4,
+    "5": 4,
+    "2": 3
+   }
+  },
+  {
+   "key": "Dmtr",
+   "count": 123,
+   "type": "UntF",
+   "types": [
+    "UntF"
+   ],
+   "samples": [
+    "200 #Pxl",
+    "8 #Pxl",
+    "10 #Pxl",
+    "25 #Pxl",
+    "16 #Pxl",
+    "112 #Pxl",
+    "80 #Pxl",
+    "60 #Pxl"
+   ],
+   "in_repo_parser": true,
+   "repo_refs": [
+    "src/brush_converter/mapping.py:218",
+    "src/brush_converter/mapping.py:303"
+   ],
+   "count_files": 6,
+   "paths": [
+    "Brsh[].Brsh.Dmtr (×79)",
+    "Brsh[].dualBrush.Brsh.Dmtr (×44)"
+   ],
+   "depths": [
+    2,
+    3
+   ],
+   "value_range": {
+    "min": 1.0,
+    "max": 1920.0
+   },
+   "units": [
+    "#Pxl"
+   ]
+  },
+  {
+   "key": "ErsB",
+   "count": 1,
+   "type": "long",
+   "types": [
+    "long"
+   ],
+   "samples": [
+    "1"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 1,
+   "paths": [
+    "Brsh[].toolOptions.ErsB (×1)"
+   ],
+   "depths": [
+    2
+   ],
+   "value_range": {
+    "min": 1.0,
+    "max": 1.0
+   },
+   "value_counts": {
+    "1": 1
+   }
+  },
+  {
+   "key": "Flip",
+   "count": 5,
+   "type": "bool",
+   "types": [
+    "bool"
+   ],
+   "samples": [
+    "false",
+    "true"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 2,
+   "paths": [
+    "Brsh[].dualBrush.Flip (×5)"
+   ],
+   "depths": [
+    2
+   ]
+  },
+  {
+   "key": "H   ",
+   "count": 2,
+   "type": "UntF",
+   "types": [
+    "UntF"
+   ],
+   "samples": [
+    "5 #Prc",
+    "0 #Prc"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 2,
+   "paths": [
+    "Brsh[].H    (×2)"
+   ],
+   "depths": [
+    1
+   ],
+   "value_range": {
+    "min": 0.0,
+    "max": 5.0
+   },
+   "units": [
+    "#Prc"
+   ]
+  },
+  {
+   "key": "Hrdn",
+   "count": 36,
+   "type": "UntF",
+   "types": [
+    "UntF"
+   ],
+   "samples": [
+    "100 #Prc",
+    "84 #Prc",
+    "0 #Prc",
+    "81 #Prc",
+    "4 #Prc"
+   ],
+   "in_repo_parser": true,
+   "repo_refs": [
+    "src/brush_converter/mapping.py:219",
+    "src/brush_converter/mapping.py:303"
+   ],
+   "count_files": 4,
+   "paths": [
+    "Brsh[].Brsh.Hrdn (×31)",
+    "Brsh[].dualBrush.Brsh.Hrdn (×5)"
+   ],
+   "depths": [
+    2,
+    3
+   ],
+   "value_range": {
+    "min": 0.0,
+    "max": 100.0
+   },
+   "units": [
+    "#Prc"
+   ]
+  },
+  {
+   "key": "Idnt",
+   "count": 38,
+   "type": "TEXT",
+   "types": [
+    "TEXT"
+   ],
+   "samples": [
+    "66e2987f-d47b-fa49-9e36-3ffa8b78533a",
+    "2ab8ff79-7c39-11d4-97f0-ce0e81abb313",
+    "c02fddff-f05a-1172-9a0f-f7bad69dd4b0",
+    "9e8a69ab-246a-b249-ac0b-216c91be6bcb",
+    "6d20bdc8-e1ab-11d5-913f-bc81e4dfd608",
+    "82b7191d-dbd4-1172-b2ae-cff36c934fbe",
+    "438c2948-d232-11e5-b988-9ff33e1af9cd",
+    "69d92381-cf86-a54b-9d04-7f0fc2d9345b"
+   ],
+   "in_repo_parser": true,
+   "repo_refs": [
+    "src/brush_converter/abr/descriptors.py:232",
+    "src/brush_converter/mapping.py:138"
+   ],
+   "count_files": 5,
+   "paths": [
+    "Brsh[].Txtr.Idnt (×38)"
+   ],
+   "depths": [
+    2
+   ]
+  },
+  {
+   "key": "Intr",
+   "count": 123,
+   "type": "bool",
+   "types": [
+    "bool"
+   ],
+   "samples": [
+    "true",
+    "false"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 6,
+   "paths": [
+    "Brsh[].Brsh.Intr (×79)",
+    "Brsh[].dualBrush.Brsh.Intr (×44)"
+   ],
+   "depths": [
+    2,
+    3
+   ]
+  },
+  {
+   "key": "InvT",
+   "count": 38,
+   "type": "bool",
+   "types": [
+    "bool"
+   ],
+   "samples": [
+    "true",
+    "false"
+   ],
+   "in_repo_parser": true,
+   "repo_refs": [
+    "src/brush_converter/mapping.py:154"
+   ],
+   "count_files": 5,
+   "paths": [
+    "Brsh[].InvT (×38)"
+   ],
+   "depths": [
+    1
+   ]
+  },
+  {
+   "key": "Md  ",
+   "count": 19,
+   "type": "enum",
+   "types": [
+    "enum"
+   ],
+   "samples": [
+    "BlnM:Nrml"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 3,
+   "paths": [
+    "Brsh[].toolOptions.Md   (×19)"
+   ],
+   "depths": [
+    2
+   ],
+   "value_counts": {
+    "BlnM:Nrml": 19
+   }
+  },
+  {
+   "key": "MgcE",
+   "count": 1,
+   "type": "bool",
+   "types": [
+    "bool"
+   ],
+   "samples": [
+    "false"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 1,
+   "paths": [
+    "Brsh[].toolOptions.MgcE (×1)"
+   ],
+   "depths": [
+    2
+   ]
+  },
+  {
+   "key": "Mnm ",
+   "count": 183,
+   "type": "UntF",
+   "types": [
+    "UntF"
+   ],
+   "samples": [
+    "0 #Prc",
+    "30 #Prc",
+    "49 #Prc",
+    "17 #Prc",
+    "80 #Prc",
+    "65 #Prc",
+    "9 #Prc",
+    "99 #Prc"
+   ],
+   "in_repo_parser": true,
+   "repo_refs": [
+    "src/brush_converter/mapping.py:158",
+    "src/brush_converter/mapping.py:251",
+    "src/brush_converter/mapping.py:256"
+   ],
+   "count_files": 3,
+   "paths": [
+    "Brsh[].angleDynamics.Mnm  (×20)",
+    "Brsh[].roundnessDynamics.Mnm  (×20)",
+    "Brsh[].szVr.Mnm  (×20)",
+    "Brsh[].textureDepthDynamics.Mnm  (×16)",
+    "Brsh[].countDynamics.Mnm  (×14)",
+    "Brsh[].mxVr.Mnm  (×14)",
+    "Brsh[].opVr.Mnm  (×14)",
+    "Brsh[].prVr.Mnm  (×14)",
+    "Brsh[].scatterDynamics.Mnm  (×14)",
+    "Brsh[].wtVr.Mnm  (×14)"
+   ],
+   "depths": [
+    2,
+    3
+   ],
+   "value_range": {
+    "min": 0.0,
+    "max": 100.0
+   },
+   "units": [
+    "#Prc"
+   ]
+  },
+  {
+   "key": "Nm  ",
+   "count": 204,
+   "type": "TEXT",
+   "types": [
+    "TEXT"
+   ],
+   "samples": [
+    "定量测试用",
+    "Shape 2.png",
+    "KYLE 终极硬心铅笔",
+    "炭笔形状 ",
+    "Stone",
+    "Kyle 的绘画盒 - 快乐 HB",
+    "铅笔 KTW 1",
+    "Fine Grain"
+   ],
+   "in_repo_parser": true,
+   "repo_refs": [
+    "src/brush_converter/mapping.py:139",
+    "src/brush_converter/mapping.py:210"
+   ],
+   "count_files": 6,
+   "paths": [
+    "Brsh[].Nm   (×79)",
+    "Brsh[].Brsh.Nm   (×48)",
+    "Brsh[].dualBrush.Brsh.Nm   (×39)",
+    "Brsh[].Txtr.Nm   (×38)"
+   ],
+   "depths": [
+    1,
+    2,
+    3
+   ]
+  },
+  {
+   "key": "Nose",
+   "count": 79,
+   "type": "bool",
+   "types": [
+    "bool"
+   ],
+   "samples": [
+    "false",
+    "true"
+   ],
+   "in_repo_parser": true,
+   "repo_refs": [
+    "src/brush_converter/mapping.py:326"
+   ],
+   "count_files": 6,
+   "paths": [
+    "Brsh[].Nose (×79)"
+   ],
+   "depths": [
+    1
+   ]
+  },
+  {
+   "key": "Opct",
+   "count": 20,
+   "type": "long",
+   "types": [
+    "long"
+   ],
+   "samples": [
+    "100"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 3,
+   "paths": [
+    "Brsh[].toolOptions.Opct (×20)"
+   ],
+   "depths": [
+    2
+   ],
+   "value_range": {
+    "min": 100.0,
+    "max": 100.0
+   },
+   "value_counts": {
+    "100": 20
+   }
+  },
+  {
+   "key": "Rndn",
+   "count": 123,
+   "type": "UntF",
+   "types": [
+    "UntF"
+   ],
+   "samples": [
+    "100 #Prc",
+    "24 #Prc",
+    "32 #Prc",
+    "28 #Prc",
+    "56 #Prc",
+    "20 #Prc",
+    "72 #Prc",
+    "52 #Prc"
+   ],
+   "in_repo_parser": true,
+   "repo_refs": [
+    "src/brush_converter/mapping.py:216",
+    "src/brush_converter/mapping.py:303"
+   ],
+   "count_files": 6,
+   "paths": [
+    "Brsh[].Brsh.Rndn (×79)",
+    "Brsh[].dualBrush.Brsh.Rndn (×44)"
+   ],
+   "depths": [
+    2,
+    3
+   ],
+   "value_range": {
+    "min": 20.0,
+    "max": 100.0
+   },
+   "units": [
+    "#Prc"
+   ]
+  },
+  {
+   "key": "Rpt ",
+   "count": 79,
+   "type": "bool",
+   "types": [
+    "bool"
+   ],
+   "samples": [
+    "false",
+    "true"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 6,
+   "paths": [
+    "Brsh[].Rpt  (×79)"
+   ],
+   "depths": [
+    1
+   ]
+  },
+  {
+   "key": "Smoo",
+   "count": 16,
+   "type": "long",
+   "types": [
+    "long"
+   ],
+   "samples": [
+    "20",
+    "0",
+    "35",
+    "32",
+    "18"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 3,
+   "paths": [
+    "Brsh[].toolOptions.Smoo (×16)"
+   ],
+   "depths": [
+    2
+   ],
+   "value_range": {
+    "min": 0.0,
+    "max": 35.0
+   },
+   "value_counts": {
+    "20": 6,
+    "32": 6,
+    "0": 2,
+    "18": 1,
+    "35": 1
+   }
+  },
+  {
+   "key": "Spcn",
+   "count": 176,
+   "type": "UntF",
+   "types": [
+    "UntF"
+   ],
+   "samples": [
+    "1000 #Prc",
+    "18 #Prc",
+    "9 #Prc",
+    "4 #Prc",
+    "10 #Prc",
+    "50 #Prc",
+    "8 #Prc",
+    "17 #Prc"
+   ],
+   "in_repo_parser": true,
+   "repo_refs": [
+    "src/brush_converter/mapping.py:213",
+    "src/brush_converter/mapping.py:303"
+   ],
+   "count_files": 6,
+   "paths": [
+    "Brsh[].Brsh.Spcn (×79)",
+    "Brsh[].dualBrush.Brsh.Spcn (×44)",
+    "Brsh[].dualBrush.Spcn (×41)",
+    "Brsh[].Spcn (×12)"
+   ],
+   "depths": [
+    1,
+    2,
+    3
+   ],
+   "value_range": {
+    "min": 1.0,
+    "max": 1000.0
+   },
+   "units": [
+    "#Prc"
+   ]
+  },
+  {
+   "key": "Strt",
+   "count": 2,
+   "type": "UntF",
+   "types": [
+    "UntF"
+   ],
+   "samples": [
+    "3 #Prc",
+    "0 #Prc"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 2,
+   "paths": [
+    "Brsh[].Strt (×2)"
+   ],
+   "depths": [
+    1
+   ],
+   "value_range": {
+    "min": 0.0,
+    "max": 3.0
+   },
+   "units": [
+    "#Prc"
+   ]
+  },
+  {
+   "key": "TxtC",
+   "count": 38,
+   "type": "bool",
+   "types": [
+    "bool"
+   ],
+   "samples": [
+    "true",
+    "false"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 5,
+   "paths": [
+    "Brsh[].TxtC (×38)"
+   ],
+   "depths": [
+    1
+   ]
+  },
+  {
+   "key": "Txtr",
+   "count": 38,
+   "type": "Objc",
+   "types": [
+    "Objc"
+   ],
+   "samples": [
+    "<Objc Ptrn n=2>"
+   ],
+   "in_repo_parser": true,
+   "repo_refs": [
+    "src/brush_converter/mapping.py:137"
+   ],
+   "count_files": 5,
+   "paths": [
+    "Brsh[].Txtr (×38)"
+   ],
+   "depths": [
+    1
+   ]
+  },
+  {
+   "key": "Wtdg",
+   "count": 79,
+   "type": "bool",
+   "types": [
+    "bool"
+   ],
+   "samples": [
+    "false",
+    "true"
+   ],
+   "in_repo_parser": true,
+   "repo_refs": [
+    "src/brush_converter/mapping.py:324"
+   ],
+   "count_files": 6,
+   "paths": [
+    "Brsh[].Wtdg (×79)"
+   ],
+   "depths": [
+    1
+   ]
+  },
+  {
+   "key": "angleDynamics",
+   "count": 42,
+   "type": "Objc",
+   "types": [
+    "Objc"
+   ],
+   "samples": [
+    "<Objc brVr n=4>",
+    "<Objc brVr n=3>"
+   ],
+   "in_repo_parser": true,
+   "repo_refs": [
+    "src/brush_converter/mapping.py:235"
+   ],
+   "count_files": 6,
+   "paths": [
+    "Brsh[].angleDynamics (×42)"
+   ],
+   "depths": [
+    1
+   ]
+  },
+  {
+   "key": "bVTy",
+   "count": 446,
+   "type": "long",
+   "types": [
+    "long"
+   ],
+   "samples": [
+    "0",
+    "2",
+    "5",
+    "6"
+   ],
+   "in_repo_parser": true,
+   "repo_refs": [
+    "src/brush_converter/mapping.py:245",
+    "src/brush_converter/mapping.py:250",
+    "src/brush_converter/mapping.py:255",
+    "src/brush_converter/mapping.py:260",
+    "src/brush_converter/mapping.py:264"
+   ],
+   "count_files": 6,
+   "paths": [
+    "Brsh[].dualBrush.countDynamics.bVTy (×44)",
+    "Brsh[].dualBrush.scatterDynamics.bVTy (×44)",
+    "Brsh[].opVr.bVTy (×43)",
+    "Brsh[].prVr.bVTy (×43)",
+    "Brsh[].angleDynamics.bVTy (×42)",
+    "Brsh[].roundnessDynamics.bVTy (×42)",
+    "Brsh[].szVr.bVTy (×42)",
+    "Brsh[].textureDepthDynamics.bVTy (×38)",
+    "Brsh[].countDynamics.bVTy (×33)",
+    "Brsh[].scatterDynamics.bVTy (×33)"
+   ],
+   "depths": [
+    2,
+    3
+   ],
+   "value_range": {
+    "min": 0.0,
+    "max": 6.0
+   },
+   "value_counts": {
+    "0": 327,
+    "2": 106,
+    "6": 12,
+    "5": 1
+   }
+  },
+  {
+   "key": "bothAxes",
+   "count": 77,
+   "type": "bool",
+   "types": [
+    "bool"
+   ],
+   "samples": [
+    "true",
+    "false"
+   ],
+   "in_repo_parser": true,
+   "repo_refs": [
+    "src/brush_converter/mapping.py:269"
+   ],
+   "count_files": 5,
+   "paths": [
+    "Brsh[].dualBrush.bothAxes (×44)",
+    "Brsh[].bothAxes (×33)"
+   ],
+   "depths": [
+    1,
+    2
+   ]
+  },
+  {
+   "key": "brushGroup",
+   "count": 27,
+   "type": "Objc",
+   "types": [
+    "Objc"
+   ],
+   "samples": [
+    "<Objc brushGroup n=1>"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 3,
+   "paths": [
+    "Brsh[].brushGroup (×27)"
+   ],
+   "depths": [
+    1
+   ]
+  },
+  {
+   "key": "brushPoseAngle",
+   "count": 4,
+   "type": "long",
+   "types": [
+    "long"
+   ],
+   "samples": [
+    "0"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 1,
+   "paths": [
+    "Brsh[].brushPoseAngle (×4)"
+   ],
+   "depths": [
+    1
+   ],
+   "value_range": {
+    "min": 0.0,
+    "max": 0.0
+   },
+   "value_counts": {
+    "0": 4
+   }
+  },
+  {
+   "key": "brushPosePressure",
+   "count": 4,
+   "type": "UntF",
+   "types": [
+    "UntF"
+   ],
+   "samples": [
+    "100 #Prc"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 1,
+   "paths": [
+    "Brsh[].brushPosePressure (×4)"
+   ],
+   "depths": [
+    1
+   ],
+   "value_range": {
+    "min": 100.0,
+    "max": 100.0
+   },
+   "units": [
+    "#Prc"
+   ]
+  },
+  {
+   "key": "brushPoseTiltX",
+   "count": 4,
+   "type": "long",
+   "types": [
+    "long"
+   ],
+   "samples": [
+    "0"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 1,
+   "paths": [
+    "Brsh[].brushPoseTiltX (×4)"
+   ],
+   "depths": [
+    1
+   ],
+   "value_range": {
+    "min": 0.0,
+    "max": 0.0
+   },
+   "value_counts": {
+    "0": 4
+   }
+  },
+  {
+   "key": "brushPoseTiltY",
+   "count": 4,
+   "type": "long",
+   "types": [
+    "long"
+   ],
+   "samples": [
+    "0"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 1,
+   "paths": [
+    "Brsh[].brushPoseTiltY (×4)"
+   ],
+   "depths": [
+    1
+   ],
+   "value_range": {
+    "min": 0.0,
+    "max": 0.0
+   },
+   "value_counts": {
+    "0": 4
+   }
+  },
+  {
+   "key": "brushPreset",
+   "count": 20,
+   "type": "bool",
+   "types": [
+    "bool"
+   ],
+   "samples": [
+    "true"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 3,
+   "paths": [
+    "Brsh[].toolOptions.brushPreset (×20)"
+   ],
+   "depths": [
+    2
+   ]
+  },
+  {
+   "key": "brushProjection",
+   "count": 20,
+   "type": "bool",
+   "types": [
+    "bool"
+   ],
+   "samples": [
+    "false"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 3,
+   "paths": [
+    "Brsh[].brushProjection (×20)"
+   ],
+   "depths": [
+    1
+   ]
+  },
+  {
+   "key": "clVr",
+   "count": 2,
+   "type": "Objc",
+   "types": [
+    "Objc"
+   ],
+   "samples": [
+    "<Objc brVr n=4>",
+    "<Objc brVr n=3>"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 2,
+   "paths": [
+    "Brsh[].clVr (×2)"
+   ],
+   "depths": [
+    1
+   ]
+  },
+  {
+   "key": "colorDynamicsPerTip",
+   "count": 1,
+   "type": "bool",
+   "types": [
+    "bool"
+   ],
+   "samples": [
+    "true"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 1,
+   "paths": [
+    "Brsh[].colorDynamicsPerTip (×1)"
+   ],
+   "depths": [
+    1
+   ]
+  },
+  {
+   "key": "countDynamics",
+   "count": 77,
+   "type": "Objc",
+   "types": [
+    "Objc"
+   ],
+   "samples": [
+    "<Objc brVr n=4>",
+    "<Objc brVr n=3>"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 5,
+   "paths": [
+    "Brsh[].dualBrush.countDynamics (×44)",
+    "Brsh[].countDynamics (×33)"
+   ],
+   "depths": [
+    1,
+    2
+   ]
+  },
+  {
+   "key": "dualBrush",
+   "count": 79,
+   "type": "Objc",
+   "types": [
+    "Objc"
+   ],
+   "samples": [
+    "<Objc dualBrush n=1>",
+    "<Objc dualBrush n=9>",
+    "<Objc dualBrush n=10>"
+   ],
+   "in_repo_parser": true,
+   "repo_refs": [
+    "src/brush_converter/mapping.py:330"
+   ],
+   "count_files": 6,
+   "paths": [
+    "Brsh[].dualBrush (×79)"
+   ],
+   "depths": [
+    1
+   ]
+  },
+  {
+   "key": "fStp",
+   "count": 446,
+   "type": "long",
+   "types": [
+    "long"
+   ],
+   "samples": [
+    "25",
+    "1",
+    "100"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 6,
+   "paths": [
+    "Brsh[].dualBrush.countDynamics.fStp (×44)",
+    "Brsh[].dualBrush.scatterDynamics.fStp (×44)",
+    "Brsh[].opVr.fStp (×43)",
+    "Brsh[].prVr.fStp (×43)",
+    "Brsh[].angleDynamics.fStp (×42)",
+    "Brsh[].roundnessDynamics.fStp (×42)",
+    "Brsh[].szVr.fStp (×42)",
+    "Brsh[].textureDepthDynamics.fStp (×38)",
+    "Brsh[].countDynamics.fStp (×33)",
+    "Brsh[].scatterDynamics.fStp (×33)"
+   ],
+   "depths": [
+    2,
+    3
+   ],
+   "value_range": {
+    "min": 1.0,
+    "max": 100.0
+   },
+   "value_counts": {
+    "25": 316,
+    "1": 116,
+    "100": 14
+   }
+  },
+  {
+   "key": "flipX",
+   "count": 52,
+   "type": "bool",
+   "types": [
+    "bool"
+   ],
+   "samples": [
+    "false",
+    "true"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 3,
+   "paths": [
+    "Brsh[].Brsh.flipX (×27)",
+    "Brsh[].flipX (×20)",
+    "Brsh[].dualBrush.Brsh.flipX (×5)"
+   ],
+   "depths": [
+    1,
+    2,
+    3
+   ]
+  },
+  {
+   "key": "flipY",
+   "count": 52,
+   "type": "bool",
+   "types": [
+    "bool"
+   ],
+   "samples": [
+    "false",
+    "true"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 3,
+   "paths": [
+    "Brsh[].Brsh.flipY (×27)",
+    "Brsh[].flipY (×20)",
+    "Brsh[].dualBrush.Brsh.flipY (×5)"
+   ],
+   "depths": [
+    1,
+    2,
+    3
+   ]
+  },
+  {
+   "key": "flow",
+   "count": 20,
+   "type": "long",
+   "types": [
+    "long"
+   ],
+   "samples": [
+    "100",
+    "38",
+    "55",
+    "90"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 3,
+   "paths": [
+    "Brsh[].toolOptions.flow (×20)"
+   ],
+   "depths": [
+    2
+   ],
+   "value_range": {
+    "min": 38.0,
+    "max": 100.0
+   },
+   "value_counts": {
+    "100": 17,
+    "38": 1,
+    "55": 1,
+    "90": 1
+   }
+  },
+  {
+   "key": "interpretation",
+   "count": 16,
+   "type": "bool",
+   "types": [
+    "bool"
+   ],
+   "samples": [
+    "true"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 3,
+   "paths": [
+    "Brsh[].interpretation (×16)"
+   ],
+   "depths": [
+    1
+   ]
+  },
+  {
+   "key": "jitter",
+   "count": 446,
+   "type": "UntF",
+   "types": [
+    "UntF"
+   ],
+   "samples": [
+    "0 #Prc",
+    "15 #Prc",
+    "8 #Prc",
+    "30 #Prc",
+    "3 #Prc",
+    "4 #Prc",
+    "35 #Prc",
+    "100 #Prc"
+   ],
+   "in_repo_parser": true,
+   "repo_refs": [
+    "src/brush_converter/mapping.py:265",
+    "src/brush_converter/mapping.py:271",
+    "src/brush_converter/mapping.py:271"
+   ],
+   "count_files": 6,
+   "paths": [
+    "Brsh[].dualBrush.countDynamics.jitter (×44)",
+    "Brsh[].dualBrush.scatterDynamics.jitter (×44)",
+    "Brsh[].opVr.jitter (×43)",
+    "Brsh[].prVr.jitter (×43)",
+    "Brsh[].angleDynamics.jitter (×42)",
+    "Brsh[].roundnessDynamics.jitter (×42)",
+    "Brsh[].szVr.jitter (×42)",
+    "Brsh[].textureDepthDynamics.jitter (×38)",
+    "Brsh[].countDynamics.jitter (×33)",
+    "Brsh[].scatterDynamics.jitter (×33)"
+   ],
+   "depths": [
+    2,
+    3
+   ],
+   "value_range": {
+    "min": 0.0,
+    "max": 533.0
+   },
+   "units": [
+    "#Prc"
+   ]
+  },
+  {
+   "key": "minimumDepth",
+   "count": 38,
+   "type": "UntF",
+   "types": [
+    "UntF"
+   ],
+   "samples": [
+    "0 #Prc",
+    "100 #Prc",
+    "1 #Prc"
+   ],
+   "in_repo_parser": true,
+   "repo_refs": [
+    "src/brush_converter/mapping.py:143"
+   ],
+   "count_files": 5,
+   "paths": [
+    "Brsh[].minimumDepth (×38)"
+   ],
+   "depths": [
+    1
+   ],
+   "value_range": {
+    "min": 0.0,
+    "max": 100.0
+   },
+   "units": [
+    "#Prc"
+   ]
+  },
+  {
+   "key": "minimumDiameter",
+   "count": 42,
+   "type": "UntF",
+   "types": [
+    "UntF"
+   ],
+   "samples": [
+    "0 #Prc",
+    "30 #Prc",
+    "70 #Prc",
+    "16 #Prc",
+    "39 #Prc",
+    "75 #Prc",
+    "94 #Prc",
+    "1 #Prc"
+   ],
+   "in_repo_parser": true,
+   "repo_refs": [
+    "src/brush_converter/mapping.py:241"
+   ],
+   "count_files": 6,
+   "paths": [
+    "Brsh[].minimumDiameter (×42)"
+   ],
+   "depths": [
+    1
+   ],
+   "value_range": {
+    "min": 0.0,
+    "max": 94.0
+   },
+   "units": [
+    "#Prc"
+   ]
+  },
+  {
+   "key": "minimumRoundness",
+   "count": 42,
+   "type": "UntF",
+   "types": [
+    "UntF"
+   ],
+   "samples": [
+    "1 #Prc",
+    "25 #Prc",
+    "50 #Prc",
+    "40 #Prc",
+    "30 #Prc"
+   ],
+   "in_repo_parser": true,
+   "repo_refs": [
+    "src/brush_converter/mapping.py:242"
+   ],
+   "count_files": 6,
+   "paths": [
+    "Brsh[].minimumRoundness (×42)"
+   ],
+   "depths": [
+    1
+   ],
+   "value_range": {
+    "min": 1.0,
+    "max": 50.0
+   },
+   "units": [
+    "#Prc"
+   ]
+  },
+  {
+   "key": "mxVr",
+   "count": 14,
+   "type": "Objc",
+   "types": [
+    "Objc"
+   ],
+   "samples": [
+    "<Objc brVr n=4>"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 2,
+   "paths": [
+    "Brsh[].mxVr (×14)"
+   ],
+   "depths": [
+    1
+   ]
+  },
+  {
+   "key": "opVr",
+   "count": 47,
+   "type": "Objc",
+   "types": [
+    "Objc"
+   ],
+   "samples": [
+    "<Objc brVr n=4>",
+    "<Objc brVr n=3>"
+   ],
+   "in_repo_parser": true,
+   "repo_refs": [
+    "src/brush_converter/mapping.py:237"
+   ],
+   "count_files": 5,
+   "paths": [
+    "Brsh[].opVr (×43)",
+    "Brsh[].toolOptions.opVr (×4)"
+   ],
+   "depths": [
+    1,
+    2
+   ]
+  },
+  {
+   "key": "overridePoseAngle",
+   "count": 4,
+   "type": "bool",
+   "types": [
+    "bool"
+   ],
+   "samples": [
+    "false"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 1,
+   "paths": [
+    "Brsh[].overridePoseAngle (×4)"
+   ],
+   "depths": [
+    1
+   ]
+  },
+  {
+   "key": "overridePosePressure",
+   "count": 4,
+   "type": "bool",
+   "types": [
+    "bool"
+   ],
+   "samples": [
+    "false"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 1,
+   "paths": [
+    "Brsh[].overridePosePressure (×4)"
+   ],
+   "depths": [
+    1
+   ]
+  },
+  {
+   "key": "overridePoseTiltX",
+   "count": 4,
+   "type": "bool",
+   "types": [
+    "bool"
+   ],
+   "samples": [
+    "false"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 1,
+   "paths": [
+    "Brsh[].overridePoseTiltX (×4)"
+   ],
+   "depths": [
+    1
+   ]
+  },
+  {
+   "key": "overridePoseTiltY",
+   "count": 4,
+   "type": "bool",
+   "types": [
+    "bool"
+   ],
+   "samples": [
+    "false"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 1,
+   "paths": [
+    "Brsh[].overridePoseTiltY (×4)"
+   ],
+   "depths": [
+    1
+   ]
+  },
+  {
+   "key": "prVr",
+   "count": 47,
+   "type": "Objc",
+   "types": [
+    "Objc"
+   ],
+   "samples": [
+    "<Objc brVr n=4>",
+    "<Objc brVr n=3>"
+   ],
+   "in_repo_parser": true,
+   "repo_refs": [
+    "src/brush_converter/mapping.py:238"
+   ],
+   "count_files": 5,
+   "paths": [
+    "Brsh[].prVr (×43)",
+    "Brsh[].toolOptions.prVr (×4)"
+   ],
+   "depths": [
+    1,
+    2
+   ]
+  },
+  {
+   "key": "pressureSmoothing",
+   "count": 16,
+   "type": "bool",
+   "types": [
+    "bool"
+   ],
+   "samples": [
+    "false"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 3,
+   "paths": [
+    "Brsh[].toolOptions.pressureSmoothing (×16)"
+   ],
+   "depths": [
+    2
+   ]
+  },
+  {
+   "key": "protectTexture",
+   "count": 16,
+   "type": "bool",
+   "types": [
+    "bool"
+   ],
+   "samples": [
+    "false"
+   ],
+   "in_repo_parser": true,
+   "repo_refs": [
+    "src/brush_converter/mapping.py:318"
+   ],
+   "count_files": 3,
+   "paths": [
+    "Brsh[].protectTexture (×16)"
+   ],
+   "depths": [
+    1
+   ]
+  },
+  {
+   "key": "purity",
+   "count": 2,
+   "type": "UntF",
+   "types": [
+    "UntF"
+   ],
+   "samples": [
+    "0 #Prc"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 2,
+   "paths": [
+    "Brsh[].purity (×2)"
+   ],
+   "depths": [
+    1
+   ],
+   "value_range": {
+    "min": 0.0,
+    "max": 0.0
+   },
+   "units": [
+    "#Prc"
+   ]
+  },
+  {
+   "key": "roundnessDynamics",
+   "count": 42,
+   "type": "Objc",
+   "types": [
+    "Objc"
+   ],
+   "samples": [
+    "<Objc brVr n=4>",
+    "<Objc brVr n=3>"
+   ],
+   "in_repo_parser": true,
+   "repo_refs": [
+    "src/brush_converter/mapping.py:236"
+   ],
+   "count_files": 6,
+   "paths": [
+    "Brsh[].roundnessDynamics (×42)"
+   ],
+   "depths": [
+    1
+   ]
+  },
+  {
+   "key": "sampledData",
+   "count": 87,
+   "type": "TEXT",
+   "types": [
+    "TEXT"
+   ],
+   "samples": [
+    "5deeee77-dad9-1175-913f-a4bfcac45329",
+    "4b306c25-0b7c-1176-a06d-c0318a3f33bb",
+    "52ab1a2a-ccde-117a-8c15-80b7ba17fd69",
+    "5d7c3ee4-ce48-117a-b954-8a5f8a10caf7",
+    "cabec8bc-a3b8-117a-8c68-a08beca1d52a",
+    "accca262-cf18-117a-939e-b75e95d2e6f2",
+    "7a9c8c32-12ad-1176-9ba9-863921075fd3",
+    "e7caad8c-c44a-1176-906b-e19249714d58"
+   ],
+   "in_repo_parser": true,
+   "repo_refs": [
+    "src/brush_converter/mapping.py:222"
+   ],
+   "count_files": 5,
+   "paths": [
+    "Brsh[].Brsh.sampledData (×48)",
+    "Brsh[].dualBrush.Brsh.sampledData (×39)"
+   ],
+   "depths": [
+    2,
+    3
+   ]
+  },
+  {
+   "key": "scatterDynamics",
+   "count": 77,
+   "type": "Objc",
+   "types": [
+    "Objc"
+   ],
+   "samples": [
+    "<Objc brVr n=4>",
+    "<Objc brVr n=3>"
+   ],
+   "in_repo_parser": true,
+   "repo_refs": [
+    "src/brush_converter/mapping.py:239"
+   ],
+   "count_files": 5,
+   "paths": [
+    "Brsh[].dualBrush.scatterDynamics (×44)",
+    "Brsh[].scatterDynamics (×33)"
+   ],
+   "depths": [
+    1,
+    2
+   ]
+  },
+  {
+   "key": "smoothing",
+   "count": 72,
+   "type": "bool",
+   "types": [
+    "bool"
+   ],
+   "samples": [
+    "false",
+    "true"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 6,
+   "paths": [
+    "Brsh[].smoothing (×52)",
+    "Brsh[].toolOptions.smoothing (×20)"
+   ],
+   "depths": [
+    1,
+    2
+   ]
+  },
+  {
+   "key": "smoothingCatchup",
+   "count": 16,
+   "type": "bool",
+   "types": [
+    "bool"
+   ],
+   "samples": [
+    "true"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 3,
+   "paths": [
+    "Brsh[].toolOptions.smoothingCatchup (×16)"
+   ],
+   "depths": [
+    2
+   ]
+  },
+  {
+   "key": "smoothingCatchupAtEnd",
+   "count": 16,
+   "type": "bool",
+   "types": [
+    "bool"
+   ],
+   "samples": [
+    "false"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 3,
+   "paths": [
+    "Brsh[].toolOptions.smoothingCatchupAtEnd (×16)"
+   ],
+   "depths": [
+    2
+   ]
+  },
+  {
+   "key": "smoothingRadiusMode",
+   "count": 16,
+   "type": "bool",
+   "types": [
+    "bool"
+   ],
+   "samples": [
+    "false"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 3,
+   "paths": [
+    "Brsh[].toolOptions.smoothingRadiusMode (×16)"
+   ],
+   "depths": [
+    2
+   ]
+  },
+  {
+   "key": "smoothingValue",
+   "count": 16,
+   "type": "doub",
+   "types": [
+    "doub"
+   ],
+   "samples": [
+    "51",
+    "0",
+    "89",
+    "82",
+    "46"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 3,
+   "paths": [
+    "Brsh[].toolOptions.smoothingValue (×16)"
+   ],
+   "depths": [
+    2
+   ],
+   "value_range": {
+    "min": 0.0,
+    "max": 89.0
+   },
+   "value_counts": {
+    "51": 6,
+    "82": 6,
+    "0": 2,
+    "46": 1,
+    "89": 1
+   }
+  },
+  {
+   "key": "smoothingZoomCompensation",
+   "count": 16,
+   "type": "bool",
+   "types": [
+    "bool"
+   ],
+   "samples": [
+    "true"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 3,
+   "paths": [
+    "Brsh[].toolOptions.smoothingZoomCompensation (×16)"
+   ],
+   "depths": [
+    2
+   ]
+  },
+  {
+   "key": "szVr",
+   "count": 46,
+   "type": "Objc",
+   "types": [
+    "Objc"
+   ],
+   "samples": [
+    "<Objc brVr n=4>",
+    "<Objc brVr n=3>"
+   ],
+   "in_repo_parser": true,
+   "repo_refs": [
+    "src/brush_converter/mapping.py:234"
+   ],
+   "count_files": 6,
+   "paths": [
+    "Brsh[].szVr (×42)",
+    "Brsh[].toolOptions.szVr (×4)"
+   ],
+   "depths": [
+    1,
+    2
+   ]
+  },
+  {
+   "key": "textureBlendMode",
+   "count": 38,
+   "type": "enum",
+   "types": [
+    "enum"
+   ],
+   "samples": [
+    "BlnM:linearHeight",
+    "BlnM:Hght",
+    "BlnM:Sbtr",
+    "BlnM:hardMix",
+    "BlnM:CBrn",
+    "BlnM:Mltp",
+    "BlnM:CDdg"
+   ],
+   "in_repo_parser": true,
+   "repo_refs": [
+    "src/brush_converter/mapping.py:128"
+   ],
+   "count_files": 5,
+   "paths": [
+    "Brsh[].textureBlendMode (×38)"
+   ],
+   "depths": [
+    1
+   ],
+   "value_counts": {
+    "BlnM:Mltp": 17,
+    "BlnM:linearHeight": 10,
+    "BlnM:Hght": 4,
+    "BlnM:CBrn": 3,
+    "BlnM:Sbtr": 2,
+    "BlnM:CDdg": 1,
+    "BlnM:hardMix": 1
+   }
+  },
+  {
+   "key": "textureBrightness",
+   "count": 16,
+   "type": "long",
+   "types": [
+    "long"
+   ],
+   "samples": [
+    "0",
+    "-55",
+    "2",
+    "-10",
+    "53",
+    "-37",
+    "-21",
+    "40"
+   ],
+   "in_repo_parser": true,
+   "repo_refs": [
+    "src/brush_converter/mapping.py:147"
+   ],
+   "count_files": 3,
+   "paths": [
+    "Brsh[].textureBrightness (×16)"
+   ],
+   "depths": [
+    1
+   ],
+   "value_range": {
+    "min": -55.0,
+    "max": 53.0
+   },
+   "value_counts": {
+    "0": 4,
+    "-8": 2,
+    "-10": 1,
+    "-21": 1,
+    "-27": 1,
+    "-31": 1,
+    "-37": 1,
+    "-55": 1,
+    "10": 1,
+    "2": 1,
+    "40": 1,
+    "53": 1
+   }
+  },
+  {
+   "key": "textureContrast",
+   "count": 16,
+   "type": "long",
+   "types": [
+    "long"
+   ],
+   "samples": [
+    "0",
+    "44",
+    "37",
+    "38",
+    "9",
+    "-50",
+    "84",
+    "6"
+   ],
+   "in_repo_parser": true,
+   "repo_refs": [
+    "src/brush_converter/mapping.py:148"
+   ],
+   "count_files": 3,
+   "paths": [
+    "Brsh[].textureContrast (×16)"
+   ],
+   "depths": [
+    1
+   ],
+   "value_range": {
+    "min": -50.0,
+    "max": 84.0
+   },
+   "value_counts": {
+    "0": 3,
+    "-17": 2,
+    "-40": 2,
+    "-50": 2,
+    "-12": 1,
+    "37": 1,
+    "38": 1,
+    "44": 1,
+    "6": 1,
+    "84": 1,
+    "9": 1
+   }
+  },
+  {
+   "key": "textureDepth",
+   "count": 38,
+   "type": "UntF",
+   "types": [
+    "UntF"
+   ],
+   "samples": [
+    "6 #Prc",
+    "25 #Prc",
+    "11 #Prc",
+    "78 #Prc",
+    "39 #Prc",
+    "19 #Prc",
+    "55 #Prc",
+    "5 #Prc"
+   ],
+   "in_repo_parser": true,
+   "repo_refs": [
+    "src/brush_converter/mapping.py:149"
+   ],
+   "count_files": 5,
+   "paths": [
+    "Brsh[].textureDepth (×38)"
+   ],
+   "depths": [
+    1
+   ],
+   "value_range": {
+    "min": 4.0,
+    "max": 100.0
+   },
+   "units": [
+    "#Prc"
+   ]
+  },
+  {
+   "key": "textureDepthDynamics",
+   "count": 38,
+   "type": "Objc",
+   "types": [
+    "Objc"
+   ],
+   "samples": [
+    "<Objc brVr n=4>",
+    "<Objc brVr n=3>"
+   ],
+   "in_repo_parser": true,
+   "repo_refs": [
+    "src/brush_converter/mapping.py:142"
+   ],
+   "count_files": 5,
+   "paths": [
+    "Brsh[].textureDepthDynamics (×38)"
+   ],
+   "depths": [
+    1
+   ]
+  },
+  {
+   "key": "textureScale",
+   "count": 38,
+   "type": "UntF",
+   "types": [
+    "UntF"
+   ],
+   "samples": [
+    "20 #Prc",
+    "50 #Prc",
+    "42 #Prc",
+    "100 #Prc",
+    "51 #Prc",
+    "17 #Prc",
+    "73 #Prc",
+    "37 #Prc"
+   ],
+   "in_repo_parser": true,
+   "repo_refs": [
+    "src/brush_converter/mapping.py:146"
+   ],
+   "count_files": 5,
+   "paths": [
+    "Brsh[].textureScale (×38)"
+   ],
+   "depths": [
+    1
+   ],
+   "value_range": {
+    "min": 16.0,
+    "max": 280.0
+   },
+   "units": [
+    "#Prc"
+   ]
+  },
+  {
+   "key": "tiltScale",
+   "count": 42,
+   "type": "UntF",
+   "types": [
+    "UntF"
+   ],
+   "samples": [
+    "200 #Prc"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 6,
+   "paths": [
+    "Brsh[].tiltScale (×42)"
+   ],
+   "depths": [
+    1
+   ],
+   "value_range": {
+    "min": 200.0,
+    "max": 200.0
+   },
+   "units": [
+    "#Prc"
+   ]
+  },
+  {
+   "key": "toolOptions",
+   "count": 20,
+   "type": "Objc",
+   "types": [
+    "Objc"
+   ],
+   "samples": [
+    "<Objc PbTl n=15>",
+    "<Objc PbTl n=11>",
+    "<Objc ErTl n=12>"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 3,
+   "paths": [
+    "Brsh[].toolOptions (×20)"
+   ],
+   "depths": [
+    1
+   ]
+  },
+  {
+   "key": "useBrushGroup",
+   "count": 27,
+   "type": "bool",
+   "types": [
+    "bool"
+   ],
+   "samples": [
+    "false"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 3,
+   "paths": [
+    "Brsh[].brushGroup.useBrushGroup (×27)"
+   ],
+   "depths": [
+    2
+   ]
+  },
+  {
+   "key": "useBrushPose",
+   "count": 27,
+   "type": "bool",
+   "types": [
+    "bool"
+   ],
+   "samples": [
+    "false",
+    "true"
+   ],
+   "in_repo_parser": true,
+   "repo_refs": [
+    "src/brush_converter/mapping.py:328"
+   ],
+   "count_files": 3,
+   "paths": [
+    "Brsh[].useBrushPose (×27)"
+   ],
+   "depths": [
+    1
+   ]
+  },
+  {
+   "key": "useBrushSize",
+   "count": 27,
+   "type": "bool",
+   "types": [
+    "bool"
+   ],
+   "samples": [
+    "false",
+    "true"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 3,
+   "paths": [
+    "Brsh[].useBrushSize (×27)"
+   ],
+   "depths": [
+    1
+   ]
+  },
+  {
+   "key": "useColorDynamics",
+   "count": 79,
+   "type": "bool",
+   "types": [
+    "bool"
+   ],
+   "samples": [
+    "false",
+    "true"
+   ],
+   "in_repo_parser": true,
+   "repo_refs": [
+    "src/brush_converter/mapping.py:322"
+   ],
+   "count_files": 6,
+   "paths": [
+    "Brsh[].useColorDynamics (×79)"
+   ],
+   "depths": [
+    1
+   ]
+  },
+  {
+   "key": "useDualBrush",
+   "count": 79,
+   "type": "bool",
+   "types": [
+    "bool"
+   ],
+   "samples": [
+    "false",
+    "true"
+   ],
+   "in_repo_parser": true,
+   "repo_refs": [
+    "src/brush_converter/mapping.py:331"
+   ],
+   "count_files": 6,
+   "paths": [
+    "Brsh[].dualBrush.useDualBrush (×79)"
+   ],
+   "depths": [
+    2
+   ]
+  },
+  {
+   "key": "useLegacy",
+   "count": 20,
+   "type": "bool",
+   "types": [
+    "bool"
+   ],
+   "samples": [
+    "false"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 3,
+   "paths": [
+    "Brsh[].toolOptions.useLegacy (×20)"
+   ],
+   "depths": [
+    2
+   ]
+  },
+  {
+   "key": "usePaintDynamics",
+   "count": 79,
+   "type": "bool",
+   "types": [
+    "bool"
+   ],
+   "samples": [
+    "false",
+    "true"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 6,
+   "paths": [
+    "Brsh[].usePaintDynamics (×79)"
+   ],
+   "depths": [
+    1
+   ]
+  },
+  {
+   "key": "usePressureOverridesOpacity",
+   "count": 20,
+   "type": "bool",
+   "types": [
+    "bool"
+   ],
+   "samples": [
+    "false"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 3,
+   "paths": [
+    "Brsh[].toolOptions.usePressureOverridesOpacity (×20)"
+   ],
+   "depths": [
+    2
+   ]
+  },
+  {
+   "key": "usePressureOverridesSize",
+   "count": 20,
+   "type": "bool",
+   "types": [
+    "bool"
+   ],
+   "samples": [
+    "false"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 3,
+   "paths": [
+    "Brsh[].toolOptions.usePressureOverridesSize (×20)"
+   ],
+   "depths": [
+    2
+   ]
+  },
+  {
+   "key": "useScatter",
+   "count": 123,
+   "type": "bool",
+   "types": [
+    "bool"
+   ],
+   "samples": [
+    "false",
+    "true"
+   ],
+   "in_repo_parser": true,
+   "repo_refs": [
+    "src/brush_converter/mapping.py:267"
+   ],
+   "count_files": 6,
+   "paths": [
+    "Brsh[].useScatter (×79)",
+    "Brsh[].dualBrush.useScatter (×44)"
+   ],
+   "depths": [
+    1,
+    2
+   ]
+  },
+  {
+   "key": "useTexture",
+   "count": 79,
+   "type": "bool",
+   "types": [
+    "bool"
+   ],
+   "samples": [
+    "true",
+    "false"
+   ],
+   "in_repo_parser": true,
+   "repo_refs": [
+    "src/brush_converter/mapping.py:312",
+    "src/brush_converter/mapping.py:273"
+   ],
+   "count_files": 6,
+   "paths": [
+    "Brsh[].useTexture (×79)"
+   ],
+   "depths": [
+    1
+   ]
+  },
+  {
+   "key": "useTipDynamics",
+   "count": 79,
+   "type": "bool",
+   "types": [
+    "bool"
+   ],
+   "samples": [
+    "true",
+    "false"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 6,
+   "paths": [
+    "Brsh[].useTipDynamics (×79)"
+   ],
+   "depths": [
+    1
+   ]
+  },
+  {
+   "key": "wtVr",
+   "count": 14,
+   "type": "Objc",
+   "types": [
+    "Objc"
+   ],
+   "samples": [
+    "<Objc brVr n=4>"
+   ],
+   "in_repo_parser": false,
+   "repo_refs": [],
+   "count_files": 2,
+   "paths": [
+    "Brsh[].wtVr (×14)"
+   ],
+   "depths": [
+    1
+   ]
+  }
+ ]
+}

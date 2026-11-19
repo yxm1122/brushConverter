@@ -1,0 +1,655 @@
+{
+  "schema_version": "1.0",
+  "description": "Krita 5.3.3 侧能力表（任务 22）。每项含 param/krita_path/type/range_or_enum/source。",
+  "krita_version": {
+    "product": "5.3.3",
+    "git": "858d352",
+    "exe": "<LOCAL_APP_DIR>\\Krita (x64)\\bin\\krita.exe",
+    "verified_command": "'<LOCAL_APP_DIR>/Krita (x64)/bin/krita.com' --version  →  krita 5.3.3 (git 858d352)",
+    "verified_by": "krita.exe 文件元数据 FileVersion/ProductVersion = 5.3.3 (git 858d352)",
+    "verified_at": "2026-11-19"
+  },
+  "source_commit": "858d352",
+  "source_base_blob": "https://invent.kde.org/graphics/krita/-/blob/858d352/",
+  "source_base_raw": "https://invent.kde.org/graphics/krita/-/raw/858d352/",
+  "source_fetched_at": "2026-11-19",
+  "scope_note": "完整覆盖纹理参数（任务 22 重点）+ 曲线/传感器机制；相邻参数（散布/传递/形状）只登记已核实的键与范围，供任务 23/26–28 使用；是否扩展到全量非纹理参数属任务书『决策 3』，待人工拍板。",
+  "params": [
+    {
+      "param": "纹理启用开关",
+      "krita_path": "Texture/Pattern/Enabled",
+      "type": "bool",
+      "range_or_enum": {
+        "default": false
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisTextureOptionData.cpp#L15-15",
+      "scope": "texture"
+    },
+    {
+      "param": "纹理缩放倍数",
+      "krita_path": "Texture/Pattern/Scale",
+      "type": "double",
+      "range_or_enum": {
+        "default": 1,
+        "ui_slider_range": [
+          0,
+          2
+        ],
+        "ui_step": 0.01,
+        "ui_multipliers": [
+          0.1,
+          2,
+          10
+        ],
+        "read_clamp": "无（getDouble 原样读取）"
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisTextureOptionData.cpp#L16-16 ; https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/kis_texture_chooser.cpp#L21-26",
+      "scope": "texture"
+    },
+    {
+      "param": "纹理亮度（Krita 归一化 -1..1）",
+      "krita_path": "Texture/Pattern/Brightness",
+      "type": "double",
+      "range_or_enum": {
+        "default": 0,
+        "ui_slider_range": [
+          -1,
+          1
+        ],
+        "ui_step": 0.01,
+        "read_clamp": "无（getDouble 原样读取）；有效值在掩码计算里 clamp 到 0..1"
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisTextureOptionData.cpp#L17-17 ; https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/kis_texture_chooser.cpp#L28-28 ; https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisTextureMaskInfo.cpp#L192-192",
+      "scope": "texture"
+    },
+    {
+      "param": "纹理对比度（Krita 归一化 0..2，1=不变）",
+      "krita_path": "Texture/Pattern/Contrast",
+      "type": "double",
+      "range_or_enum": {
+        "default": 1,
+        "ui_slider_range": [
+          0,
+          2
+        ],
+        "ui_step": 0.01,
+        "read_clamp": "无（getDouble 原样读取）"
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisTextureOptionData.cpp#L18-18 ; https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/kis_texture_chooser.cpp#L33-33 ; https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisTextureMaskInfo.cpp#L194-194",
+      "scope": "texture"
+    },
+    {
+      "param": "中性点（灰点，仅 Lightness/Gradient 模式用）",
+      "krita_path": "Texture/Pattern/NeutralPoint",
+      "type": "double",
+      "range_or_enum": {
+        "default": 0.5,
+        "ui_slider_range": [
+          0,
+          1
+        ],
+        "ui_step": 0.01
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisTextureOptionData.cpp#L19-19 ; https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/kis_texture_chooser.cpp#L37-37",
+      "scope": "texture"
+    },
+    {
+      "param": "纹理 X 偏移（px）",
+      "krita_path": "Texture/Pattern/OffsetX",
+      "type": "int",
+      "range_or_enum": {
+        "default": 0,
+        "max": "图案宽/2（按图案尺寸动态设置）"
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisTextureOptionData.cpp#L20-20 ; https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisTextureOptionModel.cpp#L82-82",
+      "scope": "texture"
+    },
+    {
+      "param": "纹理 Y 偏移（px）",
+      "krita_path": "Texture/Pattern/OffsetY",
+      "type": "int",
+      "range_or_enum": {
+        "default": 0,
+        "max": "图案高/2（按图案尺寸动态设置）"
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisTextureOptionData.cpp#L21-21 ; https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisTextureOptionModel.cpp#L83-83",
+      "scope": "texture"
+    },
+    {
+      "param": "随机 X 偏移",
+      "krita_path": "Texture/Pattern/isRandomOffsetX",
+      "type": "bool",
+      "range_or_enum": {
+        "default": false
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisTextureOptionData.cpp#L22-22",
+      "scope": "texture"
+    },
+    {
+      "param": "随机 Y 偏移",
+      "krita_path": "Texture/Pattern/isRandomOffsetY",
+      "type": "bool",
+      "range_or_enum": {
+        "default": false
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisTextureOptionData.cpp#L23-23",
+      "scope": "texture"
+    },
+    {
+      "param": "纹理混合模式枚举（任务 22 重点）",
+      "krita_path": "Texture/Pattern/TexturingMode",
+      "type": "int enum",
+      "range_or_enum": {
+        "min": 0,
+        "max": 15,
+        "count": 16,
+        "enum_complete": [
+          {
+            "value": 0,
+            "name": "MULTIPLY"
+          },
+          {
+            "value": 1,
+            "name": "SUBTRACT"
+          },
+          {
+            "value": 2,
+            "name": "LIGHTNESS"
+          },
+          {
+            "value": 3,
+            "name": "GRADIENT"
+          },
+          {
+            "value": 4,
+            "name": "DARKEN"
+          },
+          {
+            "value": 5,
+            "name": "OVERLAY"
+          },
+          {
+            "value": 6,
+            "name": "COLOR_DODGE"
+          },
+          {
+            "value": 7,
+            "name": "COLOR_BURN"
+          },
+          {
+            "value": 8,
+            "name": "LINEAR_DODGE"
+          },
+          {
+            "value": 9,
+            "name": "LINEAR_BURN"
+          },
+          {
+            "value": 10,
+            "name": "HARD_MIX_PHOTOSHOP"
+          },
+          {
+            "value": 11,
+            "name": "HARD_MIX_SOFTER_PHOTOSHOP"
+          },
+          {
+            "value": 12,
+            "name": "HEIGHT"
+          },
+          {
+            "value": 13,
+            "name": "LINEAR_HEIGHT"
+          },
+          {
+            "value": 14,
+            "name": "HEIGHT_PHOTOSHOP"
+          },
+          {
+            "value": 15,
+            "name": "LINEAR_HEIGHT_PHOTOSHOP"
+          }
+        ],
+        "default_stored": 0,
+        "ui_default_index": 1,
+        "ui_conditional_members": "LIGHTNESS(2)/GRADIENT(3) 只在笔刷引擎传入 SupportsLightnessMode/SupportsGradientMode 时出现在下拉框；本项目使用的像素笔刷引擎在 kis_brushop_settings_widget.cpp:77 传入这两个 flag（KisBrushOpResources.cpp:51），因此 2/3 对本项目可用；不传 flag 的引擎会把 2/3 替换成 SUBTRACT(1)"
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisTextureOptionData.h#L29-45 ; https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisTextureOptionData.cpp#L24-24 ; https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/kis_texture_chooser.cpp#L47-79 ; https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/kis_texture_option.cpp#L70-71 ; https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/defaultpaintops/brush/kis_brushop_settings_widget.cpp#L77-77 ; https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/defaultpaintops/brush/KisBrushOpResources.cpp#L51-51",
+      "scope": "texture"
+    },
+    {
+      "param": "软纹理开关",
+      "krita_path": "Texture/Pattern/UseSoftTexturing",
+      "type": "bool",
+      "range_or_enum": {
+        "default": false
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisTextureOptionData.cpp#L25-25",
+      "scope": "texture"
+    },
+    {
+      "param": "截断策略",
+      "krita_path": "Texture/Pattern/CutoffPolicy",
+      "type": "int enum",
+      "range_or_enum": {
+        "min": 0,
+        "max": 2,
+        "enum_complete": [
+          {
+            "value": 0,
+            "name": "Cut Off Disabled"
+          },
+          {
+            "value": 1,
+            "name": "Cut Off Brush"
+          },
+          {
+            "value": 2,
+            "name": "Cut Off Pattern"
+          }
+        ]
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisTextureOptionData.cpp#L26-26 ; https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/kis_texture_chooser.cpp#L82-82",
+      "scope": "texture"
+    },
+    {
+      "param": "截断左端（0..255）",
+      "krita_path": "Texture/Pattern/CutoffLeft",
+      "type": "int",
+      "range_or_enum": {
+        "default": 0,
+        "min": 0,
+        "max": 255
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisTextureOptionData.cpp#L27-27",
+      "scope": "texture"
+    },
+    {
+      "param": "截断右端（0..255）",
+      "krita_path": "Texture/Pattern/CutoffRight",
+      "type": "int",
+      "range_or_enum": {
+        "default": 255,
+        "min": 0,
+        "max": 255
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisTextureOptionData.cpp#L28-28",
+      "scope": "texture"
+    },
+    {
+      "param": "纹理反相",
+      "krita_path": "Texture/Pattern/Invert",
+      "type": "bool",
+      "range_or_enum": {
+        "default": false
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisTextureOptionData.cpp#L29-29",
+      "scope": "texture"
+    },
+    {
+      "param": "橡皮擦时自动反相",
+      "krita_path": "Texture/Pattern/AutoInvertOnErase",
+      "type": "bool",
+      "range_or_enum": {
+        "default": false
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisTextureOptionData.cpp#L30-30",
+      "scope": "texture"
+    },
+    {
+      "param": "图案 md5 的 base64（旧格式字段）",
+      "krita_path": "Texture/Pattern/PatternMD5",
+      "type": "string(base64)",
+      "range_or_enum": {
+        "default": ""
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisEmbeddedTextureData.cpp#L85-85",
+      "scope": "texture"
+    },
+    {
+      "param": "图案 md5 的 hex（5.1+ 查找键）",
+      "krita_path": "Texture/Pattern/PatternMD5Sum",
+      "type": "string(hex md5)",
+      "range_or_enum": {
+        "default": ""
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisEmbeddedTextureData.cpp#L86-86",
+      "scope": "texture"
+    },
+    {
+      "param": "图案文件名（取 basename）",
+      "krita_path": "Texture/Pattern/PatternFileName",
+      "type": "string",
+      "range_or_enum": {
+        "default": ""
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisEmbeddedTextureData.cpp#L87-87",
+      "scope": "texture"
+    },
+    {
+      "param": "图案资源名",
+      "krita_path": "Texture/Pattern/Name",
+      "type": "string",
+      "range_or_enum": {
+        "default": ""
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisEmbeddedTextureData.cpp#L88-88",
+      "scope": "texture"
+    },
+    {
+      "param": "内嵌图案 base64（嵌入纹理唯一可靠来源）",
+      "krita_path": "Texture/Pattern/Pattern",
+      "type": "string(base64 PNG)",
+      "range_or_enum": {
+        "default": ""
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisEmbeddedTextureData.cpp#L89-89",
+      "scope": "texture"
+    },
+    {
+      "param": "最大 X 偏移（读取被刻意跳过）",
+      "krita_path": "Texture/Pattern/MaximumOffsetX",
+      "type": "int",
+      "range_or_enum": {
+        "default": 2,
+        "readable": false,
+        "note": "read 的 TODO 注释明确不加载，避免覆盖模型算出的值"
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisTextureOptionData.cpp#L32-32",
+      "scope": "texture"
+    },
+    {
+      "param": "最大 Y 偏移（读取被刻意跳过）",
+      "krita_path": "Texture/Pattern/MaximumOffsetY",
+      "type": "int",
+      "range_or_enum": {
+        "default": 2,
+        "readable": false
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisTextureOptionData.cpp#L32-32",
+      "scope": "texture"
+    },
+    {
+      "param": "纹理强度「效果强度」启用开关（isChecked，不是压感）",
+      "krita_path": "PressureTexture/Strength/",
+      "type": "bool",
+      "range_or_enum": {
+        "default": false,
+        "meaning": "true = 启用强度曲线"
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisKritaSensorPack.cpp#L120-120",
+      "scope": "texture",
+      "converter_key": "PressureTexture/Strength/"
+    },
+    {
+      "param": "强度控制源（XML 传感器定义）",
+      "krita_path": "Texture/Strength/Sensor",
+      "type": "string(XML)",
+      "range_or_enum": {
+        "format": "<params><Sensor id=\"pressure\" .../></params>；多传感器根节点 id=\"sensorslist\"",
+        "default": ""
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisKritaSensorPack.cpp#L136-136",
+      "scope": "texture",
+      "converter_key": "Texture/Strength/Sensor"
+    },
+    {
+      "param": "是否启用强度曲线",
+      "krita_path": "Texture/Strength/UseCurve",
+      "type": "bool",
+      "range_or_enum": {
+        "default": true
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisKritaSensorPack.cpp#L231-231",
+      "scope": "texture",
+      "converter_key": "Texture/Strength/UseCurve"
+    },
+    {
+      "param": "所有传感器共用同一条曲线",
+      "krita_path": "Texture/Strength/UseSameCurve",
+      "type": "bool",
+      "range_or_enum": {
+        "default": true
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisKritaSensorPack.cpp#L188-188",
+      "scope": "texture",
+      "converter_key": "Texture/Strength/UseSameCurve"
+    },
+    {
+      "param": "强度值（0..1）",
+      "krita_path": "Texture/Strength/Value",
+      "type": "double",
+      "range_or_enum": {
+        "default": 1,
+        "min": 0,
+        "max": 1
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisKritaSensorPack.cpp#L225-225 ; https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisCurveOptionDataCommon.h#L57-57",
+      "scope": "texture",
+      "converter_key": "Texture/Strength/Value"
+    },
+    {
+      "param": "共用曲线字符串",
+      "krita_path": "Texture/Strength/commonCurve",
+      "type": "string",
+      "range_or_enum": {
+        "default": "0,0;1,1;"
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisKritaSensorPack.cpp#L205-205",
+      "scope": "texture",
+      "converter_key": "Texture/Strength/commonCurve"
+    },
+    {
+      "param": "曲线模式",
+      "krita_path": "Texture/Strength/curveMode",
+      "type": "int",
+      "range_or_enum": {
+        "default": 0
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisKritaSensorPack.cpp#L232-232",
+      "scope": "texture",
+      "converter_key": "Texture/Strength/curveMode"
+    },
+    {
+      "param": "强度选项 id（前缀形式）",
+      "krita_path": "Texture/Strength/",
+      "type": "KoID",
+      "range_or_enum": {
+        "note": "KisStrengthOptionData 的 KoID = \"Texture/Strength/\"；键名 = id + Value/Sensor/UseCurve/commonCurve/curveMode，启用位 = Pressure+id"
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisStandardOptionData.h#L113-117",
+      "scope": "texture"
+    },
+    {
+      "param": "曲线选项通用键组",
+      "krita_path": "<Id>Value / <Id>Sensor / <Id>UseCurve / <Id>UseSameCurve / <Id>commonCurve / <Id>curveMode / Pressure<Id>",
+      "type": "键组",
+      "range_or_enum": {
+        "strength_range_default": [
+          0,
+          1
+        ],
+        "note": "<Id>Value 缺省 = strengthMaxValue（构造参数 valueRange.second）"
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisCurveOptionData.h#L27-27 ; https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisKritaSensorPack.cpp#L136-232",
+      "scope": "mechanism"
+    },
+    {
+      "param": "传感器 id 全集",
+      "krita_path": "sensor XML @id",
+      "type": "string enum",
+      "range_or_enum": {
+        "values": [
+          "pressure",
+          "pressurein",
+          "tangentialpressure",
+          "drawingangle",
+          "xtilt",
+          "ytilt",
+          "ascension",
+          "declination",
+          "rotation",
+          "fuzzy",
+          "fuzzystroke",
+          "speed",
+          "fade",
+          "distance",
+          "time",
+          "perspective",
+          "sensorslist"
+        ],
+        "note": "ascension/declination = 倾斜方向/倾角（序列化名保持旧预设兼容）；sensorslist 为组合容器"
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisDynamicSensorIds.h#L11-35",
+      "scope": "mechanism"
+    },
+    {
+      "param": "散布量（UI 0..500%）",
+      "krita_path": "ScatterValue",
+      "type": "double",
+      "range_or_enum": {
+        "min": 0,
+        "max": 5,
+        "default": 5
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisScatterOptionData.cpp#L33-33",
+      "scope": "adjacent"
+    },
+    {
+      "param": "散布量旧键",
+      "krita_path": "Scattering/Amount",
+      "type": "double",
+      "range_or_enum": {
+        "min": 0,
+        "max": 5
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisScatterOptionData.cpp#L12-38",
+      "scope": "adjacent"
+    },
+    {
+      "param": "散布 X 轴开关",
+      "krita_path": "Scattering/AxisX",
+      "type": "bool",
+      "range_or_enum": {
+        "default": true
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisScatterOptionData.cpp#L10-10",
+      "scope": "adjacent"
+    },
+    {
+      "param": "散布 Y 轴开关",
+      "krita_path": "Scattering/AxisY",
+      "type": "bool",
+      "range_or_enum": {
+        "default": true
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisScatterOptionData.cpp#L11-11",
+      "scope": "adjacent"
+    },
+    {
+      "param": "不透明度曲线选项（0..1）",
+      "krita_path": "OpacityValue / PressureOpacity / OpacitySensor …",
+      "type": "double",
+      "range_or_enum": {
+        "min": 0,
+        "max": 1
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisStandardOptionData.h#L12-18",
+      "scope": "adjacent"
+    },
+    {
+      "param": "流量曲线选项（0..1）",
+      "krita_path": "FlowValue / PressureFlow / FlowSensor …",
+      "type": "double",
+      "range_or_enum": {
+        "min": 0,
+        "max": 1
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisStandardOptionData.h#L23-28",
+      "scope": "adjacent"
+    },
+    {
+      "param": "圆度（宽高比）曲线选项（0..1）",
+      "krita_path": "RatioValue / PressureRatio / RatioSensor …",
+      "type": "double",
+      "range_or_enum": {
+        "min": 0,
+        "max": 1
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisStandardOptionData.h#L35-40",
+      "scope": "adjacent"
+    },
+    {
+      "param": "旋转曲线选项（值坐标 0..1，UI 标签 ±180°）",
+      "krita_path": "RotationValue / PressureRotation / RotationSensor …",
+      "type": "double",
+      "range_or_enum": {
+        "min": 0,
+        "max": 1,
+        "ui_label_range": [
+          -180,
+          180
+        ]
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisStandardOptionData.h#L55-60 ; https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisStandardOptionData.cpp#L23-27",
+      "scope": "adjacent"
+    },
+    {
+      "param": "大小曲线选项（0..1 乘子）",
+      "krita_path": "SizeValue / PressureSize / SizeSensor …",
+      "type": "double",
+      "range_or_enum": {
+        "min": 0,
+        "max": 1
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisSizeOptionData.cpp#L11-11",
+      "scope": "adjacent"
+    },
+    {
+      "param": "锐度曲线选项（0..1）",
+      "krita_path": "SharpnessValue / Sharpness/factor / Sharpness/softness",
+      "type": "double",
+      "range_or_enum": {
+        "min": 0,
+        "max": 1
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisSharpnessOptionData.cpp#L8-37",
+      "scope": "adjacent"
+    },
+    {
+      "param": "间距是否各向同性（间距倍数在 brush_definition XML 的 spacing 属性）",
+      "krita_path": "Spacing/Isotropic",
+      "type": "bool",
+      "range_or_enum": {
+        "default": false
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/libpaintop/KisSpacingOptionData.cpp#L10-15",
+      "scope": "adjacent"
+    },
+    {
+      "param": "像素笔刷引擎的纹理模式能力（引擎 flags）",
+      "krita_path": "Texture/Pattern/TexturingMode（引擎 flags）",
+      "type": "flags",
+      "range_or_enum": {
+        "flags": [
+          "SupportsLightnessMode",
+          "SupportsGradientMode"
+        ],
+        "note": "决定枚举 2(LIGHTNESS)/3(GRADIENT) 是否出现在下拉框、以及读入后是否被替换成 SUBTRACT"
+      },
+      "source": "https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/defaultpaintops/brush/kis_brushop_settings_widget.cpp#L77-77 ; https://invent.kde.org/graphics/krita/-/blob/858d352/plugins/paintops/defaultpaintops/brush/KisBrushOpResources.cpp#L51-51",
+      "scope": "texture"
+    }
+  ],
+  "notes": [
+    "本表只收录「有源码依据」的键与范围；Krita 明确没有对应实现的 PS 参数（湿边/混合/双笔刷/颜色动态等）不放进 params，交叉验证见 docs/研究报告/krita-能力表.md。",
+    "源码取自已安装二进制的 git 提交 858d352（krita.com --version = 5.3.3 (git 858d352)），行号与使用者本机 5.3.3 构建一一对应；未用 master 分支。"
+  ],
+  "totals": {
+    "params": 45,
+    "by_scope": {
+      "texture": 32,
+      "mechanism": 2,
+      "adjacent": 11
+    }
+  }
+}
