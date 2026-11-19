@@ -1,3 +1,66 @@
+# brushConverter v1.3.0（2026-11-20）
+
+纹理混合模式逐模式定论与转正：**47 个 Photoshop 纹理混合模式全部有结论**
+（可映射 22 / 需校准 1 / 不可映射 24 / 不可判定 0），转换器为其中 22 个模式登记了明确映射。
+
+## 主要变化
+
+- **纹理混合模式逐模式转正**：`src/brush_converter/mapping.py` 的 `_TEXTURING_MODE` 由
+  **19 键扩到 34 键（新增 15 个）**，其中三处是实质修复：
+  - `Dfrn`（Difference）实测 PS 侧像素 ≡ 减去 → 映射 `SUBTRACT(1)`；
+    旧行为静默回退 Multiply，实测差 **69.04%~99.29%**；
+  - `blendSubtraction` 同样 → `SUBTRACT(1)`；旧行为回退 Multiply 属「把减去当正片叠底」的映射错误；
+  - `linearDodge` → `8 LINEAR_DODGE`、`linearBurn` → `9 LINEAR_BURN` 显式登记；
+    旧行为静默回退 Multiply，实测差 **96.11%~100%**。
+  其余新增键（`Mltp`、`Nrml`、`Bhnd`、`Clar`、`H   `、`Strt`、`Clr `、`Lmns`、`passThrough`、
+  `lighterColor`、`darkerColor`）让已实测达标的模式不再落进「回退 Multiply + 警告」分支。
+  逐模式结论与证据强度见 `docs/数据/mode-table.json`（唯一真相）与 `docs/parameter-mapping.md` §7.2。
+- **模式号依据**：以 Krita `TexturingMode` 的 16 个成员（0..15）为准取枚举值；
+  Photoshop 专用模式优先用 Krita 的 (Photoshop) 项（`height`→14、`linearHeight`→15、`hardMix`→10）。
+  Difference / blendSubtraction 这种「名字对不上但像素对得上」的，按逐像素实测校准，不按名字硬套。
+- **文档定稿**：README 新增「已知不可映射模式」一节（24 个模式逐个给非技术语言理由，分
+  「Krita 无对应能力 16 个」与「Photoshop 侧产不出可比真值 8 个」两类）；
+  `docs/parameter-mapping.md` 新增 §7.2 逐模式结论；`docs/developer-guide.md` 新增数据文件索引；
+  GUI 中英文提示同步改为事实陈述。
+- **参数矩阵定稿**：`docs/参数矩阵.json`（130 行）修正 `textureBlendMode` 的过时说明、
+  补齐 `H   `/`Strt` 两行的来源栏；`python tools/check_matrix.py` 退出码 **0**
+  （此前 2 项 C6c 恒红）。
+
+## 已知限制（如实记录）
+
+1. **24 个纹理混合模式不可映射**：16 个是 Krita 侧没有对应算子（结构性限制），
+   8 个是 Photoshop 侧产不出可比真值（`Add`、`Rvrt`、`SgdD`、`MgdD`、`HgdD`、`Lght`、`Grdn`、`HdMxS`）。
+   未登记的模式会回退 Multiply(0) 并保留警告——是近似，不是等价转换。
+2. **0.00% 不等于语义等价**：39 个有 PS 真值的模式在 6 组参数下只出 **12 类**像素，
+   **31 个模式与别的模式像素完全不可区分**；本版本的说法统一是「当前口径下像素不可区分」。
+3. **`height` 与 `linearHeight` 两侧都逐像素不可区分**（Krita 14/15 渲染 max Δ=0），
+   不能说哪一个更准，也不能写「linearHeight 已精确复现」。
+4. **亮度/对比度按实测校准，不是按源码复刻**：这两个值已证实是像素通路的真实输入
+   （改值会改像素：multiply 97.45%、linearHeight 67.31% 的改值差异），
+   但**具体哪段代码消费它们算像素尚未定位**，所以 calibrated 公式是数据拟合的结果。
+5. **hardMix 需校准**：6 组里只有 1 组差 **1.03% / max 255**，是 PS 与 Krita 在 `src==0` 边界上的判定不同，
+   转换侧没有参数可修。
+6. v1.2.x 的既有结构性限制不变：Krita 对比度上限 2（PS 对比度 > 50 无法表达）、
+   PS 深度 > 83% 时纹理强度封顶 1.0、亮度/对比度保留 3 位小数。
+
+## 回退方式
+
+本轮**不做功能开关**（不新增环境变量）。整体回退 = 把工作区 `git revert` 回 **v1.2.1**
+（tag `v1.2.1`，commit `85aae49`），或直接 `git checkout v1.2.1`。
+
+## 验证
+
+- **参数矩阵自检**：`python tools/check_matrix.py` → `=== 参数矩阵校验通过 ===`，
+  矩阵 130 行、逆向独有 39 行，退出码 0。
+- **模式总表确定性**：`python tools/render_mode_table.py --build` 连跑两次哈希相同；
+  `--check` 与 `python tools/render_matrix_md.py --check` 均输出「同步」。
+- **全量回归**：`python -m pytest -q` → **251 passed / 0 failed / 0 skipped**（v0.4 合流验收，
+  见 `docs/验收报告/37-报告.md` §三.5；v1.3.0 文档定稿后在最终工作区复跑，80.38 s，结果相同）。
+- **端到端抽检**：Mltp / Sbtr / blendSubtraction 三个模式用当前转换链重新出 `.kpp` 后
+  Krita 5.3.3 真机渲染，与 PS 真值逐像素比 **0.00% / max 0**（`docs/验收报告/37-报告.md` §三.6）。
+
+---
+
 # brushConverter v1.2.1（2026-11-19）
 
 两处实验已实测证实的修复：高度系纹理强度 ×1.2（PS W=12 vs Krita W=10）

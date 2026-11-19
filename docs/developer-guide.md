@@ -12,7 +12,9 @@
 
 | 我想… | 看这份 |
 |---|---|
-| 知道逐字段怎么映射（尺寸/间距/角度/散布/纹理…） | [`parameter-mapping.md`](parameter-mapping.md)（**映射唯一权威**，含纹理 §7/§7.1） |
+| 知道逐字段怎么映射（尺寸/间距/角度/散布/纹理…） | [`parameter-mapping.md`](parameter-mapping.md)（**映射唯一权威**，含纹理 §7/§7.1，纹理模式逐模式结论见 §7.2） |
+| 查 47 个纹理混合模式的结论（可映射/需校准/不可映射） | [`数据/mode-table.json`](数据/mode-table.json)（**模式结论唯一真相**，47 行，含证据强度/可区分/塌缩类/前提） |
+| 查某个参数键的结论、来源与承载字段 | [`参数矩阵.json`](参数矩阵.json)（**参数结论唯一真相**，130 行；渲染版 [`参数矩阵.md`](参数矩阵.md)，由脚本生成，禁止手改） |
 | 判断某个映射为什么这么定、有没有实测依据 | [`parameter-mapping.md`](parameter-mapping.md) + 下方「研究结论」 |
 | 跑验证、看懂「通过/失败/跳过」口径 | [`验证体系使用说明.md`](验证体系使用说明.md) |
 | 加一张基准图 / 搞清楚命名与登记规则 | [`基准库命名规范.md`](基准库命名规范.md) |
@@ -50,6 +52,21 @@
 3. **改纹理**：本文 §5.3 与 §7.5/§7.6 + [`纹理掩码复刻说明.md`](纹理掩码复刻说明.md) + `研究报告/缩放深度-归因实验.md`（**高度系强度有 ×1.2 增益、资源名必须走内容哈希**，别改回去）。
 4. **加验证**：[`验证体系使用说明.md`](验证体系使用说明.md) + [`基准库命名规范.md`](基准库命名规范.md) + [`全量验收说明.md`](全量验收说明.md)。
 5. **发版**：本文 §7.4 + [`全量验收说明.md`](全量验收说明.md) + `../releases/RELEASE_NOTES.md`；跑 `python tools/verify_all.py --archive` 与 `python -m pytest -q` 必须全绿。
+
+### 0.5 数据文件索引（v1.3.0 定稿）
+
+这些 JSON 是「结论的唯一真相」，文档和代码都应以它们为准；改动后要重跑对应的校验/渲染脚本。
+
+| 文件 | 用途 | 生成/校验 |
+|---|---|---|
+| [`参数矩阵.json`](参数矩阵.json) | 130 个 ABR/PS 参数键的结论（semantics / range / sources / krita_target / verdict） | 手改 JSON 后跑 `python tools/render_matrix_md.py`，再跑 `python tools/check_matrix.py`（退出码 0 才算过） |
+| [`参数矩阵.md`](参数矩阵.md) | 矩阵的渲染版 + 模式总表节 | 只由 `tools/render_matrix_md.py` 生成，**不许手改**（check_matrix 的 C9 会红） |
+| [`数据/ps_keys.json`](数据/ps_keys.json) | 逆向得到的 PS 参数键全集（125 条） | 任务 21 产出；check_matrix 的 C6a 依赖 |
+| [`数据/abr_keys.json`](数据/abr_keys.json) | 真实 .abr 样本里实测出现的键（91 条） | 任务 22 产出；check_matrix 的 C6b 依赖 |
+| [`数据/candidates.json`](数据/candidates.json) | 候选映射清单（跨模式候选、判据与置信度） | 任务 29 产出；模式判定时查 |
+| [`数据/mode-table.json`](数据/mode-table.json) | **47 个纹理混合模式的逐模式结论**（唯一真相） | `python tools/render_mode_table.py --build`；`--check` 校验与 `参数矩阵.md` 同步 |
+| [`数据/mode-batch.json`](数据/mode-batch.json) | 三批（A/B/C）模式的批次成员、PS 真值状态、Krita 渲染登记 | `python tools/mode_batch.py --plan/--manifest`；重跑 `--manifest` 后须再跑 `render_mode_table.py --amend-data` |
+| [`数据/mode-align.json`](数据/mode-align.json) | PS 模式号 ↔ Krita TexturingMode 的对齐表（含 runtime_id） | 任务 33/37 数据；Krita 基线生成时断言用 |
 
 ---
 
@@ -303,7 +320,7 @@ PS 纹理深度无论是否接传感器都要设为 `true`；深度随压感（`
 注意：
 - **`PatternMD5Sum` 存 hex md5**；`PatternMD5` 留空——Krita 5.0 曾在该字段写原始
   二进制导致非法 XML（Krita 官方 MR 修复），新版本以 `PatternMD5Sum` 为准。
-- `TexturingMode` 数值来自 Krita `KisTextureOptionData::TexturingMode`：Multiply=0、Subtract=1、Lightness=2、Gradient=3、Darken=4、Overlay=5、Color Dodge=6、Color Burn=7、Linear Dodge=8、Linear Burn=9、Hard Mix (Photoshop)=10、Hard Mix Softer (Photoshop)=11、Height=12、Linear Height=13、Height (Photoshop)=14、Linear Height (Photoshop)=15。ABR 的 `linearHeight` 优先映射到 15，避免误落到 Darken=4。
+- `TexturingMode` 数值来自 Krita `KisTextureOptionData::TexturingMode`：Multiply=0、Subtract=1、Lightness=2、Gradient=3、Darken=4、Overlay=5、Color Dodge=6、Color Burn=7、Linear Dodge=8、Linear Burn=9、Hard Mix (Photoshop)=10、Hard Mix Softer (Photoshop)=11、Height=12、Linear Height=13、Height (Photoshop)=14、Linear Height (Photoshop)=15。ABR 的 `linearHeight` 优先映射到 15，避免误落到 Darken=4。v1.3.0 把 `_TEXTURING_MODE` 由 19 键扩到 **34 键**并逐模式定论：47 个 PS 模式中 **22 可映射 / 1 需校准 / 24 不可映射 / 0 不可判定**，未登记的模式回退 0 并警告；逐模式结论、证据强度与「0.00% ≠ 语义等价」的口径见 [`数据/mode-table.json`](数据/mode-table.json) 与 [`parameter-mapping.md`](parameter-mapping.md) §7.2。
 - 亮/对比度换算依据 Krita `KisTextureMaskInfo::recalculateMask()` 与 Photoshop/Krita 对照。**默认公式为 `calibrated`（v1.2.0 起，任务 12 拟合 + 任务 13 转正）**：对比度 `c_k = k`（PS 中心因子，`C<0→1+C/100`、`C>=0→1/(1-C/100)`）；亮度 `b_k = (1-k)/(510k) - v/255`（C>=0）或 `(1-k)/(510k) - v/(255k)`（C<0）；保留 3 位小数，最终 clamp 到 Krita UI 范围（亮度 [-1,1]、对比度 [0,2]）。掩码空间 A/B：`calibrated` 0.00% vs 旧公式 70.75%。
   历史方案（`legacy`，v1.1.2 行为，可用环境变量回退）：所有模式统一亮度 `round(0.10-v/250,2)`，对比度用同一 PS 中心因子并 round 两位。开关与回退命令见 `parameter-mapping.md` §7.1。
   Linear Height (Photoshop) 曾使用 0.30 基线与对比度倒数的特殊映射，实测效果不好，2026-08-27 确认取消。源码快照与来源链接见 `research/krita_texture/` 和 `research/README.md`。

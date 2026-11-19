@@ -32,7 +32,7 @@ _STRINGS: dict[str, dict[str, str]] = {
         "computed_brush": "计算笔刷",
         "sampled_brush": "采样笔刷",
         "diameter": "直径 {d}px",
-        "warn_prefix": "⚠ 未映射：",
+        "warn_prefix": "⚠ 未映射参数：",
         "list_sep": "、",
         "colon": "：",
         "select_abr": "选择 ABR 文件",
@@ -52,8 +52,8 @@ _STRINGS: dict[str, dict[str, str]] = {
         "need_select": "请至少勾选一支笔刷。",
         "unmapped_title": "无法映射的参数",
         "unmapped_body": "以下笔刷包含无法映射的参数，转换后将丢失这些效果：\n\n{lines}\n\n是否继续？",
-        "texture_hint_title": "纹理亮度/对比度提示",
-        "texture_hint_body": "检测到 {n} 支笔刷使用了纹理。\n\n纹理「亮度/对比度」已按 Photoshop 公式校准（calibrated 方案，v1.2.0 起为默认），同引擎掩码空间差异 0.00%。仍有两处结构性限制无法精确表达：PS 对比度 > 50（Krita 上限为 2）、PS 深度 > 83%（Krita 纹理强度上限 1.0）。如需 v1.1.2 的旧行为，请在启动本程序前设置环境变量 BRUSHCONVERTER_TEXTURE_FORMULA=legacy。\n\n是否继续？",
+        "texture_hint_title": "纹理与混合模式提示",
+        "texture_hint_body": "检测到 {n} 支笔刷使用了纹理。\n\n纹理「亮度/对比度」已按 Photoshop 公式校准（calibrated 方案，v1.2.0 起为默认），同引擎掩码空间差异 0.00%；仍有两处结构性限制：PS 对比度 > 50（Krita 上限为 2）、PS 深度 > 83%（Krita 纹理强度上限 1.0）。\n\n纹理混合模式：47 个 Photoshop 模式中 22 个已可映射、1 个需校准（hardMix，边界残差 1.03%）、24 个不可映射（16 个是 Krita 没有对应算子，8 个是 Photoshop 侧产不出可比真值）。未登记或不可映射的模式会按「正片叠底」近似并保留警告，这不是等价转换。\n\n如需 v1.1.2 的旧亮度/对比度行为，请在启动本程序前设置环境变量 BRUSHCONVERTER_TEXTURE_FORMULA=legacy。\n\n是否继续？",
         "converting": "正在转换…",
         "convert_failed": "转换失败",
         "done_status": "完成：{n} 支笔刷",
@@ -78,7 +78,7 @@ _STRINGS: dict[str, dict[str, str]] = {
         "computed_brush": "Computed brush",
         "sampled_brush": "Sampled brush",
         "diameter": "Diameter {d}px",
-        "warn_prefix": "⚠ Not mapped: ",
+        "warn_prefix": "⚠ Unmapped parameters: ",
         "list_sep": ", ",
         "colon": ": ",
         "select_abr": "Select ABR file",
@@ -98,8 +98,8 @@ _STRINGS: dict[str, dict[str, str]] = {
         "need_select": "Please select at least one brush.",
         "unmapped_title": "Unmapped Parameters",
         "unmapped_body": "These brushes contain parameters that cannot be mapped and will be lost after conversion:\n\n{lines}\n\nContinue?",
-        "texture_hint_title": "Texture Brightness/Contrast Notice",
-        "texture_hint_body": "{n} brush(es) use a texture.\n\nThe texture \"Brightness/Contrast\" is calibrated to the Photoshop formula (the \"calibrated\" scheme, default since v1.2.0); the difference in the same-engine mask space is 0.00%. Two structural limits cannot be expressed exactly: PS contrast > 50 (Krita's maximum is 2) and PS depth > 83% (Krita texture strength caps at 1.0). For the old v1.1.2 behaviour, set the environment variable BRUSHCONVERTER_TEXTURE_FORMULA=legacy before starting the app.\n\nContinue?",
+        "texture_hint_title": "Texture & Blend Mode Notice",
+        "texture_hint_body": "{n} brush(es) use a texture.\n\nThe texture \"Brightness/Contrast\" is calibrated to the Photoshop formula (the \"calibrated\" scheme, default since v1.2.0); the difference in the same-engine mask space is 0.00%. Two structural limits remain: PS contrast > 50 (Krita's maximum is 2) and PS depth > 83% (Krita texture strength caps at 1.0).\n\nTexture blend modes: of the 47 Photoshop modes, 22 are mapped, 1 needs calibration (hardMix, 1.03% edge residual) and 24 cannot be mapped (16 have no corresponding Krita operator; 8 have no comparable Photoshop ground truth). Unregistered or unmappable modes are approximated with Multiply and keep a warning; this is not an equivalent conversion.\n\nFor the old v1.1.2 brightness/contrast behaviour, set the environment variable BRUSHCONVERTER_TEXTURE_FORMULA=legacy before starting the app.\n\nContinue?",
         "converting": "Converting…",
         "convert_failed": "Conversion Failed",
         "done_status": "Done: {n} brushes",
@@ -153,7 +153,7 @@ def tr_warning(warning: str) -> str:
     # fullmatch：避免把「纹理混合模式(...) 其它后缀」这样的字符串也吞掉
     m = re.fullmatch(r"纹理混合模式\((.*)\)", warning)
     if m:
-        inner = m.group(1).replace("回退Multiply", "falls back to Multiply")
+        inner = m.group(1).replace("回退Multiply", "not mapped to a Krita mode; falls back to Multiply")
         return f"Texture blend mode ({inner})"
     m = re.fullmatch(r"旋转控制源\(bVTy=(\d+) 未映射\)", warning)
     if m:

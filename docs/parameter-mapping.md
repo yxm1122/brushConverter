@@ -100,7 +100,7 @@
 | `textureDepthDynamics.bVTy==0` | `PressureTexture/Strength/` + `Texture/Strength/UseCurve` | `true` + `false`（效果强度开启、无传感器，恒定用 Value） | ✅ |
 | `textureDepthDynamics.Mnm` | `Texture/Strength/commonCurve` | 高度系 `0,min(1,1.2×Mnm/100);1,1;`；非高度系 `0,Mnm/100;1,1;`（仅 bVTy==2，v1.2.1） | ✅ |
 | `InvT` | `Texture/Pattern/Invert` | 直接 | ✅ |
-| `textureBlendMode` | `Texture/Pattern/TexturingMode` | 优先使用 Krita `(Photoshop)` 模式：`linearHeight`→Linear Height (Photoshop)=15、`Hght`/`height`→Height (Photoshop)=14、`hardMix`→Hard Mix (Photoshop)=10；其余模式按 Krita 枚举映射（`Mul `→0、`Sbtr`→1、`Ovrl`→5 等）；未知回退 0 + 警告 | ✅ |
+| `textureBlendMode` | `Texture/Pattern/TexturingMode` | 按 `mapping._TEXTURING_MODE`（v1.3.0 起 **34 个键**）取 Krita 枚举值：`linearHeight`→15、`height`→14、`hardMix`→10、`Mltp`→0、`Sbtr`→1、`Dfrn`→1、`blendSubtraction`→1、`Ovrl`→5、`CDdg`→6、`CBrn`→7、`linearDodge`→8、`linearBurn`→9 等；未登记的模式回退 Multiply(0) 并保留一条警告 | ✅ 22 / 🧪 1 / ⛔ 24（逐模式见 §7.2） |
 | `textureBrightness`（PS -150..150） | `Texture/Pattern/Brightness` | **默认（calibrated，v1.2.0 起）**：`b_k = (1-k)/(510k) - v/255`（C≥0）或 `(1-k)/(510k) - v/(255k)`（C<0），保留 3 位小数，clamp [-1,1]；**历史方案（legacy，v1.1.2，可回退）**：`round(0.10-v/250,2)`，clamp [-1,1] | ✅ / 🧪 |
 | `textureContrast`（PS -50..100） | `Texture/Pattern/Contrast` | 两条路径共用 PS 中心因子 `k`（C<0：1+C/100；C≥0：1/(1-C/100)），clamp [0,2]；calibrated（默认）保留 3 位小数，legacy 保留 2 位 | ✅ / 🧪 |
 | `TxtC` / `interpretation` | — | Krita 无对应，静默忽略（源文件默认值） | ⚠️ |
@@ -220,6 +220,65 @@ b_k = (1-k)/(510k) - b/(255k)     （C <  0，亮度在对比度之后 → 反�
      Krita 图案库里有什么文件，无法预判撞车。所以两件事必须一起做、且每次都做。
    - 依据：`docs/验收报告/实验-Krita侧-报告.md` §8.2；修复回归用例
      `tests/test_texture_v121_fixes.py`。
+
+### 7.2 纹理混合模式逐模式结论（v1.3.0；`docs/数据/mode-table.json` 为唯一真相）
+
+判定口径：PS 真值 vs Krita 渲染，同一支笔、同一纹理、6 组参数（深度 10/60/100 × 亮度对比度两档），
+差异比例 ≤2% 且 max_delta ≤2 才算达标，分母 W×H。判据材料是**单笔尖满覆盖（base=1）+ 单纹理**，
+所以下面所有结论只在这个口径成立。
+
+**47 个模式：可映射 22 / 需校准 1 / 不可映射 24 / 不可判定 0（无结论 0）。**
+
+| 结论 | 条数 | 模式（order） |
+|---|---:|---|
+| 可映射·证据强 | 2 | `Mltp`(4)、`Sbtr`(20)：自有 Krita 同模式真机渲染，两侧非饱和，6/6 组 0.00% / max≤1 |
+| 可映射·证据中 | 4 | `Dfrn`(11)、`blendSubtraction`(42)、`height`(38)、`linearHeight`(39)：跨模式候选或部分组两侧饱和 |
+| 可映射·证据弱-饱和 | 4 | `Ovrl`、`CDdg`、`CBrn`、`linearDodge`：两侧 6/6 组饱和，0.00% 只证明「不冲突」 |
+| 可映射·证据弱-退化 | 1 | `linearBurn`：base=1 数学退化（9 号与 0 号在本材料上同像素） |
+| 可映射·证据弱-塌缩 | 11 | `Nrml`×2、`Bhnd`、`Clar`、`H`、`Strt`、`Clr`、`Lmns`、`passThrough`、`lighterColor`、`darkerColor` |
+| 需校准 | 1 | `hardMix`(21)：1.03% / max 255，边界残差已定位，**转换侧无参数可修** |
+| 不可映射 | 24 | 见下两分类（16 + 8） |
+| 不可判定 | 0 | 原 A 批 4 个「真值饱和」按「Krita 枚举有无该成员」改判 |
+
+⚠ **0.00% 不等于语义等价。** 39 个有 PS 真值的模式在 6 组参数下只出 **12 类**像素，
+**31 个模式与别的模式像素完全不可区分**；本表凡写 0.00% 的地方，含义一律是「当前口径下像素不可区分」。
+`height` 与 `linearHeight` 两侧都逐像素不可区分（Krita 14/15 渲染 max Δ=0），**不能**写成「linearHeight 已精确复现」。
+
+**① Krita 侧没有对应能力（结构性不可映射，16 条）**
+
+| 模式 | 一句话原因 |
+|---|---|
+| `Dslv` Dissolve | Krita 的 16 个纹理模式全是确定性算子，没有随机溶解 |
+| `Scrn` Screen | Krita 纹理模式枚举里没有「滤色」 |
+| `SftL` Soft Light | 枚举里没有「柔光」 |
+| `HrdL` Hard Light | 枚举里没有「强光」；最接近的候选也差 2.79% 以上 |
+| `Drkn` Darken | Krita 有「变暗」，但 PS 在纹理上按深度换算子，单个 Krita 模式覆盖不了 |
+| `Lghn` Lighten | 枚举里没有「变亮」 |
+| `Xclu` Exclusion | 枚举里没有「排除」；与「减去」的 0.00% 属 base=1 退化 |
+| `linearLight` | 枚举里没有「线性光」；最近候选 7.24% 起 |
+| `vividLight` | 枚举里没有「亮光」 |
+| `pinLight` | 枚举里没有「点光」；最近候选 2.79% 起 |
+| `SnrB` Burn-Shadow | 枚举里没有该变体（真名 `BrnS`，PS 真值为常量 255） |
+| `MnrB` Burn-Midtone | 同上（真名 `BrnM`，常量 255） |
+| `HnrB` Burn-Highlight | 同上（真名 `BrnH`，常量 242/178/127；最佳替代 59.80% 起） |
+| `ttsD`（Dstt） | 同上（真名 `Dstt`，常量 249/217/192；最佳替代 65.40% 起） |
+| `Str ` Saturation | 枚举里没有「饱和度」 |
+| `blendDivide` Divide | 枚举里没有「划分」（PS 真值恒 255） |
+
+**② PS 侧产不出可比真值（8 条）**：`Add`、`Rvrt`、`SgdD`、`MgdD`、`HgdD`、`Lght`、`Grdn`、`HdMxS`。
+这些模式 PS 不接受/忽略了枚举值，或落笔直接报错（`Add` 提示该模式不可用于此版本；
+`SgdD/MgdD/HgdD` 是 Ghidra 小端反序伪名，真名为 `DdgS/DdgM/DdgH`），拿不到可逐像素比对的真值。
+结论由枚举与静态证据给出，**不等于**「Krita 一定没有对应」。
+
+**v1.3.0 登记变更**：`_TEXTURING_MODE` 由 19 键扩到 **34 键（新增 15 个）**。三处是实质修复：
+`Dfrn`（Difference）实测 PS 侧像素 ≡ 减去 → SUBTRACT(1)（旧行为回退 Multiply，实测差 69.04%~99.29%）；
+`blendSubtraction` 同样 → SUBTRACT(1)（旧行为回退 Multiply 属「把减去当正片叠底」的错误）；
+`linearDodge`/`linearBurn` 显式登记 8/9（旧行为静默回退 Multiply，差 96.11%~100%）。
+其余新增键（`Mltp`、`Nrml`、`Bhnd`、`Clar`、`H   `、`Strt`、`Clr `、`Lmns`、`passThrough`、
+`lighterColor`、`darkerColor`）让已实测达标的模式不再落进回退分支。
+
+> brightness/contrast 的证据口径：改这两个值确实**会改像素**（multiply 97.45%、linearHeight 67.31% 的改值差异），
+> 说明它们是像素通路的真实输入；但**具体哪段代码消费它们算像素尚未定位**，所以公式是按实测校准的，不是按源码复刻的。
 
 ## 8. 控制源编码（bVTy → Krita 传感器）
 

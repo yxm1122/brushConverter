@@ -104,3 +104,13 @@ Krita 纹理混合模式没有该成员），**只出 PS 真值**，判据是结
    这是 PS 真实行为，但**对拟合没有信息量**，34/35/36 拟合时应按 alpha_unique==1 过滤。
 3. Krita 渲染的 Alpha 边缘有随机种子/抗锯齿抖动：docs/Krita无头渲染说明.md 实测两次运行
    最大差 4–6/255，因此**基线比对要用容差**（tools/imgdiff.py 的默认 tol），不要承诺逐像素零差。
+4. **C 批 5 个模式（order 32–36）的 PS 真值是改名重出后的结果**：`SnrB/MnrB/HnrB/ttsD/Str ` 在 33 期
+   用 stringID 伪名被 PS 忽略（落笔报错 / 回读停在上一模式），C 批改用 charID 真名
+   （`BrnS/BrnM/BrnH/Dstt/Str`）重出 **30 张全部 ok**；原失败记录保留在 `manifest.json` 与
+   `docs/数据/mode-batch.json` 的 `ps_truth.orig_images`，不要当成「PS 没有这些模式」。
+5. **复刻器只在强度 s=1 可信**：`tools/texture_mask.py` 的 `blend()` 没有 `use_soft_texturing` 分支，
+   s<1 时与真实渲染实测差 229/102 像素 → 复刻结果只能用于 s=1 的交叉校验，
+   **不能**拿 s<1 的复刻结果当「不达标」证据。
+6. **0.00% 只表示当前口径下像素不可区分**：39 个有真值的模式按 6 组 alpha_sha256 元组只有 **12 类**，
+   **31 个模式与别的模式完全同图**；`height` 与 `linearHeight` 两侧都不可区分。
+   写报告时不要用「语义等价」「精确复现」，统一写「当前口径下像素不可区分」。

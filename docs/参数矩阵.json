@@ -99,7 +99,8 @@
   "range": "ABR 实测 0..5",
   "sources": [
    "re",
-   "abr"
+   "abr",
+   "parser"
   ],
   "krita_target": "未定",
   "verdict": "未定"
@@ -278,7 +279,8 @@
   "range": "ABR 实测 0..3",
   "sources": [
    "re",
-   "abr"
+   "abr",
+   "parser"
   ],
   "krita_target": "未定",
   "verdict": "未定"
@@ -1165,7 +1167,7 @@
  },
  {
   "key": "textureBlendMode",
-  "semantics": "纹理混合模式（BlnM 枚举成员）；Mltp 未登记进 mapping._TEXTURING_MODE，现状静默回退 Multiply 并多打警告，需补别名",
+  "semantics": "纹理混合模式（BlnM 枚举成员）。47 个 PS 纹理模式已逐模式定论：可映射 22 / 需校准 1 / 不可映射 24 / 不可判定 0（无结论 0）。mapping._TEXTURING_MODE 已登记 34 个键（v0.4 新增 15 个，含 Mltp、Nrml、Dfrn、linearDodge、linearBurn、passThrough、blendSubtraction 等），未登记的模式回退 Multiply(0) 并保留警告。本键 verdict 保留「需校准」：22 个模式已转正、1 个（hardMix）有边界残差、24 个不可映射；逐模式结论与证据强度见 docs/数据/mode-table.json（唯一真相）",
   "range": "enum；ABR 实测 Mltp 17、linearHeight 10、Hght 4、CBrn 3、Sbtr 2、CDdg 1、hardMix 1（共 38）",
   "sources": [
    "re",
