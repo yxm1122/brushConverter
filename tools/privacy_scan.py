@@ -28,6 +28,9 @@
   python tools/privacy_scan.py --selftest
   python tools/privacy_scan.py --worktree-only
   python tools/privacy_scan.py --history-only
+  python tools/privacy_scan.py --fix-worktree            # 只预览要占位化的文件（不落盘）
+  python tools/privacy_scan.py --fix-worktree --apply     # 真正占位化工作区
+  python tools/privacy_scan.py --fix-tree --root <路径>   # 供 git filter-branch --tree-filter 调用（重写历史）
 
 说明：本文件自己也会被扫描（自身源码必须干净），因此所有敏感样例都用字符串拼接构造，
 源码里不出现任何真实的用户名/家目录/安装路径/邮箱/SID。
@@ -67,6 +70,31 @@ NEUTRAL_EMAIL = "contributors@brushconverter.invalid"
 GITHUB_OWNER = "yxm" + "1122"
 # 项目已知的本机登录用户名（拼接构造：源码里不出现完整用户名，避免扫描器自己命中自己）。
 PROJECT_KNOWN_USERS = ["15" + "pro"]
+
+# 已发布 / 已推送的边界：这些提交里的命中只登记为 warn（改写会破坏已公开的 tag 与别人已 clone 的历史）。
+# 未推送范围（origin/main..HEAD）里的命中是 block，必须占位化后重写历史。
+PUBLISHED_TAG = "v" + "1.2.1"
+PUSHED_REF = "refs/remotes/origin/main"
+
+# 本轮新增/需要显式证明「扫过」的目录（覆盖清单，0 个文件即报 block：覆盖缺失）。
+COVERAGE_DIRS = [
+    ("docs/数据/", "本轮新增数据（参数矩阵 / 键名全集 / 模式表 / 动态命中）"),
+    ("docs/数据/dyn-hits/", "动态命中记录（30A 改值因果实验）"),
+    ("docs/研究报告/", "本轮研究报告（静态-* / 动态-* / 模式-* / 逆向-*）"),
+    ("docs/验收报告/", "本轮验收报告"),
+    ("tests/baselines/mode/", "PS 真值基线 mode"),
+    ("tests/baselines/mode-A/", "模式批 A 产物"),
+    ("tests/baselines/mode-B/", "模式批 B 产物"),
+    ("tests/baselines/mode-C/", "模式批 C 产物"),
+    ("tools/re_pipeline/", "逆向流水线脚本"),
+    ("gui/", "GUI 源码与 i18n"),
+]
+
+# 扫描根：默认仓库根；--fix-tree 时由 --root 指定（历史重写时路径按原仓库根构造规则）。
+SCAN_ROOT = REPO_ROOT
+
+# 全部提交（由 build_result 在扫描前填充）；历史命中按「是否已公开」分级。
+PUBLISHED_COMMITS: set[str] = set()
 
 CATEGORY_LABELS = {
     "credential": "凭据",
@@ -139,6 +167,7 @@ class Hit:
     evidence: str  # 上下文（截断；凭据类已脱敏）
     note: str = ""
     commit: str | None = None
+    published: bool | None = None
 
     def key(self) -> tuple:
         return (self.category, self.rule, self.scope, self.location, self.matched)
@@ -155,6 +184,7 @@ class Hit:
             "matched": self.matched,
             "evidence": self.evidence,
             "note": self.note,
+            "published": self.published,
         }
 
 
@@ -168,6 +198,7 @@ class Rule:
     redact_group: int | None = None
     judge: Callable[[re.Match, str], tuple[str, str]] | None = None
     note: str = ""
+    fix: Callable[[re.Match], str] | None = None
 
 
 def _mask(secret: str) -> str:
@@ -210,12 +241,24 @@ def _judge_known_token(m: re.Match, path: str) -> tuple[str, str]:
 def _judge_install_path(m: re.Match, path: str) -> tuple[str, str]:
     """本机安装路径：文档/报告/日志里必须占位化（block）；运行期脚本默认值允许保留（warn）。"""
     p = path.replace("\\", "/")
-    runtime = (p.startswith("tools/") or "/" not in p) and p.endswith(
-        (".py", ".jsx", ".js", ".sh", ".bat", ".cmd")
-    )
+    # 运行期脚本（tools/、tests/、gui/ 等处的代码，但不在 docs/ 文档里）的本机默认值允许保留：
+    # 不含身份信息，按第一轮口径记 warn（脚本需要本机默认值才能直接跑；应写成「环境变量优先 + 默认兜底」）。
+    code_ext = (".py", ".jsx", ".js", ".sh", ".bat", ".cmd", ".java", ".ps1")
+    runtime = p.endswith(code_ext) and not p.startswith("docs/")
     if runtime:
         return "warn", "；运行期脚本默认值：不含身份信息，改成「环境变量优先 + 本机默认兜底」即可"
     return "block", "；文档/报告/日志里的本机安装路径，必须占位化为 " + PH_APP
+
+
+# 占位符修复动作（--fix-worktree / --fix-tree / 历史重写共用同一套映射）
+def _fix_plain(value: str) -> Callable[[re.Match], str]:
+    return lambda _m: value
+
+
+def _fix_install_dir(m: re.Match) -> str:
+    """吃掉盘符与 program 段，保留末尾分隔符的写法（JSON 里是双反斜杠，必须原样保留）。"""
+    tail = re.search(r"[\\/]+$", m.group(0))
+    return PH_APP + (tail.group(0) if tail else "")
 
 
 # Users 下这些不是用户目录（PATH 里常见），命中降 warn
@@ -255,7 +298,8 @@ _RE_CRED_ASSIGN = re.compile(
 # ---------------------------------------------------------------------------
 # 规则表（源码里不出现任何真实敏感串，全部用字符类/拼接构造）
 # ---------------------------------------------------------------------------
-def build_rules(names: list[str]) -> list[Rule]:
+def build_rules(names: list[str], root: Path | None = None) -> list[Rule]:
+    base = root or SCAN_ROOT
     text_rules: list[Rule] = []
 
     # ---------- ① 凭据 ----------
@@ -315,6 +359,7 @@ def build_rules(names: list[str]) -> list[Rule]:
                 "block",
                 re.compile(r"(?<![0-9A-Za-z_])%s(?![0-9A-Za-z_])" % re.escape(nm)),
                 note="；登录用户名：单独出现时占位化为 " + PH_USER,
+                fix=_fix_plain(PH_USER),
             )
         )
     text_rules.append(
@@ -324,6 +369,7 @@ def build_rules(names: list[str]) -> list[Rule]:
             "block",
             re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}"),
             note="；邮箱：占位化为 " + PH_EMAIL,
+            fix=_fix_plain(PH_EMAIL),
         )
     )
     text_rules.append(
@@ -333,6 +379,7 @@ def build_rules(names: list[str]) -> list[Rule]:
             "block",
             re.compile(r"S-1-5-21-\d{9,10}-\d{9,10}-\d{9,10}-\d{3,5}"),
             note="；机器 SID：占位化为 " + PH_SID,
+            fix=_fix_plain(PH_SID),
         )
     )
     text_rules.append(
@@ -368,6 +415,7 @@ def build_rules(names: list[str]) -> list[Rule]:
             ),
             judge=_judge_home_dir,
             note="；家目录绝对路径：占位化为 " + PH_HOME,
+            fix=_fix_plain(PH_HOME),
         )
     )
     text_rules.append(
@@ -378,6 +426,7 @@ def build_rules(names: list[str]) -> list[Rule]:
             re.compile(r"[A-Za-z]:[\\/]+program[\\/]+"),
             judge=_judge_install_path,
             note="；本机安装路径：文档里占位化为 " + PH_APP,
+            fix=_fix_install_dir,
         )
     )
     text_rules.append(
@@ -404,16 +453,30 @@ def build_rules(names: list[str]) -> list[Rule]:
             "path_repo_root",
             "path",
             "block",
-            re.compile(r"(?i)(?:%s)" % _repo_root_alternation()),
+            re.compile(r"(?i)(?:%s)" % _repo_root_alternation(base)),
             note="；仓库根绝对路径：占位化为 " + PH_REPO,
+            fix=_fix_plain(PH_REPO),
+        )
+    )
+    # 本机第三方工具链安装目录（Java / IDE / PortableApps / nvm 等）：不含身份信息，登记为 warn。
+    text_rules.append(
+        Rule(
+            "path_local_toolchain",
+            "path",
+            "warn",
+            re.compile(
+                r"(?i)[A-Za-z]:[\\/]+(?:java\d+|portableapps|intellij[^\\/\s\"'<>|]*|"
+                r"pycharm[^\\/\s\"'<>|]*|nvm[\\/]+installs)[\\/]"
+            ),
+            note="；本机第三方工具链安装目录：只暴露装了什么软件，不含身份信息；按 lead 口径登记 warn、不占位化",
         )
     )
     return text_rules
 
 
-def _repo_root_alternation() -> str:
+def _repo_root_alternation(root: Path | None = None) -> str:
     """当前仓库根的绝对路径，兼容反斜杠/正斜杠写法。"""
-    repo_str = str(REPO_ROOT)
+    repo_str = str(root or SCAN_ROOT)
     variants = {repo_str, repo_str.replace("\\", "/"), repo_str.replace("/", "\\")}
     return "|".join(re.escape(v) for v in sorted(variants, key=len, reverse=True))
 
@@ -435,6 +498,25 @@ def _is_allowed_email(value: str) -> bool:
     return False
 
 
+def _rev_list(*args: str) -> list[str]:
+    try:
+        return run_git("rev-list", *args).split()
+    except RuntimeError:
+        return []
+
+
+def published_commits() -> set[str]:
+    """已公开的提交集合 = 已发布 tag 可达 ∪ 已推送 origin/main 可达。
+
+    这批提交里出现过的内容已经能被任何人 clone 出来，改写只会破坏 tag 与别人的仓库，
+    因此只如实登记为 warn；其余（未推送）提交里的命中是 block，必须占位化后重写历史。
+    """
+    shas: set[str] = set()
+    for ref in (PUBLISHED_TAG, PUSHED_REF):
+        shas.update(_rev_list(ref))
+    return shas
+
+
 def scan_text(
     text: str,
     path: str,
@@ -443,6 +525,7 @@ def scan_text(
     commit: str | None = None,
     line_offset: int = 0,
     subject: str | None = None,
+    published: bool = True,
 ) -> list[Hit]:
     """对一段文本逐行套规则；返回命中（已去重）。"""
     hits: list[Hit] = []
@@ -469,10 +552,18 @@ def scan_text(
                         shown = value.replace(secret, _mask(secret), 1)
                     evidence = line.replace(secret, _mask(secret), 1)
                 if scope == "history":
-                    # 历史只读：除真凭据外一律 warn（团队规则不许改写历史；发布前由 lead 决策）
-                    if severity == "block" and rule.category != "credential":
+                    if not published:
+                        # 未推送历史（origin/main..HEAD）：命中仍是 block，必须占位化后重写；
+                        # 只删最新提交不算过——旧提交里的内容照样能被 git log -S 检索到。
+                        if severity == "block":
+                            note = note + "；未推送历史：必须占位化后重写"
+                        else:
+                            note = note + "；未推送历史：warn 级，登记原因"
+                    elif severity == "block" and rule.category != "credential":
+                        # 已公开历史（已发布 tag / 已推送 origin）：改写会破坏已公开 tag 与他人 clone，
+                        # 按 lead 口径只登记、不改写。
                         severity = "warn"
-                        note = note + "；历史内容，按口径不改写历史"
+                        note = note + "；已公开历史（已发布 tag / 已推送 origin），按口径不改写，如实登记"
                     if subject:
                         note = note + "；提交信息：" + subject[:60]
                 if scope == "history":
@@ -489,6 +580,7 @@ def scan_text(
                     evidence=evidence.strip()[:240],
                     note=note,
                     commit=commit,
+                    published=(published if scope == "history" else None),
                 )
                 if hit.key() in seen:
                     continue
@@ -621,25 +713,44 @@ def scan_history_metadata() -> tuple[list[Hit], list[dict]]:
                 "subject": subject,
             }
         )
+        is_published = sha in PUBLISHED_COMMITS
         for role, nm, em in (("作者", an, ae), ("提交者", cn, ce)):
             if nm == NEUTRAL_NAME and em == NEUTRAL_EMAIL:
                 continue
-            note = "；%s身份：已随已发布 tag 公开的仓库所有者身份，按 lead 口径判定为 warn、不改写历史" % role
+            if is_published:
+                sev = "warn"
+                note = (
+                    "；%s身份：已随已发布 tag / 已推送提交公开的仓库所有者身份，"
+                    "按 lead 口径判定为 warn、不改写历史" % role
+                )
+            else:
+                sev = "block"
+                note = (
+                    "；%s身份不是中性署名：未推送提交必须用 brushConverter contributors 中性署名重写" % role
+                )
             hits.append(
                 Hit(
                     category="metadata",
                     rule="meta_commit_identity",
-                    severity="warn",
+                    severity=sev,
                     scope="history",
                     location="%s %s" % (sha[:10], role),
                     matched="%s <%s>" % (nm, em),
                     evidence="%s | %s" % (subject[:80], ad),
                     note=note,
                     commit=sha,
+                    published=is_published,
                 )
             )
         # 提交信息本身也过一遍内容规则（邮箱/用户名/家目录/安装路径等）
-        for hit in scan_text(subject + "\n" + body, "(提交信息)", "history", commit=sha, subject=subject):
+        for hit in scan_text(
+            subject + "\n" + body,
+            "(提交信息)",
+            "history",
+            commit=sha,
+            subject=subject,
+            published=is_published,
+        ):
             hit.rule = "meta_commit_message:" + hit.rule
             hits.append(hit)
     uniq: dict[tuple, Hit] = {}
@@ -672,7 +783,16 @@ def scan_history_content() -> list[Hit]:
             content = line[1:]
             if not content.strip():
                 continue
-            hits.extend(scan_text(content, cur_file or "(未知文件)", "history", commit=commit, subject=subject))
+            hits.extend(
+                scan_text(
+                    content,
+                    cur_file or "(未知文件)",
+                    "history",
+                    commit=commit,
+                    subject=subject,
+                    published=(commit in PUBLISHED_COMMITS),
+                )
+            )
         elif line.startswith("Binary files ") or line.startswith("GIT binary patch"):
             if cur_file:
                 hits.append(
@@ -711,6 +831,7 @@ INTERNAL_ARTIFACT_RULES = [
     (".mnemon/", re.compile(r"^\.mnemon/")),
     ("docs/优化提示词/（内部规划文档）", re.compile(r"^docs/优化提示词/")),
     ("docs/工作流程/（内部规划文档）", re.compile(r"^docs/工作流程/")),
+    ("_work/（一次性探针脚手架 / 调试日志）", re.compile(r"(?:^|/)_work/")),
     (".env 文件", re.compile(r"(?:^|/)\.env(?:\.[^/]*)?$")),
 ]
 
@@ -737,6 +858,139 @@ def check_internal_artifacts(paths: list[str]) -> list[Hit]:
                 )
             )
     return hits
+
+
+# ---------------------------------------------------------------------------
+# 覆盖清单（本轮新增目录必须真的被扫到，0 个文件即报覆盖缺失）
+# ---------------------------------------------------------------------------
+def coverage_report(paths: list[str]) -> list[dict]:
+    """逐目录统计扫描覆盖；目录里 0 个文件视为覆盖缺失（block）。"""
+    rows: list[dict] = []
+    for prefix, desc in COVERAGE_DIRS:
+        matched = [p for p in paths if p.replace("\\", "/").startswith(prefix)]
+        rows.append({"dir": prefix, "desc": desc, "files": len(matched)})
+    return rows
+
+
+def coverage_hits(rows: list[dict]) -> list[Hit]:
+    hits: list[Hit] = []
+    for row in rows:
+        if row["files"] > 0:
+            continue
+        hits.append(
+            Hit(
+                category="artifact",
+                rule="coverage_missing:" + row["dir"],
+                severity="block",
+                scope="worktree",
+                location=row["dir"],
+                matched="0 个文件",
+                evidence="本轮新增目录没有被扫描覆盖",
+                note="；检查该目录是否已被 git 跟踪、是否改名",
+            )
+        )
+    return hits
+
+
+# ---------------------------------------------------------------------------
+# 占位符修复（--fix-worktree / --fix-tree；历史重写复用同一套映射，保证口径一致）
+# ---------------------------------------------------------------------------
+def _fix_rules() -> list[Rule]:
+    """按「先长后短」顺序返回带修复动作的规则：先整条路径，最后才是裸用户名。"""
+    order = ["path_repo_root", "path_home_dir", "path_install_dir", "identity_email", "identity_sid"]
+    picked: list[Rule] = []
+    for name in order:
+        picked.extend(r for r in RULES if r.name == name and r.fix is not None)
+    picked.extend(r for r in RULES if r.name.startswith("identity_username:") and r.fix is not None)
+    return picked
+
+
+def apply_fixes(text: str, path: str) -> tuple[str, int]:
+    """按规则把 block 级命中替换成统一占位符；返回 (新文本, 替换次数)。warn 级一律保留。"""
+    total = 0
+    for rule in _fix_rules():
+        counter = {"n": 0}
+
+        def _sub(m: re.Match, _rule=rule, _counter=counter) -> str:
+            severity = _rule.severity
+            if _rule.judge is not None:
+                severity, _ = _rule.judge(m, path)
+            if severity != "block":
+                return m.group(0)
+            # 中性/示例邮箱（contributors@brushconverter.invalid、git@github.com 等）与扫描器口径一致：不替换
+            if _rule.name == "identity_email" and _is_allowed_email(m.group(0)):
+                return m.group(0)
+            replaced = _rule.fix(m) if _rule.fix is not None else m.group(0)
+            if replaced != m.group(0):
+                _counter["n"] += 1
+            return replaced
+
+        text = rule.pattern.sub(_sub, text)
+        total += counter["n"]
+    return text, total
+
+
+_FIX_SKIP_DIRS = {".git", "__pycache__", ".pytest_cache", ".idea", ".vscode", "node_modules"}
+
+
+def _iter_tree_files(root: Path):
+    for dirpath, dirnames, filenames in os.walk(root):
+        dirnames[:] = [d for d in dirnames if d not in _FIX_SKIP_DIRS]
+        for name in filenames:
+            if name == ".git":  # git worktree 里 .git 是文件而不是目录
+                continue
+            yield Path(dirpath) / name
+
+
+def fix_files(root: Path, paths: list[str], apply: bool) -> dict:
+    """对给定文件列表做占位化；apply=False 只预览。二进制/非 UTF-8 文件跳过。"""
+    changed: list[dict] = []
+    replacements = 0
+    skipped = 0
+    for rel in paths:
+        full = root / rel
+        if full.is_symlink() or not full.is_file():
+            continue
+        try:
+            data = full.read_bytes()
+        except OSError:
+            skipped += 1
+            continue
+        if b"\x00" in data[:8192]:
+            skipped += 1
+            continue
+        try:
+            text = data.decode("utf-8")
+        except UnicodeDecodeError:
+            skipped += 1
+            continue
+        new_text, n = apply_fixes(text, rel)
+        if n <= 0 or new_text == text:
+            continue
+        if apply:
+            try:
+                full.write_bytes(new_text.encode("utf-8"))
+            except OSError:
+                skipped += 1
+                continue
+        changed.append({"path": rel, "replacements": n})
+        replacements += n
+    return {
+        "files_changed": len(changed),
+        "replacements": replacements,
+        "binary_skipped": skipped,
+        "applied": apply,
+        "details": changed,
+    }
+
+
+def fix_worktree(paths: list[str], apply: bool) -> dict:
+    return fix_files(REPO_ROOT, paths, apply)
+
+
+def fix_tree(root: Path, apply: bool) -> dict:
+    paths = [p.relative_to(root).as_posix() for p in _iter_tree_files(root) if p.is_file()]
+    return fix_files(root, paths, apply)
 
 
 # ---------------------------------------------------------------------------
@@ -770,6 +1024,13 @@ def render_text(result: dict, max_per_rule: int) -> str:
             result["history"]["commits"],
         )
     )
+    add(
+        "文件类型覆盖：文本 %s"
+        % "、".join(
+            "%s×%d" % (k or "(无扩展名)", v)
+            for k, v in list(result["worktree"].get("text_extensions", {}).items())[:14]
+        )
+    )
     add("分级口径：block=发布前必须清零；warn=允许保留但必须逐条说明理由")
     add("")
     add("一、分类统计")
@@ -778,6 +1039,21 @@ def render_text(result: dict, max_per_rule: int) -> str:
     for cat in CATEGORY_ORDER:
         c = by_cat.get(cat, {"block": 0, "warn": 0})
         add("| %s | %d | %d |" % (CATEGORY_LABELS.get(cat, cat), c["block"], c["warn"]))
+    add("")
+    sc = result.get("scopes", {})
+    ps = result.get("published_split", {})
+    add(
+        "block 构成：工作区 %d 条 / 未推送历史 %d 条；已公开历史命中已降级为 warn（%d 条）"
+        % (
+            sc.get("worktree", {}).get("block", 0),
+            ps.get("unpublished", {}).get("block", 0),
+            ps.get("published", {}).get("warn", 0),
+        )
+    )
+    add("")
+    add("一·五、覆盖清单（本轮新增目录，0 个文件即判覆盖缺失）")
+    for row in result.get("coverage", []):
+        add("- %s（%s）：%d 个文件" % (row["dir"], row["desc"], row["files"]))
     add("")
 
     def dump(severity: str) -> None:
@@ -836,6 +1112,8 @@ def render_text(result: dict, max_per_rule: int) -> str:
 
 def build_result(args) -> dict:
     started = _dt.datetime.now().astimezone()
+    PUBLISHED_COMMITS.clear()
+    PUBLISHED_COMMITS.update(published_commits())
     paths: list[str] = []
     hist_meta_hits: list[Hit] = []
     hist_content_hits: list[Hit] = []
@@ -847,6 +1125,8 @@ def build_result(args) -> dict:
     text_files = 0
     binary_files = 0
     untracked_count = 0
+    text_ext_counts: dict[str, int] = {}
+    coverage_rows: list[dict] = []
 
     want_worktree = not args.history_only
     want_history = not args.worktree_only
@@ -880,6 +1160,8 @@ def build_result(args) -> dict:
                 binary_files += 1
                 continue
             text_files += 1
+            _ext = Path(rel).suffix.lower()
+            text_ext_counts[_ext] = text_ext_counts.get(_ext, 0) + 1
             try:
                 text = data.decode("utf-8")
             except UnicodeDecodeError:
@@ -896,6 +1178,9 @@ def build_result(args) -> dict:
         internal_hits = check_internal_artifacts(paths)
         worktree_hits.extend(internal_hits)
         internal = [{"path": h.location, "rule": h.rule} for h in internal_hits]
+        # 覆盖清单（本轮新增目录必须真的被扫到；0 个文件即 block）
+        coverage_rows = coverage_report(paths)
+        worktree_hits.extend(coverage_hits(coverage_rows))
         # 扫描器自身也必须干净（即使它还没被跟踪）
         if SELF_PATH.exists():
             try:
@@ -928,6 +1213,12 @@ def build_result(args) -> dict:
         ),
     )
     counts = count_by(hits)
+    scopes: dict = {"worktree": {"block": 0, "warn": 0}, "history": {"block": 0, "warn": 0}}
+    published_split: dict = {"published": {"block": 0, "warn": 0}, "unpublished": {"block": 0, "warn": 0}}
+    for h in hits:
+        scopes.setdefault(h.scope, {"block": 0, "warn": 0})[h.severity] += 1
+        if h.scope == "history":
+            published_split["published" if h.published else "unpublished"][h.severity] += 1
     block_total = sum(c["block"] for c in counts.values())
     warn_total = sum(c["warn"] for c in counts.values())
     verdict = (
@@ -953,11 +1244,20 @@ def build_result(args) -> dict:
             "scanned_files": len(paths),
             "text_files": text_files,
             "binary_files": binary_files,
+            "text_extensions": dict(sorted(text_ext_counts.items(), key=lambda kv: -kv[1])),
             "scanned_self": (
                 SELF_PATH.relative_to(REPO_ROOT).as_posix() if SELF_PATH.exists() else None
             ),
         },
-        "history": {"commits": commit_count},
+        "history": {
+            "commits": commit_count,
+            "published_tag": PUBLISHED_TAG,
+            "published_commits": len(PUBLISHED_COMMITS),
+            "unpublished_commits": len(set(records and [r["commit"] for r in records]) - PUBLISHED_COMMITS),
+        },
+        "scopes": scopes,
+        "published_split": published_split,
+        "coverage": coverage_rows,
         "counts": {
             "block": block_total,
             "warn": warn_total,
@@ -992,6 +1292,7 @@ def selftest() -> int:
         "path_unc": "\\\\" + "fileserver" + "\\" + "share" + "\\x",
         "path_file_url": "file:" + "///" + "D:/x/y",
         "path_repo_root": str(REPO_ROOT).replace("\\", "/"),
+        "path_local_toolchain": "D:" + "\\" + "java21" + "\\" + "bin",
     }
     safe = [
         PH_HOME + "\\AppData\\Local",
@@ -1026,6 +1327,20 @@ def selftest() -> int:
     hits = scan_text("token " + secret, "(selftest)", "worktree")
     if not hits or secret in hits[0].matched or secret in hits[0].evidence:
         failures.append("凭据脱敏失败：打印内容里出现了完整秘密")
+    # 占位化器自检：对合成样本跑一遍，block 必须清零，且占位符不被二次改写
+    fix_sample = (
+        "C:" + "/" + "Users" + "/" + "alice" + "/AppData "
+        + "D:" + "\\" + "program" + "\\" + "Krita (x64)"
+    )
+    fixed, nfix = apply_fixes(fix_sample, "(selftest)")
+    if nfix < 2:
+        failures.append("占位化器替换不足：%r -> %r（%d 处）" % (fix_sample, fixed, nfix))
+    leftover = [h for h in scan_text(fixed, "(selftest)", "worktree") if h.severity == "block"]
+    if leftover:
+        failures.append(
+            "占位化后仍有 block：%r -> %s" % (fixed, [(h.rule, h.matched) for h in leftover])
+        )
+
     if failures:
         print("自检失败（%d 项）：" % len(failures))
         for f in failures:
@@ -1071,6 +1386,18 @@ def main(argv: list[str] | None = None) -> int:
         help="把尚未跟踪、也没被 .gitignore 排除的新文件一并纳入（收尾增量扫描用）",
     )
     parser.add_argument("--selftest", action="store_true", help="只跑内置自检（不读仓库、不写文件）")
+    parser.add_argument(
+        "--fix-worktree",
+        action="store_true",
+        help="预览工作区占位化（配合 --apply 才写回文件）",
+    )
+    parser.add_argument(
+        "--fix-tree",
+        action="store_true",
+        help="对当前目录整棵树做占位化（供 git filter-branch --tree-filter 重写历史调用）",
+    )
+    parser.add_argument("--root", metavar="PATH", help="扫描根（默认仓库根；历史重写时指定原仓库根）")
+    parser.add_argument("--apply", action="store_true", help="与 --fix-worktree/--fix-tree 连用：真正写回文件")
     parser.add_argument("--max-per-rule", type=int, default=500, help="文本报告里同一规则最多打印多少条")
     parser.add_argument("--quiet", action="store_true", help="不打印文本报告（只写文件）")
     args = parser.parse_args(argv)
@@ -1081,11 +1408,54 @@ def main(argv: list[str] | None = None) -> int:
     if args.worktree_only and args.history_only:
         print("[错误] --worktree-only 与 --history-only 不能同时使用", file=sys.stderr)
         return 2
+
+    global SCAN_ROOT
+    if args.root:
+        SCAN_ROOT = Path(args.root).resolve()
+
+    if args.fix_tree:
+        RULES = build_rules(build_identity_names(), SCAN_ROOT)
+        root = Path.cwd()
+        stats = fix_tree(root, apply=True)
+        print(
+            "[fix-tree] %s：改动文件 %d 个 / 替换 %d 处 / 跳过二进制 %d 个"
+            % (root, stats["files_changed"], stats["replacements"], stats["binary_skipped"])
+        )
+        if args.json:
+            Path(args.json).write_text(
+                json.dumps(stats, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+            )
+        return 0
+
+    if args.fix_worktree:
+        RULES = build_rules(build_identity_names(), SCAN_ROOT)
+        paths = tracked_files()
+        if args.include_untracked:
+            known = set(paths)
+            paths += [p for p in untracked_files() if p not in known]
+        stats = fix_worktree(paths, apply=args.apply)
+        print(
+            "[fix-worktree] 模式=%s 改动文件 %d 个 / 替换 %d 处 / 跳过二进制 %d 个"
+            % (
+                "写回" if args.apply else "预览",
+                stats["files_changed"],
+                stats["replacements"],
+                stats["binary_skipped"],
+            )
+        )
+        for item in stats["details"]:
+            print("  - %s（%d 处）" % (item["path"], item["replacements"]))
+        if args.json:
+            Path(args.json).write_text(
+                json.dumps(stats, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+            )
+        return 0
+
     if not (REPO_ROOT / ".git").exists():
         print("[错误] %s 不是 git 仓库根" % REPO_ROOT, file=sys.stderr)
         return 2
 
-    RULES = build_rules(build_identity_names())
+    RULES = build_rules(build_identity_names(), SCAN_ROOT)
 
     try:
         result = build_result(args)
