@@ -1,0 +1,7 @@
+# 任务 35（B 批）批次目录：图与工作文件都不入库（judge-result.json 由 judge_b.py 重跑生成）
+*.png
+*.kpp
+_work/
+ps/
+krita/
+judge-result.json

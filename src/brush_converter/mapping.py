@@ -51,6 +51,39 @@ _TEXTURING_MODE = {
     "linearHeightPhotoshop": 15,  # LINEAR_HEIGHT_PHOTOSHOP
     "linearHeightPS": 15,
     "HghtPS": 14,
+    # PS 2025 把纹理混合模式写成 stringID（不是 4CC），下面两条由此前一律静默回退
+    # Multiply(0)。任务 35（B 批）实测转正：PS 真值 ↔ Krita 对应模式渲染 6/6 组 0.00%/max≤1。
+    "linearDodge": 8,    # LINEAR_DODGE（等价 4CC 键 LDdg）
+    "linearBurn": 9,     # LINEAR_BURN（等价 4CC 键 LBur）
+    # --- v0.4 任务 34（A 批实测转正，证据 docs/研究报告/模式-A.md）---
+    # 依据：PS 真值 Alpha 与 Mltp 真值同哈希（6/6 组）、与 Krita 对应模式真机渲染
+    # 掩码空间 0.00%、max_delta ≤1。显式登记后不再打印「回退Multiply」警告。
+    # 注意：base=1（不透明笔尖章）时 MULTIPLY/DARKEN/LINEAR_BURN 三算子像素相同，
+    # 选 Multiply 是因为名字语义与既有默认，不是因为这三种能区分。
+    "Mltp": 0,           # Multiply（PS 4CC 写法；ABR 里另一种写法 "Mul " 见上）
+    "Nrml": 0,           # Normal 普通（实测 Alpha 通路 ≡ 正片叠底）
+    "Bhnd": 0,           # Behind 背后（同上）
+    "Clar": 0,           # Clear 清除（同上）
+    "H   ": 0,           # Hue 色相（颜色域模式，Alpha 通路无独立传递律）
+    "Strt": 0,           # Saturation 饱和度（同上）
+    "Clr ": 0,           # Color 颜色（同上）
+    "Lmns": 0,           # Luminosity 明度（同上）
+    # Difference 实测并不是「差值」：PS 侧 Alpha ≡ 减去（d<100 与 Sbtr 同哈希、
+    # d=100 同为 255−u）。映射到 Krita SUBTRACT(1) 后 6/6 组 0.00%/max≤1；
+    # 旧行为是静默回退 Multiply，实测差异 69.04%~99.29%。按像素校准，不是按名字对应。
+    "Dfrn": 1,           # SUBTRACT
+    # --- v0.4 任务 36（C 批实测转正，证据 docs/研究报告/模式-C.md）---
+    # 口径：PS 真值 vs「任务 33 已渲染的 Krita 同组图」逐像素比（tol=2，门槛 2%/max2）。
+    # 前三条：PS 侧真值与 Mltp 真值逐字节相同，且 vs Krita Multiply 渲染 6/6 组
+    # 0.00%、max_delta<=1。PS 把这几个「层域」模式名在纹理笔迹上按默认算子处理，
+    # 映射成 Multiply 是当前唯一有像素证据的选择（显式登记后不再打印「回退Multiply」）。
+    "passThrough": 0,     # 穿透：6/6 组 0.00%/max 0~1
+    "lighterColor": 0,    # 较亮颜色：6/6 组 0.00%/max 0~1
+    "darkerColor": 0,     # 较暗颜色：6/6 组 0.00%/max 0~1
+    # 减去的第二种写法（PS 层域名，与 4CC "Sbtr" 同义）：PS 侧真值与 Sbtr 真值逐字节
+    # 相同，且 vs Krita Subtract 渲染 6/6 组 0.00%/max 0~1。旧代码无此键 → 回退
+    # Multiply(0)，属映射错误（把「减去」当「正片叠底」），本批修正。
+    "blendSubtraction": 1,  # SUBTRACT：6/6 组 0.00%/max 0~1
 }
 
 

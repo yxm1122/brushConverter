@@ -1,0 +1,7 @@
+# 任务 34（A 批）批次目录：图与工作文件都不入库（judge-result.json 由 judge_a.py 重跑生成）
+*.png
+*.kpp
+_work/
+ps/
+krita/
+judge-result.json
