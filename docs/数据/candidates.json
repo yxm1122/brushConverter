@@ -1,0 +1,1733 @@
+[
+  {
+    "id": "K01",
+    "priority": 1,
+    "role": "loader",
+    "grade": "已证实",
+    "domain": [
+      "纹理",
+      "散布",
+      "传递",
+      "形状动态",
+      "颜色动态",
+      "湿边",
+      "噪点",
+      "重复/喷枪",
+      "画笔姿态"
+    ],
+    "func": "0x141a8f520",
+    "offsets_read": [
+      "+0x88",
+      "+0xd8",
+      "+0x198",
+      "+0x1e8",
+      "+0x1fc",
+      "+0x210",
+      "+0x224",
+      "+0x238",
+      "+0x290",
+      "+0x291",
+      "+0x292",
+      "+0x293",
+      "+0x294",
+      "+0x295",
+      "+0x1e1",
+      "+0x18",
+      "+0x1c"
+    ],
+    "evidence": [
+      "0x141a8f88a lea rcx,[rsi+0x88] -> 0x141a8f894 call 0x141a932b0（tipDynamics）",
+      "0x141a8f899 lea rcx,[rsi+0xd8] -> 0x141a8f8a3 call 0x141a930b0（散布子对象）",
+      "0x141a8f964 lea rcx,[rsi+0x198] -> 0x141a8f96b call 0x141a935f0（纹理）",
+      "0x141a8f98f lea rcx,[rsi+0x1e8] / 0x141a8f996 mov r8d,0x70725672（prVr）",
+      "0x141a8f9ad lea rcx,[rsi+0x1fc] / 0x141a8f9a4 mov r8d,0x6f705672（opVr）",
+      "0x141a8f9d7 lea rcx,[rsi+0x210] / 0x141a8f9ce mov r8d,0x6d785672（mxVr）",
+      "0x141a8f9b9 lea rcx,[rsi+0x224] / 0x141a8f9c0 mov r8d,0x77745672（wtVr）",
+      "0x141a8f9e3 lea rbx,[rsi+0x238] -> 0x141a8f9f0 call 0x141a93ab0（colorDynamics）",
+      "0x141a8f9f5 lea r8,[rsi+0x292] / 0x141a8fa0c lea rdx,\"wetEdges\" / 0x141a8fa13 call 0x142c4a8f0",
+      "0x141a8fa18 lea r8,[rsi+0x293] / 0x141a8fa2f lea rdx,\"noise\"",
+      "0x141a8fa3b lea r8,[rsi+0x294] / 0x141a8fa52 lea rdx,\"repeat\"",
+      "0x141a8f988 mov byte [rsi+0x1e1],0（useDualBrush）",
+      "0x141a8f983 call 0x141a937e0（H1 真入口）",
+      "0x141a8fadf cmp dword [rbx+0x18],0 / 0x141a8fae5 cmp dword [rbx+0x1c],0（colorDynamics 段判空）"
+    ],
+    "sources": [
+      "25:§4#3 已证实档",
+      "25:§5.1 传参层",
+      "26:§3.1 散布读取器调用点",
+      "26:§4.1 装载偏移表",
+      "27:§3.7 对象装载入口",
+      "28:§0.3 两套键空间/§2.2 湿边写点"
+    ],
+    "refs": [
+      "docs/研究报告/静态-纹理.md:95",
+      "docs/研究报告/静态-纹理.md:115",
+      "docs/研究报告/静态-散布传递.md:58",
+      "docs/研究报告/静态-散布传递.md:112",
+      "docs/研究报告/静态-形状颜色.md:80",
+      "docs/研究报告/静态-形状颜色.md:242",
+      "docs/研究报告/静态-湿边等.md:31",
+      "docs/研究报告/静态-湿边等.md:93"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "四域唯一的共同装载入口：一次断点即可看到 tipDynamics/散布/纹理/4 个传递动态/颜色/4 个 bool 的全部落位，v0.3 首选（也是 26 §9 的 V1/V2 前置）。域差异：25 用它证明「纹理 +0x18/+0x1c 读取」并把它列为纯传参层；26 用它取「各子结构基址」；27 用它证明 tipDynamics 与 clVr 的装载路径；28 用它证明「字符串键与 4CC 键并存于同一对象」。注意 +0x18/+0x1c 在此函数里是对 colorDynamics 段的判空（rsi=rbx+0x238 时），不是纹理 brightness/contrast（见冲突 C-4）。"
+  },
+  {
+    "id": "K02",
+    "priority": 2,
+    "role": "read_point_candidate",
+    "grade": "已证实",
+    "domain": [
+      "纹理"
+    ],
+    "func": "0x141a8af30",
+    "offsets_read": [
+      "+0x18",
+      "+0x1c",
+      "+0x10"
+    ],
+    "evidence": [
+      "0x141a8af8c mulss xmm6,[r9+0x18]",
+      "0x141a8afac mulss xmm6,[r9+0x1c]",
+      "0x141a8afb4 movss xmm,[r9+0x10]（与浮点常量 comiss 比较）",
+      "跳转表 0x141a8af7b / 0x141a8af83 / 0x141a8af86（jmp rcx），各分支 subss -> mulss k -> addss 即 (x-y)*k+y"
+    ],
+    "sources": [
+      "25:§4#1 已证实档"
+    ],
+    "refs": [
+      "docs/研究报告/静态-纹理.md:93"
+    ],
+    "pixel_consumer_verdict": "候选（未证实）",
+    "note": "全库唯一「按模式选一个字段当混合系数」的算术形态，因此在四份报告里最像纹理混合数值核；但三个字段都是 float（mulss），而描述符侧 +0x18/+0x1c 是 int32 -> 结构体身份未证，可能是运行期派生对象。务必按「读取点/形态候选」读，不是已证实的像素消费端（25 §7.1 明确「像素消费端未定位」）。"
+  },
+  {
+    "id": "K03",
+    "priority": 3,
+    "role": "domain_reader",
+    "grade": "已证实",
+    "domain": [
+      "散布"
+    ],
+    "func": "0x141a930b0",
+    "offsets_read": [
+      "+0x00",
+      "+0x04",
+      "+0x08",
+      "+0x0c",
+      "+0x10",
+      "+0x24",
+      "+0x2c"
+    ],
+    "evidence": [
+      "0x141a93252 取 useScatter(bool) -> [rbx]",
+      "0x141a93118 / 0x141a93120 cmp eax,r14d(0x3e8) / 0x141a93123 cmovg（散布量 clamp [0,1000]）",
+      "0x141a93127 mov dword ptr [rbx+0x2c],eax（scatter）",
+      "0x141a93136 判有无 -> 0x141a9315d 取 double -> 0x141a93162 取整 -> 0x141a93187 mov [rbx+rax],esi（+0x04 Spcn，clamp [1,1000]）",
+      "0x141a93180 取 count -> 0x141a931c3..0x141a931d3（clamp [1,10]，0x141a931a0 附近 mov ecx,0xa）",
+      "0x141a931e2 lea r8,[rbx+0xc] -> 0x141a931ed call 0x142c4a8f0（bothAxes）",
+      "0x141a93201 lea rcx,[rbx+0x10] -> 0x141a93208 call 0x141a93ea0（countDynamics）",
+      "0x141a9321c lea rcx,[rbx+0x24] -> 0x141a93223 call 0x141a93ea0（scatterDynamics）",
+      "0x141a93272 cmp dword [rbx+0x2c],0 / 0x141a93278 cmp dword [rbx+8],1 / 0x141a93280 mov [rbx],al（useScatter 推导式）"
+    ],
+    "sources": [
+      "25:§5.1 传参层（0x141a93cc0 -> call 0x141a930b0）",
+      "26:§3.1 散布域主表"
+    ],
+    "refs": [
+      "docs/研究报告/静态-纹理.md:114",
+      "docs/研究报告/静态-散布传递.md:58",
+      "docs/研究报告/静态-散布传递.md:64",
+      "docs/研究报告/静态-散布传递.md:69"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "26 §9 V1 指定的第一个断点：出口读 [rcx+0x04]（Spcn）/[rcx+0x2c]（散布量）/[rcx+0x08]（count）/[rcx+0x0c]（bothAxes）。同时是 U4/U5（散布/间距消费端、压感求值点）与 V4/V5（对预设对象 +0x104=+0xd8+0x2c、+0xdc=+0xd8+0x04 下硬件写断点）的取证锚点：必须先在此出口取到预设对象地址。"
+  },
+  {
+    "id": "K04",
+    "priority": 4,
+    "role": "domain_reader",
+    "grade": "已证实",
+    "domain": [
+      "散布",
+      "传递",
+      "形状动态",
+      "颜色动态"
+    ],
+    "func": "0x141a93ea0",
+    "offsets_read": [
+      "+0x00",
+      "+0x04",
+      "+0x08",
+      "+0x0c",
+      "+0x10"
+    ],
+    "evidence": [
+      "0x141a93ef7 call 0x142c4f200（取嵌套描述符对象）",
+      "0x141a93f0e mov edx,0x62565479（bVTy）-> 0x141a93f13 call 0x142c4e7c0 -> 0x141a93f18 mov [rbx],eax",
+      "0x141a93f2b mov edx,0x66537470（fStp）-> 0x141a93f35 mov [rbx+4],eax",
+      "0x141a93f46 判 jitter -> 0x141a93f72 lea rdx,\"jitter\" -> 0x141a93f79 call 0x142c4d280 -> 0x141a93f7e mulsd / 0x141a93f82 divsd（×100÷100 恒等）-> 0x141a93f8e/0x141a93f94 clamp -> 0x141a93f97 mov [rbx+8],eax",
+      "0x141a93f5e mov esi,[rbx+0xc] / 0x141a93f94 cmovg eax,esi（jitter 上界，只读不写）",
+      "0x141a93fab minimum -> 0x141a93fd3 call 0x142c4d280 -> 0x141a93fe0 cvttsd2si -> 0x141a93fe8 mov ecx,0x64 -> 0x141a93ff4 mov [rbx+0x10],edi"
+    ],
+    "sources": [
+      "26:§3.3 dynamics 统一布局/§8.1 U1",
+      "27:§3.2 通用动态子对象布局"
+    ],
+    "refs": [
+      "docs/研究报告/静态-散布传递.md:86",
+      "docs/研究报告/静态-散布传递.md:91",
+      "docs/研究报告/静态-散布传递.md:94",
+      "docs/研究报告/静态-散布传递.md:276",
+      "docs/研究报告/静态-形状颜色.md:100",
+      "docs/研究报告/静态-形状颜色.md:107"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "散布/传递/形状/颜色四域共用的同一个动态子对象读取器（szVr/angleDynamics/roundnessDynamics/countDynamics/scatterDynamics/prVr/opVr/mxVr/wtVr/clVr 全部走它），26 §9 的 V2 指定在此出口按 r8d 分组读 5 个字段。未定位项：+0x0c（jitter 上界）的赋值点——26 记 U1（读写两侧都不写），27 给出构造函数 0x141a88bf0 的 6 条 0x64 写入，覆盖 6/7 个动态；scatterDynamics 的上界槽（+0xd8+0x24+0xc = +0x108）不在那 6 条里，仍属 U1 残余（这正好解释 ABR 里 scatterDynamics.jitter 能到 533 > 100）。"
+  },
+  {
+    "id": "K05",
+    "priority": 5,
+    "role": "domain_reader",
+    "grade": "已证实",
+    "domain": [
+      "形状动态",
+      "画笔姿态"
+    ],
+    "func": "0x141a932b0",
+    "offsets_read": [
+      "+0x00",
+      "+0x04",
+      "+0x08",
+      "+0x0c",
+      "+0x10",
+      "+0x24",
+      "+0x38",
+      "+0x4c",
+      "+0x4d",
+      "+0x4e"
+    ],
+    "evidence": [
+      "0x141a9339c mov ecx,0xc8 / 0x141a933a1 cmovg / 0x141a933a6 mov [rbx+4]（tiltScale clamp [0,200]）",
+      "0x141a9331b call 0x142c4d220 / 0x141a93335 cmp eax,r13d(0x64) / 0x141a9333c mov [rbx+8]（minimumDiameter）",
+      "0x141a93468 cmp eax,1 / 0x141a9347d mov eax,0x19（缺省 25）/ 0x141a93482 mov [rbx+0xc]（minimumRoundness）",
+      "0x141a933a9 mov r8d,0x737a5672（szVr）-> 0x141a933b6 call 0x141a93ea0",
+      "0x141a933bb lea rcx,\"angleDynamics\" -> 0x141a933c2 call 0x142c90280 -> 0x141a933d1 call 0x141a93ea0",
+      "0x141a933d6 -> 0x141a933ec call 0x141a93ea0（roundnessDynamics）",
+      "0x141a9353b mov byte ptr [rbx+0x4e],0（brushProjection）/ 0x141a934b8 / 0x141a934f6（flipX/flipY）",
+      "0x141a93590..0x141a935b8 连续 cmp [rbx+0x10/0x18/0x24/0x2c/0x38/0x40/0x4e],0（useTipDynamics 默认式）"
+    ],
+    "sources": [
+      "26:§4.4 笔尖动态子结构",
+      "27:§3.1 tipDynamics 偏移表/§3.7 参数层读取",
+      "28:§5.2 brushProjection 写点"
+    ],
+    "refs": [
+      "docs/研究报告/静态-散布传递.md:154",
+      "docs/研究报告/静态-散布传递.md:158",
+      "docs/研究报告/静态-形状颜色.md:85",
+      "docs/研究报告/静态-形状颜色.md:240",
+      "docs/研究报告/静态-湿边等.md:354"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "形状动态三兄弟（szVr +0x10 / angleDynamics +0x24 / roundnessDynamics +0x38）与 brushProjection(+0x4e) 的唯一读取器。v0.3 待验：27 §五第 2 条建议在此出口对 [设置对象+0xb4]（=+0x88+0x24+0x8，angleDynamics.jitter）下硬件读断点抓消费端；27 §3.5.2 在 brush 窗口按 disp 0xb4/0xb8/0xac/0xa0/0xc8 扫 0 命中，说明消费端不在此窗口或走间接寻址。"
+  },
+  {
+    "id": "K06",
+    "priority": 6,
+    "role": "domain_reader",
+    "grade": "已证实",
+    "domain": [
+      "颜色动态"
+    ],
+    "func": "0x141a93ab0",
+    "offsets_read": [
+      "+0x00",
+      "+0x14",
+      "+0x18",
+      "+0x1c",
+      "+0x20",
+      "+0x24"
+    ],
+    "evidence": [
+      "0x141a93abf mov r8d,0x636c5672（clVr）-> 0x141a93ad0 call 0x141a93ea0（前 0x14 字节就是 clVr 动态）",
+      "0x141a93ae1 lea rdx,\"hue\" -> hasKey；缺失回退 0x141a93b10 lea rdx,\"chroma\" -> 0x141a93b36 call 0x142c4d280 -> 0x141a93b4b mov [rdi+0x14],eax",
+      "0x141a93b5a lea rdx,\"saturation\" -> 0x141a93b80 call 0x142c4d280 -> 0x141a93b95 mov [rdi+0x18],eax",
+      "0x141a93ba4 lea rdx,\"brightness\" -> 缺失 0x141a93bc9 lea rdx,\"lightness\" -> 0x141a93bef call 0x142c4d280 -> 0x141a93c04 mov [rdi+0x1c],eax",
+      "0x141a93c13 lea rdx,\"purity\" -> 0x141a93c35 call 0x142c4d280 -> 0x141a93c46 mov [rdi+0x20],esi",
+      "0x141a93c51 lea rdx,\"colorDynamicsPerTip\" -> 0x141a93c73 call 0x142c4a8f0 -> 0x141a93c78 mov [rdi+0x24],al；缺失 0x141a93c90 mov byte [rdi+0x24],1"
+    ],
+    "sources": [
+      "26:§4.1 colorDynamics 基址 +0x238",
+      "27:§4.1 颜色动态结构体布局"
+    ],
+    "refs": [
+      "docs/研究报告/静态-散布传递.md:123",
+      "docs/研究报告/静态-形状颜色.md:251",
+      "docs/研究报告/静态-形状颜色.md:261",
+      "docs/研究报告/静态-形状颜色.md:265"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "相对基址 = 设置对象 +0x238。+0x18/+0x1c 即设置对象 +0x250/+0x254，分别是 saturation / brightness——与 25 §4 #2/#3 把这两个偏移读成「useColorDynamics 判空」的读法冲突（见冲突 C-4）。颜色抖动的像素应用顺序、purity 数学定义、h/s/v/Mix 幅度标定全部未判定（27 §五第 3/4 条）。"
+  },
+  {
+    "id": "K07",
+    "priority": 7,
+    "role": "param_io",
+    "grade": "已证实",
+    "domain": [
+      "纹理"
+    ],
+    "func": "0x141a937e0",
+    "offsets_read": [
+      "+0x18",
+      "+0x1c",
+      "+0x20",
+      "+0x21"
+    ],
+    "evidence": [
+      "0x141a93a2a lea rdx,\"invertTexture\"（4 条键名 lea 之一）",
+      "0x141a93a42 lea rdx,\"protectTexture\"",
+      "0x141a93a5a lea rdx,\"textureBrightness\" / 0x141a93a61 call 0x142c4e820",
+      "0x141a93a72 lea rdx,\"textureContrast\" / 0x141a93a81 jmp 0x142c4e820（尾调用）",
+      "8 个调用点 / 4 个调用者：0x141a8f520、0x141a90410、0x141ef1f90、0x141ef92e0"
+    ],
+    "sources": [
+      "25:§3 锚点表/§5.3 已知参数 IO 层",
+      "28:§3.2 useDualBrush 落点紧随其后（0x141a8f988）"
+    ],
+    "refs": [
+      "docs/研究报告/静态-纹理.md:77",
+      "docs/研究报告/静态-纹理.md:137",
+      "docs/研究报告/静态-湿边等.md:177"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "H1 真入口。注意：v0.3 下断点必须用 0x141a937e0，不要用任务 11 记的 0x141a939d5——后者只是 .pdata 的 206 B 尾块（同一段代码被拆成 0x141a937e0/0x141a937fb/0x141a939d5/0x141a93ab0 四条记录），旧地址断点永不命中，会重演任务 11A 的 0 命中。"
+  },
+  {
+    "id": "K08",
+    "priority": 8,
+    "role": "param_io",
+    "grade": "已证实",
+    "domain": [
+      "纹理",
+      "湿边"
+    ],
+    "func": "0x141a8e060",
+    "offsets_read": [
+      "+0x18",
+      "+0x1c"
+    ],
+    "evidence": [
+      "0x141a8e74d mov [rdi+0x1c]",
+      "0x141a8e770 mov [rdi+0x18]",
+      "movd 版本 0x141a8e899 / 0x141a8e8cf",
+      "0x141a8e967 lea rdx,\"wetEdges\"（ps_keys.json ref_insn，所属函数 141a8e060-141a8ec55）"
+    ],
+    "sources": [
+      "25:§5.3 M3 批量键读写",
+      "26:§8.1 U1（列为本任务涉及的 6 个函数之一）",
+      "28:§2.2 wetEdges 8 个引用函数之一"
+    ],
+    "refs": [
+      "docs/研究报告/静态-纹理.md:141",
+      "docs/研究报告/静态-散布传递.md:276",
+      "docs/研究报告/静态-湿边等.md:98"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "批量键读写（内存->描述符方向）。v0.3 若要观察「改 PS UI 后写回描述符」，断这里比断读侧更直接；同时它是 wetEdges 的第二个引用函数，可用来分辨 +0x292 在不同装载路径下的基址差（27 §七.3 提出的疑点，见冲突 C-1）。"
+  },
+  {
+    "id": "K09",
+    "priority": 9,
+    "role": "param_io",
+    "grade": "已证实",
+    "domain": [
+      "纹理",
+      "双笔刷"
+    ],
+    "func": "0x141a93cc0",
+    "offsets_read": [
+      "+0x18",
+      "+0x1c"
+    ],
+    "evidence": [
+      "0x141a93dd1 lea r8,[rbx+0x18] -> 0x141a93de1 call 0x141b94090（把 textureBlendMode 字段地址交给模式翻译器）",
+      "0x141a93df8 lea rcx,[rbx+0x1c] -> call 0x141a930b0",
+      "0x141a93cdc lea rdx,\"dualBrush\" -> call 0x142c528d0（存在性）",
+      "0x141a93d08 lea r8,\"dualBrush\" -> call 0x142c4f280（取子对象）",
+      "lea rdx,\"useDualBrush\" -> call 0x142c4a8f0（读 bool）"
+    ],
+    "sources": [
+      "25:§5.1 传参层（判为纯传参）/§3 四级锚点",
+      "28:§3.2 dualBrush 读取函数"
+    ],
+    "refs": [
+      "docs/研究报告/静态-纹理.md:114",
+      "docs/研究报告/静态-纹理.md:70",
+      "docs/研究报告/静态-湿边等.md:176"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "同一函数有两种身份：25 判它「纯传参（只 lea 取地址，交给下家，不算消费端）」，28 判它是「dualBrush 的读取器」。两者不矛盾但断点目的不同——v0.3 在这里只能看 dualBrush 装载/模式翻译传参，看不到纹理像素。25 明确把它排除在消费端之外。"
+  },
+  {
+    "id": "K10",
+    "priority": 10,
+    "role": "param_io",
+    "grade": "已证实",
+    "domain": [
+      "散布",
+      "传递",
+      "形状动态",
+      "颜色动态"
+    ],
+    "func": "0x141a96730",
+    "offsets_read": [
+      "+0x00",
+      "+0x04",
+      "+0x08",
+      "+0x10"
+    ],
+    "evidence": [
+      "0x141a9674d mov edx,0x62725672（brVr）/ 0x141a96757 call 0x142c55500（新建嵌套描述符）",
+      "0x141a96774 mov r8d,[rbx] -> 0x141a96781 call 0x142c5b390（bVTy）",
+      "0x141a9679d mov r8d,[rbx+4] -> 0x141a967ab（fStp）",
+      "0x141a967c7 cvtdq2pd([rbx+8]) / 0x141a967e0 mov r8d,0x23507263（#Prc 单位）/ 0x141a967f2 call 0x142c5ed90（写 jitter double）",
+      "0x141a9680e cvtdq2pd([rbx+0x10]) / 0x141a9681f mov r8d,0x23507263（minimum）",
+      "0x141a9684c call 0x142c5c010（把子描述符挂到父描述符）"
+    ],
+    "sources": [
+      "26:§3.3/§3.4 dynamics 写入器与 brVr 容器",
+      "27:§3.3 jitter 以 #Prc 写回（0x141a967e0 决定单位证据）"
+    ],
+    "refs": [
+      "docs/研究报告/静态-散布传递.md:87",
+      "docs/研究报告/静态-散布传递.md:93",
+      "docs/研究报告/静态-散布传递.md:101",
+      "docs/研究报告/静态-形状颜色.md:139",
+      "docs/研究报告/静态-形状颜色.md:144"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "动态子结构的唯一写回器，也是「brVr 是新容器键」的证据（ps_keys.json 的 32 个 4CC 键里没有 brVr）。27 的「抖动单位=百分比」决定性证据（0x141a967e0 mov r8d,0x23507263 紧跟 \"jitter\" 的 lea）就在这里；v0.3 若要在 PS 里改一个抖动值看它落哪个键，断这里比断读侧更省。"
+  },
+  {
+    "id": "K11",
+    "priority": 11,
+    "role": "data_table",
+    "grade": "已证实",
+    "domain": [
+      "形状动态",
+      "传递",
+      "颜色动态",
+      "散布"
+    ],
+    "func": "0x141a88bf0",
+    "offsets_read": [
+      "+0xa4",
+      "+0xb8",
+      "+0xcc",
+      "+0x1f4",
+      "+0x208",
+      "+0x244"
+    ],
+    "evidence": [
+      "0x141a88cdd mov dword ptr [r14+0xa4],0x64（szVr.jitter 上界 = 100）",
+      "0x141a88ce8 mov dword ptr [r14+0xb8],0x64（angleDynamics.jitter 上界 = 100）",
+      "0x141a88cf3 mov qword ptr [r14+0xcc],0x64（roundness.jitter 上界 = 100）",
+      "0x141a88f22 mov dword ptr [r14+0x1f4],0x64（prVr/流量）",
+      "0x141a88f46 mov dword ptr [r14+0x208],0x64（opVr/不透明度）",
+      "0x141a88f9d mov dword ptr [r14+0x244],0x64（clVr/前景背景）",
+      "对象大小 0x2e8：0x141a90b38 mov ecx,0x2e8 -> call 0x142a04d50（operator new）-> 0x141a90b5d call 0x141a88bf0"
+    ],
+    "sources": [
+      "27:§3.1 对象构造/§3.3 jitter 上限=100 的决定性证据"
+    ],
+    "refs": [
+      "docs/研究报告/静态-形状颜色.md:76",
+      "docs/研究报告/静态-形状颜色.md:118",
+      "docs/研究报告/静态-形状颜色.md:126"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "同时是 26 §8.1 U1（+0x0c jitter 上界由谁赋值）的答案来源：6 个动态的上界在这里被写成 100 -> U1 的 6/7 已解；未写 scatterDynamics（上界槽 +0x108）-> 该 1/7 仍是 U1 残余。也是「抖动单位=百分比不是度」三方证据之一（若单位是度应为 0x168、归一化应为 1、实测是 0x64）。"
+  },
+  {
+    "id": "K12",
+    "priority": 12,
+    "role": "param_io",
+    "grade": "已证实",
+    "domain": [
+      "形状动态"
+    ],
+    "func": "0x141a90b10",
+    "offsets_read": [
+      "+0x8c",
+      "+0x94"
+    ],
+    "evidence": [
+      "0x141a90bb0 mov qword ptr [rbx+0x8c],0xc8（tiltScale 默认 200）",
+      "0x141a90bbb mov qword ptr [rbx+0x94],0x19（minimumRoundness 默认 25）",
+      "0x141a90ba9（useTipDynamics 默认 0）"
+    ],
+    "sources": [
+      "26:§8.1 U1（指出 0x141a90b10 之后的初始化链是关键）",
+      "27:§3.1 默认值补写"
+    ],
+    "refs": [
+      "docs/研究报告/静态-散布传递.md:276",
+      "docs/研究报告/静态-形状颜色.md:78",
+      "docs/研究报告/静态-形状颜色.md:86"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "构造函数之后的「默认值补写」。minimumRoundness 缺省 25 而 src 侧键缺失时用 0.0（mapping.py:260-262，27 §七.1 登记为映射偏差候选，本轮不改 src）——这条默认值就是该偏差的 PS 侧依据。"
+  },
+  {
+    "id": "K13",
+    "priority": 13,
+    "role": "read_point_candidate",
+    "grade": "已证实",
+    "domain": [
+      "纹理",
+      "颜色动态",
+      "湿边"
+    ],
+    "func": "0x141a90410",
+    "offsets_read": [
+      "+0x18",
+      "+0x1c",
+      "+0x00",
+      "+0x08",
+      "+0x14",
+      "+0x20",
+      "+0x292"
+    ],
+    "evidence": [
+      "0x141a908b1 cmp dword ptr [rsi+0x18],0",
+      "0x141a908b7 cmp dword ptr [rsi+0x1c],0",
+      "0x141a908a0..0x141a908bd 同段还读 [rsi+0]/[rsi+8]/[rsi+0x14]/[rsi+0x20]",
+      "0x141a908d7 结果写 [rbx+0x291]（= useColorDynamics）",
+      "0x141a907a9 rsi = rbx+0x238（colorDynamics 段基址）",
+      "0x141a907bb lea r8,[rbx+0x292] / mov byte [r8],0 / lea rdx,\"wetEdges\"（第二处 wetEdges 写点）",
+      "0x141a937e0 的 4 个调用者之一"
+    ],
+    "sources": [
+      "25:§4#2 已证实档",
+      "27:§3.7 tipDynamics 调用者列表",
+      "28:§2.2 wetEdges 第二处写点"
+    ],
+    "refs": [
+      "docs/研究报告/静态-纹理.md:94",
+      "docs/研究报告/静态-形状颜色.md:240",
+      "docs/研究报告/静态-湿边等.md:95"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "读的是 colorDynamics 段的 +0x18/+0x1c（= 设置对象 +0x250/+0x254 = saturation/brightness），并把结果落到 useColorDynamics(+0x291)——所以它是「启用位推导」，不是纹理 brightness/contrast 的消费（冲突 C-4）。25 当初凭「偏移共现」把它列为纹理已证实档第 2 名，27 的字段表把它判成颜色域——v0.3 不要在这个函数里找纹理像素。"
+  },
+  {
+    "id": "K14",
+    "priority": 14,
+    "role": "data_table",
+    "grade": "已证实",
+    "domain": [
+      "传递",
+      "形状动态",
+      "颜色动态",
+      "散布"
+    ],
+    "func": "0x141fac800",
+    "offsets_read": [
+      "+0x4c8",
+      "+0x4ca"
+    ],
+    "evidence": [
+      "9 条名串 lea：0x141fac83f Off / 0x141fac85e Fade / 0x141fac87d PenPressure / 0x141fac89c PenTilt / 0x141fac8bb StylusWheel / 0x141fac8da InitialDirection / 0x141fac8f9 Direction / 0x141fac918 Speed / 0x141fac938 Rotation",
+      "0x141fac9aa cmp rcx,[rbp+0x40] -> 0x141fac9b0 mov rax,r14(0)（Off=0）",
+      "0x141fac9c2 cmp -> 0x141fac9c8 mov eax,2（Pen Pressure=2）",
+      "0x141fac9e9 cmp rcx,[rbp-0x60] -> 0x141fac9ef mov eax,5（Initial Direction=5）",
+      "0x141fac9f6 cmp rcx,[rbp-0x80] -> 0x141fac9fc mov eax,6（Direction=6）",
+      "0x141faca11 cmp rcx,[rsp+0x40] / 0x141faca19 cmove rax,r15(8)（Rotation=8）",
+      "0x141faca1d mov word ptr [rdi+rax*2+0x4c8],bx（枚举号 -> 组合框序号的重映射表）"
+    ],
+    "sources": [
+      "26:§5.3 证据 A/B（bVTy 9 值枚举）"
+    ],
+    "refs": [
+      "docs/研究报告/静态-散布传递.md:200",
+      "docs/研究报告/静态-散布传递.md:214",
+      "docs/研究报告/静态-散布传递.md:228"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "bVTy 枚举的硬证据：0=Off、1=Fade、2=Pen Pressure、3=Pen Tilt、4=Stylus Wheel、5=Initial Direction、6=Direction、7=Speed、8=Rotation。旧说法「6=初始方向」作废（6 是笔迹方向 Direction，初始方向是 5）；src/brush_converter/mapping.py:10/264 把 6 映 drawingangle 是对的，要改的是文档与任务书。26 §8.1 U3（bVTy 值送进这张表的那条数据流指令）未定位。"
+  },
+  {
+    "id": "K15",
+    "priority": 15,
+    "role": "data_table",
+    "grade": "已证实",
+    "domain": [
+      "传递",
+      "形状动态",
+      "颜色动态",
+      "散布"
+    ],
+    "func": "0x141faed00",
+    "offsets_read": [
+      "+0x4c8",
+      "+0x4ca",
+      "+0x4ce",
+      "+0x4d0"
+    ],
+    "evidence": [
+      "0x141faed8b call 0x141fac800（建枚举表）",
+      "0x141faed90 movzx edx,word ptr [rbx+0x4ce]（槽 6）",
+      "0x141faedd3 movzx edx,word ptr [rbx+0x4d0]（槽 7）",
+      "0x141faedb7 cmp word [rax],dx（扫 [rbx+0x4ca] 起 9 项）",
+      "0x141faf30b movzx edi,word ptr [rbx+rdx*2+0x4c8]（用 0..8 的值直接索引该表）"
+    ],
+    "sources": [
+      "26:§5.3 枚举表消费者"
+    ],
+    "refs": [
+      "docs/研究报告/静态-散布传递.md:229"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "证明「0..8 是枚举、表按枚举号索引」的数据流证据。26 §9 的 V8 指定顺手验证这张表在运行时就是这份（读 [rdi+0x4c8] 起 9 个 word）。"
+  },
+  {
+    "id": "K16",
+    "priority": 16,
+    "role": "data_table",
+    "grade": "已证实",
+    "domain": [
+      "模式对齐"
+    ],
+    "func": "0x141b94750",
+    "offsets_read": [],
+    "evidence": [
+      "从 0x14b219c6c 起写 23 条 {标识, 枚举 0x0a..0x36}，终止记录 \"null\"@0x14b219d24",
+      "静态表 0x14b219bc0（21 条 {dword id, dword 4CC}，终止 {35,0}@0x14b219c68）",
+      "0x141b94090 / 0x141b952c0 两个翻译器都 call 0x141b94750 取表基址",
+      "函数入口 0x141b94750 即表写入循环的首条指令地址（25 §6.1(b) 只给入口、未给逐条写指令；23 条记录的数据地址 0x14b219c6c..0x14b219d24 属数据级证据）"
+    ],
+    "sources": [
+      "25:§6.1(b) 运行期注册表"
+    ],
+    "refs": [
+      "docs/研究报告/静态-纹理.md:167",
+      "docs/研究报告/静态-纹理.md:184"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "PS 侧模式表有两张两套编号：静态表 Nrml=0 / 运行期表 Nrml=0x16；ABR 的 BlnM 存 4CC 字符串，整数与 4CC 的转换点未定位（25 §7.2）。v0.3/31 读模式号时不要把这套编号当 Krita 值。"
+  },
+  {
+    "id": "K17",
+    "priority": 17,
+    "role": "param_io",
+    "grade": "已证实",
+    "domain": [
+      "模式对齐",
+      "纹理"
+    ],
+    "func": "0x141b94090",
+    "offsets_read": [],
+    "evidence": [
+      "0x141b94090 mov rcx,[rbx] / call 0x142c90280（字符串->interned id）",
+      "call 0x142c52870（描述符有无该键）/ call 0x142c4cbd0（取整数值 -> ebx）",
+      "call 0x141b94750（取表基址）/ loop: cmp dword [rax],0x36 终止；cmp dword [rax+4],ebx 命中则 *out = dword [rax]",
+      "5 个直接调用者（25 §3 锚点表 M4 行）"
+    ],
+    "sources": [
+      "25:§6.1(c) 模式翻译器（读）/§3 四级锚点 M4"
+    ],
+    "refs": [
+      "docs/研究报告/静态-纹理.md:79",
+      "docs/研究报告/静态-纹理.md:187"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "4CC 模式名 -> PS 内部模式 id 的翻译器（读侧）。25 的锚点法用它把 3450 收敛到 5 个；v0.3/31 复核模式号时这是入口之一。"
+  },
+  {
+    "id": "K18",
+    "priority": 18,
+    "role": "param_io",
+    "grade": "已证实",
+    "domain": [
+      "模式对齐"
+    ],
+    "func": "0x141b952c0",
+    "offsets_read": [],
+    "evidence": [
+      "call 0x142c90280 / call 0x141b94750 / loop: cmp dword [rax],ebx 命中",
+      "mov r8d,[rax+4] / mov r8d,0x426c6e4d（4CC \"BlnM\"）/ call 0x142c58e60",
+      "0x141b95278 / 0x141b952d5 附近 / 0x141b95320 mov r8d,0x426c6e4d"
+    ],
+    "sources": [
+      "25:§6.1(c) 模式翻译器（写）/§3 四级锚点 L5"
+    ],
+    "refs": [
+      "docs/研究报告/静态-纹理.md:80",
+      "docs/研究报告/静态-纹理.md:191",
+      "docs/研究报告/静态-纹理.md:195"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "内部模式 id -> 4CC BlnM 的写侧翻译器；0x426c6e4d = \"BlnM\" 是「运行期注册表就是 BlnM 值域」的硬证据。0x141a964d0 在 0x141a96585 把 [rdi+0x18] 当模式值喂给它（见 K19）。"
+  },
+  {
+    "id": "K19",
+    "priority": 19,
+    "role": "param_io",
+    "grade": "已证实",
+    "domain": [
+      "纹理",
+      "双笔刷"
+    ],
+    "func": "0x141a964d0",
+    "offsets_read": [
+      "+0x18",
+      "+0x1c"
+    ],
+    "evidence": [
+      "0x141a96585 mov r8d,[rdi+0x18] -> call 0x141b952c0（把 +0x18 当 BlnM 模式值写回）",
+      "0x141a965ae movzx r8d,byte ptr [rdi+0x1c]（+0x1c 在这里是 1 字节 bool）",
+      "ps_keys.json ref_insn 0x141a964f9 / 0x141a966b7（\"dualBrush\"，所属函数 141a964d0-141a96727）"
+    ],
+    "sources": [
+      "25:§5.3 写回姊妹函数（关键反例）",
+      "28:§3.2 dualBrush 引用函数之一（ps_keys.json 给出）"
+    ],
+    "refs": [
+      "docs/研究报告/静态-纹理.md:143",
+      "docs/研究报告/静态-湿边等.md:175"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "关键反例：同一对偏移 +0x18/+0x1c 在这里是「模式值 int32 + bool」，与纹理子对象（contrast/brightness 两个 int32）类型不同 -> 偏移相同不等于结构体相同。任何人按「读到 +0x18/+0x1c 就是纹理」做判断都会错。"
+  },
+  {
+    "id": "K20",
+    "priority": 20,
+    "role": "param_io",
+    "grade": "已证实",
+    "domain": [
+      "形状动态"
+    ],
+    "func": "0x141a95ee0",
+    "offsets_read": [
+      "+0x10",
+      "+0x24",
+      "+0x38"
+    ],
+    "evidence": [
+      "0x141a96049 喂 0x737a5672（szVr）到 0x141a96730",
+      "0x141a96057 喂 \"angleDynamics\"",
+      "0x141a96072 喂 \"roundnessDynamics\"",
+      "ps_keys.json ref_insn 0x141a95f87（\"brushProjection\"，所属函数 141a95ee0-）"
+    ],
+    "sources": [
+      "27:§3.1 写侧交叉验证/§3.7 内存->描述符写",
+      "28:§2.2 brushProjection 引用函数"
+    ],
+    "refs": [
+      "docs/研究报告/静态-形状颜色.md:94",
+      "docs/研究报告/静态-形状颜色.md:241",
+      "docs/研究报告/静态-湿边等.md:98"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "tipDynamics 的批量写回（内存->描述符），偏移与读侧完全对称，是 27 用来交叉验证结构体基址一致性的证据。v0.3 若改 UI 看写回，可与 K05 配对使用。"
+  },
+  {
+    "id": "K21",
+    "priority": 21,
+    "role": "param_io",
+    "grade": "已证实",
+    "domain": [
+      "纹理"
+    ],
+    "func": "0x141a935f0",
+    "offsets_read": [],
+    "evidence": [
+      "6 条键名引用（H3：描述符 -> 结构体，模式/深度组）",
+      "0x141a93651 call 0x141b94090（走模式注册表）",
+      "4 个直接调用者，其中 2 个同基址读 +0x18/+0x1c",
+      "26 §4.1：0x141a8f964 lea rcx,[rsi+0x198] -> 0x141a8f96b call 0x141a935f0（纹理 @+0x198）"
+    ],
+    "sources": [
+      "25:§3 四级锚点 H3",
+      "26:§4.1 预设对象子结构偏移表"
+    ],
+    "refs": [
+      "docs/研究报告/静态-纹理.md:78",
+      "docs/研究报告/静态-散布传递.md:118"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "纹理子对象（设置对象 +0x198）的装载函数，内含模式/深度组。纹理 brightness/contrast/invert/protect 的落位要从这里追到 +0x18/+0x1c（25 §5.2 的 8 个拷贝层函数交叉验证了布局）。"
+  },
+  {
+    "id": "K22",
+    "priority": 22,
+    "role": "param_io",
+    "grade": "已证实",
+    "domain": [
+      "纹理"
+    ],
+    "func": "0x141a96230",
+    "offsets_read": [
+      "+0x18",
+      "+0x1c",
+      "+0x20",
+      "+0x21"
+    ],
+    "evidence": [
+      "0x141a96320 mov r8d,[rdi+0x1c]（brightness 写回）",
+      "0x141a9633f mov r8d,[rdi+0x18]（contrast 写回）",
+      "0x141a962db / 0x141a96300 movzx [rdi+0x20]/[rdi+0x21]（invert/protect）"
+    ],
+    "sources": [
+      "25:§5.3 H2 结构体->描述符"
+    ],
+    "refs": [
+      "docs/研究报告/静态-纹理.md:138"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "纹理 H2 写回；四条指令与 +0x18/+0x1c/+0x20/+0x21 的宽度完全对齐（+0x18/+0x1c 4 字节、+0x20/+0x21 1 字节），是「纹理子对象布局」在写侧的自证。"
+  },
+  {
+    "id": "K23",
+    "priority": 23,
+    "role": "read_point_candidate",
+    "grade": "已证实",
+    "domain": [
+      "纹理"
+    ],
+    "func": "0x144ba3de0",
+    "offsets_read": [
+      "+0x18",
+      "+0x1c",
+      "+0x20",
+      "+0x21"
+    ],
+    "evidence": [
+      "0x144ba3f64 sub eax,[rbx+0x18]（另有 mov/4 @0x144ba3fc4、movsxd/4 @0x144ba4059）",
+      "0x144ba3eb5 cmp dword [rbx+0x1c],r13d",
+      "+0x20 字节 @0x144ba429e、+0x21 字节 @0x144ba417b"
+    ],
+    "sources": [
+      "25:§4#4 已证实档"
+    ],
+    "refs": [
+      "docs/研究报告/静态-纹理.md:96"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "形态是「区间/容量判断」（sub eax,[..+0x18]; cmp eax,0x16），更像容器布局而非纹理；无笔刷模块归属证据。列此以保留完整候选面。"
+  },
+  {
+    "id": "K24",
+    "priority": 24,
+    "role": "read_point_candidate",
+    "grade": "已证实",
+    "domain": [
+      "纹理"
+    ],
+    "func": "0x141c1c889",
+    "offsets_read": [
+      "+0x18",
+      "+0x1c"
+    ],
+    "evidence": [
+      "0x141c1ca52 movss xmm,[r..+0x18]",
+      "0x141c1ca7d movss xmm,[r..+0x1c]",
+      "addss 版本 0x141c1ca61 / 0x141c1ca8f"
+    ],
+    "sources": [
+      "25:§4#5 已证实档"
+    ],
+    "refs": [
+      "docs/研究报告/静态-纹理.md:97"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "浮点相加形态，无 +0x20/+0x21 指纹、无笔刷语义 -> 优先级低。"
+  },
+  {
+    "id": "K25",
+    "priority": 25,
+    "role": "read_point_candidate",
+    "grade": "已证实",
+    "domain": [
+      "纹理"
+    ],
+    "func": "0x141c1d041",
+    "offsets_read": [
+      "+0x18",
+      "+0x1c"
+    ],
+    "evidence": [
+      "0x141c1d199 addss xmm,[r..+0x18]",
+      "0x141c1d1c2 addss xmm,[r..+0x1c]",
+      "movss 版本 0x141c1d19f / 0x141c1d1c8"
+    ],
+    "sources": [
+      "25:§4#6 已证实档"
+    ],
+    "refs": [
+      "docs/研究报告/静态-纹理.md:98"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "与 K24 同构（浮动累加），优先级低。"
+  },
+  {
+    "id": "K26",
+    "priority": 26,
+    "role": "read_point_candidate",
+    "grade": "已证实",
+    "domain": [
+      "纹理"
+    ],
+    "func": "0x141b7df90",
+    "offsets_read": [
+      "+0x18",
+      "+0x1c"
+    ],
+    "evidence": [
+      "0x141b7e466 subss xmm,[r..+0x18]",
+      "0x141b7e49b subss xmm,[r..+0x1c]"
+    ],
+    "sources": [
+      "25:§4#7 已证实档"
+    ],
+    "refs": [
+      "docs/研究报告/静态-纹理.md:99"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "浮点相减，无纹理指纹。"
+  },
+  {
+    "id": "K27",
+    "priority": 27,
+    "role": "read_point_candidate",
+    "grade": "已证实",
+    "domain": [
+      "纹理"
+    ],
+    "func": "0x141b4f5e0",
+    "offsets_read": [
+      "+0x18",
+      "+0x1c"
+    ],
+    "evidence": [
+      "0x141b4fca5 subss xmm,[r..+0x18]",
+      "0x141b4fcab subss xmm,[r..+0x1c]"
+    ],
+    "sources": [
+      "25:§4#8 已证实档"
+    ],
+    "refs": [
+      "docs/研究报告/静态-纹理.md:100"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "与 K26 同构。"
+  },
+  {
+    "id": "K28",
+    "priority": 28,
+    "role": "read_point_candidate",
+    "grade": "已证实",
+    "domain": [
+      "纹理"
+    ],
+    "func": "0x1439ebf50",
+    "offsets_read": [
+      "+0x18",
+      "+0x1c",
+      "+0x10",
+      "+0x14",
+      "+0x20"
+    ],
+    "evidence": [
+      "0x1439ebf68 add edx,[rbx+0x18]",
+      "0x1439ebf5e mov edx,[rbx+0x1c]",
+      "+0x10 累加 @0x1439ebf59、+0x14 上限 @0x1439ebf6e、+0x20 bool @0x1439ebf75"
+    ],
+    "sources": [
+      "25:§4#9 已证实档"
+    ],
+    "refs": [
+      "docs/研究报告/静态-纹理.md:101"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "形态是「累加器 + 上限」（[0x10]+=d; cmp 0x1c; 溢出则 0x1c+=0x18）-> 明显非纹理，列此以证明「算术判据也会误命中」。"
+  },
+  {
+    "id": "K29",
+    "priority": 29,
+    "role": "read_point_candidate",
+    "grade": "已证实",
+    "domain": [
+      "纹理"
+    ],
+    "func": "0x143b86990",
+    "offsets_read": [
+      "+0x18",
+      "+0x1c",
+      "+0x10",
+      "+0x14",
+      "+0x20"
+    ],
+    "evidence": [
+      "0x143b869a8 add edx,[rbx+0x18]",
+      "0x143b8699e mov edx,[rbx+0x1c]",
+      "+0x10 @0x143b86999、+0x14 @0x143b869ae、+0x20 @0x143b869b5"
+    ],
+    "sources": [
+      "25:§4#10 已证实档"
+    ],
+    "refs": [
+      "docs/研究报告/静态-纹理.md:102"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "K28 的姊妹（同构累加器），同上。"
+  },
+  {
+    "id": "K30",
+    "priority": 30,
+    "role": "param_io",
+    "grade": "已证实",
+    "domain": [
+      "画笔姿态"
+    ],
+    "func": "0x141a92d50",
+    "offsets_read": [
+      "+0x0c",
+      "+0x10",
+      "+0x14",
+      "+0x15",
+      "+0x16",
+      "+0x17"
+    ],
+    "evidence": [
+      "0x141a92f94 mov dword ptr [rdi+0xc],ebp（brushPoseAngle）后 lea rdx,\"brushPoseAngle\" / call 0x142c528d0",
+      "0x141a92e3a mov dword ptr [rdi+0x10],eax（brushPosePressure）",
+      "ps_keys.json out_param 0x141a93057 disp=0x14 / 0x141a92fbf disp=0x15 / 0x141a93027 disp=0x16 / 0x141a92ff7 disp=0x17（overridePose*）",
+      "ps_keys.json ref_insn 0x141a92d94 / 0x141a92db3（\"useBrushPose\"，所属函数 141a92d50-141a930a1）"
+    ],
+    "sources": [
+      "28:§5.2 pose 子对象布局/写点"
+    ],
+    "refs": [
+      "docs/研究报告/静态-湿边等.md:345",
+      "docs/研究报告/静态-湿边等.md:347"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "这些偏移的基址是 pose 子对象，其「在设置对象里的基址」未定位（28 §7 遗留：useBrushPose / brushPoseTiltX/Y 仍 offset=null）。v0.3 下断点前必须先在运行时确认 rdi 是谁的指针。28 给的换算（TiltX/Y 与 ascension/declination 极坐标互转）是待验项 V-4-2。"
+  },
+  {
+    "id": "K31",
+    "priority": 31,
+    "role": "class_factory",
+    "grade": "已证实",
+    "domain": [
+      "双笔刷"
+    ],
+    "func": "0x141a9f8a0",
+    "offsets_read": [],
+    "evidence": [
+      "0x141a9f8d9 lea rcx,\"computedBrush\" / call 0x142c90280 / cmp esi,eax / je -> 0x142022ed0",
+      "0x141a9f8ed lea rcx,\"dBrush\" / je -> 0x14254ad00",
+      "0x141a9f8fd lea rcx,\"dTips\" / je -> 0x1425401b0",
+      "0x141a9f90d lea rcx,\"sampledBrush\" / jne -> 0x141a9f9f8"
+    ],
+    "sources": [
+      "28:§3.3 dBrush/dTips 是描述符类名"
+    ],
+    "refs": [
+      "docs/研究报告/静态-湿边等.md:185",
+      "docs/研究报告/静态-湿边等.md:192"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "证明 dBrush / dTips 是「笔刷子对象的类标识」，不是可映射参数（28 D-3 建议矩阵 verdict 改「非参数（类标识）」，本轮不改矩阵）。断点价值低，登记以防 v0.3 把它们当参数去找。"
+  },
+  {
+    "id": "K32",
+    "priority": 32,
+    "role": "param_io",
+    "grade": "已证实",
+    "domain": [
+      "湿边",
+      "双笔刷",
+      "画笔姿态",
+      "噪点",
+      "重复/喷枪"
+    ],
+    "func": "0x141a8b470",
+    "offsets_read": [],
+    "evidence": [
+      "ps_keys.json ref_insn：0x141a8b67c（\"wetEdges\"）、0x141a8b621（\"dualBrush\"）、0x141a8b6ef（\"useBrushPose\"）、0x141a8b4f8（\"brushProjection\"）、0x141a8b62c（\"useColorDynamics\"）",
+      "所属 .pdata 函数 141a8b470-141a8b809；紧随的键消费者 0x142c90190"
+    ],
+    "sources": [
+      "28:§2.2 wetEdges 的 8 个引用函数之一（函数区间取自 ps_keys.json evidence）"
+    ],
+    "refs": [
+      "docs/研究报告/静态-湿边等.md:98"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "一组 bool 键的引用函数（湿边/双笔刷/姿态/投影/颜色启用位都在这里出现），但 28 没有给它逐条指令语义——引用点有了，落点（写哪个偏移）未定位。v0.3 若要追「键名->字段」的通用派发，这里比单个键函数更集中。"
+  },
+  {
+    "id": "K33",
+    "priority": 33,
+    "role": "param_io",
+    "grade": "已证实",
+    "domain": [
+      "湿边"
+    ],
+    "func": "0x141ef15c0",
+    "offsets_read": [],
+    "evidence": [
+      "ps_keys.json ref_insn 0x141ef18da（\"wetEdges\"，所属 .pdata 函数 141ef15c0-141ef1ee3）"
+    ],
+    "sources": [
+      "26:§8.1 U1（列为本任务涉及的 6 个函数之一）",
+      "28:§2.2 wetEdges 的 8 个引用函数之一"
+    ],
+    "refs": [
+      "docs/研究报告/静态-散布传递.md:276",
+      "docs/研究报告/静态-湿边等.md:98"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "湿边键的引用函数，且 26 明确它不写 dynamics 的 +0x0c 上界（U1 的反证集合之一）。"
+  },
+  {
+    "id": "K34",
+    "priority": 34,
+    "role": "param_io",
+    "grade": "已证实",
+    "domain": [
+      "纹理",
+      "湿边",
+      "噪点",
+      "重复/喷枪"
+    ],
+    "func": "0x141ef92e0",
+    "offsets_read": [],
+    "evidence": [
+      "ps_keys.json ref_insn 0x141ef973a（\"wetEdges\"）、同类还有 noise/repeat 引用，所属 .pdata 函数 141ef92e0-141ef9ca6",
+      "0x141a937e0（H1 真入口）的 4 个直接调用者之一"
+    ],
+    "sources": [
+      "25:§3 锚点表（H1 的 4 个调用者之一）",
+      "26:§8.1 U1",
+      "28:§2.2 wetEdges 的 8 个引用函数之一"
+    ],
+    "refs": [
+      "docs/研究报告/静态-纹理.md:77",
+      "docs/研究报告/静态-散布传递.md:276",
+      "docs/研究报告/静态-湿边等.md:98"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "同时是「H1 的调用者」与「湿边/噪点/重复三个 bool 的引用函数」——跨 25/26/28 三份报告。v0.3 若要一条断点同时看纹理装载与三个像素开关，这里比分头断 H1 与 wetEdges 更省。"
+  },
+  {
+    "id": "K35",
+    "priority": 35,
+    "role": "param_io",
+    "grade": "已证实",
+    "domain": [
+      "湿边"
+    ],
+    "func": "0x141efd020",
+    "offsets_read": [],
+    "evidence": [
+      "ps_keys.json ref_insn 0x141efd1bf（\"wetEdges\"，所属 .pdata 函数 141efd020-141efd80a）"
+    ],
+    "sources": [
+      "28:§2.2 wetEdges 的 8 个引用函数之一"
+    ],
+    "refs": [
+      "docs/研究报告/静态-湿边等.md:98"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "湿边键的引用函数（第三条代码路径），落点未定位。"
+  },
+  {
+    "id": "K60",
+    "priority": 60,
+    "role": "copy_layer",
+    "grade": "已证实",
+    "domain": [
+      "纹理"
+    ],
+    "func": "0x141ef62b3",
+    "offsets_read": [
+      "+0x18",
+      "+0x1c",
+      "+0x20",
+      "+0x21"
+    ],
+    "evidence": [
+      "0x141ef62c0 mov eax,[rbx+0x18] -> 0x141ef62c3 mov [rsi+0x18],eax；0x141ef62c6 mov eax,[rbx+0x1c]；0x141ef62cc/0x141ef62d3 movzx [rbx+0x20]/[rbx+0x21]"
+    ],
+    "sources": [
+      "25:§5.2 拷贝层"
+    ],
+    "refs": [
+      "docs/研究报告/静态-纹理.md:122"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "拷贝层：只把 +0x10/+0x14/+0x18/+0x1c/+0x20/+0x21 整块按原宽度搬运，52 B。25 明确判定不计入消费端；它的价值是「纹理子对象布局」的跨模块交叉验证（8 个函数分处 0x140fxxxxx / 0x141efxxxx / 0x1455xxxxx 三个互不相邻模块却搬同一布局）。v0.3 不要在这里找像素。（25 §5.2 对 K61–K64/K66/K67 只给了地址对、未给助记符，原文如此，本清单不推测补全。）"
+  },
+  {
+    "id": "K61",
+    "priority": 61,
+    "role": "copy_layer",
+    "grade": "已证实",
+    "domain": [
+      "纹理"
+    ],
+    "func": "0x141efa785",
+    "offsets_read": [
+      "+0x18",
+      "+0x1c",
+      "+0x20",
+      "+0x21"
+    ],
+    "evidence": [
+      "0x141efa792/0x141efa798（+0x18/+0x1c）、0x141efa79e/0x141efa7a5（+0x20/+0x21）"
+    ],
+    "sources": [
+      "25:§5.2 拷贝层"
+    ],
+    "refs": [
+      "docs/研究报告/静态-纹理.md:122"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "拷贝层：只把 +0x10/+0x14/+0x18/+0x1c/+0x20/+0x21 整块按原宽度搬运，52 B。25 明确判定不计入消费端；它的价值是「纹理子对象布局」的跨模块交叉验证（8 个函数分处 0x140fxxxxx / 0x141efxxxx / 0x1455xxxxx 三个互不相邻模块却搬同一布局）。v0.3 不要在这里找像素。（25 §5.2 对 K61–K64/K66/K67 只给了地址对、未给助记符，原文如此，本清单不推测补全。）"
+  },
+  {
+    "id": "K62",
+    "priority": 62,
+    "role": "copy_layer",
+    "grade": "已证实",
+    "domain": [
+      "纹理"
+    ],
+    "func": "0x140f8a300",
+    "offsets_read": [
+      "+0x18",
+      "+0x1c",
+      "+0x20",
+      "+0x21"
+    ],
+    "evidence": [
+      "0x140f8a368/0x140f8a36e（+0x18/+0x1c）、0x140f8a374/0x140f8a37b（+0x20/+0x21）；同段还搬 +0x10/+0x14"
+    ],
+    "sources": [
+      "25:§5.2 拷贝层"
+    ],
+    "refs": [
+      "docs/研究报告/静态-纹理.md:122"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "拷贝层：只把 +0x10/+0x14/+0x18/+0x1c/+0x20/+0x21 整块按原宽度搬运，317 B。25 明确判定不计入消费端；它的价值是「纹理子对象布局」的跨模块交叉验证（8 个函数分处 0x140fxxxxx / 0x141efxxxx / 0x1455xxxxx 三个互不相邻模块却搬同一布局）。v0.3 不要在这里找像素。（25 §5.2 对 K61–K64/K66/K67 只给了地址对、未给助记符，原文如此，本清单不推测补全。）"
+  },
+  {
+    "id": "K63",
+    "priority": 63,
+    "role": "copy_layer",
+    "grade": "已证实",
+    "domain": [
+      "纹理"
+    ],
+    "func": "0x140f8a460",
+    "offsets_read": [
+      "+0x18",
+      "+0x1c",
+      "+0x20",
+      "+0x21"
+    ],
+    "evidence": [
+      "0x140f8a4c8/0x140f8a4ce、0x140f8a4d4/0x140f8a4db"
+    ],
+    "sources": [
+      "25:§5.2 拷贝层"
+    ],
+    "refs": [
+      "docs/研究报告/静态-纹理.md:122"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "拷贝层：只把 +0x10/+0x14/+0x18/+0x1c/+0x20/+0x21 整块按原宽度搬运，410 B。25 明确判定不计入消费端；它的价值是「纹理子对象布局」的跨模块交叉验证（8 个函数分处 0x140fxxxxx / 0x141efxxxx / 0x1455xxxxx 三个互不相邻模块却搬同一布局）。v0.3 不要在这里找像素。（25 §5.2 对 K61–K64/K66/K67 只给了地址对、未给助记符，原文如此，本清单不推测补全。）"
+  },
+  {
+    "id": "K64",
+    "priority": 64,
+    "role": "copy_layer",
+    "grade": "已证实",
+    "domain": [
+      "纹理"
+    ],
+    "func": "0x140f86550",
+    "offsets_read": [
+      "+0x18",
+      "+0x1c",
+      "+0x20",
+      "+0x21"
+    ],
+    "evidence": [
+      "0x140f865fc/0x140f86602、0x140f86608/0x140f8660f"
+    ],
+    "sources": [
+      "25:§5.2 拷贝层"
+    ],
+    "refs": [
+      "docs/研究报告/静态-纹理.md:122"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "拷贝层：只把 +0x10/+0x14/+0x18/+0x1c/+0x20/+0x21 整块按原宽度搬运，577 B。25 明确判定不计入消费端；它的价值是「纹理子对象布局」的跨模块交叉验证（8 个函数分处 0x140fxxxxx / 0x141efxxxx / 0x1455xxxxx 三个互不相邻模块却搬同一布局）。v0.3 不要在这里找像素。（25 §5.2 对 K61–K64/K66/K67 只给了地址对、未给助记符，原文如此，本清单不推测补全。）"
+  },
+  {
+    "id": "K65",
+    "priority": 65,
+    "role": "copy_layer",
+    "grade": "已证实",
+    "domain": [
+      "纹理"
+    ],
+    "func": "0x1455a89e0",
+    "offsets_read": [
+      "+0x18",
+      "+0x1c",
+      "+0x20",
+      "+0x21"
+    ],
+    "evidence": [
+      "三处同构：0x1455a935a/0x1455a9363、0x1455a9675/0x1455a967e、0x1455a9c33/0x1455a9c3c；每处后跟 +0x20/+0x21 字节拷贝，再 call 0x14536bc60（结构体拷贝）；另 0x1455a939f mov rax,[rcx+0xb8] + 0x1455a93a2 call qword ptr [rip+0x2c1cd28]（间接派发）"
+    ],
+    "sources": [
+      "25:§5.2 拷贝层"
+    ],
+    "refs": [
+      "docs/研究报告/静态-纹理.md:122"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "拷贝层：只把 +0x10/+0x14/+0x18/+0x1c/+0x20/+0x21 整块按原宽度搬运，8189 B。25 明确判定不计入消费端；它的价值是「纹理子对象布局」的跨模块交叉验证（8 个函数分处 0x140fxxxxx / 0x141efxxxx / 0x1455xxxxx 三个互不相邻模块却搬同一布局）。v0.3 不要在这里找像素。（25 §5.2 对 K61–K64/K66/K67 只给了地址对、未给助记符，原文如此，本清单不推测补全。） 另外 25 §7.1 把这里的 call qword ptr [rip+0x2c1cd28] 列为「消费端可能藏在间接派发后面」的唯一直接证据（未证实假设 2）。"
+  },
+  {
+    "id": "K66",
+    "priority": 66,
+    "role": "copy_layer",
+    "grade": "已证实",
+    "domain": [
+      "纹理"
+    ],
+    "func": "0x1455b0d00",
+    "offsets_read": [
+      "+0x18",
+      "+0x1c",
+      "+0x20",
+      "+0x21"
+    ],
+    "evidence": [
+      "0x1455b12cc/0x1455b12d2 等三处"
+    ],
+    "sources": [
+      "25:§5.2 拷贝层"
+    ],
+    "refs": [
+      "docs/研究报告/静态-纹理.md:122"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "拷贝层：只把 +0x10/+0x14/+0x18/+0x1c/+0x20/+0x21 整块按原宽度搬运，3788 B。25 明确判定不计入消费端；它的价值是「纹理子对象布局」的跨模块交叉验证（8 个函数分处 0x140fxxxxx / 0x141efxxxx / 0x1455xxxxx 三个互不相邻模块却搬同一布局）。v0.3 不要在这里找像素。（25 §5.2 对 K61–K64/K66/K67 只给了地址对、未给助记符，原文如此，本清单不推测补全。）"
+  },
+  {
+    "id": "K67",
+    "priority": 67,
+    "role": "copy_layer",
+    "grade": "已证实",
+    "domain": [
+      "纹理"
+    ],
+    "func": "0x1455e0940",
+    "offsets_read": [
+      "+0x18",
+      "+0x1c",
+      "+0x20",
+      "+0x21"
+    ],
+    "evidence": [
+      "0x1455e0e18/0x1455e0e1f、0x1455e0fdf/0x1455e0fe6"
+    ],
+    "sources": [
+      "25:§5.2 拷贝层"
+    ],
+    "refs": [
+      "docs/研究报告/静态-纹理.md:122"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "拷贝层：只把 +0x10/+0x14/+0x18/+0x1c/+0x20/+0x21 整块按原宽度搬运，1786 B。25 明确判定不计入消费端；它的价值是「纹理子对象布局」的跨模块交叉验证（8 个函数分处 0x140fxxxxx / 0x141efxxxx / 0x1455xxxxx 三个互不相邻模块却搬同一布局）。v0.3 不要在这里找像素。（25 §5.2 对 K61–K64/K66/K67 只给了地址对、未给助记符，原文如此，本清单不推测补全。）"
+  },
+  {
+    "id": "K70",
+    "priority": 70,
+    "role": "kernel_helper",
+    "grade": "推测",
+    "domain": [
+      "描述符内核"
+    ],
+    "func": "0x142c4a8f0",
+    "offsets_read": [],
+    "evidence": [
+      "0x141a8fa13 call 0x142c4a8f0（\"wetEdges\"）",
+      "0x141a931ed call 0x142c4a8f0（bothAxes）",
+      "0x141a93c73 call 0x142c4a8f0（colorDynamicsPerTip）",
+      "0x141a9352d call 0x142c4a8f0（brushProjection）",
+      "0x142c4a8f0: mov rbx,r8 / call 0x142c49f20 / jmp [rcx+0x108]"
+    ],
+    "sources": [
+      "26:§3.1 bothAxes",
+      "27:§4.1 colorDynamicsPerTip",
+      "28:§2.2 bool 键读写形态"
+    ],
+    "refs": [
+      "docs/研究报告/静态-散布传递.md:66",
+      "docs/研究报告/静态-形状颜色.md:265",
+      "docs/研究报告/静态-湿边等.md:110",
+      "docs/研究报告/静态-湿边等.md:121"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "描述符 IO 内核：取/写 bool 的键读写助手（形态：mov rbx,r8 -> call 0x142c49f20 -> mov rdx,rbx -> jmp qword ptr [rip+..]，走 [rcx+0x108] 虚表槽）。语义是观察推断（这些函数都没有符号名，28 §2.2 明确「属观察推断」），只有「被谁在哪个地址调用」是已证实 -> 因此整条落「推测」档（任务 29 §五：语义/角色未证实的不许放进已证实）。四条并行线各自独立地摸到了同一层——这正是本任务「重复实现」一节的证据：25/26/27/28 每份报告都重新描述了 3–5 个同层助手。"
+  },
+  {
+    "id": "K71",
+    "priority": 71,
+    "role": "kernel_helper",
+    "grade": "推测",
+    "domain": [
+      "描述符内核"
+    ],
+    "func": "0x142c4d220",
+    "offsets_read": [],
+    "evidence": [
+      "0x141a9310e call 0x142c4d220（Spcn）",
+      "0x141a93388 call 0x142c4d220（tiltScale）",
+      "0x14347c724 call 0x142c4d220（\"Nose\"）"
+    ],
+    "sources": [
+      "26:§3.1 类型链证据",
+      "27:§3.1 tiltScale",
+      "28:§4.2 Nose 4CC 站点"
+    ],
+    "refs": [
+      "docs/研究报告/静态-散布传递.md:73",
+      "docs/研究报告/静态-形状颜色.md:86",
+      "docs/研究报告/静态-湿边等.md:283"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "描述符 IO 内核：按 4CC 立即数取数值（double）的助手。语义是观察推断（这些函数都没有符号名，28 §2.2 明确「属观察推断」），只有「被谁在哪个地址调用」是已证实 -> 因此整条落「推测」档（任务 29 §五：语义/角色未证实的不许放进已证实）。四条并行线各自独立地摸到了同一层——这正是本任务「重复实现」一节的证据：25/26/27/28 每份报告都重新描述了 3–5 个同层助手。"
+  },
+  {
+    "id": "K72",
+    "priority": 72,
+    "role": "kernel_helper",
+    "grade": "推测",
+    "domain": [
+      "描述符内核"
+    ],
+    "func": "0x142c4d280",
+    "offsets_read": [],
+    "evidence": [
+      "0x141a93f79 call 0x142c4d280（jitter）",
+      "0x141a93fd3 call 0x142c4d280（minimum）",
+      "0x141a93b36/0x141a93b80/0x141a93bef/0x141a93c35 call 0x142c4d280（hue/saturation/brightness/purity）"
+    ],
+    "sources": [
+      "26:§3.3",
+      "27:§4.1"
+    ],
+    "refs": [
+      "docs/研究报告/静态-散布传递.md:93",
+      "docs/研究报告/静态-形状颜色.md:261"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "描述符 IO 内核：按名字取 double 的助手（getDouble）。语义是观察推断（这些函数都没有符号名，28 §2.2 明确「属观察推断」），只有「被谁在哪个地址调用」是已证实 -> 因此整条落「推测」档（任务 29 §五：语义/角色未证实的不许放进已证实）。四条并行线各自独立地摸到了同一层——这正是本任务「重复实现」一节的证据：25/26/27/28 每份报告都重新描述了 3–5 个同层助手。"
+  },
+  {
+    "id": "K73",
+    "priority": 73,
+    "role": "kernel_helper",
+    "grade": "推测",
+    "domain": [
+      "描述符内核"
+    ],
+    "func": "0x142c5ed90",
+    "offsets_read": [],
+    "evidence": [
+      "0x141a967f2 call 0x142c5ed90（jitter，unit 0x23507263）",
+      "0x141a96831 call 0x142c5ed90（minimum）",
+      "0x141a967e0 mov r8d,0x23507263"
+    ],
+    "sources": [
+      "26:§3.3 写侧",
+      "27:§3.3 单位证据"
+    ],
+    "refs": [
+      "docs/研究报告/静态-散布传递.md:93",
+      "docs/研究报告/静态-形状颜色.md:147"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "描述符 IO 内核：按 (name, unit, double) 写描述符的助手；0x23507263 = \"#Prc\"。语义是观察推断（这些函数都没有符号名，28 §2.2 明确「属观察推断」），只有「被谁在哪个地址调用」是已证实 -> 因此整条落「推测」档（任务 29 §五：语义/角色未证实的不许放进已证实）。四条并行线各自独立地摸到了同一层——这正是本任务「重复实现」一节的证据：25/26/27/28 每份报告都重新描述了 3–5 个同层助手。"
+  },
+  {
+    "id": "K74",
+    "priority": 74,
+    "role": "kernel_helper",
+    "grade": "推测",
+    "domain": [
+      "描述符内核"
+    ],
+    "func": "0x142c90280",
+    "offsets_read": [],
+    "evidence": [
+      "0x141a9f8d9/0x141a9f8ed 等 lea + call 0x142c90280（类名分派）",
+      "0x141a933c2 call 0x142c90280（\"angleDynamics\"）",
+      "0x141b94090: mov rcx,[rbx] / call 0x142c90280"
+    ],
+    "sources": [
+      "25:§6.1(c)",
+      "27:§3.1",
+      "28:§3.3"
+    ],
+    "refs": [
+      "docs/研究报告/静态-纹理.md:187",
+      "docs/研究报告/静态-形状颜色.md:90",
+      "docs/研究报告/静态-湿边等.md:185"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "描述符 IO 内核：字符串 -> interned id（类名/键名转 id）。语义是观察推断（这些函数都没有符号名，28 §2.2 明确「属观察推断」），只有「被谁在哪个地址调用」是已证实 -> 因此整条落「推测」档（任务 29 §五：语义/角色未证实的不许放进已证实）。四条并行线各自独立地摸到了同一层——这正是本任务「重复实现」一节的证据：25/26/27/28 每份报告都重新描述了 3–5 个同层助手。"
+  },
+  {
+    "id": "K75",
+    "priority": 75,
+    "role": "kernel_helper",
+    "grade": "推测",
+    "domain": [
+      "描述符内核"
+    ],
+    "func": "0x142c528d0",
+    "offsets_read": [],
+    "evidence": [
+      "0x141a93cdc lea rdx,\"dualBrush\" / call 0x142c528d0",
+      "0x141a92fa4 lea rdx,\"brushPoseAngle\" / call 0x142c528d0",
+      "0x141a9350d lea rdx,\"brushProjection\" / call 0x142c528d0"
+    ],
+    "sources": [
+      "28:§2.2/§3.2"
+    ],
+    "refs": [
+      "docs/研究报告/静态-湿边等.md:176",
+      "docs/研究报告/静态-湿边等.md:346"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "描述符 IO 内核：描述符「有无该键」判定的助手（hasKey）。语义是观察推断（这些函数都没有符号名，28 §2.2 明确「属观察推断」），只有「被谁在哪个地址调用」是已证实 -> 因此整条落「推测」档（任务 29 §五：语义/角色未证实的不许放进已证实）。四条并行线各自独立地摸到了同一层——这正是本任务「重复实现」一节的证据：25/26/27/28 每份报告都重新描述了 3–5 个同层助手。"
+  },
+  {
+    "id": "K76",
+    "priority": 76,
+    "role": "kernel_helper",
+    "grade": "推测",
+    "domain": [
+      "描述符内核"
+    ],
+    "func": "0x142c4f280",
+    "offsets_read": [],
+    "evidence": [
+      "0x141a93d08 lea r8,\"dualBrush\" / call 0x142c4f280"
+    ],
+    "sources": [
+      "28:§3.2"
+    ],
+    "refs": [
+      "docs/研究报告/静态-湿边等.md:176"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "描述符 IO 内核：取子描述符对象（getObject）。语义是观察推断（这些函数都没有符号名，28 §2.2 明确「属观察推断」），只有「被谁在哪个地址调用」是已证实 -> 因此整条落「推测」档（任务 29 §五：语义/角色未证实的不许放进已证实）。四条并行线各自独立地摸到了同一层——这正是本任务「重复实现」一节的证据：25/26/27/28 每份报告都重新描述了 3–5 个同层助手。"
+  },
+  {
+    "id": "K77",
+    "priority": 77,
+    "role": "kernel_helper",
+    "grade": "推测",
+    "domain": [
+      "描述符内核"
+    ],
+    "func": "0x142c4e7c0",
+    "offsets_read": [],
+    "evidence": [
+      "0x141a93f0e mov edx,0x62565479 / 0x141a93f13 call 0x142c4e7c0 / 0x141a93f18 mov [rbx],eax"
+    ],
+    "sources": [
+      "26:§3.3 读侧"
+    ],
+    "refs": [
+      "docs/研究报告/静态-散布传递.md:91"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "描述符 IO 内核：按 4CC 立即数取整数值。语义是观察推断（这些函数都没有符号名，28 §2.2 明确「属观察推断」），只有「被谁在哪个地址调用」是已证实 -> 因此整条落「推测」档（任务 29 §五：语义/角色未证实的不许放进已证实）。四条并行线各自独立地摸到了同一层——这正是本任务「重复实现」一节的证据：25/26/27/28 每份报告都重新描述了 3–5 个同层助手。"
+  },
+  {
+    "id": "K78",
+    "priority": 78,
+    "role": "kernel_helper",
+    "grade": "推测",
+    "domain": [
+      "描述符内核"
+    ],
+    "func": "0x142c58e60",
+    "offsets_read": [],
+    "evidence": [
+      "0x141b952c0: mov r8d,[rax+4] / mov r8d,0x426c6e4d / call 0x142c58e60",
+      "0x141b95320 mov r8d,0x426c6e4d（\"BlnM\"）"
+    ],
+    "sources": [
+      "25:§6.1(c) 写侧翻译器"
+    ],
+    "refs": [
+      "docs/研究报告/静态-纹理.md:192"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "描述符 IO 内核：把 (4CC, 值) 写进描述符。语义是观察推断（这些函数都没有符号名，28 §2.2 明确「属观察推断」），只有「被谁在哪个地址调用」是已证实 -> 因此整条落「推测」档（任务 29 §五：语义/角色未证实的不许放进已证实）。四条并行线各自独立地摸到了同一层——这正是本任务「重复实现」一节的证据：25/26/27/28 每份报告都重新描述了 3–5 个同层助手。"
+  },
+  {
+    "id": "K79",
+    "priority": 79,
+    "role": "kernel_helper",
+    "grade": "推测",
+    "domain": [
+      "描述符内核"
+    ],
+    "func": "0x142c55500",
+    "offsets_read": [],
+    "evidence": [
+      "0x141a9674d mov edx,0x62725672（brVr）/ 0x141a96757 call 0x142c55500"
+    ],
+    "sources": [
+      "26:§3.4 brVr 容器"
+    ],
+    "refs": [
+      "docs/研究报告/静态-散布传递.md:101"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "描述符 IO 内核：新建描述符对象（brVr 容器由此创建）。语义是观察推断（这些函数都没有符号名，28 §2.2 明确「属观察推断」），只有「被谁在哪个地址调用」是已证实 -> 因此整条落「推测」档（任务 29 §五：语义/角色未证实的不许放进已证实）。四条并行线各自独立地摸到了同一层——这正是本任务「重复实现」一节的证据：25/26/27/28 每份报告都重新描述了 3–5 个同层助手。"
+  },
+  {
+    "id": "K80",
+    "priority": 80,
+    "role": "kernel_helper",
+    "grade": "推测",
+    "domain": [
+      "描述符内核"
+    ],
+    "func": "0x142c4f200",
+    "offsets_read": [],
+    "evidence": [
+      "0x141a93ef7 call 0x142c4f200（dynamics 读侧取 brVr 子描述符）"
+    ],
+    "sources": [
+      "26:§3.3"
+    ],
+    "refs": [
+      "docs/研究报告/静态-散布传递.md:86"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "描述符 IO 内核：取嵌套描述符对象。语义是观察推断（这些函数都没有符号名，28 §2.2 明确「属观察推断」），只有「被谁在哪个地址调用」是已证实 -> 因此整条落「推测」档（任务 29 §五：语义/角色未证实的不许放进已证实）。四条并行线各自独立地摸到了同一层——这正是本任务「重复实现」一节的证据：25/26/27/28 每份报告都重新描述了 3–5 个同层助手。"
+  },
+  {
+    "id": "K81",
+    "priority": 81,
+    "role": "kernel_helper",
+    "grade": "推测",
+    "domain": [
+      "描述符内核"
+    ],
+    "func": "0x140c532a0",
+    "offsets_read": [],
+    "evidence": [
+      "0x141a93113 call 0x140c532a0（scatter 取整）"
+    ],
+    "sources": [
+      "26:§3.1 类型链证据"
+    ],
+    "refs": [
+      "docs/研究报告/静态-散布传递.md:73"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "描述符 IO 内核：double -> int 的取整助手（addsd 0.5 + 饱和 + cvttsd2si，函数体 0x140c532a0-0x140c532e0）。语义是观察推断（这些函数都没有符号名，28 §2.2 明确「属观察推断」），只有「被谁在哪个地址调用」是已证实 -> 因此整条落「推测」档（任务 29 §五：语义/角色未证实的不许放进已证实）。四条并行线各自独立地摸到了同一层——这正是本任务「重复实现」一节的证据：25/26/27/28 每份报告都重新描述了 3–5 个同层助手。"
+  },
+  {
+    "id": "K82",
+    "priority": 82,
+    "role": "kernel_helper",
+    "grade": "推测",
+    "domain": [
+      "描述符内核"
+    ],
+    "func": "0x142c4e820",
+    "offsets_read": [],
+    "evidence": [
+      "0x141a93a61 call 0x142c4e820（textureBrightness）",
+      "0x141a93a81 jmp 0x142c4e820（textureContrast，尾调用）"
+    ],
+    "sources": [
+      "25:§6.4 接口提醒（H1 取值链）"
+    ],
+    "refs": [
+      "docs/验收报告/25-报告.md:162"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "描述符 IO 内核：取「整数值」的助手（textureBrightness / textureContrast 由 H1 经它取值）。语义是观察推断（这些函数都没有符号名，28 §2.2 明确「属观察推断」），只有「被谁在哪个地址调用」是已证实 -> 因此整条落「推测」档（任务 29 §五：语义/角色未证实的不许放进已证实）。四条并行线各自独立地摸到了同一层——这正是本任务「重复实现」一节的证据：25/26/27/28 每份报告都重新描述了 3–5 个同层助手。"
+  },
+  {
+    "id": "K90",
+    "priority": 90,
+    "role": "param_io",
+    "grade": "推测",
+    "domain": [
+      "纹理"
+    ],
+    "func": "0x141a960c0",
+    "offsets_read": [],
+    "evidence": [
+      "25 §5.3 表把它列为 M1「写回（模式/深度组）」，未给任何指令地址（该行证据栏原文为「—」）"
+    ],
+    "sources": [
+      "25:§5.3 已知参数 IO 层（M1 行）"
+    ],
+    "refs": [
+      "docs/研究报告/静态-纹理.md:140"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "降档说明：25 把它列进「已知参数 IO 层」，但只给了地址、没给指令，按任务 29 §五「只有引用点没有指令地址 -> 降到推测档，不要放宽」的规矩落为推测。v0.3 若要在此下断点，需先复核它确实是写回函数（可用 27 报告 §六 脚本 1 反汇编）。"
+  },
+  {
+    "id": "K91",
+    "priority": 91,
+    "role": "caller",
+    "grade": "推测",
+    "domain": [
+      "纹理",
+      "形状动态"
+    ],
+    "func": "0x141ef1f90",
+    "offsets_read": [],
+    "evidence": [
+      "25 §3 锚点表：0x141a937e0 的 4 个调用者之一（汇总表给了调用者起始地址，未给逐条 call 指令地址）",
+      "27 §3.7：tipDynamics 的 4 个调用者之一"
+    ],
+    "sources": [
+      "25:§3 锚点表（H1 调用者）",
+      "27:§3.7 tipDynamics 调用者列表"
+    ],
+    "refs": [
+      "docs/研究报告/静态-纹理.md:77",
+      "docs/研究报告/静态-形状颜色.md:240"
+    ],
+    "pixel_consumer_verdict": "未判定",
+    "note": "降档说明：只有「它是调用者」的汇总级证据，没有调用点指令地址（0x141a937e0 的 8 个调用点/4 个调用者只给了汇总数字）。按规矩落推测。v0.3 用 x64dbg 在 0x141a937e0 入口断一次就能同时确认它的 4 个调用者，不必单独为它设点。"
+  }
+]
