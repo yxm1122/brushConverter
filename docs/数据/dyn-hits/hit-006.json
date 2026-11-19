@@ -1,0 +1,268 @@
+{
+ "seq": 6,
+ "experiment": "第六次实验：以 K02(0x141a8af30，静态里「按模式选混合系数」的算术核) 为锚点，在函数入口取 r9 当纹理参数对象，对 r9+0x18/+0x1c 下发 DR0/DR1",
+ "time": "2026-11-20T03:07:16",
+ "ps_version": "26.9.0.15 (Adobe Photoshop 2025)",
+ "ps_module_base": "0x7ff7b8630000",
+ "module_size": 218800128,
+ "bp": {
+  "addr": "0x7ff7ba0baf30",
+  "rva": "0x1a8af30"
+ },
+ "dr_watch": {
+  "watch": [
+   [
+    "0xe04c2fac28",
+    4,
+    "rw",
+    "k02obj+0x18"
+   ],
+   [
+    "0xe04c2fac2c",
+    4,
+    "rw",
+    "k02obj+0x1c"
+   ]
+  ],
+  "threads_ok": 175,
+  "threads_fail": 0,
+  "armed_after_bp_hit": 8
+ },
+ "bp_hits": [
+  {
+   "tid": 3300,
+   "r9": "0xe04c2fb008",
+   "f32_0x18": 0,
+   "f32_0x1c": 1,
+   "f32_0x10": 360,
+   "caller_rva": "0x1f0177e",
+   "stack_rva": [
+    "0x1f0177e",
+    "0xe3af42",
+    "0x1b64b46",
+    "0x1f08499"
+   ]
+  },
+  {
+   "tid": 3300,
+   "r9": "0xe04c2fb008",
+   "f32_0x18": 0,
+   "f32_0x1c": 1,
+   "f32_0x10": 360,
+   "caller_rva": "0x1f01a5e",
+   "stack_rva": [
+    "0x1f01a5e",
+    "0xe3af42",
+    "0x1b64b46",
+    "0x1f08499"
+   ]
+  },
+  {
+   "tid": 3300,
+   "r9": "0xe04c2fb008",
+   "f32_0x18": 0,
+   "f32_0x1c": 1,
+   "f32_0x10": 360,
+   "caller_rva": "0x1eff94d",
+   "stack_rva": [
+    "0x1eff94d",
+    "0x1b64b46",
+    "0x1f0850f",
+    "0x1f088d5"
+   ]
+  },
+  {
+   "tid": 3300,
+   "r9": "0xe04c2fb008",
+   "f32_0x18": 0,
+   "f32_0x1c": 1,
+   "f32_0x10": 360,
+   "caller_rva": "0x1eff9b7",
+   "stack_rva": [
+    "0x1eff9b7",
+    "0x1b64b46",
+    "0x1f0850f",
+    "0x1f088d5"
+   ]
+  },
+  {
+   "tid": 3300,
+   "r9": "0xe04c2fac10",
+   "f32_0x18": 0,
+   "f32_0x1c": 1,
+   "f32_0x10": 360,
+   "caller_rva": "0x1f0177e",
+   "stack_rva": [
+    "0x1f0177e",
+    "0xc49693",
+    "0x1f08499",
+    "0x1f088d5"
+   ]
+  },
+  {
+   "tid": 3300,
+   "r9": "0xe04c2fac10",
+   "f32_0x18": 0,
+   "f32_0x1c": 1,
+   "f32_0x10": 360,
+   "caller_rva": "0x1f01a5e",
+   "stack_rva": [
+    "0x1f01a5e",
+    "0xc49693",
+    "0x1f08499",
+    "0x1f088d5"
+   ]
+  },
+  {
+   "tid": 3300,
+   "r9": "0xe04c2fac10",
+   "f32_0x18": 0,
+   "f32_0x1c": 1,
+   "f32_0x10": 360,
+   "caller_rva": "0x1eff94d",
+   "stack_rva": [
+    "0x1eff94d",
+    "0x1f0850f",
+    "0x1f088d5",
+    "0x2a89e52"
+   ]
+  },
+  {
+   "tid": 3300,
+   "r9": "0xe04c2fac10",
+   "f32_0x18": 0,
+   "f32_0x1c": 1,
+   "f32_0x10": 360,
+   "caller_rva": "0x1eff9b7",
+   "stack_rva": [
+    "0x1eff9b7",
+    "0x1f0850f",
+    "0x1f088d5",
+    "0x2a89e52"
+   ]
+  }
+ ],
+ "dr_hit_count": 800,
+ "event_counts": {
+  "1": 386719,
+  "2": 176,
+  "3": 1,
+  "4": 3,
+  "6": 261,
+  "8": 3
+ },
+ "aggregate_top": [
+  {
+   "instr_addr": "0x7ff7ba64f03c",
+   "instr_rva": "0x201f03c",
+   "text": "adc dword ptr [rsi + 0x18], edx",
+   "kind": "write",
+   "count": 186,
+   "tids": {
+    "3300": 186
+   },
+   "values": [
+    0
+   ]
+  },
+  {
+   "instr_addr": "0x7ff7ba64f059",
+   "instr_rva": "0x201f059",
+   "text": "adc dword ptr [rsi + 0x1c], ecx",
+   "kind": "write",
+   "count": 186,
+   "tids": {
+    "3300": 186
+   },
+   "values": [
+    1
+   ]
+  },
+  {
+   "instr_addr": "0x7ff7ba5b00e9",
+   "instr_rva": "0x1f800e9",
+   "text": "pop rax",
+   "kind": "unknown",
+   "count": 33,
+   "tids": {
+    "3300": 33
+   },
+   "values": [
+    1.432127030539963e-42,
+    0
+   ]
+  },
+  {
+   "instr_addr": "0x7ff7ba5b00ed",
+   "instr_rva": "0x1f800ed",
+   "text": "pop rsp",
+   "kind": "unknown",
+   "count": 33,
+   "tids": {
+    "3300": 33
+   },
+   "values": [
+    1.432127030539963e-42,
+    0
+   ]
+  },
+  {
+   "instr_addr": "0x7ff7ba5b0169",
+   "instr_rva": "0x1f80169",
+   "text": "pop rsp",
+   "kind": "unknown",
+   "count": 24,
+   "tids": {
+    "3300": 24
+   },
+   "values": [
+    0,
+    1.432127030539963e-42
+   ]
+  },
+  {
+   "instr_addr": "0x7ff7ba5b016d",
+   "instr_rva": "0x1f8016d",
+   "text": "pop rax",
+   "kind": "unknown",
+   "count": 24,
+   "tids": {
+    "3300": 24
+   },
+   "values": [
+    1.432127030539963e-42,
+    0
+   ]
+  },
+  {
+   "instr_addr": "0x7ff7ba5aa471",
+   "instr_rva": "0x1f7a471",
+   "text": "imul eax, dword ptr [rsi]",
+   "kind": "read",
+   "count": 17,
+   "tids": {
+    "3300": 17
+   },
+   "values": [
+    1.432127030539963e-42
+   ]
+  },
+  {
+   "instr_addr": "0x7ff7ba5aa489",
+   "instr_rva": "0x1f7a489",
+   "text": "imul eax, dword ptr [rsi + 4]",
+   "kind": "read",
+   "count": 17,
+   "tids": {
+    "3300": 17
+   },
+   "values": [
+    1.432127030539963e-42
+   ]
+  }
+ ],
+ "result": "方法不可行（本轮）：K02 入口处 r9 指向的是**栈上临时浮点缓冲**（同一轮里出现两个不同 r9：0xe04c2fb008 / 0xe04c2fac10；内容是 (0,1,360) 三个 float，360 像画布/尺度参数），不是纹理参数对象。DR 因此被下到栈地址，800 次命中全部是该栈块被反复读写（含系统 DLL 与误码指令，watch_value 退化成 1e-42 之类的 denormal），无判别价值。",
+ "note_positive": "K02 的调用链确实在**绘制侧**：8 次命中的返回地址分别为 0x1f0177e / 0x1f01a5e / 0x1eff94d / 0x1eff9b7，再往上是 0x1f08499 / 0x1f088d5 / 0x2a89e52，与「参数应用线程 tid=29688」不是同一条链（本次 tid=3300）→ 这条链值得 30A 继续追，但**不能**用入口 r9 当锚点。",
+ "conclusion": "锚点选错（入口 r9 = 栈临时），本轮不下结论；K02 的「纹理混合数值核」身份仍是「候选（未证实）」，与 29 号报告一致。",
+ "step_log_excerpt": "1795115245163 STEP 0 begin s1_b0_c0 t=1795115245163\n1795115245816 APPLIED s1_b0_c0 | useTexture=true;pattern=bc30tex;brightness=0;contrast=0;depth=100 t=1795115245816\n1795115254789 STEP 0 end s1_b0_c0 t=1795115254789\n1795115254922 STEP 1 begin s2_b50_c0 t=1795115254922\n1795115257654 APPLIED s2_b50_c0 | useTexture=true;pattern=bc30tex;brightness=50;contrast=0;depth=100 t=1795115257654\n1795115268983 STEP 1 end s2_b50_c0 t=1795115268983\n1795115269122 STEP 2 begin s3_bm50_c0 t=1795115269122\n1795115271866 APPLIED s3_bm50_c0 | useTexture=true;pattern=bc30tex;brightness=-50;contrast=0;depth=100 t=1795115271866\n1795115283173 STEP 2 end s3_bm50_c0 t=1795115283173\n1795115283311 STEP 3 begin s4_b0_c50 t=1795115283311\n1795115286021 APPLIED s4_b0_c50 | useTexture=true;pattern=bc30tex;brightness=0;contrast=50;depth=100 t=1795115286021\n1795115297343 STEP 3 end s4_b0_c50 t=1795115297343\n1795115297485 STEP 4 begin s5_b0_cm50 t=1795115297485\n1795115300233 APPLIED s5_b0_cm50 | useTexture=true;pattern=bc30tex;brightness=0;contrast=-50;depth=100 t=1795115300233\n1795115311522 STEP 4 end s5_b0_cm50 t=1795115311522\n1795115311670 STEP 5 begin s6_b0_c0 t=1795115311670\n1795115314408 APPLIED s6_b0_c0 | useTexture=true;pattern=bc30tex;brightness=0;contrast=0;depth=100 t=1795115314408\n1795115325657 STEP 5 end s6_b0_c0 t=1795115325657\n1795115325794 STEP 6 begin s7_b100_c100 t=1795115325794\n1795115328518 APPLIED s7_b100_c100 | useTexture=true;pattern=bc30tex;brightness=100;contrast=100;depth=100 t=1795115328518\n1795115339812 STEP 6 end s7_b100_c100 t=1795115339812\n1795115339952 STEP 7 begin s8_bm100_cm100 t=1795115339952\n1795115342703 APPLIED s8_bm100_cm100 | useTexture=true;pattern=bc30tex;brightness=-100;contrast=-100;depth=100 t=1795115342703\n1795115353996 STEP 7 end s8_bm100_cm100 t=1795115353996\n1795115354137 ALL DONE t=1795115354137"
+}

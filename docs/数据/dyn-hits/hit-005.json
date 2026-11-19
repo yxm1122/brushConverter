@@ -1,0 +1,261 @@
+{
+ "seq": 5,
+ "experiment": "第五次实验：对 10 个候选函数入口下 INT3，统计 8 步参数+描边实验期间的命中次数（每点上限 15 次后停止重插）",
+ "time": "2026-11-20T03:03:56",
+ "ps_version": "26.9.0.15 (Adobe Photoshop 2025)",
+ "ps_module_base": "0x7ff7b8630000",
+ "module_size": 218800128,
+ "candidates": [
+  {
+   "func_static": "0x141a8f520",
+   "rva": "0x1a8f520",
+   "hit_count": 0,
+   "capped_at_15": false,
+   "status": "未命中",
+   "first_hit": null
+  },
+  {
+   "func_static": "0x141a93ea0",
+   "rva": "0x1a93ea0",
+   "hit_count": 15,
+   "capped_at_15": true,
+   "status": "命中",
+   "first_hit": {
+    "instr": "0x7ff7ba0c3ea0",
+    "tid": 18476,
+    "regs": {
+     "rax": "0x1",
+     "rbx": "0x97ac8fbaa0",
+     "rcx": "0x97ac8fb940",
+     "rdx": "0x97ac8fbaa0",
+     "rsi": "0x7ff7c3eb43f0",
+     "rdi": "0x2",
+     "r8": "0x70725672",
+     "r9": "0x0"
+    },
+    "stack_rva": [
+     "0x2a67dcb",
+     "0xb8843f0",
+     "0x2c8d4b3",
+     "0x83f2974",
+     "0x2a676ca"
+    ]
+   }
+  },
+  {
+   "func_static": "0x141a930b0",
+   "rva": "0x1a930b0",
+   "hit_count": 15,
+   "capped_at_15": true,
+   "status": "命中",
+   "first_hit": {
+    "instr": "0x7ff7ba0c30b0",
+    "tid": 18476,
+    "regs": {
+     "rax": "0x7ff7b90f5300",
+     "rbx": "0x1d7523c9d80",
+     "rcx": "0x1d7523c9d9c",
+     "rdx": "0x97ac8fb9d0",
+     "rsi": "0x20",
+     "rdi": "0x97ac8fbaa0",
+     "r8": "0x1d880d2b900",
+     "r9": "0x1d75361dee0"
+    },
+    "stack_rva": [
+     "0x1a93e01",
+     "0x1ef223f",
+     "0xb8843f0",
+     "0x2c4f344",
+     "0x2732fb9"
+    ]
+   }
+  },
+  {
+   "func_static": "0x141a932b0",
+   "rva": "0x1a932b0",
+   "hit_count": 15,
+   "capped_at_15": true,
+   "status": "命中",
+   "first_hit": {
+    "instr": "0x7ff7ba0c32b0",
+    "tid": 18476,
+    "regs": {
+     "rax": "0x7ff7b90f5300",
+     "rbx": "0x7ff7c3eb43f0",
+     "rcx": "0x1d7523ca380",
+     "rdx": "0x97ac8fbaa0",
+     "rsi": "0x20",
+     "rdi": "0x97ac8fbaa0",
+     "r8": "0x1d87a7436b0",
+     "r9": "0x1d72608dbc0"
+    },
+    "stack_rva": [
+     "0x1ef2266",
+     "0xb8843f0",
+     "0x2c4f344",
+     "0x2732fb9",
+     "0xb8843f0"
+    ]
+   }
+  },
+  {
+   "func_static": "0x141a93ab0",
+   "rva": "0x1a93ab0",
+   "hit_count": 15,
+   "capped_at_15": true,
+   "status": "命中",
+   "first_hit": {
+    "instr": "0x7ff7ba0c3ab0",
+    "tid": 18476,
+    "regs": {
+     "rax": "0x0",
+     "rbx": "0x7ff7c3eb43f0",
+     "rcx": "0x1d754f85170",
+     "rdx": "0x97ac8fbaa0",
+     "rsi": "0x20",
+     "rdi": "0x97ac8fbaa0",
+     "r8": "0x1d87a7436b0",
+     "r9": "0x1d889a028a0"
+    },
+    "stack_rva": [
+     "0x1ef2296",
+     "0xb8843f0",
+     "0x2c4f344",
+     "0x2732fb9",
+     "0xb8843f0"
+    ]
+   }
+  },
+  {
+   "func_static": "0x141a937e0",
+   "rva": "0x1a937e0",
+   "hit_count": 15,
+   "capped_at_15": true,
+   "status": "命中",
+   "first_hit": {
+    "instr": "0x7ff7ba0c37e0",
+    "tid": 18476,
+    "regs": {
+     "rax": "0x1d729d99750",
+     "rbx": "0x7ff7c3eb43f0",
+     "rcx": "0x1d754f85080",
+     "rdx": "0x97ac8fbaa0",
+     "rsi": "0x20",
+     "rdi": "0x97ac8fbaa0",
+     "r8": "0x1d74bf769c0",
+     "r9": "0x1d74bf832c0"
+    },
+    "stack_rva": [
+     "0x1ef2218",
+     "0xb8843f0",
+     "0x2c4f344",
+     "0x2732fb9",
+     "0xb8843f0"
+    ]
+   }
+  },
+  {
+   "func_static": "0x141a8af30",
+   "rva": "0x1a8af30",
+   "hit_count": 15,
+   "capped_at_15": true,
+   "status": "命中",
+   "first_hit": {
+    "instr": "0x7ff7ba0baf30",
+    "tid": 18476,
+    "regs": {
+     "rax": "0x0",
+     "rbx": "0x1d71e546ff0",
+     "rcx": "0x1d71e547214",
+     "rdx": "0x97ac8fb2b0",
+     "rsi": "0x97ac8fb2b0",
+     "rdi": "0x97ac8fb3f8",
+     "r8": "0x97ac8fb3f8",
+     "r9": "0x97ac8fb3f8"
+    },
+    "stack_rva": [
+     "0x1f0177e",
+     "0xe3af42",
+     "0x1b64b46",
+     "0x1f08499",
+     "0x1f088d5"
+    ]
+   }
+  },
+  {
+   "func_static": "0x141ef62b3",
+   "rva": "0x1ef62b3",
+   "hit_count": 15,
+   "capped_at_15": true,
+   "status": "命中",
+   "first_hit": {
+    "instr": "0x7ff7ba5262b3",
+    "tid": 18476,
+    "regs": {
+     "rax": "0x1d7263a0ee0",
+     "rbx": "0x1d754f85080",
+     "rcx": "0x1d7263a0ed0",
+     "rdx": "0x97ac8f9478",
+     "rsi": "0x97ac8f9478",
+     "rdi": "0x0",
+     "r8": "0x1d853155340",
+     "r9": "0x1d880d2ab80"
+    },
+    "stack_rva": [
+     "0xb8843f0",
+     "0xb8843f0",
+     "0x1ef1723",
+     "0xb8843f0",
+     "0x84bbe8a"
+    ]
+   }
+  },
+  {
+   "func_static": "0x141a90410",
+   "rva": "0x1a90410",
+   "hit_count": 0,
+   "capped_at_15": false,
+   "status": "未命中",
+   "first_hit": null
+  },
+  {
+   "func_static": "0x141a935f0",
+   "rva": "0x1a935f0",
+   "hit_count": 15,
+   "capped_at_15": true,
+   "status": "命中",
+   "first_hit": {
+    "instr": "0x7ff7ba0c35f0",
+    "tid": 18476,
+    "regs": {
+     "rax": "0x0",
+     "rbx": "0x7ff7c3eb43f0",
+     "rcx": "0x1d754f850e0",
+     "rdx": "0x97ac8fbaa0",
+     "rsi": "0x20",
+     "rdi": "0x97ac8fbaa0",
+     "r8": "0x1d87a7436b0",
+     "r9": "0x1d889a02fa0"
+    },
+    "stack_rva": [
+     "0x1ef2227",
+     "0xb8843f0",
+     "0x2c4f344",
+     "0x2732fb9",
+     "0xb8843f0"
+    ]
+   }
+  }
+ ],
+ "event_counts": {
+  "1": 337,
+  "2": 178,
+  "3": 1,
+  "4": 3,
+  "6": 262,
+  "8": 3
+ },
+ "elapsed_s": 24.7,
+ "conclusion": "K04/K03/K05/K06/K07/K21/K02/K60 全部命中且都达到 15 次上限（说明是热路径）；K01(0x141a8f520) 与 K13(0x141a90410) 在本实验期间 0 次命中。注意本实验没有 DR 断点，事件总数仅 337（对比实验 002 的 200902），说明实验 002 的异常洪水来自「DR 被下到栈地址」而不是 PS 自己。",
+ "step_log_excerpt": "1795115045768 STEP 0 begin s1_b0_c0 t=1795115045768\n1795115046494 APPLIED s1_b0_c0 | useTexture=true;pattern=bc30tex;brightness=0;contrast=0;depth=100 t=1795115046494\n1795115047010 STEP 0 end s1_b0_c0 t=1795115047010\n1795115047158 STEP 1 begin s2_b50_c0 t=1795115047158\n1795115047927 APPLIED s2_b50_c0 | useTexture=true;pattern=bc30tex;brightness=50;contrast=0;depth=100 t=1795115047927\n1795115048399 STEP 1 end s2_b50_c0 t=1795115048399\n1795115048534 STEP 2 begin s3_bm50_c0 t=1795115048534\n1795115049237 APPLIED s3_bm50_c0 | useTexture=true;pattern=bc30tex;brightness=-50;contrast=0;depth=100 t=1795115049237\n1795115049708 STEP 2 end s3_bm50_c0 t=1795115049708\n1795115049846 STEP 3 begin s4_b0_c50 t=1795115049846\n1795115050581 APPLIED s4_b0_c50 | useTexture=true;pattern=bc30tex;brightness=0;contrast=50;depth=100 t=1795115050581\n1795115051075 STEP 3 end s4_b0_c50 t=1795115051075\n1795115051222 STEP 4 begin s5_b0_cm50 t=1795115051222\n1795115051936 APPLIED s5_b0_cm50 | useTexture=true;pattern=bc30tex;brightness=0;contrast=-50;depth=100 t=1795115051936\n1795115052444 STEP 4 end s5_b0_cm50 t=1795115052444\n1795115052585 STEP 5 begin s6_b0_c0 t=1795115052585\n1795115053351 APPLIED s6_b0_c0 | useTexture=true;pattern=bc30tex;brightness=0;contrast=0;depth=100 t=1795115053351\n1795115053978 STEP 5 end s6_b0_c0 t=1795115053978\n1795115054110 STEP 6 begin s7_b100_c100 t=1795115054110\n1795115054884 APPLIED s7_b100_c100 | useTexture=true;pattern=bc30tex;brightness=100;contrast=100;depth=100 t=1795115054884\n1795115055566 STEP 6 end s7_b100_c100 t=1795115055566\n1795115055714 STEP 7 begin s8_bm100_cm100 t=1795115055714\n1795115056497 APPLIED s8_bm100_cm100 | useTexture=true;pattern=bc30tex;brightness=-100;contrast=-100;depth=100 t=1795115056497\n1795115057218 STEP 7 end s8_bm100_cm100 t=1795115057218\n1795115057357 ALL DONE t=1795115057357"
+}

@@ -1,0 +1,364 @@
+{
+ "seq": 2,
+ "experiment": "第二次完整实验（记录为失败/过程证据）：BP 落在 0x141a937e0（H1 真入口），此处 rdi 不是纹理结构体（rdi=rdx=栈地址 rsp+0xE8），DR 断点被下到错误地址",
+ "time": "2026-11-20T02:37:29",
+ "ps_version": "26.9.0.15 (Adobe Photoshop 2025)",
+ "ps_module_base": "0x7ff7b8630000",
+ "bp": {
+  "addr": "0x7ff7ba0c37e0",
+  "rva": "0x1a937e0",
+  "note": "H1 真入口；入口处 rdi/rdx 都是调用者的栈地址，不是结构体"
+ },
+ "dr_watch": {
+  "watch": [
+   [
+    "0x56558fb808",
+    4,
+    "rw"
+   ],
+   [
+    "0x56558fb80c",
+    4,
+    "rw"
+   ]
+  ],
+  "threads_ok": 176,
+  "threads_fail": 0
+ },
+ "result": {
+  "h1_hit_count": 1,
+  "dr_hit_count_recorded": 0,
+  "note": "dr_hit_count=0 是「识别失败」而不是「没命中」：本次上下文用 CONTEXT_FULL 读取，未带 CONTEXT_DEBUG_REGISTERS，Dr6 读回 0，于是 200902 条 EXCEPTION_SINGLE_STEP(0x80000004) 全被当成单步处理，未记成 DR 命中。这正说明 DR 断点当场就在反复触发。"
+ },
+ "event_counts": {
+  "1": 200902,
+  "2": 177,
+  "3": 1,
+  "4": 2,
+  "6": 261,
+  "8": 3
+ },
+ "exception_log_first": [
+  {
+   "code": "0x80000003",
+   "addr": "0x7ffc1f403f40",
+   "tid": 19984,
+   "first": 1,
+   "cont": "0x10002",
+   "ctx_none": false
+  },
+  {
+   "code": "0xe06d7363",
+   "addr": "0x7ffc1c8f408a",
+   "tid": 18200,
+   "first": 1,
+   "cont": "0x80010001",
+   "ctx_none": false
+  },
+  {
+   "code": "0xe06d7363",
+   "addr": "0x7ffc1c8f408a",
+   "tid": 18200,
+   "first": 1,
+   "cont": "0x80010001",
+   "ctx_none": false
+  },
+  {
+   "code": "0x80000003",
+   "addr": "0x7ff7ba0c37e0",
+   "tid": 18200,
+   "first": 1,
+   "cont": "0x10002",
+   "ctx_none": false
+  },
+  {
+   "code": "0x80000004",
+   "addr": "0x7ff7ba0c37e2",
+   "tid": 18200,
+   "first": 1,
+   "cont": "0x10002",
+   "ctx_none": false
+  },
+  {
+   "code": "0x80000004",
+   "addr": "0x7ff7b9c7e627",
+   "tid": 18200,
+   "first": 1,
+   "cont": "0x10002",
+   "ctx_none": false
+  },
+  {
+   "code": "0x80000004",
+   "addr": "0x7ffc1f548040",
+   "tid": 18200,
+   "first": 1,
+   "cont": "0x10002",
+   "ctx_none": false
+  },
+  {
+   "code": "0x80000004",
+   "addr": "0x7ff7b9c7e6ad",
+   "tid": 18200,
+   "first": 1,
+   "cont": "0x10002",
+   "ctx_none": false
+  },
+  {
+   "code": "0x80000004",
+   "addr": "0x7ff7be628a85",
+   "tid": 18200,
+   "first": 1,
+   "cont": "0x10002",
+   "ctx_none": false
+  },
+  {
+   "code": "0x80000004",
+   "addr": "0x7ff7be628acc",
+   "tid": 18200,
+   "first": 1,
+   "cont": "0x10002",
+   "ctx_none": false
+  },
+  {
+   "code": "0x80000004",
+   "addr": "0x7ff7be628af5",
+   "tid": 18200,
+   "first": 1,
+   "cont": "0x10002",
+   "ctx_none": false
+  },
+  {
+   "code": "0x80000004",
+   "addr": "0x7ff7be626505",
+   "tid": 18200,
+   "first": 1,
+   "cont": "0x10002",
+   "ctx_none": false
+  },
+  {
+   "code": "0x80000004",
+   "addr": "0x7ff7be62650e",
+   "tid": 18200,
+   "first": 1,
+   "cont": "0x10002",
+   "ctx_none": false
+  },
+  {
+   "code": "0x80000004",
+   "addr": "0x7ff7be62655d",
+   "tid": 18200,
+   "first": 1,
+   "cont": "0x10002",
+   "ctx_none": false
+  },
+  {
+   "code": "0x80000004",
+   "addr": "0x7ff7be62761c",
+   "tid": 18200,
+   "first": 1,
+   "cont": "0x10002",
+   "ctx_none": false
+  },
+  {
+   "code": "0x80000004",
+   "addr": "0x7ff7be62777c",
+   "tid": 18200,
+   "first": 1,
+   "cont": "0x10002",
+   "ctx_none": false
+  },
+  {
+   "code": "0x80000004",
+   "addr": "0x7ffc1e67f57f",
+   "tid": 18200,
+   "first": 1,
+   "cont": "0x10002",
+   "ctx_none": false
+  },
+  {
+   "code": "0x80000004",
+   "addr": "0x7ffc1e67f57f",
+   "tid": 18200,
+   "first": 1,
+   "cont": "0x10002",
+   "ctx_none": false
+  },
+  {
+   "code": "0x80000004",
+   "addr": "0x7ffc1e67f57f",
+   "tid": 18200,
+   "first": 1,
+   "cont": "0x10002",
+   "ctx_none": false
+  },
+  {
+   "code": "0x80000004",
+   "addr": "0x7ffc1e67f57f",
+   "tid": 18200,
+   "first": 1,
+   "cont": "0x10002",
+   "ctx_none": false
+  },
+  {
+   "code": "0x80000004",
+   "addr": "0x7ffc1e67f57f",
+   "tid": 18200,
+   "first": 1,
+   "cont": "0x10002",
+   "ctx_none": false
+  },
+  {
+   "code": "0x80000004",
+   "addr": "0x7ffc1e67f57f",
+   "tid": 18200,
+   "first": 1,
+   "cont": "0x10002",
+   "ctx_none": false
+  },
+  {
+   "code": "0x80000004",
+   "addr": "0x7ffc1e67f57f",
+   "tid": 18200,
+   "first": 1,
+   "cont": "0x10002",
+   "ctx_none": false
+  },
+  {
+   "code": "0x80000004",
+   "addr": "0x7ffc1e67f57f",
+   "tid": 18200,
+   "first": 1,
+   "cont": "0x10002",
+   "ctx_none": false
+  },
+  {
+   "code": "0x80000004",
+   "addr": "0x7ffc1e67f57f",
+   "tid": 18200,
+   "first": 1,
+   "cont": "0x10002",
+   "ctx_none": false
+  },
+  {
+   "code": "0x80000004",
+   "addr": "0x7ffc1e67f57f",
+   "tid": 18200,
+   "first": 1,
+   "cont": "0x10002",
+   "ctx_none": false
+  },
+  {
+   "code": "0x80000004",
+   "addr": "0x7ffc1e67f57f",
+   "tid": 18200,
+   "first": 1,
+   "cont": "0x10002",
+   "ctx_none": false
+  },
+  {
+   "code": "0x80000004",
+   "addr": "0x7ffc1e67f57f",
+   "tid": 18200,
+   "first": 1,
+   "cont": "0x10002",
+   "ctx_none": false
+  },
+  {
+   "code": "0x80000004",
+   "addr": "0x7ffc1e67f57f",
+   "tid": 18200,
+   "first": 1,
+   "cont": "0x10002",
+   "ctx_none": false
+  },
+  {
+   "code": "0x80000004",
+   "addr": "0x7ffc1e67f57f",
+   "tid": 18200,
+   "first": 1,
+   "cont": "0x10002",
+   "ctx_none": false
+  },
+  {
+   "code": "0x80000004",
+   "addr": "0x7ffc1e67f57f",
+   "tid": 18200,
+   "first": 1,
+   "cont": "0x10002",
+   "ctx_none": false
+  },
+  {
+   "code": "0x80000004",
+   "addr": "0x7ffc1e67f57f",
+   "tid": 18200,
+   "first": 1,
+   "cont": "0x10002",
+   "ctx_none": false
+  },
+  {
+   "code": "0x80000004",
+   "addr": "0x7ffc1f548040",
+   "tid": 18200,
+   "first": 1,
+   "cont": "0x10002",
+   "ctx_none": false
+  },
+  {
+   "code": "0x80000004",
+   "addr": "0x7ffb531f7430",
+   "tid": 18200,
+   "first": 1,
+   "cont": "0x10002",
+   "ctx_none": false
+  },
+  {
+   "code": "0x80000004",
+   "addr": "0x7ffb5320d550",
+   "tid": 18200,
+   "first": 1,
+   "cont": "0x10002",
+   "ctx_none": false
+  },
+  {
+   "code": "0x80000004",
+   "addr": "0x7ffb531f743e",
+   "tid": 18200,
+   "first": 1,
+   "cont": "0x10002",
+   "ctx_none": false
+  },
+  {
+   "code": "0x80000004",
+   "addr": "0x7ffb531fa8ba",
+   "tid": 18200,
+   "first": 1,
+   "cont": "0x10002",
+   "ctx_none": false
+  },
+  {
+   "code": "0x80000004",
+   "addr": "0x7ffb531fa971",
+   "tid": 18200,
+   "first": 1,
+   "cont": "0x10002",
+   "ctx_none": false
+  },
+  {
+   "code": "0x80000004",
+   "addr": "0x7ffc1e67f577",
+   "tid": 18200,
+   "first": 1,
+   "cont": "0x10002",
+   "ctx_none": false
+  },
+  {
+   "code": "0x80000004",
+   "addr": "0x7ffc1e67f577",
+   "tid": 18200,
+   "first": 1,
+   "cont": "0x10002",
+   "ctx_none": false
+  }
+ ],
+ "conclusion": "方法可用（DR 断点触发频繁），但对象地址取错 + DR6 未读，结论不可用；已据此修正为「0x141a93a79 快照点取 rdi」+「上下文带 CONTEXT_DEBUG_REGISTERS」。"
+}

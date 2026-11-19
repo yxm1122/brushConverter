@@ -1,0 +1,310 @@
+{
+ "seq": 4,
+ "experiment": "第四次实验：两跳 DR（第一跳=纹理结构体 obj；第二跳=K60 拷贝层目标 dst）。软断点 0x141a93a79 + 0x141ef62b3，DR0/DR1 监视 obj+0x18/+0x1c，DR2/DR3 监视 dst+0x18/+0x1c",
+ "time": "2026-11-20T02:50:20",
+ "ps_version": "26.9.0.15 (Adobe Photoshop 2025)",
+ "ps_module_base": "0x7ff7b8630000",
+ "module_size": 218800128,
+ "bp1": {
+  "addr": "0x7ff7ba0c3a79",
+  "rva": "0x1a93a79"
+ },
+ "bp2": {
+  "addr": "0x7ff7ba5262b3",
+  "rva": "0x1ef62b3"
+ },
+ "dr_watch": {
+  "watch": [
+   [
+    "0x11c02219f68",
+    4,
+    "rw",
+    "orig+0x18"
+   ],
+   [
+    "0x11c02219f6c",
+    4,
+    "rw",
+    "orig+0x1c"
+   ],
+   [
+    "0x11d7f693ca0",
+    4,
+    "rw",
+    "copy+0x18"
+   ],
+   [
+    "0x11d7f693ca4",
+    4,
+    "rw",
+    "copy+0x1c"
+   ]
+  ],
+  "threads_ok": 175,
+  "threads_fail": 0,
+  "armed_after_bp_hit": 12
+ },
+ "bp2_hits": [
+  {
+   "src_rbx": "0x11c02219f50",
+   "dst_rsi": "0x136b3791f8",
+   "dst_v18": 0,
+   "dst_v1c": 0,
+   "caller_rva": "0xb8843f0",
+   "stack_rva": [
+    "0xb8843f0",
+    "0xb8843f0",
+    "0x1ef1723",
+    "0xb8843f0",
+    "0x84bbe8a"
+   ]
+  },
+  {
+   "src_rbx": "0x11c02219f50",
+   "dst_rsi": "0x136b37b3d8",
+   "dst_v18": 0,
+   "dst_v1c": 0,
+   "caller_rva": "0xb8843f0",
+   "stack_rva": [
+    "0xb8843f0",
+    "0xb8843f0",
+    "0x1a92043",
+    "0x197c525",
+    "0x857b1e0"
+   ]
+  },
+  {
+   "src_rbx": "0x11c02219f50",
+   "dst_rsi": "0x136b3791f8",
+   "dst_v18": 0,
+   "dst_v1c": 0,
+   "caller_rva": "0xb8843f0",
+   "stack_rva": [
+    "0xb8843f0",
+    "0xb8843f0",
+    "0x1ef1723",
+    "0xb8843f0",
+    "0x84bbe8a"
+   ]
+  },
+  {
+   "src_rbx": "0x11c02219f50",
+   "dst_rsi": "0x136b378e48",
+   "dst_v18": 0,
+   "dst_v1c": 0,
+   "caller_rva": "0xb8843f0",
+   "stack_rva": [
+    "0xb8843f0",
+    "0xb8843f0",
+    "0x1ef1723",
+    "0xb8843f0",
+    "0x84bbe8a"
+   ]
+  },
+  {
+   "src_rbx": "0x11c02219f50",
+   "dst_rsi": "0x11d7f693c88",
+   "dst_v18": 0,
+   "dst_v1c": 0,
+   "caller_rva": "0x1f02e71",
+   "stack_rva": [
+    "0x1f02e71",
+    "0x143c3a7",
+    "0xb8843f0",
+    "0xb884300",
+    "0x1a65f1f"
+   ]
+  },
+  {
+   "src_rbx": "0x11c02219f50",
+   "dst_rsi": "0x11d7f693c88",
+   "dst_v18": 0,
+   "dst_v1c": 0,
+   "caller_rva": "0x1f02e71",
+   "stack_rva": [
+    "0x1f02e71",
+    "0x143c3a7",
+    "0xb8843f0",
+    "0xb884300",
+    "0x1a65f1f"
+   ]
+  },
+  {
+   "src_rbx": "0x11c02219f50",
+   "dst_rsi": "0x11d7f693c88",
+   "dst_v18": 0,
+   "dst_v1c": 0,
+   "caller_rva": "0x1f02e71",
+   "stack_rva": [
+    "0x1f02e71",
+    "0x143c3a7",
+    "0xb8843f0",
+    "0xb884300",
+    "0x1a65f1f"
+   ]
+  },
+  {
+   "src_rbx": "0x11c02219f50",
+   "dst_rsi": "0x136b3791f8",
+   "dst_v18": 0,
+   "dst_v1c": 0,
+   "caller_rva": "0xb8843f0",
+   "stack_rva": [
+    "0xb8843f0",
+    "0xb8843f0",
+    "0x1ef1723",
+    "0xb8843f0",
+    "0x84bbe8a"
+   ]
+  },
+  {
+   "src_rbx": "0x11c02219f50",
+   "dst_rsi": "0x136b3791f8",
+   "dst_v18": 0,
+   "dst_v1c": 0,
+   "caller_rva": "0xb8843f0",
+   "stack_rva": [
+    "0xb8843f0",
+    "0xb8843f0",
+    "0x1ef1723",
+    "0xb8843f0",
+    "0x84bbe8a"
+   ]
+  },
+  {
+   "src_rbx": "0x11c02219f50",
+   "dst_rsi": "0x136b378e48",
+   "dst_v18": 0,
+   "dst_v1c": 0,
+   "caller_rva": "0xb8843f0",
+   "stack_rva": [
+    "0xb8843f0",
+    "0xb8843f0",
+    "0x1ef1723",
+    "0xb8843f0",
+    "0x84bbe8a"
+   ]
+  },
+  {
+   "src_rbx": "0x11c02219f50",
+   "dst_rsi": "0x11d7f693c88",
+   "dst_v18": 0,
+   "dst_v1c": 0,
+   "caller_rva": "0x1f02e71",
+   "stack_rva": [
+    "0x1f02e71",
+    "0x143c3a7",
+    "0xb8843f0",
+    "0xb884300",
+    "0x1a65f1f"
+   ]
+  },
+  {
+   "src_rbx": "0x11c02219f50",
+   "dst_rsi": "0x11d7f693c88",
+   "dst_v18": 0,
+   "dst_v1c": 0,
+   "caller_rva": "0x1f02e71",
+   "stack_rva": [
+    "0x1f02e71",
+    "0x143c3a7",
+    "0xb8843f0",
+    "0xb884300",
+    "0x1a65f1f"
+   ]
+  }
+ ],
+ "signal_hits": [
+  {
+   "t_rel": 9.39,
+   "field": "copy+0x18",
+   "instr": "0x7ff7ba5262c3",
+   "instr_rva": "0x1ef62c3",
+   "text": "mov dword ptr [rsi + 0x18], eax",
+   "kind": "write",
+   "watch_value": -40,
+   "tid": 25428,
+   "stack_rva": [
+    "0xb8843f0",
+    "0xb8843f0",
+    "0x1ef1723",
+    "0xb8843f0",
+    "0x84bbe8a"
+   ]
+  },
+  {
+   "t_rel": 9.39,
+   "field": "copy+0x1c",
+   "instr": "0x7ff7ba5262c9",
+   "instr_rva": "0x1ef62c9",
+   "text": "mov dword ptr [rsi + 0x1c], eax",
+   "kind": "write",
+   "watch_value": -8,
+   "tid": 25428,
+   "stack_rva": [
+    "0xb8843f0",
+    "0xb8843f0",
+    "0x1ef1723",
+    "0xb8843f0",
+    "0x84bbe8a"
+   ]
+  },
+  {
+   "t_rel": 9.39,
+   "field": "copy+0x1c",
+   "instr": "0x7ff7ba0c6321",
+   "instr_rva": "0x1a96321",
+   "text": "mov eax, dword ptr [rdi + 0x1c]",
+   "kind": "read",
+   "watch_value": -8,
+   "tid": 25428,
+   "stack_rva": [
+    "0xb8843f0",
+    "0x1ef173b",
+    "0xb8843f0",
+    "0x84bbe8a",
+    "0x2c8d4b3"
+   ]
+  },
+  {
+   "t_rel": 9.39,
+   "field": "copy+0x18",
+   "instr": "0x7ff7ba0c6340",
+   "instr_rva": "0x1a96340",
+   "text": "mov eax, dword ptr [rdi + 0x18]",
+   "kind": "read",
+   "watch_value": -40,
+   "tid": 25428,
+   "stack_rva": [
+    "0xb8843f0",
+    "0x1ef173b",
+    "0xb8843f0",
+    "0x84bbe8a",
+    "0x2c8d4b3"
+   ]
+  }
+ ],
+ "signal_aggregate": {
+  "0x1ef62c3 mov dword ptr [rsi + 0x18], eax": 1,
+  "0x1ef62c9 mov dword ptr [rsi + 0x1c], eax": 1,
+  "0x1a96321 mov eax, dword ptr [rdi + 0x1c]": 1,
+  "0x1a96340 mov eax, dword ptr [rdi + 0x18]": 1
+ },
+ "noise": {
+  "total_hits_capped": 3000,
+  "out_of_module": 2430,
+  "in_module_unrelated": 566,
+  "garbage_watch_values": 1095,
+  "note": "第二跳的 dst 是短生命期临时对象（每次 applyTex 都换一个地址：见 bp2_hits.dst_rsi 各不相同）；该堆块释放后被堆管理器复用，后续命中落在系统 DLL 与描述符内核的分配/释放代码上，watch_value 变成非参数垃圾值"
+ },
+ "event_counts": {
+  "1": 83885,
+  "2": 179,
+  "3": 1,
+  "4": 4,
+  "6": 262,
+  "8": 6
+ },
+ "conclusion": "第二跳只拿到 K60 自己的写回（0x141ef62c3/0x141ef62c9）与 H2 写回侧读回（0x141a96321/0x141a96340）；拷贝目标随即被释放 → 「像素端是否读副本」本轮仍属未判定（见 30-报告 §五）。",
+ "step_log_excerpt": "1795114229324 STEP 0 begin s1_b0_c0 t=1795114229324\n1795114240758 APPLIED s1_b0_c0 | useTexture=true;pattern=bc30tex;brightness=0;contrast=0;depth=100 t=1795114240758\n1795114241671 STEP 0 end s1_b0_c0 t=1795114241671\n1795114241810 STEP 1 begin s2_b50_c0 t=1795114241810\n1795114254903 APPLIED s2_b50_c0 | useTexture=true;pattern=bc30tex;brightness=50;contrast=0;depth=100 t=1795114254903\n1795114255739 STEP 1 end s2_b50_c0 t=1795114255739\n1795114255881 STEP 2 begin s3_bm50_c0 t=1795114255881\n1795114257643 APPLIED s3_bm50_c0 | useTexture=true;pattern=bc30tex;brightness=-50;contrast=0;depth=100 t=1795114257643\n1795114258158 STEP 2 end s3_bm50_c0 t=1795114258158\n1795114258291 STEP 3 begin s4_b0_c50 t=1795114258291\n1795114259901 APPLIED s4_b0_c50 | useTexture=true;pattern=bc30tex;brightness=0;contrast=50;depth=100 t=1795114259901\n1795114260565 STEP 3 end s4_b0_c50 t=1795114260565\n1795114260712 STEP 4 begin s5_b0_cm50 t=1795114260712\n1795114262088 APPLIED s5_b0_cm50 | useTexture=true;pattern=bc30tex;brightness=0;contrast=-50;depth=100 t=1795114262088\n1795114262679 STEP 4 end s5_b0_cm50 t=1795114262679\n1795114262820 STEP 5 begin s6_b0_c0 t=1795114262820\n1795114264084 APPLIED s6_b0_c0 | useTexture=true;pattern=bc30tex;brightness=0;contrast=0;depth=100 t=1795114264084\n1795114264765 STEP 5 end s6_b0_c0 t=1795114264765\n1795114264905 STEP 6 begin s7_b100_c100 t=1795114264905\n1795114266044 APPLIED s7_b100_c100 | useTexture=true;pattern=bc30tex;brightness=100;contrast=100;depth=100 t=1795114266044\n1795114266566 STEP 6 end s7_b100_c100 t=1795114266566\n1795114266713 STEP 7 begin s8_bm100_cm100 t=1795114266713\n1795114267875 APPLIED s8_bm100_cm100 | useTexture=true;pattern=bc30tex;brightness=-100;contrast=-100;depth=100 t=1795114267875\n1795114268397 STEP 7 end s8_bm100_cm100 t=1795114268397\n1795114268536 ALL DONE t=1795114268536"
+}
