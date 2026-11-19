@@ -1,0 +1,131 @@
+{
+  "schema": "brushconverter/ghidra-coverage/1",
+  "task": "20",
+  "generated_at": "2026-11-20T01:33:10.155+08:00",
+  "target": {
+    "file": "Photoshop.exe",
+    "product": "Adobe Photoshop 2025 26.9.0.15（FileVersion 26.9 (20250724.r.15)）",
+    "sha256": "05720af2cd207ead737b4c9ff422ffb7191f2d65cc0045b88735030cda76c953",
+    "size_bytes": 208456176,
+    "notice": "函数地址随 PS 版本失效；本文件只保留聚合数字，不保留函数地址"
+  },
+  "tool": {
+    "ghidra_version": "12.2（application.java.min=25）",
+    "java_version": "Temurin OpenJDK 25.0.5+8",
+    "project": "ps_re（仓库外 %TEMP%/brushconverter-team/ghidra-proj，不入库）"
+  },
+  "functions": {
+    "total": 428344,
+    "analyzed": 424865,
+    "unanalyzed": 2,
+    "definitions": {
+      "total": "FunctionManager.getFunctionCount()（含 thunk；本程序 external=0）",
+      "analyzed": "非 thunk、函数入口已反汇编且函数体地址数>0",
+      "unanalyzed": "非 thunk 函数中入口未反汇编或函数体为空的个数（= 非 thunk 总数 - analyzed）"
+    },
+    "thunks": 3477,
+    "non_thunk": 424867,
+    "analyzed_ratio_of_non_thunk": 0.999995,
+    "decompiler_stage_signature_functions": 0
+  },
+  "code": {
+    "num_instructions": 30481818,
+    "exec_block_bytes": 136040448,
+    "exec_defined_bytes": 127947396,
+    "exec_undefined_bytes": 8093052,
+    "exec_defined_ratio": 0.94051
+  },
+  "xrefs": {
+    "reference_source_addresses": 7940849,
+    "reference_destination_addresses": 2988984
+  },
+  "decompiler_sample": {
+    "requested": 200,
+    "attempted": 200,
+    "succeeded": 200,
+    "failed": 0,
+    "avg_ms": 19.5
+  },
+  "independent_crosscheck_pdata": {
+    "source": "PE .pdata（x64 栈展开表）直接解析，与 Ghidra 无关；脚本 tools/re_pipeline/native_xref.py 的 FunctionTable",
+    "records": 438177,
+    "bytes_union_in_text": 127058059,
+    "text_size": 136037140,
+    "text_covered_ratio": 0.933995
+  },
+  "analysis_run": {
+    "completed": false,
+    "elapsed_seconds_total": 22983.8,
+    "analysis_passes": [
+      {
+        "pass": "A-3600",
+        "started": "2026-11-19T19:15:35",
+        "exit_code": "killed",
+        "elapsed_seconds": 12745,
+        "analysis_timeout_seconds": 3600,
+        "ghidra_analysis_total_seconds": null,
+        "timed_out": false
+      },
+      {
+        "pass": "B-1200",
+        "started": "2026-11-19T22:38:38",
+        "exit_code": "-1",
+        "elapsed_seconds": 988.1,
+        "analysis_timeout_seconds": 1200,
+        "ghidra_analysis_total_seconds": null,
+        "timed_out": false
+      },
+      {
+        "pass": "C-480",
+        "started": "2026-11-19T22:55:07",
+        "exit_code": "0",
+        "elapsed_seconds": 924.7,
+        "analysis_timeout_seconds": 480,
+        "ghidra_analysis_total_seconds": 913,
+        "timed_out": true
+      },
+      {
+        "pass": "L-7200-cpu8",
+        "started": "2026-11-19T23:18:54",
+        "exit_code": "-1",
+        "elapsed_seconds": 8013.8,
+        "analysis_timeout_seconds": 7200,
+        "ghidra_analysis_total_seconds": null,
+        "timed_out": false
+      },
+      {
+        "pass": "probe-incr-300",
+        "started": "2026-11-19T19:10:09",
+        "exit_code": "0",
+        "elapsed_seconds": 312.2,
+        "analysis_timeout_seconds": 300,
+        "ghidra_analysis_total_seconds": 301,
+        "timed_out": true
+      }
+    ],
+    "analyzers_completed": [
+      "Call-Fixup Installer",
+      "Create Function",
+      "DWARF",
+      "Decompiler Switch Analysis",
+      "Decompiler Switch Analysis - One Time",
+      "Disassemble Entry Points",
+      "Embedded Media",
+      "External Entry References",
+      "Non-Returning Functions - Discovered",
+      "Non-Returning Functions - Known",
+      "PDB Universal",
+      "Shared Return Calls",
+      "Source Language Support",
+      "Subroutine References",
+      "Windows x86 PE Exception Handling",
+      "Windows x86 Thread Environment Block (TEB) Analyzer"
+    ],
+    "stages_not_completed": [
+      "Constant Propagation（ConstantPropagationAnalyzer）：5 轮都没跑到它返回；线程栈显示并行线程争同一把 DBHandle 锁（详见 docs/研究报告/ghidra-全量分析.md 第六节）",
+      "Decompiler Parameter ID 及之后所有反编译级分析器：signature_source 全部为 DEFAULT（0 个函数被改写签名）"
+    ],
+    "log_location": "%TEMP%/brushconverter-team/logs/20-*.log（本机，不入库）"
+  },
+  "reproduce": "见 docs/研究报告/ghidra-全量分析.md 第四节；命令模板：%GHIDRA_INSTALL_DIR%/support/analyzeHeadless.bat %TEMP%/brushconverter-team/ghidra-proj ps_re -process Photoshop.exe -analysisTimeoutPerFile <秒> -max-cpu 4 （JAVA_HOME 指向 JDK 25，GHIDRA_HEADLESS_MAXMEM 控制堆）"
+}
