@@ -1,0 +1,4 @@
+# 任务 33：真值图/渲染基线体积大，不入库；只提交 README.md / manifest.json / .gitignore
+*.png
+*.kpp
+_work/

@@ -1,0 +1,4012 @@
+{
+ "schema_version": "1.0",
+ "task": "33",
+ "generated_at": "2026-11-20 04:02:20",
+ "purpose": "把 v0.4 要判定的模式清单按顺序三等分给任务 34/35/36；每批含 ps_member / runtime_id / krita_value / status 与图路径清单",
+ "basis": {
+  "ps": {
+   "product": "Adobe Photoshop 2025",
+   "version": "26.9.0.15",
+   "route": "tools/ps_export.jsx（ExtendScript 通路）",
+   "canvas": {
+    "width": 100,
+    "height": 100,
+    "dpi": 72
+   },
+   "texture": "research/测试用纹理.png（原始字节定义图案）",
+   "texture_scale": 100,
+   "invert_texture": true,
+   "brush": "tests/定量测试专用.abr → 定量测试用"
+  },
+  "krita": {
+   "product": "Krita",
+   "version": "5.3.3",
+   "route": "GUI 进程 + PyKrita 启动插件（tools/krita_render_runner.py）",
+   "canvas": [
+    100,
+    100
+   ],
+   "stroke": 60,
+   "pressure": 1.0,
+   "preset_basis": "当前转换器口径 conv：strength=depth/100（高度系 ×1.2 封顶 1.0），brightness/contrast 用 calibrated 公式，mode 用 mode-align 的 krita_value"
+  },
+  "groups": [
+   {
+    "tag": "d10_b0_c0",
+    "depth": 10,
+    "brightness": 0,
+    "contrast": 0
+   },
+   {
+    "tag": "d10_b-50_c-50",
+    "depth": 10,
+    "brightness": -50,
+    "contrast": -50
+   },
+   {
+    "tag": "d60_b0_c0",
+    "depth": 60,
+    "brightness": 0,
+    "contrast": 0
+   },
+   {
+    "tag": "d60_b-50_c-50",
+    "depth": 60,
+    "brightness": -50,
+    "contrast": -50
+   },
+   {
+    "tag": "d100_b0_c0",
+    "depth": 100,
+    "brightness": 0,
+    "contrast": 0
+   },
+   {
+    "tag": "d100_b-50_c-50",
+    "depth": 100,
+    "brightness": -50,
+    "contrast": -50
+   }
+  ],
+  "naming": "ps__mode__<序号>_<模式>__d<深度>_b<亮度>_c<对比度>.png / krita__mode__<同>__…png"
+ },
+ "counts": {
+  "total_modes": 47,
+  "with_krita_baseline": 14,
+  "ps_truth_only": 33,
+  "groups_per_mode": 6,
+  "planned_ps_images": 282,
+  "planned_krita_images": 84,
+  "ps_ok": 204,
+  "krita_ok": 84,
+  "batches": {
+   "A": 16,
+   "B": 16,
+   "C": 15
+  },
+  "batches_with_krita": {
+   "A": 3,
+   "B": 6,
+   "C": 5
+  }
+ },
+ "batches": [
+  {
+   "batch": "A",
+   "members": [
+    {
+     "order": 0,
+     "ps_member": "Nrml",
+     "ps_semantics": "Normal 普通",
+     "runtime_id": 0,
+     "krita_value": null,
+     "krita_member": null,
+     "status": "无对应",
+     "judge_kind": "结构判定（Krita 无对应，仅 PS 真值）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 6,
+      "fail": 0,
+      "status": "ok（6/6）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__00_Nrml__d10_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "normal",
+        "error": "",
+        "sha256": "8d107d882c299d6cc3cfb9027459a9e341141d87d249cab42e53fec9cc64a7a3"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__00_Nrml__d10_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "normal",
+        "error": "",
+        "sha256": "04f516407410edc11fc920305ed51bc5d6459d78a3252e5e0795466427448bfc"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__00_Nrml__d60_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "normal",
+        "error": "",
+        "sha256": "b11bfb75baa4f2260100742342191b3489b50d607cf4641e7b9377fc4b78d30a"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__00_Nrml__d60_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "normal",
+        "error": "",
+        "sha256": "5020d9741e0135ae6c2981d6b3a764d757e884e016ddc9211a6555c2cd5bde50"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__00_Nrml__d100_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "normal",
+        "error": "",
+        "sha256": "49e9b425de8c5d1c13e963fabf6c98943eeda00fdd9fb01e85c15aedf8a49ead"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__00_Nrml__d100_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "normal",
+        "error": "",
+        "sha256": "98d84f9be90f3041a44b16e7f68a4cf2d9167915660b62f0d317286b1a247e8b"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 0,
+      "ok": 0,
+      "images": []
+     },
+     "ps_note": "Krita TexturingMode 无该纹理模式（PS 图层/其它传递模式）"
+    },
+    {
+     "order": 1,
+     "ps_member": "Dslv",
+     "ps_semantics": "Dissolve 溶解",
+     "runtime_id": 9,
+     "krita_value": null,
+     "krita_member": null,
+     "status": "无对应",
+     "judge_kind": "结构判定（Krita 无对应，仅 PS 真值）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 6,
+      "fail": 0,
+      "status": "ok（6/6）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__01_Dslv__d10_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "dissolve",
+        "error": "",
+        "sha256": "7c0e8d723482de468fdabef071c7e56c1363418b8064466dfb8a7a3862a90648"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__01_Dslv__d10_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "dissolve",
+        "error": "",
+        "sha256": "977593dccb2cf6dae8be4b82e28359bffdf9e8022aca74d628f37fe21519e056"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__01_Dslv__d60_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "dissolve",
+        "error": "",
+        "sha256": "d8a6c9c7fa00b08ddb090673e556b62976b5bd38fe8cd413856b1ac365ade619"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__01_Dslv__d60_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "dissolve",
+        "error": "",
+        "sha256": "64c2be01b6660524f8cacfbc7fbab7a470850336a9f1054f9afd05690014c6bd"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__01_Dslv__d100_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "dissolve",
+        "error": "",
+        "sha256": "934ef4bfce63027506880e7a4b78944b705b3f572b75755ebe4225e24f65e6fb"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__01_Dslv__d100_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "dissolve",
+        "error": "",
+        "sha256": "a6df74144cb01d922a1f2203823ad1134f46476d9f1c16e05230e5efc44b8dc0"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 0,
+      "ok": 0,
+      "images": []
+     },
+     "ps_note": "Krita TexturingMode 无该纹理模式（PS 图层/其它传递模式）"
+    },
+    {
+     "order": 2,
+     "ps_member": "Bhnd",
+     "ps_semantics": "Behind 背后",
+     "runtime_id": 28,
+     "krita_value": null,
+     "krita_member": null,
+     "status": "无对应",
+     "judge_kind": "结构判定（Krita 无对应，仅 PS 真值）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 6,
+      "fail": 0,
+      "status": "ok（6/6）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__02_Bhnd__d10_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "behind",
+        "error": "",
+        "sha256": "85299a0a4089ff5e59ca7a5f64c1d22dc24e991f6fb6dd04d5c1bc50cf78b59f"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__02_Bhnd__d10_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "behind",
+        "error": "",
+        "sha256": "3572b0a6a8022c389f08d49d23c0169be262be714b01d4a80bf2ce3760aa2829"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__02_Bhnd__d60_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "behind",
+        "error": "",
+        "sha256": "e0cf716c4cb253eeedf077f33a2e7776744c3dd399a6d5684c2b2259205b0a79"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__02_Bhnd__d60_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "behind",
+        "error": "",
+        "sha256": "1a833b9a4e8c93789aed18260e8cffbe985c1b428a0a24c699d3a78eb0880ef3"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__02_Bhnd__d100_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "behind",
+        "error": "",
+        "sha256": "e044f73572a267f6c6d425d8975f0103446ff0f2ae9082a8851ac7b057dcbb59"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__02_Bhnd__d100_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "behind",
+        "error": "",
+        "sha256": "819c46380e6760be6e1b4ca246acd1d8d82655d9777a662d0c48d9f79117e2c4"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 0,
+      "ok": 0,
+      "images": []
+     },
+     "ps_note": "Krita TexturingMode 无该纹理模式（PS 图层/其它传递模式）"
+    },
+    {
+     "order": 3,
+     "ps_member": "Clar",
+     "ps_semantics": "Clear 清除",
+     "runtime_id": 16,
+     "krita_value": null,
+     "krita_member": null,
+     "status": "无对应",
+     "judge_kind": "结构判定（Krita 无对应，仅 PS 真值）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 6,
+      "fail": 0,
+      "status": "ok（6/6）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__03_Clar__d10_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "clearEnum",
+        "error": "",
+        "sha256": "9db4721546d7f980da0798cad38c4f81b6ac3e6d9e520bfaf7cb6f5c649278bf"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__03_Clar__d10_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "clearEnum",
+        "error": "",
+        "sha256": "d1ea92184f780c1b18c6d6511ccc7eae6c7aa513c2998e24456006bb888ff48f"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__03_Clar__d60_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "clearEnum",
+        "error": "",
+        "sha256": "47dd0f7729f74fecd3e4a7a979e6b8cbd28f54b15d83149235f5289ec2d9c8c0"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__03_Clar__d60_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "clearEnum",
+        "error": "",
+        "sha256": "9745341c9c6f205ae066d684270645d2cfb63d76b62d1158965630b15bc2e963"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__03_Clar__d100_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "clearEnum",
+        "error": "",
+        "sha256": "13387dc6eb4b735beb2390ae0e853d8d37f38ded6b218a6a8f8712378f0cdb8a"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__03_Clar__d100_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "clearEnum",
+        "error": "",
+        "sha256": "6eb92393f9ebc7360dd2e10c876d2ca2c43e7ff4aa844c74935472aafddcd679"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 0,
+      "ok": 0,
+      "images": []
+     },
+     "ps_note": "Krita TexturingMode 无该纹理模式（PS 图层/其它传递模式）"
+    },
+    {
+     "order": 4,
+     "ps_member": "Mltp",
+     "ps_semantics": "Multiply 正片叠底",
+     "runtime_id": 7,
+     "krita_value": 0,
+     "krita_member": "MULTIPLY",
+     "status": "有对应",
+     "judge_kind": "像素比对（PS vs Krita）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 6,
+      "fail": 0,
+      "status": "ok（6/6）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__04_Mltp__d10_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "multiply",
+        "error": "",
+        "sha256": "399d2b23cfcdd792e3be08120816fb62e609a46450385810383a8221e0feefe1"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__04_Mltp__d10_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "multiply",
+        "error": "",
+        "sha256": "774d3df69c6463f90b62b7ee84384037dc896817cf37f9681f37fe5836b9a5cb"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__04_Mltp__d60_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "multiply",
+        "error": "",
+        "sha256": "70352f49d90baa68c52380e26564731ff56aaff93e67d4b257e7704caf63a8d6"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__04_Mltp__d60_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "multiply",
+        "error": "",
+        "sha256": "8ed05c76ab63c06366a6bead13f9f994f1041a44da0ec90e332b96b3a76fa003"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__04_Mltp__d100_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "multiply",
+        "error": "",
+        "sha256": "3eaaee30f2a6f29aa7018a675ce3e173be674c3656df3cfeb35fd7e7fb3420a9"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__04_Mltp__d100_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "multiply",
+        "error": "",
+        "sha256": "a59f6c35ae53dcea3bd6aa1b3528872d022a7bf4624a991005af93ce2105676a"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 6,
+      "ok": 6,
+      "images": [
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__04_Mltp__d10_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "25bc17b1df9ce4ae45a4e49a9900d811c1c256d8591674123133dae826183f7f"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__04_Mltp__d10_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "23f86427941611fb322b3afd3ce0dc18628686596300b01917f97923ae886fe6"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__04_Mltp__d60_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "e75e16def6b0b4806e97b7ed0bfd4f34d2fe303bb191629411a130f7a1de41f6"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__04_Mltp__d60_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "d13b84a6066de33b30fc55124821eed81a7e29c39658f4ba247dd70a9c108e46"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__04_Mltp__d100_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "a5251ef30c1c8950b3ef84caf2033d51836495603e2288323c9a9e01b9abfb59"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__04_Mltp__d100_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "067e5d4e18662a8acc63a610fe5e6f4636dea14ec35d2dbdc6003af884970d7b"
+       }
+      ]
+     },
+     "ps_note": "ABR 实测出现 17/38；PS 静态表 id=7"
+    },
+    {
+     "order": 5,
+     "ps_member": "Scrn",
+     "ps_semantics": "Screen 滤色",
+     "runtime_id": 8,
+     "krita_value": null,
+     "krita_member": null,
+     "status": "无对应",
+     "judge_kind": "结构判定（Krita 无对应，仅 PS 真值）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 6,
+      "fail": 0,
+      "status": "ok（6/6）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__05_Scrn__d10_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "screen",
+        "error": "",
+        "sha256": "17d8f0574a3b7ece42d5d2308b937897b82ff15556cba618b55caf633a0d9648"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__05_Scrn__d10_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "screen",
+        "error": "",
+        "sha256": "3470b6221d1275816567bd92fce6cd57697b8cd4d69176df580290f45f479f5a"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__05_Scrn__d60_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "screen",
+        "error": "",
+        "sha256": "572be5c8da5c070102c21d48567be35cfb908d50fe36a9ade86cf9a490a1f3c2"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__05_Scrn__d60_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "screen",
+        "error": "",
+        "sha256": "ee06a5e039cae600c05f9c6424382dd6d27178fec9b9ebf735df1dc535ba4176"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__05_Scrn__d100_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "screen",
+        "error": "",
+        "sha256": "183853cbe4de71eeeb7a56869429b63982ba98902f35ff2ed4964fd2037e6ead"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__05_Scrn__d100_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "screen",
+        "error": "",
+        "sha256": "65894976de38a0369ae9a55161a546f7b7a8dc01180571ab5f39c3d8bedf6fb9"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 0,
+      "ok": 0,
+      "images": []
+     },
+     "ps_note": "Krita TexturingMode 无该纹理模式（PS 图层/其它传递模式）"
+    },
+    {
+     "order": 6,
+     "ps_member": "Ovrl",
+     "ps_semantics": "Overlay 叠加",
+     "runtime_id": 17,
+     "krita_value": 5,
+     "krita_member": "OVERLAY",
+     "status": "有对应",
+     "judge_kind": "像素比对（PS vs Krita）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 6,
+      "fail": 0,
+      "status": "ok（6/6）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__06_Ovrl__d10_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "overlay",
+        "error": "",
+        "sha256": "1de70889e4319e8d9d9d815c9d9b64d2cb7f4b44595bb1fba1953e5d3502030d"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__06_Ovrl__d10_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "overlay",
+        "error": "",
+        "sha256": "16cbae9a6a9676d658a5147f8979ec460aa86b8b2b281cbf5fdc12b35297b5fc"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__06_Ovrl__d60_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "overlay",
+        "error": "",
+        "sha256": "13febddcadc90a1438836a1849dd974694367505964a5b1095a3ca324905f9a1"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__06_Ovrl__d60_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "overlay",
+        "error": "",
+        "sha256": "1a6cb7ba621f4b89cf41c7790d383ddcb8b940f2ab194d3a23fcf8accb4f98f0"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__06_Ovrl__d100_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "overlay",
+        "error": "",
+        "sha256": "1feb6b34998dc23be7efb9ae859d12acce10c327512da278b05e3b295cf96626"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__06_Ovrl__d100_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "overlay",
+        "error": "",
+        "sha256": "55c5e844f7ea8fd8003d574428994e0c0f8ec300261ce9ecaba5b2f28d1acd81"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 6,
+      "ok": 6,
+      "images": [
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__06_Ovrl__d10_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__06_Ovrl__d10_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__06_Ovrl__d60_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__06_Ovrl__d60_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__06_Ovrl__d100_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__06_Ovrl__d100_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       }
+      ]
+     },
+     "ps_note": "ABR 实测 1/38；静态表 id=17"
+    },
+    {
+     "order": 7,
+     "ps_member": "SftL",
+     "ps_semantics": "Soft Light 柔光",
+     "runtime_id": 19,
+     "krita_value": null,
+     "krita_member": null,
+     "status": "无对应",
+     "judge_kind": "结构判定（Krita 无对应，仅 PS 真值）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 6,
+      "fail": 0,
+      "status": "ok（6/6）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__07_SftL__d10_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "softLight",
+        "error": "",
+        "sha256": "8b7a14d11215aac47362a55f7efa6f19e9a4f40c45de54c3fd6ddc0aa712e017"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__07_SftL__d10_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "softLight",
+        "error": "",
+        "sha256": "84b699b20b1474aa09b019c633ed9dcde426d3ab39e769839a20c0c5889c8551"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__07_SftL__d60_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "softLight",
+        "error": "",
+        "sha256": "7b0c01a05f3789652bf707d399d100991e0afb5553586a36e0c9db598fa80678"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__07_SftL__d60_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "softLight",
+        "error": "",
+        "sha256": "9df1e3100b473b00a534f3531d3c353614a6f7c7b498917d022f4d9dc67857b5"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__07_SftL__d100_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "softLight",
+        "error": "",
+        "sha256": "7ff5512942205222631422bee55dcd2aeeb6116e2a60d9be4a82015374ec70cc"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__07_SftL__d100_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "softLight",
+        "error": "",
+        "sha256": "b4b63160d076bf41be4b89c4c8ad969e2ba4e329bb4bcb9d16241347979abae9"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 0,
+      "ok": 0,
+      "images": []
+     },
+     "ps_note": "Krita TexturingMode 无该纹理模式（PS 图层/其它传递模式）"
+    },
+    {
+     "order": 8,
+     "ps_member": "HrdL",
+     "ps_semantics": "Hard Light 强光",
+     "runtime_id": 18,
+     "krita_value": null,
+     "krita_member": null,
+     "status": "无对应",
+     "judge_kind": "结构判定（Krita 无对应，仅 PS 真值）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 6,
+      "fail": 0,
+      "status": "ok（6/6）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__08_HrdL__d10_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "hardLight",
+        "error": "",
+        "sha256": "bcf6a8e02539a8c443006e53f3c5d1cc31818dff12eac3d72db3b40adc0f21e6"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__08_HrdL__d10_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "hardLight",
+        "error": "",
+        "sha256": "85972bf5f122ccc297b8fc499ce9e95356b9f07cc87e462a9fed6ca4790512ea"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__08_HrdL__d60_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "hardLight",
+        "error": "",
+        "sha256": "6ea563192af532869e9e6637d53f09deed2eab41384587bcc492680b318d5c1b"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__08_HrdL__d60_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "hardLight",
+        "error": "",
+        "sha256": "a5e6870f78a8c277a3ee9b3111ae96a57bb5aad03584c4ac00c4976aeff3fdce"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__08_HrdL__d100_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "hardLight",
+        "error": "",
+        "sha256": "adcf8a9af883781a0e306a9a8e81441bef4d85b7495d3eee6c99ead80aa6e93c"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__08_HrdL__d100_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "hardLight",
+        "error": "",
+        "sha256": "6e9c2230d9c1971fa4fd27cd330509e08ed1a03a368a5784c6c38f848909b8d3"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 0,
+      "ok": 0,
+      "images": []
+     },
+     "ps_note": "Krita TexturingMode 无该纹理模式（PS 图层/其它传递模式）"
+    },
+    {
+     "order": 9,
+     "ps_member": "Drkn",
+     "ps_semantics": "Darken 变暗",
+     "runtime_id": 1,
+     "krita_value": 4,
+     "krita_member": "DARKEN",
+     "status": "有对应",
+     "judge_kind": "像素比对（PS vs Krita）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 6,
+      "fail": 0,
+      "status": "ok（6/6）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__09_Drkn__d10_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "darken",
+        "error": "",
+        "sha256": "d08d9330ad558c227befedaaaaef81af1a94e1d6afe9aee38d9b205e0ae80533"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__09_Drkn__d10_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "darken",
+        "error": "",
+        "sha256": "bc644f3f8eb9a0f5fae195be3ed6abf181c8e34dc5d7be49ae31f4fc72b0e2a8"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__09_Drkn__d60_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "darken",
+        "error": "",
+        "sha256": "6a0c32352d2da2c5c50e2064b3e421a23d3f1040024736030897d9920460d613"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__09_Drkn__d60_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "darken",
+        "error": "",
+        "sha256": "eed25b32925209415c9a8a50bb781797dbe7b2ec5a970389322ed042697a530f"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__09_Drkn__d100_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "darken",
+        "error": "",
+        "sha256": "f2f534c4cf62beb18a1535427b8b86e50b8619f932e1d7e6ca55e17e9a380d38"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__09_Drkn__d100_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "darken",
+        "error": "",
+        "sha256": "9fc298133e29beb7811f221eee05ab85fb68246d814d92ac3896b7ddba777c66"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 6,
+      "ok": 6,
+      "images": [
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__09_Drkn__d10_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "25bc17b1df9ce4ae45a4e49a9900d811c1c256d8591674123133dae826183f7f"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__09_Drkn__d10_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "23f86427941611fb322b3afd3ce0dc18628686596300b01917f97923ae886fe6"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__09_Drkn__d60_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "e75e16def6b0b4806e97b7ed0bfd4f34d2fe303bb191629411a130f7a1de41f6"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__09_Drkn__d60_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "d13b84a6066de33b30fc55124821eed81a7e29c39658f4ba247dd70a9c108e46"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__09_Drkn__d100_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "a5251ef30c1c8950b3ef84caf2033d51836495603e2288323c9a9e01b9abfb59"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__09_Drkn__d100_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "067e5d4e18662a8acc63a610fe5e6f4636dea14ec35d2dbdc6003af884970d7b"
+       }
+      ]
+     },
+     "ps_note": "ABR 实测(dualBrush)4 次；静态表 id=1"
+    },
+    {
+     "order": 10,
+     "ps_member": "Lghn",
+     "ps_semantics": "Lighten 变亮",
+     "runtime_id": 2,
+     "krita_value": null,
+     "krita_member": null,
+     "status": "无对应",
+     "judge_kind": "结构判定（Krita 无对应，仅 PS 真值）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 6,
+      "fail": 0,
+      "status": "ok（6/6）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__10_Lghn__d10_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "lighten",
+        "error": "",
+        "sha256": "fa4f10e3d9af5f92432323c0335a7aa16bf4aba1c29633b920f901a0160ee013"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__10_Lghn__d10_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "lighten",
+        "error": "",
+        "sha256": "d09a6202578bf1fdbf6b5e9c4fff07f074579cea004339506dc09100a6003838"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__10_Lghn__d60_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "lighten",
+        "error": "",
+        "sha256": "e0f72e8b5f58dfe22c79f66df5dbfc3ad4ad5919a28b7421276446bc60924cb4"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__10_Lghn__d60_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "lighten",
+        "error": "",
+        "sha256": "3b63bb75b29e591c84bc572359aa99419753541f7f82ec97f93518ba1a44de35"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__10_Lghn__d100_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "lighten",
+        "error": "",
+        "sha256": "ca7231d2d94d9c2ac06613ad3b4bd38a6dd8446bc032986f803abf9f60f01bcc"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__10_Lghn__d100_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "lighten",
+        "error": "",
+        "sha256": "ae6383a0f9ff91fc3783519140b1d78a9d97744cf3b4a745d5863f6f801a2e47"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 0,
+      "ok": 0,
+      "images": []
+     },
+     "ps_note": "Krita TexturingMode 无该纹理模式（PS 图层/其它传递模式）"
+    },
+    {
+     "order": 11,
+     "ps_member": "Dfrn",
+     "ps_semantics": "Difference 差值",
+     "runtime_id": 23,
+     "krita_value": null,
+     "krita_member": null,
+     "status": "无对应",
+     "judge_kind": "结构判定（Krita 无对应，仅 PS 真值）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 6,
+      "fail": 0,
+      "status": "ok（6/6）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__11_Dfrn__d10_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "difference",
+        "error": "",
+        "sha256": "8be64ca42d8d9a58898c658dd2a856c649b1c81f201e833d42ff1bd9ab0a21a9"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__11_Dfrn__d10_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "difference",
+        "error": "",
+        "sha256": "71417c4c64c6e7b1fb3463dec3bb5c7c1a7bac244556c6a285c4eeee619b799c"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__11_Dfrn__d60_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "difference",
+        "error": "",
+        "sha256": "7906d707e2f1650ce876212e8af4a4cc0a5d50ec3547f9b0be17980d0e7631aa"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__11_Dfrn__d60_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "difference",
+        "error": "",
+        "sha256": "499f940992c8700f32f671fc911a35cce52dad5ec799bb373421a2d40d8074b8"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__11_Dfrn__d100_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "difference",
+        "error": "",
+        "sha256": "96b0d2cbc3b68e84e3901151485452897b33a53d5498f0afc4535813925f091f"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__11_Dfrn__d100_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "difference",
+        "error": "",
+        "sha256": "c54b4de84ad87edeaf58499f35f1ca32a72c1de9dd954b3e03b0cb01bc216867"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 0,
+      "ok": 0,
+      "images": []
+     },
+     "ps_note": "Krita TexturingMode 无该纹理模式（PS 图层/其它传递模式）"
+    },
+    {
+     "order": 12,
+     "ps_member": "H   ",
+     "ps_semantics": "Hue 色相",
+     "runtime_id": 3,
+     "krita_value": null,
+     "krita_member": null,
+     "status": "无对应",
+     "judge_kind": "结构判定（Krita 无对应，仅 PS 真值）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 6,
+      "fail": 0,
+      "status": "ok（6/6）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__12_H__d10_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "hue",
+        "error": "",
+        "sha256": "c2a09d9b535c552bf35b94deb2c5e5cc697186e1303357aacfc935273d84d0b6"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__12_H__d10_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "hue",
+        "error": "",
+        "sha256": "01ef2bfa1cfe5da5c39b8759695a1f01c99d9467ba577d8adf68b0ec1d4c02ea"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__12_H__d60_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "hue",
+        "error": "",
+        "sha256": "d1823d51ae8d8f221d60f0b09665231d89627090dcb5ace05a23180898314cd6"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__12_H__d60_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "hue",
+        "error": "",
+        "sha256": "acae74bf816bdd5b64bb39d3a7cbd9be0a66c6ed4a91c717804ccc291c0252a8"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__12_H__d100_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "hue",
+        "error": "",
+        "sha256": "7a3b81f107ed2d78d5024771dfdf2c4d1ea2545765fff4d489e5649ff033feeb"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__12_H__d100_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "hue",
+        "error": "",
+        "sha256": "e217532d0242e357e46e7711cbd2f1b707edb8464bf8ee0523f45eb9723732d5"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 0,
+      "ok": 0,
+      "images": []
+     },
+     "ps_note": "Krita TexturingMode 无该纹理模式（PS 图层/其它传递模式）"
+    },
+    {
+     "order": 13,
+     "ps_member": "Strt",
+     "ps_semantics": "Saturation 饱和度",
+     "runtime_id": 4,
+     "krita_value": null,
+     "krita_member": null,
+     "status": "无对应",
+     "judge_kind": "结构判定（Krita 无对应，仅 PS 真值）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 6,
+      "fail": 0,
+      "status": "ok（6/6）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__13_Strt__d10_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "saturation",
+        "error": "",
+        "sha256": "5dcf9e35581c4064665b126ac5d9cf7b96595e47adfccbcdd3ac6ace8c9d63f7"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__13_Strt__d10_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "saturation",
+        "error": "",
+        "sha256": "6a04fbbef66047e9b80b5fbd92a0afc081809e1c53cf748a21a9c7e61ae767e9"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__13_Strt__d60_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "saturation",
+        "error": "",
+        "sha256": "93e53c49dc8a01aa56762a5c75773ac2ccbd44ec60922a08ae1562419204432a"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__13_Strt__d60_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "saturation",
+        "error": "",
+        "sha256": "6d8e7646ad3c4b759627b8b2502766dd1b9fb1e74eec2dfd1b0bff9845ce63ff"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__13_Strt__d100_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "saturation",
+        "error": "",
+        "sha256": "23c6bc4ad9d4186d520858d241e31097f2b74e4a4e78407c910eeb544cacdcc3"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__13_Strt__d100_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "saturation",
+        "error": "",
+        "sha256": "dfcaff19b5358bbac2625e04c9f1989411f66d5d95cb2b82bcf10621fdb22808"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 0,
+      "ok": 0,
+      "images": []
+     },
+     "ps_note": "Krita TexturingMode 无该纹理模式（PS 图层/其它传递模式）"
+    },
+    {
+     "order": 14,
+     "ps_member": "Clr ",
+     "ps_semantics": "Color 颜色",
+     "runtime_id": 5,
+     "krita_value": null,
+     "krita_member": null,
+     "status": "无对应",
+     "judge_kind": "结构判定（Krita 无对应，仅 PS 真值）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 6,
+      "fail": 0,
+      "status": "ok（6/6）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__14_Clr__d10_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "color",
+        "error": "",
+        "sha256": "1fa80f211e3d74767cc82a1c26cf42ffe0d1295e2ed49b7f4c06ae4f820880c8"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__14_Clr__d10_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "color",
+        "error": "",
+        "sha256": "acc53a0046248244df05bd2e4ed35f6cb99990fefcc3f780c453abf5d2f8d5ea"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__14_Clr__d60_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "color",
+        "error": "",
+        "sha256": "724e924638a63318c2d238f84ac599e115a60642c37427a4cf449173b8b1d929"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__14_Clr__d60_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "color",
+        "error": "",
+        "sha256": "dc530001739067bb43eda985b105735e322e8605e73995b25c270b53013ee8a6"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__14_Clr__d100_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "color",
+        "error": "",
+        "sha256": "2d0a454b989cd6a7edb508b547e9faf4bea692d62eb4d78ca95cb1dca2f6c2da"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__14_Clr__d100_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "color",
+        "error": "",
+        "sha256": "ae67952a1a20b5427938e5fffb19523cf6242c4ddaf045ded1cee11811ab36ea"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 0,
+      "ok": 0,
+      "images": []
+     },
+     "ps_note": "Krita TexturingMode 无该纹理模式（PS 图层/其它传递模式）"
+    },
+    {
+     "order": 15,
+     "ps_member": "Lmns",
+     "ps_semantics": "Luminosity 明度",
+     "runtime_id": 6,
+     "krita_value": null,
+     "krita_member": null,
+     "status": "无对应",
+     "judge_kind": "结构判定（Krita 无对应，仅 PS 真值）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 6,
+      "fail": 0,
+      "status": "ok（6/6）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__15_Lmns__d10_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "luminosity",
+        "error": "",
+        "sha256": "23a66c3be3b69dd604c28ab93f72df2aa3c67b8b42f21658f3f0c1e6edec8d7d"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__15_Lmns__d10_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "luminosity",
+        "error": "",
+        "sha256": "be7ddbf96b0f0ac4996563d71f6492eee7c8f5a8ab35c6a775a722dc572c0203"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__15_Lmns__d60_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "luminosity",
+        "error": "",
+        "sha256": "ed190b8abfb2aaeecd5db72b2be94f6e7fe208004bbf3dff9d46dbe87672ace9"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__15_Lmns__d60_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "luminosity",
+        "error": "",
+        "sha256": "aced056cbe952d7714d862500b02c32dbfc80cc8c56ec7c855c2e3db9ae90bcf"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__15_Lmns__d100_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "luminosity",
+        "error": "",
+        "sha256": "34b42cbf862b44e24ba87fa0f3f9042cda119ebd62f9c3641436318ecb80c082"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__15_Lmns__d100_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "luminosity",
+        "error": "",
+        "sha256": "e3f35e2dbff11006c3685263168da095556498de8cb215f34a7bdda8ab05ade3"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 0,
+      "ok": 0,
+      "images": []
+     },
+     "ps_note": "Krita TexturingMode 无该纹理模式（PS 图层/其它传递模式）"
+    }
+   ]
+  },
+  {
+   "batch": "B",
+   "members": [
+    {
+     "order": 16,
+     "ps_member": "Xclu",
+     "ps_semantics": "Exclusion 排除",
+     "runtime_id": 24,
+     "krita_value": null,
+     "krita_member": null,
+     "status": "无对应",
+     "judge_kind": "结构判定（Krita 无对应，仅 PS 真值）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 6,
+      "fail": 0,
+      "status": "ok（6/6）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__16_Xclu__d10_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "exclusion",
+        "error": "",
+        "sha256": "bc1ffc17a4293dc7b854100923d14b5aaf67f69134cf02a61942562a645da24e"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__16_Xclu__d10_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "exclusion",
+        "error": "",
+        "sha256": "aa1f0946990126fc7852e1722ece1dc606ce132eee13b6a034b803ceb9aed504"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__16_Xclu__d60_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "exclusion",
+        "error": "",
+        "sha256": "ccaee4a22d46824f7ceb7464690d634129d756a67442be37f4de1783f3d64884"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__16_Xclu__d60_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "exclusion",
+        "error": "",
+        "sha256": "4a9c1088df44a047bcd48bf3a6fe93d9babd1f85d6fbf4bca484825937429485"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__16_Xclu__d100_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "exclusion",
+        "error": "",
+        "sha256": "903ee15eb0c1e229121f80479dcc2f4f3d783a78c5aae300743249f02097e063"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__16_Xclu__d100_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "exclusion",
+        "error": "",
+        "sha256": "adf252a68ecf061b7e7cc44a9fb0f8561a90bc7f6e2c23ea3b11c7d41008ba25"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 0,
+      "ok": 0,
+      "images": []
+     },
+     "ps_note": "Krita TexturingMode 无该纹理模式（PS 图层/其它传递模式）"
+    },
+    {
+     "order": 17,
+     "ps_member": "CDdg",
+     "ps_semantics": "Color Dodge 颜色减淡",
+     "runtime_id": 25,
+     "krita_value": 6,
+     "krita_member": "COLOR_DODGE",
+     "status": "有对应",
+     "judge_kind": "像素比对（PS vs Krita）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 6,
+      "fail": 0,
+      "status": "ok（6/6）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__17_CDdg__d10_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "colorDodge",
+        "error": "",
+        "sha256": "63ceb28bc763b31b5a88b56fb0473d589d202dbf8dc6ad19b38c341d61bde9ee"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__17_CDdg__d10_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "colorDodge",
+        "error": "",
+        "sha256": "bb9264663047c4f572adf0bd03be19446c023e2e96c1f7cdd75ed152accb13c5"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__17_CDdg__d60_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "colorDodge",
+        "error": "",
+        "sha256": "da60e429f8022a9b40063390cfdbdc637c1df250d65b155c32cb0f6f3e42298e"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__17_CDdg__d60_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "colorDodge",
+        "error": "",
+        "sha256": "b111682532d098b4534bf5f091e6a2b89ad7adbe0c3a2e546906f59938d7bc65"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__17_CDdg__d100_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "colorDodge",
+        "error": "",
+        "sha256": "09cd4084985e5bef645e263b78844eb152dad8ab839232a7144f131fa97fa00e"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__17_CDdg__d100_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "colorDodge",
+        "error": "",
+        "sha256": "50659ec2169e0e4b3d69a1abd923969a67bb49e78eb1da84858f379c559f53c1"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 6,
+      "ok": 6,
+      "images": [
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__17_CDdg__d10_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__17_CDdg__d10_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__17_CDdg__d60_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__17_CDdg__d60_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__17_CDdg__d100_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__17_CDdg__d100_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       }
+      ]
+     },
+     "ps_note": "ABR 实测 1/38；静态表 id=25"
+    },
+    {
+     "order": 18,
+     "ps_member": "CBrn",
+     "ps_semantics": "Color Burn 颜色加深",
+     "runtime_id": 26,
+     "krita_value": 7,
+     "krita_member": "COLOR_BURN",
+     "status": "有对应",
+     "judge_kind": "像素比对（PS vs Krita）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 6,
+      "fail": 0,
+      "status": "ok（6/6）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__18_CBrn__d10_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "colorBurn",
+        "error": "",
+        "sha256": "001e6fbbe75a883934f6f090329815d33a500f77c89d171a16658b070073ee84"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__18_CBrn__d10_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "colorBurn",
+        "error": "",
+        "sha256": "7570abbc96ba0c2f94a343efe6b9ad3db78027c6c7a9b5d38ba5c7a7c948d764"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__18_CBrn__d60_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "colorBurn",
+        "error": "",
+        "sha256": "63860ddfc45fd5118180ad1433a468f9e316e5b2ccebdfe8e1cab800bf543fa7"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__18_CBrn__d60_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "colorBurn",
+        "error": "",
+        "sha256": "42513a7005acf033b2f6f02e57a43755d9ad827b5a79d8cd8fe3b804eafb0a1d"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__18_CBrn__d100_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "colorBurn",
+        "error": "",
+        "sha256": "5de0dd1bca86cc39c8703ee65a04d10496a307f76b0ae6d21d43b1e2a05897fc"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__18_CBrn__d100_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "colorBurn",
+        "error": "",
+        "sha256": "eca935c5a1c6cbea3c42a76c837bed4dceadbe5326069437e80940dcb8edbee7"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 6,
+      "ok": 6,
+      "images": [
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__18_CBrn__d10_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__18_CBrn__d10_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__18_CBrn__d60_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__18_CBrn__d60_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__18_CBrn__d100_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__18_CBrn__d100_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       }
+      ]
+     },
+     "ps_note": "ABR 实测 3/38；静态表 id=26"
+    },
+    {
+     "order": 19,
+     "ps_member": "Add ",
+     "ps_semantics": "Add/LINEAR_DODGE 线性减淡(相加)",
+     "runtime_id": 38,
+     "krita_value": null,
+     "krita_member": null,
+     "status": "无对应",
+     "judge_kind": "结构判定（Krita 无对应，仅 PS 真值）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 0,
+      "fail": 6,
+      "status": "fail：PS 落笔/保存报错（见 images[].error）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__19_Add__d10_b0_c0.png",
+        "ok": false,
+        "jsx_verify": true,
+        "mode_read": "add",
+        "error": "发生了常规 Photoshop 错误。该功能可能无法在这个版本的 Photoshop 中使用。 - 不能完成命令，因为程序错误。 line 238",
+        "sha256": null
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__19_Add__d10_b-50_c-50.png",
+        "ok": false,
+        "jsx_verify": true,
+        "mode_read": "add",
+        "error": "发生了常规 Photoshop 错误。该功能可能无法在这个版本的 Photoshop 中使用。 - 不能完成命令，因为程序错误。 line 238",
+        "sha256": null
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__19_Add__d60_b0_c0.png",
+        "ok": false,
+        "jsx_verify": true,
+        "mode_read": "add",
+        "error": "发生了常规 Photoshop 错误。该功能可能无法在这个版本的 Photoshop 中使用。 - 不能完成命令，因为程序错误。 line 238",
+        "sha256": null
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__19_Add__d60_b-50_c-50.png",
+        "ok": false,
+        "jsx_verify": true,
+        "mode_read": "add",
+        "error": "发生了常规 Photoshop 错误。该功能可能无法在这个版本的 Photoshop 中使用。 - 不能完成命令，因为程序错误。 line 238",
+        "sha256": null
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__19_Add__d100_b0_c0.png",
+        "ok": false,
+        "jsx_verify": true,
+        "mode_read": "add",
+        "error": "发生了常规 Photoshop 错误。该功能可能无法在这个版本的 Photoshop 中使用。 - 不能完成命令，因为程序错误。 line 238",
+        "sha256": null
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__19_Add__d100_b-50_c-50.png",
+        "ok": false,
+        "jsx_verify": true,
+        "mode_read": "add",
+        "error": "发生了常规 Photoshop 错误。该功能可能无法在这个版本的 Photoshop 中使用。 - 不能完成命令，因为程序错误。 line 238",
+        "sha256": null
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 0,
+      "ok": 0,
+      "images": []
+     },
+     "ps_note": "Krita TexturingMode 无该纹理模式（PS 图层/其它传递模式）"
+    },
+    {
+     "order": 20,
+     "ps_member": "Sbtr",
+     "ps_semantics": "Subtract 减去",
+     "runtime_id": 39,
+     "krita_value": 1,
+     "krita_member": "SUBTRACT",
+     "status": "有对应",
+     "judge_kind": "像素比对（PS vs Krita）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 6,
+      "fail": 0,
+      "status": "ok（6/6）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__20_Sbtr__d10_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "subtract",
+        "error": "",
+        "sha256": "dcea7778845ce6bf036ce179e2e483d5140c09f39b2c052a3e52c12327f4977f"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__20_Sbtr__d10_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "subtract",
+        "error": "",
+        "sha256": "9c9b27cf088ffd3d333335d1e110a8394bd7620fae3472a096f06698b9d1f0d1"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__20_Sbtr__d60_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "subtract",
+        "error": "",
+        "sha256": "e19843e39c59a47255f0881f44103165d9552db9119dfeca75a733db50a15042"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__20_Sbtr__d60_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "subtract",
+        "error": "",
+        "sha256": "98df8084e715d34d51a2450458fab7f2e8e6aa1fb25aadb9019a9854308033b6"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__20_Sbtr__d100_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "subtract",
+        "error": "",
+        "sha256": "929676275b551a26a0cd45026211a8f1fb0067134af4d21f49c67a399fcbd95c"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__20_Sbtr__d100_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "subtract",
+        "error": "",
+        "sha256": "24f65acbaa82d977cf6bce609216618b1e74c6c62a0bc747dc74f63073367f16"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 6,
+      "ok": 6,
+      "images": [
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__20_Sbtr__d10_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "9bbd7257c3aaab4e641b4be24aa4a16056ffbd1285ae85a1b3d18e5ffe9d73cf"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__20_Sbtr__d10_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "b731b6f4d9dd65c1d82f9fc60b82a743db0658e15a77318b5689511fe74e1490"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__20_Sbtr__d60_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "dd1fb38253e11e4390f419d9de29242840f96f70a3a24436a3f8db7687a0b3b5"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__20_Sbtr__d60_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "95454dd2bb74c18db11f95f2f78c19b98ea94e51175cdf8b2246c922a1d6ff5e"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__20_Sbtr__d100_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "54e4a33e1cd5b7b2126268607fd59171d8b7a0c8421e7966c2ccf4afb0b8c298"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__20_Sbtr__d100_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "89208ff419c89a7d9c7da7264e02d2bfbf8334497904c34c87b05b385746d4ad"
+       }
+      ]
+     },
+     "ps_note": "ABR 实测 2/38；静态表 id=39"
+    },
+    {
+     "order": 21,
+     "ps_member": "hardMix",
+     "ps_semantics": "Hard Mix 实色混合",
+     "runtime_id": 35,
+     "krita_value": 10,
+     "krita_member": "HARD_MIX_PHOTOSHOP",
+     "status": "有对应",
+     "judge_kind": "像素比对（PS vs Krita）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 6,
+      "fail": 0,
+      "status": "ok（6/6）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__21_hardMix__d10_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "hardMix",
+        "error": "",
+        "sha256": "132c56b1a2b4bff85000012714e2ce7486cc68268c067a9e58d1055787893ee4"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__21_hardMix__d10_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "hardMix",
+        "error": "",
+        "sha256": "72a3a5f5fcae73c1960ebb10a3d5e3dc1f71860c9991293a079d7013b676cf56"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__21_hardMix__d60_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "hardMix",
+        "error": "",
+        "sha256": "6f0f464dc24ed115a1fd4342e8c433a2470b05c84c99fa7b40cdfc48dbeb8ada"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__21_hardMix__d60_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "hardMix",
+        "error": "",
+        "sha256": "8eed4e40b332258027250ad1a5f60500605a9358fbb7b6bd7090e3e79b37475b"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__21_hardMix__d100_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "hardMix",
+        "error": "",
+        "sha256": "0ca6e045c56ee4c78207071efd8a4ea5ba1f3821da153a4b80891042a0669450"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__21_hardMix__d100_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "hardMix",
+        "error": "",
+        "sha256": "b795e8efa058a4c7ec453649e8eca462751aa61117ccd1e274c0f8fe5584bd12"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 6,
+      "ok": 6,
+      "images": [
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__21_hardMix__d10_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__21_hardMix__d10_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__21_hardMix__d60_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__21_hardMix__d60_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__21_hardMix__d100_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "473963c14d861f3eccecf744ed0733cc8c4cd85db9e636e3061d7dc6af58f3d5"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__21_hardMix__d100_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       }
+      ]
+     },
+     "ps_note": "注册表 0x14b219c6c 值 0x1e；ABR 实测 1/38"
+    },
+    {
+     "order": 22,
+     "ps_member": "linearDodge",
+     "ps_semantics": "Linear Dodge 线性减淡",
+     "runtime_id": 30,
+     "krita_value": 8,
+     "krita_member": "LINEAR_DODGE",
+     "status": "有对应",
+     "judge_kind": "像素比对（PS vs Krita）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 6,
+      "fail": 0,
+      "status": "ok（6/6）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__22_linearDodge__d10_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "linearDodge",
+        "error": "",
+        "sha256": "7dfdcc0f032ecbd3386fff9c33119afc26d126f9c975ee945cd92f2e650421cb"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__22_linearDodge__d10_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "linearDodge",
+        "error": "",
+        "sha256": "de6b9acd7f48f1d53e1128f3a1be8f619ab6e76d761640f2731287d8fe82a1a0"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__22_linearDodge__d60_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "linearDodge",
+        "error": "",
+        "sha256": "e903f1da5f48df9db83a5721e80d455b2e898307414b1ad54f2938c3e5506127"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__22_linearDodge__d60_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "linearDodge",
+        "error": "",
+        "sha256": "5e3eb54de607460549bf4689a0b7fa408fd4b2fb61eeedb6ff902e59d5deb062"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__22_linearDodge__d100_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "linearDodge",
+        "error": "",
+        "sha256": "870d16b45457cd082f37b1acdaba8ffcf1f068b172a33ba60f80d58482c34384"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__22_linearDodge__d100_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "linearDodge",
+        "error": "",
+        "sha256": "c56fc92e753fb784fc4ceba8f220a08f3e7e1624e388abcd8e33076b94ee4ab6"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 6,
+      "ok": 6,
+      "images": [
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__22_linearDodge__d10_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__22_linearDodge__d10_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__22_linearDodge__d60_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__22_linearDodge__d60_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__22_linearDodge__d100_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__22_linearDodge__d100_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       }
+      ]
+     },
+     "ps_note": "注册表 0x14b219c74 值 0x1f"
+    },
+    {
+     "order": 23,
+     "ps_member": "linearBurn",
+     "ps_semantics": "Linear Burn 线性加深",
+     "runtime_id": 31,
+     "krita_value": 9,
+     "krita_member": "LINEAR_BURN",
+     "status": "有对应",
+     "judge_kind": "像素比对（PS vs Krita）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 6,
+      "fail": 0,
+      "status": "ok（6/6）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__23_linearBurn__d10_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "linearBurn",
+        "error": "",
+        "sha256": "1b51cbbd784b6fb45d5a5b619aa366ec4c004f7dae4a32ab509502d6ef3712b2"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__23_linearBurn__d10_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "linearBurn",
+        "error": "",
+        "sha256": "a579ff7cdc70b42389f3e803b13711b316c53462a76cb22c59daa66b09e5ca8b"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__23_linearBurn__d60_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "linearBurn",
+        "error": "",
+        "sha256": "c7f7425a279f5cadb39f141af54684bd00973762b16e56edab11aa253608d797"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__23_linearBurn__d60_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "linearBurn",
+        "error": "",
+        "sha256": "673ac931fe0a36d33d02055ea17d5536e883e249ce2b685f72d890a5e1584bcb"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__23_linearBurn__d100_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "linearBurn",
+        "error": "",
+        "sha256": "1c64474a59b0a8bff5424c996b20873a567ad20652bb81d22b4e4dc8cb823c29"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__23_linearBurn__d100_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "linearBurn",
+        "error": "",
+        "sha256": "c24acac10378f0c135b9e8456c8136aa72d33e85bdda4878ab042c44c2871aad"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 6,
+      "ok": 6,
+      "images": [
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__23_linearBurn__d10_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "25bc17b1df9ce4ae45a4e49a9900d811c1c256d8591674123133dae826183f7f"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__23_linearBurn__d10_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "23f86427941611fb322b3afd3ce0dc18628686596300b01917f97923ae886fe6"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__23_linearBurn__d60_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "e75e16def6b0b4806e97b7ed0bfd4f34d2fe303bb191629411a130f7a1de41f6"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__23_linearBurn__d60_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "d13b84a6066de33b30fc55124821eed81a7e29c39658f4ba247dd70a9c108e46"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__23_linearBurn__d100_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "a5251ef30c1c8950b3ef84caf2033d51836495603e2288323c9a9e01b9abfb59"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__23_linearBurn__d100_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "067e5d4e18662a8acc63a610fe5e6f4636dea14ec35d2dbdc6003af884970d7b"
+       }
+      ]
+     },
+     "ps_note": "注册表 0x14b219c7c 值 0x20"
+    },
+    {
+     "order": 24,
+     "ps_member": "linearLight",
+     "ps_semantics": "Linear Light 线性光",
+     "runtime_id": 32,
+     "krita_value": null,
+     "krita_member": null,
+     "status": "无对应",
+     "judge_kind": "结构判定（Krita 无对应，仅 PS 真值）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 6,
+      "fail": 0,
+      "status": "ok（6/6）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__24_linearLight__d10_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "linearLight",
+        "error": "",
+        "sha256": "e3c57cd5943ec2fc4b2a738f8b56a54833f02f24099b14a55f60ed6b6f43e2c0"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__24_linearLight__d10_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "linearLight",
+        "error": "",
+        "sha256": "e7319a2f7d17ec1dce63a50e9d24490b194e04aa287b38a14bcd556ef3d2e63a"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__24_linearLight__d60_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "linearLight",
+        "error": "",
+        "sha256": "1cf040d408ee2f749003e1ff481f7a20b184d84cea02cea828137341b6d58385"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__24_linearLight__d60_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "linearLight",
+        "error": "",
+        "sha256": "9e4f5cfbce3e9ec6aa0b05d979f44f1528615b6389287bc0f4940d95e023e932"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__24_linearLight__d100_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "linearLight",
+        "error": "",
+        "sha256": "a2e5a4fd8ee3b95e9102fdde94bd62b36f3430b134b558257110228f6c394e5a"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__24_linearLight__d100_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "linearLight",
+        "error": "",
+        "sha256": "aeea31663e1d4dcb335fdb4dfe4961c76fdea923704390111ba9176100ec7687"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 0,
+      "ok": 0,
+      "images": []
+     },
+     "ps_note": "Krita TexturingMode 无该模式"
+    },
+    {
+     "order": 25,
+     "ps_member": "vividLight",
+     "ps_semantics": "Vivid Light 亮光",
+     "runtime_id": 33,
+     "krita_value": null,
+     "krita_member": null,
+     "status": "无对应",
+     "judge_kind": "结构判定（Krita 无对应，仅 PS 真值）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 6,
+      "fail": 0,
+      "status": "ok（6/6）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__25_vividLight__d10_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "vividLight",
+        "error": "",
+        "sha256": "5318ec6d4d819c4592e538b2ba061853719ec1ad280106b68f041482b4c0cc7f"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__25_vividLight__d10_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "vividLight",
+        "error": "",
+        "sha256": "f1a5b477666acc7db87220f447b7c1fb4470a331f15c8517a99df89c14b06322"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__25_vividLight__d60_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "vividLight",
+        "error": "",
+        "sha256": "cfc3c92ad8d4ee8cb1615c8ecf5594900c8df7639aaaafa89ce41b4789f836df"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__25_vividLight__d60_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "vividLight",
+        "error": "",
+        "sha256": "a8c7f1a2ca7713c68ee4e85aba85fc508b6bb4c6ab97400d636a48a7027c94a7"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__25_vividLight__d100_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "vividLight",
+        "error": "",
+        "sha256": "e06affa29b321e9a8c870d597233cf87e9c1998dd3c24a5ac2daeadb53dcabf8"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__25_vividLight__d100_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "vividLight",
+        "error": "",
+        "sha256": "93921eeb15762fadf44d4e473f7baada65a8f59297111ed58e43e799048eef01"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 0,
+      "ok": 0,
+      "images": []
+     },
+     "ps_note": "Krita TexturingMode 无该模式"
+    },
+    {
+     "order": 26,
+     "ps_member": "pinLight",
+     "ps_semantics": "Pin Light 点光",
+     "runtime_id": 34,
+     "krita_value": null,
+     "krita_member": null,
+     "status": "无对应",
+     "judge_kind": "结构判定（Krita 无对应，仅 PS 真值）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 6,
+      "fail": 0,
+      "status": "ok（6/6）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__26_pinLight__d10_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "pinLight",
+        "error": "",
+        "sha256": "6c2f52bb5849521d843750980c22b5fdebd2edb9c35d4b7cdf4404d25b224a79"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__26_pinLight__d10_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "pinLight",
+        "error": "",
+        "sha256": "614cd1aeba8ad07944f99f8e3812d2c338aa9c057415f00a322d2de8a0289b43"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__26_pinLight__d60_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "pinLight",
+        "error": "",
+        "sha256": "846ddab31e34f7c8bf3bd5280a27e15cf28dc0d1ce8a9d2462063b0c834cf7fc"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__26_pinLight__d60_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "pinLight",
+        "error": "",
+        "sha256": "0e1f4fba88f44145596e290d0842d596012009d6cfcb04e2ab32de3cfec22731"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__26_pinLight__d100_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "pinLight",
+        "error": "",
+        "sha256": "ad1d529811462c07ba6639df2a41bd65ef114fbbf4934baf99ec072ec9533a6f"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__26_pinLight__d100_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "pinLight",
+        "error": "",
+        "sha256": "6c7df36cb96dd090619c03424a84ca30320cc61ddccea0431e4d53fab39106b0"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 0,
+      "ok": 0,
+      "images": []
+     },
+     "ps_note": "Krita TexturingMode 无该模式"
+    },
+    {
+     "order": 27,
+     "ps_member": "Nrml",
+     "ps_semantics": "Normal 普通",
+     "runtime_id": 0,
+     "krita_value": null,
+     "krita_member": null,
+     "status": "无对应",
+     "judge_kind": "结构判定（Krita 无对应，仅 PS 真值）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 6,
+      "fail": 0,
+      "status": "ok（6/6）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__27_Nrml__d10_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "normal",
+        "error": "",
+        "sha256": "1a0462a7b5f1b23dcdc26d37c0feead13e1e0c193bfa4d37308be0d5f54ee0a7"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__27_Nrml__d10_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "normal",
+        "error": "",
+        "sha256": "7dcc36a07b0e7524b493ce6e40c7c24b732daa04b26abf1790425880506a4d31"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__27_Nrml__d60_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "normal",
+        "error": "",
+        "sha256": "c0e0ecfe01dd3a4935b57e8edd3c1d134ad894005ce2cf7f0368c9c74cbf6e59"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__27_Nrml__d60_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "normal",
+        "error": "",
+        "sha256": "dbdf05b15082a987fac4bc555054e61137e742216c3c003298945b883621382b"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__27_Nrml__d100_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "normal",
+        "error": "",
+        "sha256": "4125c63e106bb13bbdb5c00fdc87a8410dcbbabb936547ad82ac136bbcfb10b7"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__27_Nrml__d100_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "normal",
+        "error": "",
+        "sha256": "12262d843c2b2befb26e4f91cff20c0a8a67f45dcfcd716e124263a41bd49600"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 0,
+      "ok": 0,
+      "images": []
+     },
+     "ps_note": "Krita TexturingMode 无该模式"
+    },
+    {
+     "order": 28,
+     "ps_member": "Rvrt",
+     "ps_semantics": "Revert 反相还原(名待定)",
+     "runtime_id": 22,
+     "krita_value": null,
+     "krita_member": null,
+     "status": "无对应",
+     "judge_kind": "结构判定（Krita 无对应，仅 PS 真值）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 0,
+      "fail": 6,
+      "status": "fail：值被 PS 忽略（回读停在上一模式）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__28_Rvrt__d10_b0_c0.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "54bd55830d33d745f8f40943f77a158e70f54cadce3574642cf6e362470368f0"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__28_Rvrt__d10_b-50_c-50.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "a58ceca014040371a0c8456a3ce78ac96436c27659ecbcb36eb82f2ef9fbda64"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__28_Rvrt__d60_b0_c0.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "6665be36e9ea8c6c814abd6b699164dc352a57cae73709035d09844fab5b301e"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__28_Rvrt__d60_b-50_c-50.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "b3d5d4363ad1b3ecc6f945db75b6ff71a3a06d5a548036fcb7ffcc04f0cbdc52"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__28_Rvrt__d100_b0_c0.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "605a74c6f1cfda1890c24073996e153bf60063234893f3b6101a9860ca77f5d9"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__28_Rvrt__d100_b-50_c-50.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "1e148d87a2277fa51c1bbfa60ca673d4411a442e1134a932f740f9a69bb18631"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 0,
+      "ok": 0,
+      "images": []
+     },
+     "ps_note": "Krita TexturingMode 无该模式"
+    },
+    {
+     "order": 29,
+     "ps_member": "SgdD",
+     "ps_semantics": "Dodge-Shadow 变体(名待定)",
+     "runtime_id": 10,
+     "krita_value": null,
+     "krita_member": null,
+     "status": "无对应",
+     "judge_kind": "结构判定（Krita 无对应，仅 PS 真值）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 0,
+      "fail": 6,
+      "status": "fail：值被 PS 忽略（回读停在上一模式）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__29_SgdD__d10_b0_c0.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "c8b43d399caccea589ddf4da3493ca1f20ebcf4ea9bc71c36c4901c5fa9ffe2f"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__29_SgdD__d10_b-50_c-50.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "a459c199a19e9345ce26fad8370a66a105315ee16f514b93355f7fd18050affb"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__29_SgdD__d60_b0_c0.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "b5688bd33d60a41b622fdace4755f8193076ec2fefc424c42c3aa373d7a27e31"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__29_SgdD__d60_b-50_c-50.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "41f39ae2319077cde1e9ada60e151d3b0de4da5c043663f5842e18e27ab3dc7d"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__29_SgdD__d100_b0_c0.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "b613fe04d971afb91d05d9912ba8a06183226465bc07346fb8568af0f8adbf78"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__29_SgdD__d100_b-50_c-50.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "086cbb1c140fc830d88502485e7da83e2d01c51d0e5ba02bfde99635acec44d9"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 0,
+      "ok": 0,
+      "images": []
+     },
+     "ps_note": "Krita TexturingMode 无该模式"
+    },
+    {
+     "order": 30,
+     "ps_member": "MgdD",
+     "ps_semantics": "Dodge-Midtone 变体(名待定)",
+     "runtime_id": 11,
+     "krita_value": null,
+     "krita_member": null,
+     "status": "无对应",
+     "judge_kind": "结构判定（Krita 无对应，仅 PS 真值）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 0,
+      "fail": 6,
+      "status": "fail：值被 PS 忽略（回读停在上一模式）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__30_MgdD__d10_b0_c0.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "c91015881c80dfdb7aac701338a4b8559daf8f2e214ce1c4731e1aa00edd1f3b"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__30_MgdD__d10_b-50_c-50.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "732c46efd4e64247b56057d08428218b731c07a6d1958a86a249d6e09773830c"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__30_MgdD__d60_b0_c0.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "68fdb585e61fe263ac6fb3d7201de1c5e3a020e84705c2b7bda8ae87ad0e4c07"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__30_MgdD__d60_b-50_c-50.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "6cd3e3f35af96e51f23f17af0580ccc7d34510e0126f971847f0acca41941a0a"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__30_MgdD__d100_b0_c0.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "58ebe56ed92472e1a34e9c83e783d40f795d4918544b04e85a3424f55d3f4bc1"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__30_MgdD__d100_b-50_c-50.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "586a0d8ab3495bd9d2947013fec2fed26af867c29dbabc54ee98a51c29679999"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 0,
+      "ok": 0,
+      "images": []
+     },
+     "ps_note": "Krita TexturingMode 无该模式"
+    },
+    {
+     "order": 31,
+     "ps_member": "HgdD",
+     "ps_semantics": "Dodge-Highlight 变体(名待定)",
+     "runtime_id": 12,
+     "krita_value": null,
+     "krita_member": null,
+     "status": "无对应",
+     "judge_kind": "结构判定（Krita 无对应，仅 PS 真值）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 0,
+      "fail": 6,
+      "status": "fail：值被 PS 忽略（回读停在上一模式）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__31_HgdD__d10_b0_c0.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "21a661da2e694e9249fdfbc514fe8c5b065f56ecdd54f334bd1bb906892feee6"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__31_HgdD__d10_b-50_c-50.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "77aa62ef8f70abd9dd41997d307c3d0935efacaa6f55739de3fae5be5d918516"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__31_HgdD__d60_b0_c0.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "16d8016b541e6d19b1bfeb84c21feaed95bcf11618e5754c83654956fab0bef2"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__31_HgdD__d60_b-50_c-50.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "d574779a1751a8fa5ddf3c642eb2c048b631d73afaa2a00575474e52b4cd9fce"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__31_HgdD__d100_b0_c0.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "ce12bc298b9394c8f5a814efdc3777767db4bec3f3976dca261eacc3d8f4822f"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__31_HgdD__d100_b-50_c-50.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "2cf689f04fcdb810572f744c6f5e98a5de52e2ca874d017188e71bb7a8bd716e"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 0,
+      "ok": 0,
+      "images": []
+     },
+     "ps_note": "Krita TexturingMode 无该模式"
+    }
+   ]
+  },
+  {
+   "batch": "C",
+   "members": [
+    {
+     "order": 32,
+     "ps_member": "SnrB",
+     "ps_semantics": "Burn-Shadow 变体(名待定)",
+     "runtime_id": 13,
+     "krita_value": null,
+     "krita_member": null,
+     "status": "无对应",
+     "judge_kind": "结构判定（Krita 无对应，仅 PS 真值）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 0,
+      "fail": 6,
+      "status": "fail：值被 PS 忽略（回读停在上一模式）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__32_SnrB__d10_b0_c0.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "6f8c8c000b30a715311297a9b0100e795b05e404e3af66a3e0023d77aa7e31fb"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__32_SnrB__d10_b-50_c-50.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "423577d4b80ec9219222a3f1e8f48097bf2519f5e726b962f4f9d864c9ad43bc"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__32_SnrB__d60_b0_c0.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "3c71af5c2f89b1123d270a8a0161850fae4f9e164f6062c55a0e3a350ae75941"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__32_SnrB__d60_b-50_c-50.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "85602dbbe9d9fba49f0985a59abf1f86333607cd2f41a7b3333f18d854cbf0eb"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__32_SnrB__d100_b0_c0.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "947c3e50ae73235da639ca81977d82baf4e54c865f8fd276d60e85f3fb85dc9f"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__32_SnrB__d100_b-50_c-50.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "1499f99107cf0413ff30bd4c25d12600289487e604d528da1cf4473a2ab6c05c"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 0,
+      "ok": 0,
+      "images": []
+     },
+     "ps_note": "Krita TexturingMode 无该模式"
+    },
+    {
+     "order": 33,
+     "ps_member": "MnrB",
+     "ps_semantics": "Burn-Midtone 变体(名待定)",
+     "runtime_id": 14,
+     "krita_value": null,
+     "krita_member": null,
+     "status": "无对应",
+     "judge_kind": "结构判定（Krita 无对应，仅 PS 真值）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 0,
+      "fail": 6,
+      "status": "fail：值被 PS 忽略（回读停在上一模式）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__33_MnrB__d10_b0_c0.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "da58ecd8b626c7956d54fd5d45191e6da63d5a9edd908b6be6c25a72ecf0c2df"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__33_MnrB__d10_b-50_c-50.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "7b6259c88c24dd4f49b2c112bdecec033e9a36ea75bd6e278e4257065ee2adb8"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__33_MnrB__d60_b0_c0.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "f3affba842548a056afa6ec03ebde9135cfd2ab8097633514f591bf7ea9a61b1"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__33_MnrB__d60_b-50_c-50.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "efb73c45b19f378f1a60b3b89b65c40e2e54c5e315e2f6a2e57cad65287c8db9"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__33_MnrB__d100_b0_c0.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "8a0a51e515538ea230f58c5fed066194d8f6a5a744a7b28e24c9b4b14fefe568"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__33_MnrB__d100_b-50_c-50.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "91ce53de5e369a8c89983826679a777bc047eea3f222f76025b2b0f50de69af5"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 0,
+      "ok": 0,
+      "images": []
+     },
+     "ps_note": "Krita TexturingMode 无该模式"
+    },
+    {
+     "order": 34,
+     "ps_member": "HnrB",
+     "ps_semantics": "Burn-Highlight 变体(名待定)",
+     "runtime_id": 15,
+     "krita_value": null,
+     "krita_member": null,
+     "status": "无对应",
+     "judge_kind": "结构判定（Krita 无对应，仅 PS 真值）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 0,
+      "fail": 6,
+      "status": "fail：值被 PS 忽略（回读停在上一模式）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__34_HnrB__d10_b0_c0.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "295ffed72e9b63ac9aeba264ef327e40cdabdcf6be3c139f7d8ce1dab101df0f"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__34_HnrB__d10_b-50_c-50.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "24a3828f0b73c2849cdc20087244b5991462fd5a935f2f9a0383c20174793a8d"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__34_HnrB__d60_b0_c0.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "cd0a310e256a2873e722cbd6860b7fe1fa3270515625402467efc85a891de0e9"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__34_HnrB__d60_b-50_c-50.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "a16e805f17d67f557d22b49ad5ea3aa4b4a349df2addd7163c50484e768c9b58"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__34_HnrB__d100_b0_c0.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "05688183535984ffc363aabf25b42d759ee844188bdd6aa66a2dfd3a764c841a"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__34_HnrB__d100_b-50_c-50.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "d416fb52af0e18d55399d5217d03c995eb75c612592aad5bc5a1d2e4f00a57eb"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 0,
+      "ok": 0,
+      "images": []
+     },
+     "ps_note": "Krita TexturingMode 无该模式"
+    },
+    {
+     "order": 35,
+     "ps_member": "ttsD",
+     "ps_semantics": "待定(名待定)",
+     "runtime_id": 20,
+     "krita_value": null,
+     "krita_member": null,
+     "status": "无对应",
+     "judge_kind": "结构判定（Krita 无对应，仅 PS 真值）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 0,
+      "fail": 6,
+      "status": "fail：值被 PS 忽略（回读停在上一模式）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__35_ttsD__d10_b0_c0.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "05fc2bed7278dfb5b222dff80e4ae92ee2ef2f305eb0562894352141f69d77b0"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__35_ttsD__d10_b-50_c-50.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "994dc179bdddf8de8ac80f6778b90163ae5cf9ceb4d0a77c13b98307398332fe"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__35_ttsD__d60_b0_c0.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "49d2c920c99584703a120303298ab87f79f00e79dcd86fd66c56b2a8a0494aec"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__35_ttsD__d60_b-50_c-50.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "49ff716103cda6e4a8f761b69aea66fe0f5246b4e87bacb97b98dc1cd03089be"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__35_ttsD__d100_b0_c0.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "d584ed3674cf6accdddad9c3f60ca0ca916d477ea92159591d93566337e78f42"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__35_ttsD__d100_b-50_c-50.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "25f6ff1a2e91ade28bf3f540681e4301a5e3a60d1d23a0e4b643db6552bbd409"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 0,
+      "ok": 0,
+      "images": []
+     },
+     "ps_note": "Krita TexturingMode 无该模式"
+    },
+    {
+     "order": 36,
+     "ps_member": "Str ",
+     "ps_semantics": "待定(名待定)",
+     "runtime_id": 21,
+     "krita_value": null,
+     "krita_member": null,
+     "status": "无对应",
+     "judge_kind": "结构判定（Krita 无对应，仅 PS 真值）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 0,
+      "fail": 6,
+      "status": "fail：值被 PS 忽略（回读停在上一模式）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__36_Str__d10_b0_c0.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "96dce6230706aa1f92c040bd2cd65f2f437ce0df9211f8f72204efa4b7382ba2"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__36_Str__d10_b-50_c-50.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "6313c555dc6ca9d94a5631ad9063137c2bda06711b70e364f158bb7a62219137"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__36_Str__d60_b0_c0.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "08978a31a54dbb3c6da913491cae6f4166d9111e3966bd3f4ecb821e8220132b"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__36_Str__d60_b-50_c-50.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "bd76a585ec655ae9965e22d4cd4802b5175cd3d5b94b16d350d38b57d497cef0"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__36_Str__d100_b0_c0.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "f9098de3420bbc0f0a264ec412a8cefbf377feb0ae79d5caeff8d309ecee4abf"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__36_Str__d100_b-50_c-50.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "b06d16f697c7dd76b69f886fcc1844cb2e098d64f60be85bfee7ae9765d57379"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 0,
+      "ok": 0,
+      "images": []
+     },
+     "ps_note": "Krita TexturingMode 无该模式"
+    },
+    {
+     "order": 37,
+     "ps_member": "passThrough",
+     "ps_semantics": "Pass Through 穿透",
+     "runtime_id": 29,
+     "krita_value": null,
+     "krita_member": null,
+     "status": "无对应",
+     "judge_kind": "结构判定（Krita 无对应，仅 PS 真值）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 6,
+      "fail": 0,
+      "status": "ok（6/6）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__37_passThrough__d10_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "passThrough",
+        "error": "",
+        "sha256": "15dbfedd3a6d0a9860367885cd4082b4ef7f339049ff31e6e86fbf88d0c844df"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__37_passThrough__d10_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "passThrough",
+        "error": "",
+        "sha256": "e15f2dac229484e918436dbbeb7cebc78567f361a92d7b2f1234893e255db21f"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__37_passThrough__d60_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "passThrough",
+        "error": "",
+        "sha256": "9d82ed222c55f65b48c48120c03fa433c180399b450a8951544e046c7212cfe1"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__37_passThrough__d60_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "passThrough",
+        "error": "",
+        "sha256": "44bd02e25a83402059b1ad44745169fbf127737fb41f46023c2bd68b0c0bc56a"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__37_passThrough__d100_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "passThrough",
+        "error": "",
+        "sha256": "c7b501361494ca7114deee32d50fe6629fa14187c2495bc16c35dd56c6208b9a"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__37_passThrough__d100_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "passThrough",
+        "error": "",
+        "sha256": "22e73a3de71625d9be76bee3d8d5090bce4d378051b198c3f027b84007d38604"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 0,
+      "ok": 0,
+      "images": []
+     },
+     "ps_note": "Krita TexturingMode 无该模式"
+    },
+    {
+     "order": 38,
+     "ps_member": "height",
+     "ps_semantics": "Height 高度",
+     "runtime_id": 40,
+     "krita_value": 14,
+     "krita_member": "HEIGHT_PHOTOSHOP",
+     "status": "有对应",
+     "judge_kind": "像素比对（PS vs Krita）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 6,
+      "fail": 0,
+      "status": "ok（6/6）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__38_height__d10_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "4f8f637394d65f3de84a4852ab122f532c0ce5e24c6b31065a5169b0df72cf31"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__38_height__d10_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "51d97b57db687c9702893e8b7b043cfb4af3155e0b1ac4054af8e3fa0c451671"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__38_height__d60_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "d949752421127c80c42b9d033c7a63b731adb8a5273adbd631e0bbb6124d7e76"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__38_height__d60_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "9f1d53a5bdab4dd4f6da4bc5263d711e549b0e6570561c1dd9f88114f31ab527"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__38_height__d100_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "a7dfe0624feb6cd9ee7c77d204fccb5ae9a68fec5b2a1bbe28bbb0b238b47d98"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__38_height__d100_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "height",
+        "error": "",
+        "sha256": "a2347ec2a6e59b8c993d5697dd6465c30d9978449f643ef9d8650750e4810197"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 6,
+      "ok": 6,
+      "images": [
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__38_height__d10_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "9b300ee042d73a6bf739ccf16846d641f303d71ab85cf373052eb745645f958a"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__38_height__d10_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "4ea0411d18e62212449e4f71248702a27c11c1245a246cc0c658172d663cc066"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__38_height__d60_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__38_height__d60_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__38_height__d100_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__38_height__d100_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       }
+      ]
+     },
+     "ps_note": "注册表 0x14b219cf4 值 0x29；ABR 实测 4/38(Hght)"
+    },
+    {
+     "order": 39,
+     "ps_member": "linearHeight",
+     "ps_semantics": "Linear Height 线性高度",
+     "runtime_id": 41,
+     "krita_value": 15,
+     "krita_member": "LINEAR_HEIGHT_PHOTOSHOP",
+     "status": "有对应",
+     "judge_kind": "像素比对（PS vs Krita）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 6,
+      "fail": 0,
+      "status": "ok（6/6）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__39_linearHeight__d10_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "linearHeight",
+        "error": "",
+        "sha256": "fbd1c2f0e475ec6a3cd9ec08a26cb1fc64cec877c3594d59d7b3ad8066e7b7d4"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__39_linearHeight__d10_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "linearHeight",
+        "error": "",
+        "sha256": "4d1c66b9aaba76b7a89310016054e7e2e6b361dc8d1413ca2b22e58b33585ad1"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__39_linearHeight__d60_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "linearHeight",
+        "error": "",
+        "sha256": "9e7a3e664a30796ac2d34fe9a46495e67a3c9ffd2118f65ed9baaeb226a0bb23"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__39_linearHeight__d60_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "linearHeight",
+        "error": "",
+        "sha256": "de050e6bd6394ab7923df2ca315f17f52bbc04db1aab49bd9a4af5496c994ec3"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__39_linearHeight__d100_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "linearHeight",
+        "error": "",
+        "sha256": "d23f9918888ffdad62a7fe912245f1d215f8737a89647e73a1deca3d73c0d4b9"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__39_linearHeight__d100_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "linearHeight",
+        "error": "",
+        "sha256": "a3ae4a0c6446fef32c6284e1cf77d75a3626ee5b9a07897fdd9ba8721ab96faa"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 6,
+      "ok": 6,
+      "images": [
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__39_linearHeight__d10_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "9b300ee042d73a6bf739ccf16846d641f303d71ab85cf373052eb745645f958a"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__39_linearHeight__d10_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "4ea0411d18e62212449e4f71248702a27c11c1245a246cc0c658172d663cc066"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__39_linearHeight__d60_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__39_linearHeight__d60_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__39_linearHeight__d100_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__39_linearHeight__d100_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       }
+      ]
+     },
+     "ps_note": "注册表 0x14b219cfc 值 0x2a；ABR 实测 10/38"
+    },
+    {
+     "order": 40,
+     "ps_member": "lighterColor",
+     "ps_semantics": "Lighter Color 较亮颜色",
+     "runtime_id": 42,
+     "krita_value": null,
+     "krita_member": null,
+     "status": "无对应",
+     "judge_kind": "结构判定（Krita 无对应，仅 PS 真值）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 6,
+      "fail": 0,
+      "status": "ok（6/6）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__40_lighterColor__d10_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "lighterColor",
+        "error": "",
+        "sha256": "621a56cff1e4f5e0e2ecadc5841efe8637bcdd2f5f791be6e2bc1fe2b06c3feb"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__40_lighterColor__d10_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "lighterColor",
+        "error": "",
+        "sha256": "8f2c1c79b9993e205c39665ed79c0867e32c09d08ffb4ebea5e1df212c822c38"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__40_lighterColor__d60_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "lighterColor",
+        "error": "",
+        "sha256": "2d51b63bc3ffcd1e75854c1c4e6d9ccddd66dc8d2790bc3b41c59ad9340cf0d5"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__40_lighterColor__d60_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "lighterColor",
+        "error": "",
+        "sha256": "050cab589864e055a57a49a5d902e6d5ec825354a2c7bf81434ca74498276c1f"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__40_lighterColor__d100_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "lighterColor",
+        "error": "",
+        "sha256": "aa6e2d3349e03d57d92d331001eea325c92d688d93e387ea735c9ac4459197f6"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__40_lighterColor__d100_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "lighterColor",
+        "error": "",
+        "sha256": "652df685beadcb017e1ce6ce3a6193ecab25a1302c415ede4d8ffc53f6035678"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 0,
+      "ok": 0,
+      "images": []
+     },
+     "ps_note": "Krita TexturingMode 无该模式"
+    },
+    {
+     "order": 41,
+     "ps_member": "darkerColor",
+     "ps_semantics": "Darker Color 较暗颜色",
+     "runtime_id": 43,
+     "krita_value": null,
+     "krita_member": null,
+     "status": "无对应",
+     "judge_kind": "结构判定（Krita 无对应，仅 PS 真值）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 6,
+      "fail": 0,
+      "status": "ok（6/6）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__41_darkerColor__d10_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "darkerColor",
+        "error": "",
+        "sha256": "56915858bf7411ed4c5e389f6661d53d8e797f5f691f75ec4e772f9eab65d093"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__41_darkerColor__d10_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "darkerColor",
+        "error": "",
+        "sha256": "c995b3f3dafc42342e252593d7285dbbd9edd07cf66496ac661ac3d72dddde44"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__41_darkerColor__d60_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "darkerColor",
+        "error": "",
+        "sha256": "1a9ffdcae94f66ca077c7953c2e8c38c0d149ab7e00f01bb55a91bfb99f79ab2"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__41_darkerColor__d60_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "darkerColor",
+        "error": "",
+        "sha256": "4afed10f3a3fcd374614278bcc53420651f2f6b6ea960c19f7dfcd7749f50868"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__41_darkerColor__d100_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "darkerColor",
+        "error": "",
+        "sha256": "0243e5bbf5d3cd9e8c957369d08f3867687ac00b0efba19f85cdd92bb0330870"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__41_darkerColor__d100_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "darkerColor",
+        "error": "",
+        "sha256": "baa5688356bb32749f3cc84fd894f633b163c1487a997c30046422c840516ec4"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 0,
+      "ok": 0,
+      "images": []
+     },
+     "ps_note": "Krita TexturingMode 无该模式"
+    },
+    {
+     "order": 42,
+     "ps_member": "blendSubtraction",
+     "ps_semantics": "Subtract? 减去(与 Sbtr 同义?)",
+     "runtime_id": 52,
+     "krita_value": null,
+     "krita_member": null,
+     "status": "无对应",
+     "judge_kind": "结构判定（Krita 无对应，仅 PS 真值）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 6,
+      "fail": 0,
+      "status": "ok（6/6）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__42_blendSubtraction__d10_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "blendSubtraction",
+        "error": "",
+        "sha256": "17c16380ef6c1ebabfaac50c45dc8a88e2ccd7165c7337065fcc3204c83bb53c"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__42_blendSubtraction__d10_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "blendSubtraction",
+        "error": "",
+        "sha256": "0ac962abfa39ca47c13c455cebe93ba9bdace895acb6657498c4d6951251ddb3"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__42_blendSubtraction__d60_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "blendSubtraction",
+        "error": "",
+        "sha256": "9b73413321375c3b033615e9f9f645ab797c25c4ad6904ba41bf1831368f5d94"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__42_blendSubtraction__d60_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "blendSubtraction",
+        "error": "",
+        "sha256": "ae508ef09ab5dccd359c55266b17e2b5a045b769908350f50c98427143c64b38"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__42_blendSubtraction__d100_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "blendSubtraction",
+        "error": "",
+        "sha256": "a7ad0c3989821cf565b29f3e5f3fbc9be65fab8ba95d86611bb6d3206198d062"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__42_blendSubtraction__d100_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "blendSubtraction",
+        "error": "",
+        "sha256": "48e097d1e8d35571cb2e5973e4903659cb1cd7ad6d00faabed6224983f526937"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 0,
+      "ok": 0,
+      "images": []
+     },
+     "ps_note": "Krita TexturingMode 无该模式"
+    },
+    {
+     "order": 43,
+     "ps_member": "blendDivide",
+     "ps_semantics": "Divide 划分",
+     "runtime_id": 53,
+     "krita_value": null,
+     "krita_member": null,
+     "status": "无对应",
+     "judge_kind": "结构判定（Krita 无对应，仅 PS 真值）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 6,
+      "fail": 0,
+      "status": "ok（6/6）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__43_blendDivide__d10_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "blendDivide",
+        "error": "",
+        "sha256": "9ef03a6db5adbc8b46238d192c7f1b3f555eaeaf4256b4e4ec16cb42f550c93c"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__43_blendDivide__d10_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "blendDivide",
+        "error": "",
+        "sha256": "469d58fa6de6794597a5d22dfe632e941c05c621327149b7b654343f2aba81af"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__43_blendDivide__d60_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "blendDivide",
+        "error": "",
+        "sha256": "e4ec26a496edd4ee2afc5b8f514fab45640bb555f1f24f7104fb7a8059530513"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__43_blendDivide__d60_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "blendDivide",
+        "error": "",
+        "sha256": "10e20cbe338599dcb12f580996a8fa81e8052984440731b593cbd2eea36b3895"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__43_blendDivide__d100_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "blendDivide",
+        "error": "",
+        "sha256": "ba3a1531f81be224626f15c3b5833d93bfebb61ab1c961fa6aabb1496a293b78"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__43_blendDivide__d100_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "blendDivide",
+        "error": "",
+        "sha256": "55b0dfacb05d6179a6c859c181d6c9d32a00cbed9b8beb5378b74425a9d7f76d"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 0,
+      "ok": 0,
+      "images": []
+     },
+     "ps_note": "Krita TexturingMode 无该模式"
+    },
+    {
+     "order": 44,
+     "ps_member": "Lght",
+     "ps_semantics": "Lght",
+     "runtime_id": null,
+     "krita_value": 2,
+     "krita_member": "LIGHTNESS",
+     "status": "待动态确认",
+     "judge_kind": "像素比对（PS vs Krita）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 0,
+      "fail": 6,
+      "status": "fail：PS 不接受该枚举值（回读停在上一模式，图无意义）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__44_Lght__d10_b0_c0.png",
+        "ok": false,
+        "jsx_verify": true,
+        "mode_read": "height",
+        "error": "PS 不接受该枚举值（mode-ids 记为「读取失败」）；本次回读='height'，停在上一模式，图无意义",
+        "sha256": "d741ecb9eb43431c1b3189f5f60f1131facf528d4c4690e86302b2987f9652df"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__44_Lght__d10_b-50_c-50.png",
+        "ok": false,
+        "jsx_verify": true,
+        "mode_read": "height",
+        "error": "PS 不接受该枚举值（mode-ids 记为「读取失败」）；本次回读='height'，停在上一模式，图无意义",
+        "sha256": "01c08545e47bb923f58fccc44b939a26bde3665a23fd4f29b23cc253926cc779"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__44_Lght__d60_b0_c0.png",
+        "ok": false,
+        "jsx_verify": true,
+        "mode_read": "height",
+        "error": "PS 不接受该枚举值（mode-ids 记为「读取失败」）；本次回读='height'，停在上一模式，图无意义",
+        "sha256": "f6aa2665aa173a3d9dd828eaf289994aa979e2dc67572cea46c35d8e4b6be879"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__44_Lght__d60_b-50_c-50.png",
+        "ok": false,
+        "jsx_verify": true,
+        "mode_read": "height",
+        "error": "PS 不接受该枚举值（mode-ids 记为「读取失败」）；本次回读='height'，停在上一模式，图无意义",
+        "sha256": "f305f5aaa76ec918a956a7f9605f9e24aed8c77cb00e687abef58a98918ff4f0"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__44_Lght__d100_b0_c0.png",
+        "ok": false,
+        "jsx_verify": true,
+        "mode_read": "height",
+        "error": "PS 不接受该枚举值（mode-ids 记为「读取失败」）；本次回读='height'，停在上一模式，图无意义",
+        "sha256": "179dcb736f28bad3a7083570ae5bdea935c5402c689d5911bcf7ad1e37f1bd59"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__44_Lght__d100_b-50_c-50.png",
+        "ok": false,
+        "jsx_verify": true,
+        "mode_read": "height",
+        "error": "PS 不接受该枚举值（mode-ids 记为「读取失败」）；本次回读='height'，停在上一模式，图无意义",
+        "sha256": "196b4e4972f4489e2576a9905cb4dd454e4b302e78948f963cc40715c8639f54"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 6,
+      "ok": 6,
+      "images": [
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__44_Lght__d10_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "587e36016d2b4f77be2d1f572b28a6ba708f1f2a153c37235578c1f240911483"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__44_Lght__d10_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "a0bc0abe5efaffb4fda4e37ddb8250e3fcc61fea5d12862e6294398f2570f25a"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__44_Lght__d60_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "97032a41e930baf563535802f382274531524a08986347b275e304bb6b85663b"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__44_Lght__d60_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "f2b254968da8d042af3bc42519371773141d8a4359b0a944011917fdc6ab1269"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__44_Lght__d100_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "ae22b2fde5e026fc1520c051fb79ddfed5d8acee8b256a4d4fbc3a34a10779ac"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__44_Lght__d100_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "2ce7042d1dee16b5dadaba3f03042ab8b567356503292ca870549b0309b0805c"
+       }
+      ]
+     },
+     "ps_note": "**未定位**：\"Lght\" 只在 .text 里作为 float 常量字节序出现（误报），.data/.rdata 模式表无此 4CC。注意 PS 静态表里的 \"Lghn\" 是 Lighten(变亮)，不是 Lightness"
+    },
+    {
+     "order": 45,
+     "ps_member": "Grdn",
+     "ps_semantics": "Grdn",
+     "runtime_id": null,
+     "krita_value": 3,
+     "krita_member": "GRADIENT",
+     "status": "待动态确认",
+     "judge_kind": "像素比对（PS vs Krita）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 0,
+      "fail": 6,
+      "status": "fail：PS 不接受该枚举值（回读停在上一模式，图无意义）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__45_Grdn__d10_b0_c0.png",
+        "ok": false,
+        "jsx_verify": true,
+        "mode_read": "height",
+        "error": "PS 不接受该枚举值（mode-ids 记为「读取失败」）；本次回读='height'，停在上一模式，图无意义",
+        "sha256": "b3327d12cb755b34d01fccdc649bdd35568e7af73f9ed65b13e049a4ede3f2b8"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__45_Grdn__d10_b-50_c-50.png",
+        "ok": false,
+        "jsx_verify": true,
+        "mode_read": "height",
+        "error": "PS 不接受该枚举值（mode-ids 记为「读取失败」）；本次回读='height'，停在上一模式，图无意义",
+        "sha256": "cc1f4e7c3b2db663524ad9b236635a188047187f25d971642241f9c660461c90"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__45_Grdn__d60_b0_c0.png",
+        "ok": false,
+        "jsx_verify": true,
+        "mode_read": "height",
+        "error": "PS 不接受该枚举值（mode-ids 记为「读取失败」）；本次回读='height'，停在上一模式，图无意义",
+        "sha256": "fd86f816071503d5c24033379032906f5384045b8c7f49d606d5a0ec34700408"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__45_Grdn__d60_b-50_c-50.png",
+        "ok": false,
+        "jsx_verify": true,
+        "mode_read": "height",
+        "error": "PS 不接受该枚举值（mode-ids 记为「读取失败」）；本次回读='height'，停在上一模式，图无意义",
+        "sha256": "38e7938d782da0ae548ef7ad1adc8122e8b9f3b0cbe9acde112825284066cc8a"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__45_Grdn__d100_b0_c0.png",
+        "ok": false,
+        "jsx_verify": true,
+        "mode_read": "height",
+        "error": "PS 不接受该枚举值（mode-ids 记为「读取失败」）；本次回读='height'，停在上一模式，图无意义",
+        "sha256": "2c845a7efe3a7381ef1efd83923e5a6e3ea1add37ec71d610f48c5dda4dcf15e"
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__45_Grdn__d100_b-50_c-50.png",
+        "ok": false,
+        "jsx_verify": true,
+        "mode_read": "height",
+        "error": "PS 不接受该枚举值（mode-ids 记为「读取失败」）；本次回读='height'，停在上一模式，图无意义",
+        "sha256": "b1d95f1443d33584863d82bf733991f32c6cd794421d4a3b4d4f92c1854dd8bd"
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 6,
+      "ok": 6,
+      "images": [
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__45_Grdn__d10_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "9bbd7257c3aaab4e641b4be24aa4a16056ffbd1285ae85a1b3d18e5ffe9d73cf"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__45_Grdn__d10_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "b731b6f4d9dd65c1d82f9fc60b82a743db0658e15a77318b5689511fe74e1490"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__45_Grdn__d60_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "dd1fb38253e11e4390f419d9de29242840f96f70a3a24436a3f8db7687a0b3b5"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__45_Grdn__d60_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "95454dd2bb74c18db11f95f2f78c19b98ea94e51175cdf8b2246c922a1d6ff5e"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__45_Grdn__d100_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "54e4a33e1cd5b7b2126268607fd59171d8b7a0c8421e7966c2ccf4afb0b8c298"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__45_Grdn__d100_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "89208ff419c89a7d9c7da7264e02d2bfbf8334497904c34c87b05b385746d4ad"
+       }
+      ]
+     },
+     "ps_note": "**未定位**：\"Grdn\" 同样只在 .text 作为 float 常量出现；无表项"
+    },
+    {
+     "order": 46,
+     "ps_member": "HdMxS",
+     "ps_semantics": "HdMxS",
+     "runtime_id": null,
+     "krita_value": 11,
+     "krita_member": "HARD_MIX_SOFTER_PHOTOSHOP",
+     "status": "待动态确认",
+     "judge_kind": "像素比对（PS vs Krita）",
+     "ps_truth": {
+      "组数": 6,
+      "ok": 0,
+      "fail": 6,
+      "status": "fail：PS 不接受该枚举值（回读停在上一模式，图无意义）",
+      "images": [
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__46_HdMxS__d10_b0_c0.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "",
+        "error": "PS 不接受该枚举值（mode-ids 记为「读取失败」）；本次回读=''，停在上一模式，图无意义",
+        "sha256": null
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__46_HdMxS__d10_b-50_c-50.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "",
+        "error": "PS 不接受该枚举值（mode-ids 记为「读取失败」）；本次回读=''，停在上一模式，图无意义",
+        "sha256": null
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__46_HdMxS__d60_b0_c0.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "",
+        "error": "PS 不接受该枚举值（mode-ids 记为「读取失败」）；本次回读=''，停在上一模式，图无意义",
+        "sha256": null
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__46_HdMxS__d60_b-50_c-50.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "",
+        "error": "PS 不接受该枚举值（mode-ids 记为「读取失败」）；本次回读=''，停在上一模式，图无意义",
+        "sha256": null
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__46_HdMxS__d100_b0_c0.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "",
+        "error": "PS 不接受该枚举值（mode-ids 记为「读取失败」）；本次回读=''，停在上一模式，图无意义",
+        "sha256": null
+       },
+       {
+        "file": "tests/baselines/mode/ps/ps__mode__46_HdMxS__d100_b-50_c-50.png",
+        "ok": false,
+        "jsx_verify": false,
+        "mode_read": "",
+        "error": "PS 不接受该枚举值（mode-ids 记为「读取失败」）；本次回读=''，停在上一模式，图无意义",
+        "sha256": null
+       }
+      ]
+     },
+     "krita_baseline": {
+      "组数": 6,
+      "ok": 6,
+      "images": [
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__46_HdMxS__d10_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__46_HdMxS__d10_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__46_HdMxS__d60_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__46_HdMxS__d60_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__46_HdMxS__d100_b0_c0.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       },
+       {
+        "file": "tests/baselines/mode/krita/krita__mode__46_HdMxS__d100_b-50_c-50.png",
+        "ok": true,
+        "reason": "ok",
+        "sha256": "6f9f1ab583cd75bf23a1c279840139a00ecb452093d931c733f364fe453b6a5a"
+       }
+      ]
+     },
+     "ps_note": "**本轮在 Photoshop.exe 中未定位到该模式标识符**（\"HdMxS\"/\"hardMixSofter\" 全文件原始字节扫描 0 命中）；mapping.py 有该键，但无二进制证据"
+    }
+   ]
+  }
+ ]
+}
