@@ -17,6 +17,8 @@ import json
 import pathlib
 import sys
 
+HERE = pathlib.Path(__file__).resolve().parent  # 本文件目录（用于导入同目录的 render_mode_table）
+
 B = chr(96)          # 反引号（源码里不直接写反引号，便于本文件被其它工具串联）
 SP = chr(0x2420)     # 空格符号，用于标出尾随空格
 
@@ -89,6 +91,24 @@ def _row(r: dict) -> str:
         "·".join(r["sources"]), _cell(r["krita_target"]), r["verdict"])
 
 
+def _mode_section() -> list[str]:
+    """模式总表节（任务 37）：数据真身 docs/数据/mode-table.json，渲染逻辑在同目录 render_mode_table.py。
+
+    单独成节而不是塞进 130 行的参数矩阵，是因为「模式」不是 ABR 的键：它是 textureBlendMode 的取值域，
+    一个模式一行、判据与参数矩阵不同（像素比对而非单位换算）。两者共用本生成器，保证「只有一份真相」。
+    """
+    import importlib.util
+
+    path = HERE / "render_mode_table.py"
+    spec = importlib.util.spec_from_file_location("render_mode_table", path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    table = mod.TABLE_JSON
+    if not table.exists():
+        raise SystemExit("找不到 %s，请先跑 python tools/render_mode_table.py --build" % table.name)
+    return mod.render_section(mod.load(table)).rstrip("\n").split("\n")
+
+
 def render(rows: list[dict]) -> str:
     by_verdict: dict[str, list[dict]] = {v: [] for v in VERDICT_ORDER}
     for r in rows:
@@ -135,6 +155,8 @@ def render(rows: list[dict]) -> str:
         out.extend(TABLE_HEAD)
         out.extend(_row(r) for r in by_verdict[v])
         out.append("")
+    out.extend(_mode_section())
+    out.append("")
     out.append("## 生成与校验")
     out.append("")
     out.append(B * 3 + "bash")
@@ -142,6 +164,9 @@ def render(rows: list[dict]) -> str:
     out.append("python tools/render_matrix_md.py")
     out.append("# 校验矩阵（六个栏、verdict、基线行数、与三份输入 JSON 自洽）")
     out.append("python tools/check_matrix.py")
+    out.append("# 模式总表（任务 37）：先由 JSON 重算，再由本脚本写入；--check 校验节是否同步")
+    out.append("python tools/render_mode_table.py --build")
+    out.append("python tools/render_mode_table.py --check")
     out.append(B * 3)
     out.append("")
     return "\n".join(out)

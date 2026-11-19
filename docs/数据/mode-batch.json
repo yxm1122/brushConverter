@@ -77,7 +77,7 @@
   "groups_per_mode": 6,
   "planned_ps_images": 282,
   "planned_krita_images": 84,
-  "ps_ok": 204,
+  "ps_ok": 234,
   "krita_ok": 84,
   "batches": {
    "A": 16,
@@ -88,7 +88,8 @@
    "A": 3,
    "B": 6,
    "C": 5
-  }
+  },
+  "ps_ok_before_rerender": 204
  },
  "batches": [
   {
@@ -2752,10 +2753,81 @@
      "judge_kind": "结构判定（Krita 无对应，仅 PS 真值）",
      "ps_truth": {
       "组数": 6,
-      "ok": 0,
-      "fail": 6,
-      "status": "fail：值被 PS 忽略（回读停在上一模式）",
+      "ok": 6,
+      "fail": 0,
+      "status": "ok（6/6）★ 33 记为 fail「值被 PS 忽略」，实为枚举写法错；C 批按真名重出成功",
       "images": [
+       {
+        "file": "tests/baselines/mode-C/ps/ps__mode__32_SnrB__d10_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "burnInS",
+        "mode_value": "BrnS",
+        "error": "",
+        "alpha_mean": 255.0,
+        "alpha_unique": 1,
+        "alpha_sha256": "2bf7158cb3d8f419f1e19ee71df61927cc17017f37ea8820f3bd719d2b4f88f8"
+       },
+       {
+        "file": "tests/baselines/mode-C/ps/ps__mode__32_SnrB__d10_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "burnInS",
+        "mode_value": "BrnS",
+        "error": "",
+        "alpha_mean": 255.0,
+        "alpha_unique": 1,
+        "alpha_sha256": "2bf7158cb3d8f419f1e19ee71df61927cc17017f37ea8820f3bd719d2b4f88f8"
+       },
+       {
+        "file": "tests/baselines/mode-C/ps/ps__mode__32_SnrB__d60_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "burnInS",
+        "mode_value": "BrnS",
+        "error": "",
+        "alpha_mean": 255.0,
+        "alpha_unique": 1,
+        "alpha_sha256": "2bf7158cb3d8f419f1e19ee71df61927cc17017f37ea8820f3bd719d2b4f88f8"
+       },
+       {
+        "file": "tests/baselines/mode-C/ps/ps__mode__32_SnrB__d60_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "burnInS",
+        "mode_value": "BrnS",
+        "error": "",
+        "alpha_mean": 255.0,
+        "alpha_unique": 1,
+        "alpha_sha256": "2bf7158cb3d8f419f1e19ee71df61927cc17017f37ea8820f3bd719d2b4f88f8"
+       },
+       {
+        "file": "tests/baselines/mode-C/ps/ps__mode__32_SnrB__d100_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "burnInS",
+        "mode_value": "BrnS",
+        "error": "",
+        "alpha_mean": 255.0,
+        "alpha_unique": 1,
+        "alpha_sha256": "2bf7158cb3d8f419f1e19ee71df61927cc17017f37ea8820f3bd719d2b4f88f8"
+       },
+       {
+        "file": "tests/baselines/mode-C/ps/ps__mode__32_SnrB__d100_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "burnInS",
+        "mode_value": "BrnS",
+        "error": "",
+        "alpha_mean": 255.0,
+        "alpha_unique": 1,
+        "alpha_sha256": "2bf7158cb3d8f419f1e19ee71df61927cc17017f37ea8820f3bd719d2b4f88f8"
+       }
+      ],
+      "orig_status": "fail：值被 PS 忽略（回读停在上一模式）",
+      "orig_ok": 0,
+      "orig_fail": 6,
+      "orig_images": [
        {
         "file": "tests/baselines/mode/ps/ps__mode__32_SnrB__d10_b0_c0.png",
         "ok": false,
@@ -2804,7 +2876,17 @@
         "error": "",
         "sha256": "1499f99107cf0413ff30bd4c25d12600289487e604d528da1cf4473a2ab6c05c"
        }
-      ]
+      ],
+      "rerender": {
+       "task": "36",
+       "script": "tests/baselines/mode-C/ps_rerender_c.py",
+       "result": "tests/baselines/mode-C/ps_rerender_result.json",
+       "fixed_mode_kind": "char",
+       "fixed_mode_value": "BrnS",
+       "fixed_mode_key": "burnInS",
+       "images_in_repo": false,
+       "basis": "docs/研究报告/模式-C.md §5.3（伪名是 Ghidra 小端反序渲染；喂真名四张表才动）"
+      }
      },
      "krita_baseline": {
       "组数": 0,
@@ -2824,10 +2906,81 @@
      "judge_kind": "结构判定（Krita 无对应，仅 PS 真值）",
      "ps_truth": {
       "组数": 6,
-      "ok": 0,
-      "fail": 6,
-      "status": "fail：值被 PS 忽略（回读停在上一模式）",
+      "ok": 6,
+      "fail": 0,
+      "status": "ok（6/6）★ 33 记为 fail「值被 PS 忽略」，实为枚举写法错；C 批按真名重出成功",
       "images": [
+       {
+        "file": "tests/baselines/mode-C/ps/ps__mode__33_MnrB__d10_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "burnInM",
+        "mode_value": "BrnM",
+        "error": "",
+        "alpha_mean": 255.0,
+        "alpha_unique": 1,
+        "alpha_sha256": "2bf7158cb3d8f419f1e19ee71df61927cc17017f37ea8820f3bd719d2b4f88f8"
+       },
+       {
+        "file": "tests/baselines/mode-C/ps/ps__mode__33_MnrB__d10_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "burnInM",
+        "mode_value": "BrnM",
+        "error": "",
+        "alpha_mean": 255.0,
+        "alpha_unique": 1,
+        "alpha_sha256": "2bf7158cb3d8f419f1e19ee71df61927cc17017f37ea8820f3bd719d2b4f88f8"
+       },
+       {
+        "file": "tests/baselines/mode-C/ps/ps__mode__33_MnrB__d60_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "burnInM",
+        "mode_value": "BrnM",
+        "error": "",
+        "alpha_mean": 255.0,
+        "alpha_unique": 1,
+        "alpha_sha256": "2bf7158cb3d8f419f1e19ee71df61927cc17017f37ea8820f3bd719d2b4f88f8"
+       },
+       {
+        "file": "tests/baselines/mode-C/ps/ps__mode__33_MnrB__d60_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "burnInM",
+        "mode_value": "BrnM",
+        "error": "",
+        "alpha_mean": 255.0,
+        "alpha_unique": 1,
+        "alpha_sha256": "2bf7158cb3d8f419f1e19ee71df61927cc17017f37ea8820f3bd719d2b4f88f8"
+       },
+       {
+        "file": "tests/baselines/mode-C/ps/ps__mode__33_MnrB__d100_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "burnInM",
+        "mode_value": "BrnM",
+        "error": "",
+        "alpha_mean": 255.0,
+        "alpha_unique": 1,
+        "alpha_sha256": "2bf7158cb3d8f419f1e19ee71df61927cc17017f37ea8820f3bd719d2b4f88f8"
+       },
+       {
+        "file": "tests/baselines/mode-C/ps/ps__mode__33_MnrB__d100_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "burnInM",
+        "mode_value": "BrnM",
+        "error": "",
+        "alpha_mean": 255.0,
+        "alpha_unique": 1,
+        "alpha_sha256": "2bf7158cb3d8f419f1e19ee71df61927cc17017f37ea8820f3bd719d2b4f88f8"
+       }
+      ],
+      "orig_status": "fail：值被 PS 忽略（回读停在上一模式）",
+      "orig_ok": 0,
+      "orig_fail": 6,
+      "orig_images": [
        {
         "file": "tests/baselines/mode/ps/ps__mode__33_MnrB__d10_b0_c0.png",
         "ok": false,
@@ -2876,7 +3029,17 @@
         "error": "",
         "sha256": "91ce53de5e369a8c89983826679a777bc047eea3f222f76025b2b0f50de69af5"
        }
-      ]
+      ],
+      "rerender": {
+       "task": "36",
+       "script": "tests/baselines/mode-C/ps_rerender_c.py",
+       "result": "tests/baselines/mode-C/ps_rerender_result.json",
+       "fixed_mode_kind": "char",
+       "fixed_mode_value": "BrnM",
+       "fixed_mode_key": "burnInM",
+       "images_in_repo": false,
+       "basis": "docs/研究报告/模式-C.md §5.3（伪名是 Ghidra 小端反序渲染；喂真名四张表才动）"
+      }
      },
      "krita_baseline": {
       "组数": 0,
@@ -2896,10 +3059,81 @@
      "judge_kind": "结构判定（Krita 无对应，仅 PS 真值）",
      "ps_truth": {
       "组数": 6,
-      "ok": 0,
-      "fail": 6,
-      "status": "fail：值被 PS 忽略（回读停在上一模式）",
+      "ok": 6,
+      "fail": 0,
+      "status": "ok（6/6）★ 33 记为 fail「值被 PS 忽略」，实为枚举写法错；C 批按真名重出成功",
       "images": [
+       {
+        "file": "tests/baselines/mode-C/ps/ps__mode__34_HnrB__d10_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "burnInH",
+        "mode_value": "BrnH",
+        "error": "",
+        "alpha_mean": 242.0,
+        "alpha_unique": 1,
+        "alpha_sha256": "0bf958f5ee9b443c076ea9b6996edf0a91010b4e813e048d656a0d3f463fd4cb"
+       },
+       {
+        "file": "tests/baselines/mode-C/ps/ps__mode__34_HnrB__d10_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "burnInH",
+        "mode_value": "BrnH",
+        "error": "",
+        "alpha_mean": 242.0,
+        "alpha_unique": 1,
+        "alpha_sha256": "0bf958f5ee9b443c076ea9b6996edf0a91010b4e813e048d656a0d3f463fd4cb"
+       },
+       {
+        "file": "tests/baselines/mode-C/ps/ps__mode__34_HnrB__d60_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "burnInH",
+        "mode_value": "BrnH",
+        "error": "",
+        "alpha_mean": 178.0,
+        "alpha_unique": 1,
+        "alpha_sha256": "24a85df761530d4b591ce6a99debeeb5bc8e649614e4fdc34786752fd32a91fc"
+       },
+       {
+        "file": "tests/baselines/mode-C/ps/ps__mode__34_HnrB__d60_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "burnInH",
+        "mode_value": "BrnH",
+        "error": "",
+        "alpha_mean": 178.0,
+        "alpha_unique": 1,
+        "alpha_sha256": "24a85df761530d4b591ce6a99debeeb5bc8e649614e4fdc34786752fd32a91fc"
+       },
+       {
+        "file": "tests/baselines/mode-C/ps/ps__mode__34_HnrB__d100_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "burnInH",
+        "mode_value": "BrnH",
+        "error": "",
+        "alpha_mean": 127.0,
+        "alpha_unique": 1,
+        "alpha_sha256": "9e977a359e4b2572026f540c5a46982e0b1ce00865549d06562ac027cbf3db8b"
+       },
+       {
+        "file": "tests/baselines/mode-C/ps/ps__mode__34_HnrB__d100_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "burnInH",
+        "mode_value": "BrnH",
+        "error": "",
+        "alpha_mean": 127.0,
+        "alpha_unique": 1,
+        "alpha_sha256": "9e977a359e4b2572026f540c5a46982e0b1ce00865549d06562ac027cbf3db8b"
+       }
+      ],
+      "orig_status": "fail：值被 PS 忽略（回读停在上一模式）",
+      "orig_ok": 0,
+      "orig_fail": 6,
+      "orig_images": [
        {
         "file": "tests/baselines/mode/ps/ps__mode__34_HnrB__d10_b0_c0.png",
         "ok": false,
@@ -2948,7 +3182,17 @@
         "error": "",
         "sha256": "d416fb52af0e18d55399d5217d03c995eb75c612592aad5bc5a1d2e4f00a57eb"
        }
-      ]
+      ],
+      "rerender": {
+       "task": "36",
+       "script": "tests/baselines/mode-C/ps_rerender_c.py",
+       "result": "tests/baselines/mode-C/ps_rerender_result.json",
+       "fixed_mode_kind": "char",
+       "fixed_mode_value": "BrnH",
+       "fixed_mode_key": "burnInH",
+       "images_in_repo": false,
+       "basis": "docs/研究报告/模式-C.md §5.3（伪名是 Ghidra 小端反序渲染；喂真名四张表才动）"
+      }
      },
      "krita_baseline": {
       "组数": 0,
@@ -2968,10 +3212,81 @@
      "judge_kind": "结构判定（Krita 无对应，仅 PS 真值）",
      "ps_truth": {
       "组数": 6,
-      "ok": 0,
-      "fail": 6,
-      "status": "fail：值被 PS 忽略（回读停在上一模式）",
+      "ok": 6,
+      "fail": 0,
+      "status": "ok（6/6）★ 33 记为 fail「值被 PS 忽略」，实为枚举写法错；C 批按真名重出成功",
       "images": [
+       {
+        "file": "tests/baselines/mode-C/ps/ps__mode__35_ttsD__d10_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "desaturate",
+        "mode_value": "Dstt",
+        "error": "",
+        "alpha_mean": 249.0,
+        "alpha_unique": 1,
+        "alpha_sha256": "2dde3040c421188d4cc16183f35c4061064d4f0fc3369f90def3c551363c3392"
+       },
+       {
+        "file": "tests/baselines/mode-C/ps/ps__mode__35_ttsD__d10_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "desaturate",
+        "mode_value": "Dstt",
+        "error": "",
+        "alpha_mean": 249.0,
+        "alpha_unique": 1,
+        "alpha_sha256": "2dde3040c421188d4cc16183f35c4061064d4f0fc3369f90def3c551363c3392"
+       },
+       {
+        "file": "tests/baselines/mode-C/ps/ps__mode__35_ttsD__d60_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "desaturate",
+        "mode_value": "Dstt",
+        "error": "",
+        "alpha_mean": 217.0,
+        "alpha_unique": 1,
+        "alpha_sha256": "47fcf7bd18bb76548de15c07643218390587cfdf74e8e8fe25f9b1f194ea86c7"
+       },
+       {
+        "file": "tests/baselines/mode-C/ps/ps__mode__35_ttsD__d60_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "desaturate",
+        "mode_value": "Dstt",
+        "error": "",
+        "alpha_mean": 217.0,
+        "alpha_unique": 1,
+        "alpha_sha256": "47fcf7bd18bb76548de15c07643218390587cfdf74e8e8fe25f9b1f194ea86c7"
+       },
+       {
+        "file": "tests/baselines/mode-C/ps/ps__mode__35_ttsD__d100_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "desaturate",
+        "mode_value": "Dstt",
+        "error": "",
+        "alpha_mean": 192.0,
+        "alpha_unique": 1,
+        "alpha_sha256": "3170189182b95f4e4e5efa6e879c169c3bda71fe68ee98b42c4fdad4dafde246"
+       },
+       {
+        "file": "tests/baselines/mode-C/ps/ps__mode__35_ttsD__d100_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "desaturate",
+        "mode_value": "Dstt",
+        "error": "",
+        "alpha_mean": 192.0,
+        "alpha_unique": 1,
+        "alpha_sha256": "3170189182b95f4e4e5efa6e879c169c3bda71fe68ee98b42c4fdad4dafde246"
+       }
+      ],
+      "orig_status": "fail：值被 PS 忽略（回读停在上一模式）",
+      "orig_ok": 0,
+      "orig_fail": 6,
+      "orig_images": [
        {
         "file": "tests/baselines/mode/ps/ps__mode__35_ttsD__d10_b0_c0.png",
         "ok": false,
@@ -3020,7 +3335,17 @@
         "error": "",
         "sha256": "25f6ff1a2e91ade28bf3f540681e4301a5e3a60d1d23a0e4b643db6552bbd409"
        }
-      ]
+      ],
+      "rerender": {
+       "task": "36",
+       "script": "tests/baselines/mode-C/ps_rerender_c.py",
+       "result": "tests/baselines/mode-C/ps_rerender_result.json",
+       "fixed_mode_kind": "char",
+       "fixed_mode_value": "Dstt",
+       "fixed_mode_key": "desaturate",
+       "images_in_repo": false,
+       "basis": "docs/研究报告/模式-C.md §5.3（伪名是 Ghidra 小端反序渲染；喂真名四张表才动）"
+      }
      },
      "krita_baseline": {
       "组数": 0,
@@ -3040,10 +3365,81 @@
      "judge_kind": "结构判定（Krita 无对应，仅 PS 真值）",
      "ps_truth": {
       "组数": 6,
-      "ok": 0,
-      "fail": 6,
-      "status": "fail：值被 PS 忽略（回读停在上一模式）",
+      "ok": 6,
+      "fail": 0,
+      "status": "ok（6/6）★ 33 记为 fail「值被 PS 忽略」，实为枚举写法错；C 批按真名重出成功",
       "images": [
+       {
+        "file": "tests/baselines/mode-C/ps/ps__mode__36_Str__d10_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "saturate",
+        "mode_value": "Str ",
+        "error": "",
+        "alpha_mean": 255.0,
+        "alpha_unique": 1,
+        "alpha_sha256": "2bf7158cb3d8f419f1e19ee71df61927cc17017f37ea8820f3bd719d2b4f88f8"
+       },
+       {
+        "file": "tests/baselines/mode-C/ps/ps__mode__36_Str__d10_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "saturate",
+        "mode_value": "Str ",
+        "error": "",
+        "alpha_mean": 255.0,
+        "alpha_unique": 1,
+        "alpha_sha256": "2bf7158cb3d8f419f1e19ee71df61927cc17017f37ea8820f3bd719d2b4f88f8"
+       },
+       {
+        "file": "tests/baselines/mode-C/ps/ps__mode__36_Str__d60_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "saturate",
+        "mode_value": "Str ",
+        "error": "",
+        "alpha_mean": 255.0,
+        "alpha_unique": 1,
+        "alpha_sha256": "2bf7158cb3d8f419f1e19ee71df61927cc17017f37ea8820f3bd719d2b4f88f8"
+       },
+       {
+        "file": "tests/baselines/mode-C/ps/ps__mode__36_Str__d60_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "saturate",
+        "mode_value": "Str ",
+        "error": "",
+        "alpha_mean": 255.0,
+        "alpha_unique": 1,
+        "alpha_sha256": "2bf7158cb3d8f419f1e19ee71df61927cc17017f37ea8820f3bd719d2b4f88f8"
+       },
+       {
+        "file": "tests/baselines/mode-C/ps/ps__mode__36_Str__d100_b0_c0.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "saturate",
+        "mode_value": "Str ",
+        "error": "",
+        "alpha_mean": 255.0,
+        "alpha_unique": 1,
+        "alpha_sha256": "2bf7158cb3d8f419f1e19ee71df61927cc17017f37ea8820f3bd719d2b4f88f8"
+       },
+       {
+        "file": "tests/baselines/mode-C/ps/ps__mode__36_Str__d100_b-50_c-50.png",
+        "ok": true,
+        "jsx_verify": true,
+        "mode_read": "saturate",
+        "mode_value": "Str ",
+        "error": "",
+        "alpha_mean": 255.0,
+        "alpha_unique": 1,
+        "alpha_sha256": "2bf7158cb3d8f419f1e19ee71df61927cc17017f37ea8820f3bd719d2b4f88f8"
+       }
+      ],
+      "orig_status": "fail：值被 PS 忽略（回读停在上一模式）",
+      "orig_ok": 0,
+      "orig_fail": 6,
+      "orig_images": [
        {
         "file": "tests/baselines/mode/ps/ps__mode__36_Str__d10_b0_c0.png",
         "ok": false,
@@ -3092,7 +3488,17 @@
         "error": "",
         "sha256": "b06d16f697c7dd76b69f886fcc1844cb2e098d64f60be85bfee7ae9765d57379"
        }
-      ]
+      ],
+      "rerender": {
+       "task": "36",
+       "script": "tests/baselines/mode-C/ps_rerender_c.py",
+       "result": "tests/baselines/mode-C/ps_rerender_result.json",
+       "fixed_mode_kind": "char",
+       "fixed_mode_value": "Str ",
+       "fixed_mode_key": "saturate",
+       "images_in_repo": false,
+       "basis": "docs/研究报告/模式-C.md §5.3（伪名是 Ghidra 小端反序渲染；喂真名四张表才动）"
+      }
      },
      "krita_baseline": {
       "组数": 0,
@@ -4007,6 +4413,15 @@
      "ps_note": "**本轮在 Photoshop.exe 中未定位到该模式标识符**（\"HdMxS\"/\"hardMixSofter\" 全文件原始字节扫描 0 命中）；mapping.py 有该键，但无二进制证据"
     }
    ]
+  }
+ ],
+ "amendments": [
+  {
+   "task": "37",
+   "what": "B/C 批的 PS 真值状态更正：order 32–36 从「fail：值被 PS 忽略」改为「改名重出后 ok（6/6）」",
+   "basis": "docs/研究报告/模式-C.md §5.3；tests/baselines/mode-C/ps_rerender_result.json（30/30 ok+verify）",
+   "evidence": "docs/数据/mode-ids.json 的 name_corrections（SnrB→BrnS、MnrB→BrnM、HnrB→BrnH、ttsD→Dstt、Str 保持）",
+   "note": "重出的 30 张图在 tests/baselines/mode-C/ps/（.gitignore 已忽略，不入库）；本修订只改登记状态，不改任何既有图。重跑 python tools/render_mode_table.py --amend-data 可复现。"
   }
  ]
 }
