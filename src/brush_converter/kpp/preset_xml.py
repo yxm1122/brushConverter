@@ -33,6 +33,10 @@ _SENSORS = [
 ]
 
 _SENSOR_XML = '<!DOCTYPE params> <params id="pressure"/> '
+# 空传感器列表：Krita 会显示「未勾选传感器」；不能沿用 pressure 模板默认，
+# 否则 PS 侧没开的动态（不透明度/流量/尺寸/圆度/旋转/散布/间距等）在 Krita 里
+# 仍会按压感变化。任务 112 人工复验发现（2026-11-20）。
+_EMPTY_SENSOR_XML = '<!DOCTYPE params> <params/> '
 _CURVE_ID = "0,0;1,1;"
 
 
@@ -51,8 +55,11 @@ def _build_default_params() -> dict[str, tuple[str, str]]:
     p: dict[str, tuple[str, str]] = {}
 
     for s in _SENSORS:
-        p[_sensor_param_name(s, "Sensor")] = ("string", _SENSOR_XML)
-        p[_sensor_param_name(s, "UseCurve")] = ("internal", "true")
+        # 默认「无传感器 + 关曲线」；只有 build_preset_xml 里明确映射到压感/方向
+        # 等传感器时才覆盖。之前默认 pressure 会让所有未映射动态在 Krita 里
+        # 悄悄按压感变化（任务 112 人工复验发现的真实缺陷）。
+        p[_sensor_param_name(s, "Sensor")] = ("string", _EMPTY_SENSOR_XML)
+        p[_sensor_param_name(s, "UseCurve")] = ("internal", "false")
         p[_sensor_param_name(s, "UseSameCurve")] = ("internal", "true")
         p[_sensor_param_name(s, "Value")] = ("internal", "1")
         p[_sensor_param_name(s, "commonCurve")] = ("string", _CURVE_ID)
@@ -86,8 +93,8 @@ def _build_default_params() -> dict[str, tuple[str, str]]:
         "Texture/Pattern/UseSoftTexturing": ("internal", "false"),
         "Texture/Pattern/isRandomOffsetX": ("internal", "false"),
         "Texture/Pattern/isRandomOffsetY": ("internal", "false"),
-        "Texture/Strength/Sensor": ("string", _SENSOR_XML),
-        "Texture/Strength/UseCurve": ("internal", "true"),
+        "Texture/Strength/Sensor": ("string", _EMPTY_SENSOR_XML),
+        "Texture/Strength/UseCurve": ("internal", "false"),
         "Texture/Strength/UseSameCurve": ("internal", "true"),
         "Texture/Strength/Value": ("internal", "1"),
         "Texture/Strength/commonCurve": ("string", _CURVE_ID),
@@ -399,11 +406,13 @@ def _apply_texture(params: dict[str, tuple[str, str]], tex: TextureXml) -> None:
     set_internal("PressureTexture/Strength/", "true")
     if tex.strength_pressure:
         # PS textureDepthDynamics.bVTy==2：强度随压感，启用曲线（Mnm 为最小值）
+        set_string("Texture/Strength/Sensor", _pressure_sensor())
         set_internal("Texture/Strength/UseCurve", "true")
         if tex.strength_curve:
             set_string("Texture/Strength/commonCurve", tex.strength_curve)
     else:
         # PS bVTy==0：恒定强度，只写 Value（textureDepth/100），不接传感器
+        set_string("Texture/Strength/Sensor", _EMPTY_SENSOR_XML)
         set_internal("Texture/Strength/UseCurve", "false")
 
 
@@ -437,18 +446,24 @@ def build_preset_xml(
 
     if size_curve is not None:
         set_string("SizecommonCurve", size_curve)
+        set_string("SizeSensor", _pressure_sensor())
         set_internal("PressureSize", "true")
         set_internal("SizeUseCurve", "true")
     if opacity_curve is not None:
         set_string("OpacitycommonCurve", opacity_curve)
+        set_string("OpacitySensor", _pressure_sensor())
         set_internal("PressureOpacity", "true")
+        set_internal("OpacityUseCurve", "true")
     if flow_curve is not None:
         set_string("FlowcommonCurve", flow_curve)
+        set_string("FlowSensor", _pressure_sensor())
         set_internal("FlowUseCurve", "true")
         set_internal("PressureFlow", "true")
     if ratio_curve is not None:
         set_string("RatiocommonCurve", ratio_curve)
+        set_string("RatioSensor", _pressure_sensor())
         set_internal("PressureRatio", "true")
+        set_internal("RatioUseCurve", "true")
     if rotation_sensor == "drawingangle":
         # Photoshop angle jitter 直接映射为 Krita「旋转-效果强度」；
         # Krita 的 fuzzy/fuzzystroke 曲线本身负责 ±180° 随机方向；
@@ -480,6 +495,7 @@ def build_preset_xml(
             set_string("ScatterSensor", _pressure_sensor())
             set_internal("ScatterUseCurve", "true")
         else:
+            set_string("ScatterSensor", _EMPTY_SENSOR_XML)
             set_internal("ScatterUseCurve", "false")
         # 散布量换算：PS jitter(0..1000%) → Krita ScatterValue(0..5.0)
         # 任务 107 实测结论：线性系数无法同时对上 100%/300%（PS 响应超线性、Krita 线性），
