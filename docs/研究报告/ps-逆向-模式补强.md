@@ -1,5 +1,8 @@
 # 纹理模式补强：RE 记录与两个问题的回答（任务 104 · 2026-11-20）
 
+> 公开版说明：按《通用规范》第 11 条，函数/区域地址已占位化为 `<ADDR>`；完整地址与可复跑反汇编命令见本地逆向记录（`docs/优化提示词/`，不入公开仓库）。
+
+
 > 执行者：纹理补强员（v1.4.0 第三轮）｜工作区：仓库根
 > 目标二进制：Adobe Photoshop 2025 / 26.9.0.15（`Photoshop.exe`，208,456,176 字节，
 > SHA-256 `05720af2…c953`）；Krita 5.3.3。
@@ -79,70 +82,70 @@ REA 服务本身在（`rea-agents 6.9.0`，`binary_session` 报 `ghidra: availab
 是不是各自登记为不同的 runtime mode id？H3 把模式值写进运行期对象时有没有「多值合一」的归一化？
 
 **区域选择依据**（为什么是这三处、不是 H1/H2/K60）：
-H1 `0x141a937e0` 读的是 brightness/contrast/invert/protect，H2 `0x141a96230` 是它们的写回，
-K60 `0x141ef62b3` 是纹理结构体拷贝层（读 `+0x18/+0x1c`）——这三处都**不碰** `textureBlendMode`。
-真正把模式值落到运行期对象 `+4` 的是 H3 `0x141a935f0`（`lea r8,[rbx+4]; lea rdx,"textureBlendMode"; call 0x141b94090`），
-而 `0x141b94090` 查的表由 H4 `0x141b94750` 构造、4CC 条目在静态表 `0x14b219bc0`。
+H1 `<ADDR>` 读的是 brightness/contrast/invert/protect，H2 `<ADDR>` 是它们的写回，
+K60 `<ADDR>` 是纹理结构体拷贝层（读 `+0x18/+0x1c`）——这三处都**不碰** `textureBlendMode`。
+真正把模式值落到运行期对象 `+4` 的是 H3 `<ADDR>`（`lea r8,[rbx+4]; lea rdx,"textureBlendMode"; call <ADDR>`），
+而 `<ADDR>` 查的表由 H4 `<ADDR>` 构造、4CC 条目在静态表 `<ADDR>`。
 所以单区域核对选 H3 + H4 + 翻译器 + 静态表，四处都在「模式 id」这条链上。
 
 **命令（仓库根执行，`<PS_EXE>` 为 PS 主程序路径）**：
 
 ```bash
-python tools/re_pipeline/native_xref.py disasm --exe "<PS_EXE>" --start 0x141a935f0 --end 0x141a937d6
-python tools/re_pipeline/native_xref.py disasm --exe "<PS_EXE>" --start 0x141b94750 --end 0x141b949ee
-python tools/re_pipeline/native_xref.py disasm --exe "<PS_EXE>" --start 0x141b94090 --end 0x141b94136
-# 静态表 0x14b219bc0（.data，文件偏移 0xb217bc0）176 字节，按 {dword 值, dword 4CC} 8 字节记录解析
-python -c "import struct;d=open(r'<PS_EXE>','rb').read();o=0xb217bc0;[print(hex(0x14b219bc0+8*i),*struct.unpack('<II',d[o+8*i:o+8*i+8])) for i in range(22)]"
+python tools/re_pipeline/native_xref.py disasm --exe "<PS_EXE>" --start <ADDR> --end <ADDR>
+python tools/re_pipeline/native_xref.py disasm --exe "<PS_EXE>" --start <ADDR> --end <ADDR>
+python tools/re_pipeline/native_xref.py disasm --exe "<PS_EXE>" --start <ADDR> --end <ADDR>
+# 静态表 <ADDR>（.data，文件偏移 <ADDR>）176 字节，按 {dword 值, dword 4CC} 8 字节记录解析
+python -c "import struct;d=open(r'<PS_EXE>','rb').read();o=<ADDR>;[print(hex(<ADDR>+8*i),*struct.unpack('<II',d[o+8*i:o+8*i+8])) for i in range(22)]"
 ```
 
-**命中 1：H3 `0x141a935f0`（读 useTexture/coverage/模式/深度）**
+**命中 1：H3 `<ADDR>`（读 useTexture/coverage/模式/深度）**
 
 ```asm
-0x141a9363a  lea r8, [rbx + 1]                       ; textureCoverage -> obj+1
-0x141a9364a  lea r8, [rbx + 4]                       ; 模式号输出槽 = obj+4
-0x141a93651  lea rdx, [rip + 0x6afd1f0]  ; "textureBlendMode"
-0x141a93658  call 0x141b94090                        ; 翻译器：描述符值 -> 模式号 -> [r8]
-0x141a9365d  lea rcx, [rip + 0x6afd1fc]  ; "textureDepth"
+<ADDR>  lea r8, [rbx + 1]                       ; textureCoverage -> obj+1
+<ADDR>  lea r8, [rbx + 4]                       ; 模式号输出槽 = obj+4
+<ADDR>  lea rdx, [rip + <ADDR>]  ; "textureBlendMode"
+<ADDR>  call <ADDR>                        ; 翻译器：描述符值 -> 模式号 -> [r8]
+<ADDR>  lea rcx, [rip + <ADDR>]  ; "textureDepth"
 ```
 
-判定依据：模式号由 `0x141b94090` **直接写进 `[rbx+4]`**，H3 内没有对多个模式值做比较/合并/等价归一化。
+判定依据：模式号由 `<ADDR>` **直接写进 `[rbx+4]`**，H3 内没有对多个模式值做比较/合并/等价归一化。
 
-**命中 2：翻译器 `0x141b94090`（166 字节）**
+**命中 2：翻译器 `<ADDR>`（166 字节）**
 
 ```asm
-0x141b940d2  call 0x142c4cbd0        ; 描述符里取整数键值 -> ebx
-0x141b940d9  call 0x141b94750        ; 取表基址（0x14b219bc0）
-0x141b940de  cmp dword ptr [rax], 0x36       ; 终止哨兵
-0x141b940e3  cmp dword ptr [rax + 4], ebx    ; 键匹配
-0x141b940e8  add rax, 8                      ; 记录跨度固定 8 字节
-0x141b94103  mov ecx, dword ptr [rax]        ; 值 = [0]
-0x141b9410c  mov dword ptr [rsi], ecx        ; *out = 值（rsi = H3 的 rbx+4）
+<ADDR>  call <ADDR>        ; 描述符里取整数键值 -> ebx
+<ADDR>  call <ADDR>        ; 取表基址（<ADDR>）
+<ADDR>  cmp dword ptr [rax], 0x36       ; 终止哨兵
+<ADDR>  cmp dword ptr [rax + 4], ebx    ; 键匹配
+<ADDR>  add rax, 8                      ; 记录跨度固定 8 字节
+<ADDR>  mov ecx, dword ptr [rax]        ; 值 = [0]
+<ADDR>  mov dword ptr [rsi], ecx        ; *out = 值（rsi = H3 的 rbx+4）
 ```
 
 判定依据：一个键匹配一条记录、返回该记录的**一个** dword 值；没有「多个模式命中同一条记录」的写法。
 
-**命中 3：H4 `0x141b94750`（注册表构造，启动期一次性）**
+**命中 3：H4 `<ADDR>`（注册表构造，启动期一次性）**
 
 ```asm
-0x141b947d0  lea rcx, [rip + 0x6a11b79]  ; "linearBurn" @0x1485a6350
-0x141b947dc  mov dword ptr [rip + 0x968549a], eax ; 标识 = interned id -> 0x14b219c7c
-0x141b947e2  mov dword ptr [rip + 0x9685494], 0x20 ; 字面枚举 32 -> 0x14b219c80
+<ADDR>  lea rcx, [rip + <ADDR>]  ; "linearBurn" @<ADDR>
+<ADDR>  mov dword ptr [rip + <ADDR>], eax ; 标识 = interned id -> <ADDR>
+<ADDR>  mov dword ptr [rip + <ADDR>], 0x20 ; 字面枚举 32 -> <ADDR>
 ...
-0x141b94924  lea rcx, [rip + 0x683ba3d]  ; "height" @0x1483d0368
-0x141b94930  mov dword ptr [rip + 0x96853be], eax ; -> 0x14b219cf4
-0x141b94936  mov dword ptr [rip + 0x96853b8], 0x29 ; 字面枚举 41 -> 0x14b219cf8
-0x141b94940  lea rcx, [rip + 0x6a11a59]  ; "linearHeight" @0x1485a63a0
-0x141b9494c  mov dword ptr [rip + 0x96853aa], eax ; -> 0x14b219cfc
-0x141b94952  mov dword ptr [rip + 0x96853a4], 0x2a ; 字面枚举 42 -> 0x14b219d00
+<ADDR>  lea rcx, [rip + <ADDR>]  ; "height" @<ADDR>
+<ADDR>  mov dword ptr [rip + <ADDR>], eax ; -> <ADDR>
+<ADDR>  mov dword ptr [rip + <ADDR>], 0x29 ; 字面枚举 41 -> <ADDR>
+<ADDR>  lea rcx, [rip + <ADDR>]  ; "linearHeight" @<ADDR>
+<ADDR>  mov dword ptr [rip + <ADDR>], eax ; -> <ADDR>
+<ADDR>  mov dword ptr [rip + <ADDR>], 0x2a ; 字面枚举 42 -> <ADDR>
 ```
 
-**命中 4：静态 4CC 表 `0x14b219bc0`（21 条 + 终止记录，逐条解析；名字按 4CC 正序读）**
+**命中 4：静态 4CC 表 `<ADDR>`（21 条 + 终止记录，逐条解析；名字按 4CC 正序读）**
 
 ```text
-0x14b219be0 id=7   Mltp      0x14b219bf0 id=17  Ovrl
-0x14b219bf8 id=19  SftL      0x14b219c00 id=18  HrdL
-0x14b219c48 id=25  CDdg      0x14b219c50 id=26  CBrn
-0x14b219c60 id=39  Sbtr      0x14b219c68 id=35  （终止记录，第 2 个 dword 被 H4 复用）
+<ADDR> id=7   Mltp      <ADDR> id=17  Ovrl
+<ADDR> id=19  SftL      <ADDR> id=18  HrdL
+<ADDR> id=25  CDdg      <ADDR> id=26  CBrn
+<ADDR> id=39  Sbtr      <ADDR> id=35  （终止记录，第 2 个 dword 被 H4 复用）
 ```
 
 判定依据：`Ovrl=17`、`CDdg=25`、`CBrn=26` 是三条独立记录；结合 H4 的 `linearBurn=0x20`、
