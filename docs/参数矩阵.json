@@ -10,7 +10,9 @@
    "parser"
   ],
   "krita_target": "brush_definition 的 angle 属性（度→弧度，UI [0,360)）",
-  "verdict": "可映射"
+  "verdict": "可映射",
+  "ui_visibility": "有",
+  "ui_control": "画笔笔尖形状/角度"
  },
  {
   "key": "BlnM",
@@ -21,7 +23,9 @@
    "abr"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "有",
+  "ui_control": "双重画笔/模式"
  },
  {
   "key": "Brgh",
@@ -32,7 +36,9 @@
    "abr"
   ],
   "krita_target": "未定",
-  "verdict": "未定"
+  "verdict": "未定",
+  "ui_visibility": "有",
+  "ui_control": "颜色动态/亮度抖动"
  },
  {
   "key": "Brsh",
@@ -45,7 +51,9 @@
    "parser"
   ],
   "krita_target": "笔尖资源（png_brush 内嵌 PNG 或 auto_brush）",
-  "verdict": "可映射"
+  "verdict": "可映射",
+  "ui_visibility": "PS UI 无（内部键）",
+  "ui_control": ""
  },
  {
   "key": "Cnt ",
@@ -56,7 +64,9 @@
    "abr"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "有",
+  "ui_control": "散布/数量；双重画笔/数量"
  },
  {
   "key": "Dmtr",
@@ -69,7 +79,9 @@
    "parser"
   ],
   "krita_target": "png_brush 的 scale 属性 = Dmtr/max(笔尖宽,高)；计算笔刷 → auto_brush diameter",
-  "verdict": "可映射"
+  "verdict": "可映射",
+  "ui_visibility": "有",
+  "ui_control": "画笔笔尖形状/大小"
  },
  {
   "key": "ErsB",
@@ -80,7 +92,9 @@
    "abr"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "无",
+  "ui_control": ""
  },
  {
   "key": "Flip",
@@ -91,7 +105,9 @@
    "abr"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "有",
+  "ui_control": "双重画笔/翻转"
  },
  {
   "key": "H   ",
@@ -103,7 +119,9 @@
    "parser"
   ],
   "krita_target": "未定",
-  "verdict": "未定"
+  "verdict": "未定",
+  "ui_visibility": "有",
+  "ui_control": "颜色动态/色相抖动"
  },
  {
   "key": "Hrdn",
@@ -116,7 +134,9 @@
    "parser"
   ],
   "krita_target": "auto_brush 的 hfade/vfade = Hrdn/100；采样笔刷无独立承载（固化在位图）",
-  "verdict": "需校准"
+  "verdict": "需校准",
+  "ui_visibility": "有",
+  "ui_control": "画笔笔尖形状/硬度"
  },
  {
   "key": "Idnt",
@@ -129,7 +149,9 @@
    "parser"
   ],
   "krita_target": "Texture/Pattern/PatternMD5Sum 资源查找（按 UUID 取 patt 位图）",
-  "verdict": "可映射"
+  "verdict": "可映射",
+  "ui_visibility": "PS UI 无（内部键）",
+  "ui_control": ""
  },
  {
   "key": "Intr",
@@ -140,7 +162,9 @@
    "abr"
   ],
   "krita_target": "未定",
-  "verdict": "未定"
+  "verdict": "未定",
+  "ui_visibility": "PS UI 无（内部键）",
+  "ui_control": ""
  },
  {
   "key": "InvT",
@@ -152,7 +176,9 @@
    "parser"
   ],
   "krita_target": "Texture/Pattern/Invert",
-  "verdict": "可映射"
+  "verdict": "可映射",
+  "ui_visibility": "有",
+  "ui_control": "纹理/反相"
  },
  {
   "key": "Md  ",
@@ -163,7 +189,9 @@
    "abr"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "无",
+  "ui_control": ""
  },
  {
   "key": "MgcE",
@@ -174,7 +202,9 @@
    "abr"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "无",
+  "ui_control": ""
  },
  {
   "key": "Mnm ",
@@ -187,7 +217,9 @@
    "parser"
   ],
   "krita_target": "SizecommonCurve/OpacitycommonCurve/FlowcommonCurve/RatiocommonCurve 的 0 端点 = Mnm/100",
-  "verdict": "需校准"
+  "verdict": "需校准",
+  "ui_visibility": "有",
+  "ui_control": "传递/最小"
  },
  {
   "key": "Nm  ",
@@ -200,7 +232,9 @@
    "parser"
   ],
   "krita_target": "preset name（.kpp 预设名）",
-  "verdict": "可映射"
+  "verdict": "可映射",
+  "ui_visibility": "无",
+  "ui_control": ""
  },
  {
   "key": "Nose",
@@ -212,7 +246,9 @@
    "parser"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "未定",
+  "ui_control": ""
  },
  {
   "key": "Opct",
@@ -223,7 +259,9 @@
    "abr"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "无",
+  "ui_control": ""
  },
  {
   "key": "Rndn",
@@ -236,7 +274,9 @@
    "parser"
   ],
   "krita_target": "auto_brush 的 ratio = Rndn/100；采样笔刷无独立承载（固化在位图）",
-  "verdict": "需校准"
+  "verdict": "需校准",
+  "ui_visibility": "有",
+  "ui_control": "画笔笔尖形状/圆度"
  },
  {
   "key": "Rpt ",
@@ -247,7 +287,9 @@
    "abr"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "未定",
+  "ui_control": ""
  },
  {
   "key": "Smoo",
@@ -258,7 +300,9 @@
    "abr"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "无",
+  "ui_control": ""
  },
  {
   "key": "Spcn",
@@ -271,7 +315,9 @@
    "parser"
   ],
   "krita_target": "brush_definition 的 spacing 属性 = Spcn/100",
-  "verdict": "可映射"
+  "verdict": "可映射",
+  "ui_visibility": "有",
+  "ui_control": "画笔笔尖形状/间距"
  },
  {
   "key": "Strt",
@@ -283,7 +329,9 @@
    "parser"
   ],
   "krita_target": "未定",
-  "verdict": "未定"
+  "verdict": "未定",
+  "ui_visibility": "有",
+  "ui_control": "颜色动态/饱和度抖动"
  },
  {
   "key": "TxtC",
@@ -293,7 +341,9 @@
    "abr"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "有",
+  "ui_control": "纹理/为每个笔尖设置纹理"
  },
  {
   "key": "Txtr",
@@ -305,7 +355,9 @@
    "parser"
   ],
   "krita_target": "Texture/Pattern/*（整组纹理选项）",
-  "verdict": "可映射"
+  "verdict": "可映射",
+  "ui_visibility": "有",
+  "ui_control": "纹理/纹理图案"
  },
  {
   "key": "Wtdg",
@@ -316,7 +368,9 @@
    "parser"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "有",
+  "ui_control": "底部（勾选项）/湿边"
  },
  {
   "key": "angleDynamics",
@@ -329,7 +383,9 @@
    "parser"
   ],
   "krita_target": "RotationSensor + RotationValue",
-  "verdict": "可映射"
+  "verdict": "可映射",
+  "ui_visibility": "有",
+  "ui_control": "形状动态/角度抖动"
  },
  {
   "key": "bVTy",
@@ -342,7 +398,9 @@
    "parser"
   ],
   "krita_target": "sensor XML @id（pressure / drawingangle / fuzzy / fade / rotation / xtilt / ytilt 均有候选）",
-  "verdict": "需校准"
+  "verdict": "需校准",
+  "ui_visibility": "有",
+  "ui_control": "形状动态/控制；散布/控制；纹理/控制；颜色动态/控制；传递/控制"
  },
  {
   "key": "backgroundColor",
@@ -352,7 +410,9 @@
    "re"
   ],
   "krita_target": "未定",
-  "verdict": "未定"
+  "verdict": "未定",
+  "ui_visibility": "未定",
+  "ui_control": ""
  },
  {
   "key": "blendMode",
@@ -362,7 +422,9 @@
    "re"
   ],
   "krita_target": "未定",
-  "verdict": "未定"
+  "verdict": "未定",
+  "ui_visibility": "未定",
+  "ui_control": ""
  },
  {
   "key": "bothAxes",
@@ -375,7 +437,9 @@
    "parser"
   ],
   "krita_target": "Scattering/AxisX = bothAxes；AxisY 恒 true",
-  "verdict": "可映射"
+  "verdict": "可映射",
+  "ui_visibility": "有",
+  "ui_control": "散布/两轴"
  },
  {
   "key": "brightness",
@@ -385,7 +449,9 @@
    "re"
   ],
   "krita_target": "未定",
-  "verdict": "未定"
+  "verdict": "未定",
+  "ui_visibility": "有",
+  "ui_control": "颜色动态/亮度抖动"
  },
  {
   "key": "brush",
@@ -396,7 +462,9 @@
    "parser"
   ],
   "krita_target": "未定",
-  "verdict": "未定"
+  "verdict": "未定",
+  "ui_visibility": "PS UI 无（内部键）",
+  "ui_control": ""
  },
  {
   "key": "brushGroup",
@@ -407,7 +475,9 @@
    "abr"
   ],
   "krita_target": "未定",
-  "verdict": "未定"
+  "verdict": "未定",
+  "ui_visibility": "PS UI 无（内部键）",
+  "ui_control": ""
  },
  {
   "key": "brushPoseAngle",
@@ -418,7 +488,9 @@
    "abr"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "有",
+  "ui_control": "画笔笔势/旋转"
  },
  {
   "key": "brushPoseLock",
@@ -428,7 +500,9 @@
    "re"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "PS UI 无（内部键）",
+  "ui_control": ""
  },
  {
   "key": "brushPosePressure",
@@ -439,7 +513,9 @@
    "abr"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "有",
+  "ui_control": "画笔笔势/压力"
  },
  {
   "key": "brushPoseTiltX",
@@ -450,7 +526,9 @@
    "abr"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "有",
+  "ui_control": "画笔笔势/倾斜 X"
  },
  {
   "key": "brushPoseTiltY",
@@ -461,7 +539,9 @@
    "abr"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "有",
+  "ui_control": "画笔笔势/倾斜 Y"
  },
  {
   "key": "brushPreset",
@@ -472,7 +552,9 @@
    "abr"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "PS UI 无（内部键）",
+  "ui_control": ""
  },
  {
   "key": "brushProjection",
@@ -483,7 +565,9 @@
    "abr"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "有",
+  "ui_control": "形状动态/画笔投影"
  },
  {
   "key": "brushTipDynamicsLock",
@@ -493,7 +577,9 @@
    "re"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "PS UI 无（内部键）",
+  "ui_control": ""
  },
  {
   "key": "brushType",
@@ -503,7 +589,9 @@
    "re"
   ],
   "krita_target": "未定",
-  "verdict": "未定"
+  "verdict": "未定",
+  "ui_visibility": "PS UI 无（内部键）",
+  "ui_control": ""
  },
  {
   "key": "chroma",
@@ -513,7 +601,9 @@
    "re"
   ],
   "krita_target": "未定",
-  "verdict": "未定"
+  "verdict": "未定",
+  "ui_visibility": "未定",
+  "ui_control": ""
  },
  {
   "key": "clVr",
@@ -524,7 +614,9 @@
    "abr"
   ],
   "krita_target": "未定",
-  "verdict": "未定"
+  "verdict": "未定",
+  "ui_visibility": "有",
+  "ui_control": "颜色动态/前景/背景抖动"
  },
  {
   "key": "colorDynamicsLock",
@@ -534,7 +626,9 @@
    "re"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "PS UI 无（内部键）",
+  "ui_control": ""
  },
  {
   "key": "colorDynamicsPerTip",
@@ -545,7 +639,9 @@
    "abr"
   ],
   "krita_target": "未定",
-  "verdict": "未定"
+  "verdict": "未定",
+  "ui_visibility": "有",
+  "ui_control": "颜色动态/应用每笔尖"
  },
  {
   "key": "computedBrush",
@@ -555,7 +651,9 @@
    "re"
   ],
   "krita_target": "未定",
-  "verdict": "未定"
+  "verdict": "未定",
+  "ui_visibility": "PS UI 无（内部键）",
+  "ui_control": ""
  },
  {
   "key": "count",
@@ -565,7 +663,9 @@
    "re"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "有",
+  "ui_control": "散布/数量"
  },
  {
   "key": "countDynamics",
@@ -576,7 +676,9 @@
    "abr"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "有",
+  "ui_control": "散布/数量抖动"
  },
  {
   "key": "dBrush",
@@ -586,7 +688,9 @@
    "re"
   ],
   "krita_target": "未定",
-  "verdict": "未定"
+  "verdict": "未定",
+  "ui_visibility": "PS UI 无（内部键）",
+  "ui_control": ""
  },
  {
   "key": "dTips",
@@ -596,7 +700,9 @@
    "re"
   ],
   "krita_target": "未定",
-  "verdict": "未定"
+  "verdict": "未定",
+  "ui_visibility": "PS UI 无（内部键）",
+  "ui_control": ""
  },
  {
   "key": "dualBrush",
@@ -608,7 +714,9 @@
    "parser"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "PS UI 无（内部键）",
+  "ui_control": ""
  },
  {
   "key": "dualBrushLock",
@@ -618,7 +726,9 @@
    "re"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "PS UI 无（内部键）",
+  "ui_control": ""
  },
  {
   "key": "fStp",
@@ -629,7 +739,9 @@
    "abr"
   ],
   "krita_target": "未定",
-  "verdict": "未定"
+  "verdict": "未定",
+  "ui_visibility": "未定",
+  "ui_control": ""
  },
  {
   "key": "flip",
@@ -639,7 +751,9 @@
    "re"
   ],
   "krita_target": "未定",
-  "verdict": "未定"
+  "verdict": "未定",
+  "ui_visibility": "未定",
+  "ui_control": ""
  },
  {
   "key": "flipX",
@@ -650,7 +764,9 @@
    "abr"
   ],
   "krita_target": "未定",
-  "verdict": "未定"
+  "verdict": "未定",
+  "ui_visibility": "有",
+  "ui_control": "画笔笔尖形状/翻转 X"
  },
  {
   "key": "flipY",
@@ -661,7 +777,9 @@
    "abr"
   ],
   "krita_target": "未定",
-  "verdict": "未定"
+  "verdict": "未定",
+  "ui_visibility": "有",
+  "ui_control": "画笔笔尖形状/翻转 Y"
  },
  {
   "key": "flow",
@@ -672,7 +790,9 @@
    "abr"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "无",
+  "ui_control": ""
  },
  {
   "key": "foregroundColor",
@@ -682,7 +802,9 @@
    "re"
   ],
   "krita_target": "未定",
-  "verdict": "未定"
+  "verdict": "未定",
+  "ui_visibility": "未定",
+  "ui_control": ""
  },
  {
   "key": "hue",
@@ -692,7 +814,9 @@
    "re"
   ],
   "krita_target": "未定",
-  "verdict": "未定"
+  "verdict": "未定",
+  "ui_visibility": "有",
+  "ui_control": "颜色动态/色相抖动"
  },
  {
   "key": "interpretation",
@@ -703,7 +827,9 @@
    "abr"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "PS UI 无（内部键）",
+  "ui_control": ""
  },
  {
   "key": "invertTexture",
@@ -714,7 +840,9 @@
    "krita"
   ],
   "krita_target": "Texture/Pattern/Invert",
-  "verdict": "可映射"
+  "verdict": "可映射",
+  "ui_visibility": "有",
+  "ui_control": "纹理/反相"
  },
  {
   "key": "jitter",
@@ -727,7 +855,9 @@
    "parser"
   ],
   "krita_target": "ScatterValue（散布，÷400 经验系数）；RotationValue（旋转，÷100）",
-  "verdict": "需校准"
+  "verdict": "需校准",
+  "ui_visibility": "未定",
+  "ui_control": ""
  },
  {
   "key": "lightness",
@@ -737,7 +867,9 @@
    "re"
   ],
   "krita_target": "未定",
-  "verdict": "未定"
+  "verdict": "未定",
+  "ui_visibility": "未定",
+  "ui_control": ""
  },
  {
   "key": "minimumDepth",
@@ -750,7 +882,9 @@
    "parser"
   ],
   "krita_target": "Texture/Strength/commonCurve 的 0 端点（高度系再 ×1.2 并封顶 1.0）",
-  "verdict": "需校准"
+  "verdict": "需校准",
+  "ui_visibility": "有",
+  "ui_control": "纹理/最小深度"
  },
  {
   "key": "minimumDiameter",
@@ -763,7 +897,9 @@
    "parser"
   ],
   "krita_target": "SizecommonCurve = 0,{minD/100};1,1;",
-  "verdict": "可映射"
+  "verdict": "可映射",
+  "ui_visibility": "有",
+  "ui_control": "形状动态/最小直径"
  },
  {
   "key": "minimumRoundness",
@@ -776,7 +912,9 @@
    "parser"
   ],
   "krita_target": "RatiocommonCurve = 0,{minR/100};1,1;",
-  "verdict": "可映射"
+  "verdict": "可映射",
+  "ui_visibility": "有",
+  "ui_control": "形状动态/最小圆度"
  },
  {
   "key": "mxVr",
@@ -787,7 +925,9 @@
    "abr"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "有",
+  "ui_control": "传递/混合抖动"
  },
  {
   "key": "name",
@@ -799,7 +939,9 @@
    "parser"
   ],
   "krita_target": "preset name（.kpp 预设名）",
-  "verdict": "可映射"
+  "verdict": "可映射",
+  "ui_visibility": "无",
+  "ui_control": ""
  },
  {
   "key": "noise",
@@ -809,7 +951,9 @@
    "re"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "有",
+  "ui_control": "底部（勾选项）/杂色"
  },
  {
   "key": "noiseLock",
@@ -819,7 +963,9 @@
    "re"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "PS UI 无（内部键）",
+  "ui_control": ""
  },
  {
   "key": "opVr",
@@ -832,7 +978,9 @@
    "parser"
   ],
   "krita_target": "PressureOpacity + OpacitycommonCurve",
-  "verdict": "可映射"
+  "verdict": "可映射",
+  "ui_visibility": "有",
+  "ui_control": "传递/不透明度抖动"
  },
  {
   "key": "overridePoseAngle",
@@ -843,7 +991,9 @@
    "abr"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "有",
+  "ui_control": "画笔笔势/覆盖旋转"
  },
  {
   "key": "overridePosePressure",
@@ -854,7 +1004,9 @@
    "abr"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "有",
+  "ui_control": "画笔笔势/覆盖压力"
  },
  {
   "key": "overridePoseTiltX",
@@ -865,7 +1017,9 @@
    "abr"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "有",
+  "ui_control": "画笔笔势/覆盖倾斜 X"
  },
  {
   "key": "overridePoseTiltY",
@@ -876,7 +1030,9 @@
    "abr"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "有",
+  "ui_control": "画笔笔势/覆盖倾斜 Y"
  },
  {
   "key": "paintDynamicsLock",
@@ -886,7 +1042,9 @@
    "re"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "PS UI 无（内部键）",
+  "ui_control": ""
  },
  {
   "key": "prVr",
@@ -899,7 +1057,9 @@
    "parser"
   ],
   "krita_target": "PressureFlow + FlowcommonCurve",
-  "verdict": "可映射"
+  "verdict": "可映射",
+  "ui_visibility": "有",
+  "ui_control": "传递/流量抖动"
  },
  {
   "key": "pressureSmoothing",
@@ -910,7 +1070,9 @@
    "abr"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "无",
+  "ui_control": ""
  },
  {
   "key": "protectTexture",
@@ -922,7 +1084,9 @@
    "parser"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "有",
+  "ui_control": "底部（勾选项）/保护纹理"
  },
  {
   "key": "protectTextureLock",
@@ -932,7 +1096,9 @@
    "re"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "PS UI 无（内部键）",
+  "ui_control": ""
  },
  {
   "key": "purity",
@@ -943,7 +1109,9 @@
    "abr"
   ],
   "krita_target": "未定",
-  "verdict": "未定"
+  "verdict": "未定",
+  "ui_visibility": "有",
+  "ui_control": "颜色动态/纯度"
  },
  {
   "key": "repeat",
@@ -953,7 +1121,9 @@
    "re"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "未定",
+  "ui_control": ""
  },
  {
   "key": "repeatLock",
@@ -963,7 +1133,9 @@
    "re"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "PS UI 无（内部键）",
+  "ui_control": ""
  },
  {
   "key": "roundnessDynamics",
@@ -976,7 +1148,9 @@
    "parser"
   ],
   "krita_target": "PressureRatio + RatiocommonCurve",
-  "verdict": "可映射"
+  "verdict": "可映射",
+  "ui_visibility": "有",
+  "ui_control": "形状动态/圆度抖动"
  },
  {
   "key": "sampledBrush",
@@ -986,7 +1160,9 @@
    "re"
   ],
   "krita_target": "未定",
-  "verdict": "未定"
+  "verdict": "未定",
+  "ui_visibility": "PS UI 无（内部键）",
+  "ui_control": ""
  },
  {
   "key": "sampledData",
@@ -998,7 +1174,9 @@
    "parser"
   ],
   "krita_target": "png_brush 内嵌笔尖的查找键（samp 区段）",
-  "verdict": "可映射"
+  "verdict": "可映射",
+  "ui_visibility": "PS UI 无（内部键）",
+  "ui_control": ""
  },
  {
   "key": "saturation",
@@ -1008,7 +1186,9 @@
    "re"
   ],
   "krita_target": "未定",
-  "verdict": "未定"
+  "verdict": "未定",
+  "ui_visibility": "有",
+  "ui_control": "颜色动态/饱和度抖动"
  },
  {
   "key": "scatter",
@@ -1019,7 +1199,9 @@
    "krita"
   ],
   "krita_target": "ScatterValue（0..5）",
-  "verdict": "需校准"
+  "verdict": "需校准",
+  "ui_visibility": "有",
+  "ui_control": "散布/散布"
  },
  {
   "key": "scatterDynamics",
@@ -1032,7 +1214,9 @@
    "parser"
   ],
   "krita_target": "PressureScatter + ScatterSensor + ScatterValue（÷400 校准）",
-  "verdict": "需校准"
+  "verdict": "需校准",
+  "ui_visibility": "有",
+  "ui_control": "散布/散布"
  },
  {
   "key": "scatterDynamicsLock",
@@ -1042,7 +1226,9 @@
    "re"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "PS UI 无（内部键）",
+  "ui_control": ""
  },
  {
   "key": "smoothing",
@@ -1053,7 +1239,9 @@
    "abr"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "有",
+  "ui_control": "底部（勾选项）/平滑"
  },
  {
   "key": "smoothingCatchup",
@@ -1064,7 +1252,9 @@
    "abr"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "无",
+  "ui_control": ""
  },
  {
   "key": "smoothingCatchupAtEnd",
@@ -1075,7 +1265,9 @@
    "abr"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "无",
+  "ui_control": ""
  },
  {
   "key": "smoothingLock",
@@ -1085,7 +1277,9 @@
    "re"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "PS UI 无（内部键）",
+  "ui_control": ""
  },
  {
   "key": "smoothingRadiusMode",
@@ -1096,7 +1290,9 @@
    "abr"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "无",
+  "ui_control": ""
  },
  {
   "key": "smoothingValue",
@@ -1107,7 +1303,9 @@
    "abr"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "无",
+  "ui_control": ""
  },
  {
   "key": "smoothingZoomCompensation",
@@ -1118,7 +1316,9 @@
    "abr"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "无",
+  "ui_control": ""
  },
  {
   "key": "style",
@@ -1128,7 +1328,9 @@
    "re"
   ],
   "krita_target": "未定",
-  "verdict": "未定"
+  "verdict": "未定",
+  "ui_visibility": "PS UI 无（内部键）",
+  "ui_control": ""
  },
  {
   "key": "styleBrush",
@@ -1138,7 +1340,9 @@
    "re"
   ],
   "krita_target": "未定",
-  "verdict": "未定"
+  "verdict": "未定",
+  "ui_visibility": "PS UI 无（内部键）",
+  "ui_control": ""
  },
  {
   "key": "szVr",
@@ -1151,7 +1355,9 @@
    "parser"
   ],
   "krita_target": "PressureSize + SizecommonCurve",
-  "verdict": "可映射"
+  "verdict": "可映射",
+  "ui_visibility": "有",
+  "ui_control": "形状动态/大小抖动"
  },
  {
   "key": "texture",
@@ -1163,7 +1369,9 @@
    "parser"
   ],
   "krita_target": "Texture/Pattern/*（整组纹理选项）",
-  "verdict": "可映射"
+  "verdict": "可映射",
+  "ui_visibility": "PS UI 无（内部键）",
+  "ui_control": ""
  },
  {
   "key": "textureBlendMode",
@@ -1176,7 +1384,9 @@
    "parser"
   ],
   "krita_target": "Texture/Pattern/TexturingMode（0..15，Krita 16 成员）",
-  "verdict": "需校准"
+  "verdict": "需校准",
+  "ui_visibility": "有",
+  "ui_control": "纹理/模式"
  },
  {
   "key": "textureBrightness",
@@ -1189,7 +1399,9 @@
    "parser"
   ],
   "krita_target": "Texture/Pattern/Brightness（-1..1，掩码阶段再 clamp 0..1）",
-  "verdict": "需校准"
+  "verdict": "需校准",
+  "ui_visibility": "有",
+  "ui_control": "纹理/亮度"
  },
  {
   "key": "textureContrast",
@@ -1202,7 +1414,9 @@
    "parser"
   ],
   "krita_target": "Texture/Pattern/Contrast（0..2；C>50 结构性不可表达）",
-  "verdict": "需校准"
+  "verdict": "需校准",
+  "ui_visibility": "有",
+  "ui_control": "纹理/对比度"
  },
  {
   "key": "textureCoverage",
@@ -1212,7 +1426,9 @@
    "re"
   ],
   "krita_target": "未定",
-  "verdict": "未定"
+  "verdict": "未定",
+  "ui_visibility": "PS UI 无（内部键）",
+  "ui_control": ""
  },
  {
   "key": "textureDepth",
@@ -1225,7 +1441,9 @@
    "parser"
   ],
   "krita_target": "Texture/Strength/Value（高度系 min(1.0, 1.2×d/100)，>83% 提前饱和）",
-  "verdict": "需校准"
+  "verdict": "需校准",
+  "ui_visibility": "有",
+  "ui_control": "纹理/深度"
  },
  {
   "key": "textureDepthDynamics",
@@ -1238,7 +1456,9 @@
    "parser"
   ],
   "krita_target": "PressureTexture/Strength/ 启用位 + Texture/Strength/UseCurve",
-  "verdict": "可映射"
+  "verdict": "可映射",
+  "ui_visibility": "有",
+  "ui_control": "纹理/深度抖动"
  },
  {
   "key": "textureInteractionLock",
@@ -1248,7 +1468,9 @@
    "re"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "PS UI 无（内部键）",
+  "ui_control": ""
  },
  {
   "key": "textureScale",
@@ -1261,7 +1483,9 @@
    "parser"
   ],
   "krita_target": "Texture/Pattern/Scale（读取无 clamp；UI 滑块 0..2，>2.0 可否编辑待人工实测）",
-  "verdict": "需校准"
+  "verdict": "需校准",
+  "ui_visibility": "有",
+  "ui_control": "纹理/缩放"
  },
  {
   "key": "tiltScale",
@@ -1272,7 +1496,9 @@
    "abr"
   ],
   "krita_target": "未定",
-  "verdict": "未定"
+  "verdict": "未定",
+  "ui_visibility": "有",
+  "ui_control": "形状动态/倾斜缩放比例"
  },
  {
   "key": "toolOptions",
@@ -1283,7 +1509,9 @@
    "abr"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "PS UI 无（内部键）",
+  "ui_control": ""
  },
  {
   "key": "useBrushGroup",
@@ -1294,7 +1522,9 @@
    "abr"
   ],
   "krita_target": "未定",
-  "verdict": "未定"
+  "verdict": "未定",
+  "ui_visibility": "未定",
+  "ui_control": ""
  },
  {
   "key": "useBrushPose",
@@ -1306,7 +1536,9 @@
    "parser"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "有",
+  "ui_control": "画笔笔势/启用勾选框"
  },
  {
   "key": "useBrushSize",
@@ -1317,7 +1549,9 @@
    "abr"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "未定",
+  "ui_control": ""
  },
  {
   "key": "useColorDynamics",
@@ -1329,7 +1563,9 @@
    "parser"
   ],
   "krita_target": "未定",
-  "verdict": "未定"
+  "verdict": "未定",
+  "ui_visibility": "有",
+  "ui_control": "颜色动态/启用勾选框"
  },
  {
   "key": "useDualBrush",
@@ -1341,7 +1577,9 @@
    "parser"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "有",
+  "ui_control": "双重画笔/启用勾选框"
  },
  {
   "key": "useLegacy",
@@ -1352,7 +1590,9 @@
    "abr"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "无",
+  "ui_control": ""
  },
  {
   "key": "usePaintDynamics",
@@ -1363,7 +1603,9 @@
    "abr"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "未定",
+  "ui_control": ""
  },
  {
   "key": "usePressureOverridesOpacity",
@@ -1374,7 +1616,9 @@
    "abr"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "无",
+  "ui_control": ""
  },
  {
   "key": "usePressureOverridesSize",
@@ -1385,7 +1629,9 @@
    "abr"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "无",
+  "ui_control": ""
  },
  {
   "key": "useScatter",
@@ -1398,7 +1644,9 @@
    "parser"
   ],
   "krita_target": "PressureScatter（Krita 里是散布选项启用位）",
-  "verdict": "可映射"
+  "verdict": "可映射",
+  "ui_visibility": "有",
+  "ui_control": "散布/启用勾选框"
  },
  {
   "key": "useTexture",
@@ -1411,7 +1659,9 @@
    "parser"
   ],
   "krita_target": "Texture/Pattern/Enabled",
-  "verdict": "可映射"
+  "verdict": "可映射",
+  "ui_visibility": "有",
+  "ui_control": "纹理/启用勾选框"
  },
  {
   "key": "useTipDynamics",
@@ -1422,7 +1672,9 @@
    "abr"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "未定",
+  "ui_control": ""
  },
  {
   "key": "wetEdges",
@@ -1432,7 +1684,9 @@
    "re"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "有",
+  "ui_control": "底部（勾选项）/湿边"
  },
  {
   "key": "wetEdgesLock",
@@ -1442,7 +1696,9 @@
    "re"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "PS UI 无（内部键）",
+  "ui_control": ""
  },
  {
   "key": "wtVr",
@@ -1453,7 +1709,9 @@
    "abr"
   ],
   "krita_target": "无对应",
-  "verdict": "无对应"
+  "verdict": "无对应",
+  "ui_visibility": "有",
+  "ui_control": "传递/湿度抖动"
  },
  {
   "key": "zuid",
@@ -1463,6 +1721,92 @@
    "re"
   ],
   "krita_target": "未定",
-  "verdict": "未定"
+  "verdict": "未定",
+  "ui_visibility": "PS UI 无（内部键）",
+  "ui_control": ""
+ },
+ {
+  "key": "ui.shapeDynamics.flipXJitter",
+  "semantics": "形状动态页「翻转 X 抖动」复选框（界面控件 shapeDyn.flipXJitter；矩阵原无该键）",
+  "range": "勾选/未勾选（bool）；PS 界面未显示范围；当前样本值 未勾选",
+  "sources": [
+   "ui"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定",
+  "ui_visibility": "有",
+  "ui_control": "形状动态/翻转 X 抖动"
+ },
+ {
+  "key": "ui.shapeDynamics.flipYJitter",
+  "semantics": "形状动态页「翻转 Y 抖动」复选框（界面控件 shapeDyn.flipYJitter；矩阵原无该键）",
+  "range": "勾选/未勾选（bool）；PS 界面未显示范围；当前样本值 未勾选",
+  "sources": [
+   "ui"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定",
+  "ui_visibility": "有",
+  "ui_control": "形状动态/翻转 Y 抖动"
+ },
+ {
+  "key": "ui.dualBrush.size",
+  "semantics": "双重画笔页「大小」（第二笔尖直径；矩阵原无独立键，顶层 Dmtr 属主笔尖）",
+  "range": "PS 界面未显示范围；当前样本值 25 像素（主笔尖范围见 Dmtr：ABR 实测 1..1920 px）",
+  "sources": [
+   "ui"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定",
+  "ui_visibility": "有",
+  "ui_control": "双重画笔/大小"
+ },
+ {
+  "key": "ui.dualBrush.spacing",
+  "semantics": "双重画笔页「间距」（第二笔尖间距；矩阵原无独立键，顶层 Spcn 属主笔尖）",
+  "range": "PS 界面未显示范围；当前样本值 25%（主笔尖范围见 Spcn：ABR 实测 1..1000%）",
+  "sources": [
+   "ui"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定",
+  "ui_visibility": "有",
+  "ui_control": "双重画笔/间距"
+ },
+ {
+  "key": "ui.dualBrush.scatter",
+  "semantics": "双重画笔页「散布」（第二笔尖散布量；矩阵原无独立键，顶层散布属散布页签）",
+  "range": "PS 界面未显示范围；当前样本值 0%（主笔尖散布见 scatterDynamics：ABR 实测 0..533%）",
+  "sources": [
+   "ui"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定",
+  "ui_visibility": "有",
+  "ui_control": "双重画笔/散布"
+ },
+ {
+  "key": "ui.dualBrush.bothAxes",
+  "semantics": "双重画笔页「两轴」（第二笔尖散布两轴；矩阵原无独立键，bothAxes 属散布页签）",
+  "range": "勾选/未勾选（bool）；PS 界面未显示范围；当前样本值 未勾选",
+  "sources": [
+   "ui"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定",
+  "ui_visibility": "有",
+  "ui_control": "双重画笔/两轴"
+ },
+ {
+  "key": "ui.buildup",
+  "semantics": "底部勾选项「建立」（任务书旧称「喷枪」；界面控件 bottom.buildup，矩阵原无该键）",
+  "range": "勾选/未勾选（bool）；PS 界面未显示范围；当前样本值 未勾选",
+  "sources": [
+   "ui"
+  ],
+  "krita_target": "未定",
+  "verdict": "未定",
+  "ui_visibility": "有",
+  "ui_control": "底部（勾选项）/建立"
  }
 ]

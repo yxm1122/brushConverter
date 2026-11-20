@@ -7,7 +7,8 @@
     python tools/render_matrix_md.py --stdout        # 打印到 stdout（供 diff）
 
 确定性约定：输出不含时间戳、不含绝对路径、不含随机/环境相关字段；
-行序 = JSON 行序（JSON 本身按键名排序），分节按 VERDICT_ORDER 固定。
+行序 = JSON 行序（130 条旧行按键名排序；任务 102 补的 7 条 ui.* 行追加在末尾），
+分节按 VERDICT_ORDER 固定。
 带尾随空格的 4CC 键在 md 里用 U+2420（SYMBOL FOR SPACE）显式标出，避免读者复制时丢掉空格。
 """
 from __future__ import annotations
@@ -23,6 +24,8 @@ B = chr(96)          # 反引号（源码里不直接写反引号，便于本文
 SP = chr(0x2420)     # 空格符号，用于标出尾随空格
 
 VERDICT_ORDER = ("可映射", "需校准", "无对应", "未定")
+# 任务 102：UI 可见性四态（顺序固定，总览表按此顺序列出）
+UI_VISIBILITY = ("有", "无", "PS UI 无（内部键）", "未定")
 
 # 6 个带尾随空格的 4CC 键：md 里用 U+2420 显式标出空格个数。
 SPACE_KEYS = ("Cnt ", "H   ", "Md  ", "Mnm ", "Nm  ", "Rpt ")
@@ -31,9 +34,9 @@ HEADER_TMPL = """# ABR → Krita 参数矩阵
 
 > **本文件由脚本生成，禁止手改**：数据真身是 @B@docs/参数矩阵.json@B@。
 > 重新生成：@B@python tools/render_matrix_md.py@B@
-> 校验：@B@python tools/check_matrix.py@B@（每行六栏非空 / verdict 合法 / 键数不低于基线 / 与三份输入 JSON 自洽）
+> 校验：@B@python tools/check_matrix.py@B@（每行 8 栏非空 / verdict 合法 / ui_visibility 枚举与格式 / 键数不低于基线 / 与三份输入 JSON 自洽）
 >
-> 六栏：**键名 / 语义 / 取值范围（含 clamp）/ 来源 / Krita 对应 / 结论**。
+> 八栏：**键名 / 语义 / 取值范围（含 clamp）/ 来源 / Krita 对应 / 结论 / UI 可见性 / UI 控件**。
 > @B@verdict@B@ 只允许四个值：@B@可映射@B@ / @B@需校准@B@ / @B@无对应@B@ / @B@未定@B@。
 >
 > 判定口径：
@@ -43,7 +46,12 @@ HEADER_TMPL = """# ABR → Krita 参数矩阵
 > - **未定**：本轮证据不足（Krita 侧未覆盖该域，或 PS 侧语义未定）；按铁律 4 不猜，登记待 v0.2。
 >
 > 来源栏（多选）：@B@abr@B@ = @B@docs/数据/abr_keys.json@B@ 实测出现过；@B@re@B@ = @B@docs/数据/ps_keys.json@B@ 逆向有该键；
-> @B@krita@B@ = 本行在 Krita 能力表/映射表里有明确承载字段；@B@parser@B@ = 该键作为字符串字面量出现在 @B@src/brush_converter/**/*.py@B@。
+> @B@krita@B@ = 本行在 Krita 能力表/映射表里有明确承载字段；@B@parser@B@ = 该键作为字符串字面量出现在 @B@src/brush_converter/**/*.py@B@；
+> @B@ui@B@ = 该行由任务 102 从 @B@docs/数据/ps_ui_controls.json@B@ 补入（界面有、原矩阵无）。
+>
+> UI 可见性栏（任务 102，取值只有四种，通用规范第 14 条）：@B@有@B@ = PS「画笔设置」对话框里有该控件（UI 控件栏写明 @B@页签/控件名@B@，多个控件用中文分号分隔）；
+> @B@无@B@ = 只在工具选项栏或「画笔」面板，不在「画笔设置」对话框；@B@PS UI 无（内部键）@B@ = 容器/内部键，界面无控件；
+> @B@未定@B@ = 拿不准（原因见 @B@docs/验收报告/102-报告.md@B@）。**只有 UI 可见性 = 有 的行才允许投入优化**。
 >
 > 带尾随空格的 4CC 键（@SP@ 代表一个空格，JSON 里是原样空格）：{space_keys}
 """
@@ -81,14 +89,15 @@ def _code(tok: str) -> str:
     return B + tok + B
 
 
-TABLE_HEAD = ["| 键名 | 语义 | 取值范围（含 clamp） | 来源 | Krita 对应 | 结论 |",
-              "|---|---|---|---|---|---|"]
+TABLE_HEAD = ["| 键名 | 语义 | 取值范围（含 clamp） | 来源 | Krita 对应 | 结论 | UI 可见性 | UI 控件 |",
+              "|---|---|---|---|---|---|---|---|"]
 
 
 def _row(r: dict) -> str:
-    return "| %s | %s | %s | %s | %s | %s |" % (
+    return "| %s | %s | %s | %s | %s | %s | %s | %s |" % (
         _key_cell(r["key"]), _cell(r["semantics"]), _cell(r["range"]),
-        "·".join(r["sources"]), _cell(r["krita_target"]), r["verdict"])
+        "·".join(r["sources"]), _cell(r["krita_target"]), r["verdict"],
+        r["ui_visibility"], _cell(r["ui_control"]))
 
 
 def _mode_section() -> list[str]:
@@ -128,10 +137,14 @@ def render(rows: list[dict]) -> str:
     out.append("| 矩阵总行数 | %d |" % len(rows))
     for v in VERDICT_ORDER:
         out.append("| 结论 = %s | %d |" % (v, len(by_verdict[v])))
+    # 任务 102：UI 可见性四态（只有「有」的行允许投入优化）
+    for v in UI_VISIBILITY:
+        out.append("| UI 可见性 = %s | %d |" % (v, sum(1 for r in rows if r["ui_visibility"] == v)))
     out.append("| 来源含 %s（逆向有） | %d |" % (_code("re"), sum(1 for r in rows if "re" in r["sources"])))
     out.append("| 来源含 %s（ABR 实测有） | %d |" % (_code("abr"), sum(1 for r in rows if "abr" in r["sources"])))
     out.append("| 来源含 %s（Krita 有承载） | %d |" % (_code("krita"), len(krita_hit)))
     out.append("| 来源含 %s（仓库解析器提过） | %d |" % (_code("parser"), len(parser_hit)))
+    out.append("| 来源含 %s（界面清单补入） | %d |" % (_code("ui"), sum(1 for r in rows if "ui" in r["sources"])))
     out.append("| **逆向有、ABR 样本无** | **%d** |" % len(re_only))
     out.append("| ABR 有、逆向未定位 | %d |" % len(abr_only))
     out.append("")
@@ -162,7 +175,7 @@ def render(rows: list[dict]) -> str:
     out.append(B * 3 + "bash")
     out.append("# 由 JSON 重新生成本文件（唯一生成入口）")
     out.append("python tools/render_matrix_md.py")
-    out.append("# 校验矩阵（六个栏、verdict、基线行数、与三份输入 JSON 自洽）")
+    out.append("# 校验矩阵（8 栏、verdict、ui_visibility 枚举与格式、基线行数、与三份输入 JSON 自洽）")
     out.append("python tools/check_matrix.py")
     out.append("# 模式总表（任务 37）：先由 JSON 重算，再由本脚本写入；--check 校验节是否同步")
     out.append("python tools/render_mode_table.py --build")
@@ -198,7 +211,7 @@ def main(argv: list[str] | None = None) -> int:
             return 1
         print("%s 与 JSON 同步" % md_path)
         return 0
-    md_path.write_text(text, encoding="utf-8")
+    md_path.write_text(text, encoding="utf-8", newline="\n")
     print("已写 %s（%d 行矩阵）" % (md_path, len(load(json_path))))
     return 0
 

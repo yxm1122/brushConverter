@@ -3,10 +3,13 @@
 
 校验项（任何一项失败都退出码 1，并打印「第几行、哪个键、哪一栏」）：
   C1 文件存在、可解析、顶层是数组
-  C2 每行恰好有六栏：key / semantics / range / sources / krita_target / verdict
-  C3 每栏非空（sources 至少一个取值）
+  C2 每行恰好有八栏：
+     key / semantics / range / sources / krita_target / verdict / ui_visibility / ui_control
+  C3 每栏非空（sources 至少一个取值）；
+     ui_visibility 非空字符串；ui_visibility=有 时 ui_control 必须非空；
+     非 有 的行 ui_control 必须是空字符串（保证机器可判，不留半填状态）
   C4 verdict 只能是 可映射 / 需校准 / 无对应 / 未定
-  C5 sources 取值只能是 abr / re / krita / parser，且不重复
+  C5 sources 取值只能是 abr / re / krita / parser / ui，且不重复
   C6 与三份输入 JSON + 仓库源码自洽：
      a) sources 含 re    <=> 该键在 docs/数据/ps_keys.json 里
      b) sources 含 abr   <=> 该键在 docs/数据/abr_keys.json 里
@@ -16,6 +19,11 @@
   C7 基线防回退：总行数 >= BASELINE_KEYS；「逆向有而 ABR 无」行数 >= BASELINE_RE_ONLY
   C8 矩阵里不得出现函数地址（0x 形式的十六进制）
   C9 docs/参数矩阵.md 必须与 tools/render_matrix_md.py 的生成结果逐字节一致（禁止手改 md）
+  C10 ui_visibility 只能是 有 / 无 / PS UI 无（内部键） / 未定（任务 14 铁律）
+  C11 ui_visibility=有 的 ui_control 必须符合「页签/控件名」格式：
+     多段用中文分号「；」分隔、逐段校验；页签必须属于 docs/数据/ps_ui_controls.json 的 8 个页签
+     ∪ {底部（勾选项）}。控件名内部允许再出现「/」（界面原文「前景/背景抖动」就是这种），
+     故只按第一个「/」切分页签与控件名。
 
 用法（仓库根）：
     python tools/check_matrix.py
@@ -35,16 +43,25 @@ import sys
 HERE = pathlib.Path(__file__).resolve().parent
 REPO = HERE.parent
 
-FIELDS = ("key", "semantics", "range", "sources", "krita_target", "verdict")
+FIELDS = ("key", "semantics", "range", "sources", "krita_target", "verdict",
+          "ui_visibility", "ui_control")
 VERDICTS = ("可映射", "需校准", "无对应", "未定")
-SOURCE_TAGS = ("abr", "re", "krita", "parser")
+SOURCE_TAGS = ("abr", "re", "krita", "parser", "ui")
+# 任务 102（v0.6）：UI 可见性四态，只有「有」的行才允许投入优化（通用规范第 14 条）
+UI_VISIBILITY = ("有", "无", "PS UI 无（内部键）", "未定")
+# 底部 5 个勾选项在控件清单里归到这一「页签」名下（见 docs/数据/ps_ui_controls.json controls[].tab）
+UI_BOTTOM_TAB = "底部（勾选项）"
+UI_SEP = "；"          # ui_control 多段分隔符，中文分号（任务 102 规定）
 
 # ── 基线（防回退阈值）──────────────────────────────────────────────────────────
-# 130 = |ps_keys.json（125）∪ abr_keys.json（91）|
-#     = 125 条逆向键 + 5 条「ABR 有、逆向未定位」的键（InvT/TxtC/Txtr/Wtdg/sampledData）
-# 依据：任务 21 交付 125 条、任务 22 交付 91 条，两条硬性来源，交集 86 条。
-# 以后只允许增加（新逆向键/新 ABR 键），不允许减少；要下调必须同时改本常量和报告。
-BASELINE_KEYS = 130
+# 137 = 130（= |ps_keys.json（125）∪ abr_keys.json（91）| = 125 条逆向键 + 5 条
+#       「ABR 有、逆向未定位」的键（InvT/TxtC/Txtr/Wtdg/sampledData））
+#     + 7  条任务 102 补的「界面有、矩阵无」参数行（ui.shapeDynamics.flipXJitter /
+#       ui.shapeDynamics.flipYJitter / ui.dualBrush.size / ui.dualBrush.spacing /
+#       ui.dualBrush.scatter / ui.dualBrush.bothAxes / ui.buildup）
+# 依据：任务 21 交付 125 条、任务 22 交付 91 条（交集 86 条），任务 102 交付 7 条 UI 漏项。
+# 以后只允许增加（新逆向键/新 ABR 键/新 UI 键），不允许减少；要下调必须同时改本常量和报告。
+BASELINE_KEYS = 137
 # 39 = 任务 21 报出的「逆向有、ABR 样本未见」条数；这批键按硬性要求一条都不许删，
 # 所以把它也钉成基线：谁删了一条，这里立刻失败。
 BASELINE_RE_ONLY = 39
@@ -126,6 +143,9 @@ def main(argv: list[str] | None = None) -> int:
     ps_keys = {x["key"] for x in ps}
     abr_keys = {k["key"] for k in abr["keys"]}
     lits = parser_literals()
+    # C11 用：界面页签名全集（任务 101 清单；底部勾选项单列为第 9 个「页签」）
+    ui_ctl = load_json(REPO / "docs/数据/ps_ui_controls.json", "PS 界面控件清单（任务 101）")
+    ui_tabs = {t["tab"] for t in ui_ctl.get("tabs", [])} | {UI_BOTTOM_TAB}
 
     seen_keys: dict[str, int] = {}
     for idx, row in enumerate(rows, start=1):
@@ -147,7 +167,7 @@ def main(argv: list[str] | None = None) -> int:
             fail("C2", where, "缺栏 %s" % "、".join(missing))
             continue
         if extra:
-            fail("C2", where, "多出栏位 %s（只允许六栏）" % "、".join(extra))
+            fail("C2", where, "多出栏位 %s（只允许八栏）" % "、".join(extra))
 
         # C3 每栏非空
         for f in ("key", "semantics", "range", "krita_target", "verdict"):
@@ -165,6 +185,35 @@ def main(argv: list[str] | None = None) -> int:
             bad = [s for s in sources if s not in SOURCE_TAGS]
             if bad:
                 fail("C5", where, "栏 sources 含非法取值 %r（只允许 %s）" % (bad, "、".join(SOURCE_TAGS)))
+
+        # C3（UI 两栏）+ C10 枚举 + C11 格式
+        uiv = row["ui_visibility"]
+        uic = row["ui_control"]
+        if not isinstance(uiv, str) or not uiv.strip():
+            fail("C3", where, "栏 ui_visibility 为空或不是字符串")
+        elif uiv not in UI_VISIBILITY:
+            fail("C10", where, "栏 ui_visibility=%r 非法（只允许 %s）"
+                 % (uiv, "、".join(UI_VISIBILITY)))
+        if not isinstance(uic, str):
+            fail("C3", where, "栏 ui_control 不是字符串（必须写成字符串，无 UI 时写空串）")
+        elif uiv == "有":
+            if not uic.strip():
+                fail("C3", where, "ui_visibility=有 但 ui_control 为空（有 UI 的行必须写界面控件）")
+            else:
+                for seg in uic.split(UI_SEP):
+                    seg = seg.strip()
+                    if not seg:
+                        fail("C11", where, "ui_control 有空的「%s」段：%r" % (UI_SEP, uic))
+                        continue
+                    page, sep, name = seg.partition("/")
+                    if not sep or not page.strip() or not name.strip():
+                        fail("C11", where, "ui_control 段 %r 不符合「页签/控件名」格式" % seg)
+                    elif page.strip() not in ui_tabs:
+                        fail("C11", where, "ui_control 段 %r 的页签 %r 不在 8 个页签 ∪ {%s} 内：%r"
+                             % (seg, page.strip(), UI_BOTTOM_TAB, uic))
+        elif uic != "":
+            fail("C3", where, "ui_visibility=%r 的行 ui_control 必须为空字符串（实际 %r）"
+                 % (uiv, uic))
 
         # C4 verdict
         verdict = row["verdict"]
@@ -250,10 +299,15 @@ def main(argv: list[str] | None = None) -> int:
         print("=== 校验失败：%d 项 ===" % len(errors))
         return 1
 
+    n_ui = {v: sum(1 for r in rows if isinstance(r, dict) and r.get("ui_visibility") == v)
+            for v in UI_VISIBILITY}
     print("=== 参数矩阵校验通过 ===")
+    print("栏位校验              = 8 栏（%s）" % " / ".join(FIELDS))
     print("矩阵总行数            = %d" % len(rows))
     print("逆向有而 ABR 无的行数 = %d" % len(re_only))
     print("未定的行数            = %d" % n_undecided)
+    for v in UI_VISIBILITY:
+        print("ui_visibility=%s : %d" % (v, n_ui[v]))
     print("基线（防回退）        = 总行数 >= %d，逆向独有 >= %d" % (BASELINE_KEYS, BASELINE_RE_ONLY))
     return 0
 
