@@ -35,13 +35,18 @@
   "diff_ratio_best": "同上最好值（用来看「离门槛多近」）",
   "max_delta": "判定候选在 6 组中的最差 max_delta",
   "saturated_groups": "PS 真值 alpha_unique==1 的组数（饱和组无判别力）",
-  "evidence_strength": "强 / 中 / 弱-饱和 / 弱-退化 / 弱-塌缩 / 结构性 / 结构性+饱和 / 结构性+退化 / 结构性+无真值 / 需校准-边界残差",
+  "evidence_strength": "legacy 兼容别名：与 evidence_strength_legacy 同值，只为让只读工具 tools/render_mode_table.py 的渲染与 --check 继续工作；新口径请读 evidence_grade。",
   "distinguishable": "当前判据材料能否区分本行结论；false=像素不可区分（饱和/退化/塌缩）；null=无真值未测",
   "collapse_class": "PS 侧模式塌缩类（6 组 alpha_sha256 元组相同即同类）；null=无 PS 真值",
   "premise": "结论成立的判据前提（口径 / 退化 / 饱和 / 塌缩 / 枚举）",
   "s1_premise": "「条件成立」= 该行 ≤2% 结论引用了 tools/texture_mask.py 的复刻交叉校验，而复刻只在强度 s=1 与真实渲染逐像素一致（s<1 实测差 229/102）",
   "batch_verdict": "该批报告原文结论（只记录，不覆盖）",
-  "changed_files": "v0.4 本批改的 src 行；未改的写明不改"
+  "changed_files": "v0.4 本批改的 src 行；未改的写明不改",
+  "evidence_strength_legacy": "旧口径原值（强 / 中 / 弱-* / 结构性* / 需校准-边界残差），任务 103 起只读留档，不再作为分级依据。",
+  "evidence_grade": "A/B/C 证据等级（任务 103）：A=有可重跑实测或源码/逆向原文直接支撑；B=只有单点或单类证据且 note 写明依赖假设；C=仅语义命名推断或 PS UI「模式」下拉不存在。等级与 verdict 解耦，本任务 0 处改 verdict。",
+  "evidence_types": "支撑该行结论的证据类型（可多选）：像素实测 / 源码 / 逆向静态 / 逆向动态 / 文档 / 推断。",
+  "recheck_cmd": "一条在仓库根执行即可打印该行关键数字/证据的命令；只允许相对路径。「暂无（待任务 104）」= 当前材料无法给出可核对数值，任务 104 收尾必须清零或降级并写原因。",
+  "recheck_at": "执行者实际跑出/核对 recheck_cmd 的日期（YYYY-MM-DD）。"
  },
  "judging_rule": {
   "diff_tol": 2,
@@ -50,6 +55,195 @@
   "max_delta_max": 2,
   "denominator": "W×H = 10000（不是非零像素数）",
   "criterion": "差异比例 ≤ 2% 且 max_delta ≤ 2（两条都要）"
+ },
+ "evidence_grade_rules": {
+  "task": "103",
+  "criteria": {
+   "A": "有可重跑实测，或源码 / 逆向原文直接支撑；本轮要求 recheck_cmd 能当场打印该行关键数字或直接引用原文。",
+   "B": "只有单点或单类证据；note 必须写明「依赖哪个假设」。写不出假设的，要么升 A，要么降 C。",
+   "C": "仅靠语义与命名推断，或该模式在 PS 界面「模式」下拉里不存在；UI 不可见的 37 行一律 C。"
+  },
+  "ui_gate": {
+   "source": "docs/数据/ps_texture_modes_ui.json（任务 101 补拍：PS「画笔设置 > 纹理 > 模式」下拉实测 10 项）",
+   "rule": "只有该 10 项内的模式才可能评 A/B；其余 37 行一律 C，note 写「PS UI 无此模式」。C 只改证据等级，不改 verdict。",
+   "modes": [
+    {
+     "index": 1,
+     "name_ui": "正片叠底",
+     "ps_member": "Mltp"
+    },
+    {
+     "index": 2,
+     "name_ui": "减去",
+     "ps_member": "Sbtr"
+    },
+    {
+     "index": 3,
+     "name_ui": "变暗",
+     "ps_member": "Drkn"
+    },
+    {
+     "index": 4,
+     "name_ui": "叠加",
+     "ps_member": "Ovrl"
+    },
+    {
+     "index": 5,
+     "name_ui": "颜色减淡",
+     "ps_member": "CDdg"
+    },
+    {
+     "index": 6,
+     "name_ui": "颜色加深",
+     "ps_member": "CBrn"
+    },
+    {
+     "index": 7,
+     "name_ui": "线性加深",
+     "ps_member": "linearBurn"
+    },
+    {
+     "index": 8,
+     "name_ui": "实色混合",
+     "ps_member": "hardMix"
+    },
+    {
+     "index": 9,
+     "name_ui": "线性高度",
+     "ps_member": "linearHeight"
+    },
+    {
+     "index": 10,
+     "name_ui": "高度",
+     "ps_member": "height"
+    }
+   ]
+  },
+  "grade_is_not_verdict": "evidence_grade 是证据等级，不是 verdict；本任务未改任何 verdict。",
+  "build_warning": "本文件的 evidence_grade / evidence_types / recheck_cmd / recheck_at 与 note 的【103 分级】段由任务 103 手工增补；python tools/render_mode_table.py --build 会用脚本内旧 D 表覆盖整份文件并丢失这些字段，运行前必须先更新 render 脚本（任务 113）。"
+ },
+ "legacy_strength_mapping": {
+  "note": "旧 evidence_strength（已改名 evidence_strength_legacy）→ 新 evidence_grade 的折算对照；一行一个旧值。",
+  "principle": "先过 UI 门（UI 不可见一律 C），再按新判据重判；旧值只作线索，不直接换算。",
+  "map": [
+   {
+    "legacy": "强",
+    "grade": "A",
+    "rows": [
+     4,
+     20
+    ],
+    "rule": "强=自有渲染+两侧非饱和；两条均过 UI 门，直接 A。"
+   },
+   {
+    "legacy": "中",
+    "grade": "B 或 C",
+    "rows": [
+     11,
+     38,
+     39,
+     42
+    ],
+    "rule": "中=跨模式候选或部分组饱和；UI 可见的 38/39 降 B（依赖 s=1 与 14/15 不可区分），UI 不可见的 11/42 降 C。"
+   },
+   {
+    "legacy": "弱-饱和",
+    "grade": "B 或 C",
+    "rows": [
+     6,
+     17,
+     18,
+     22
+    ],
+    "rule": "饱和使 0.00% 只证明不冲突；UI 可见的 6/17/18 降 B（依赖饱和不可区分假设），UI 不可见的 22 降 C。"
+   },
+   {
+    "legacy": "弱-退化",
+    "grade": "B",
+    "rows": [
+     23
+    ],
+    "rule": "base=1 退化；UI 可见 → B（依赖静态对应 + 无冲突假设）。"
+   },
+   {
+    "legacy": "弱-塌缩",
+    "grade": "C",
+    "rows": [
+     0,
+     2,
+     3,
+     12,
+     13,
+     14,
+     15,
+     27,
+     37,
+     40,
+     41
+    ],
+    "rule": "塌缩类全部不在 UI 下拉，且 0.00% 只证明本口径不可区分 → C。"
+   },
+   {
+    "legacy": "结构性",
+    "grade": "A 或 C",
+    "rows": [
+     1,
+     8,
+     9,
+     24,
+     26,
+     34,
+     35
+    ],
+    "rule": "结构性只说明结论稳，不是 A 的理由；只有 Drkn(9) 有可重跑像素数字且 UI 可见 → A，其余 UI 不可见 → C。"
+   },
+   {
+    "legacy": "结构性+饱和",
+    "grade": "C",
+    "rows": [
+     5,
+     7,
+     10,
+     25,
+     32,
+     33,
+     36,
+     43
+    ],
+    "rule": "UI 全部不可见 → C。"
+   },
+   {
+    "legacy": "结构性+退化",
+    "grade": "C",
+    "rows": [
+     16
+    ],
+    "rule": "UI 不可见 → C。"
+   },
+   {
+    "legacy": "结构性+无真值",
+    "grade": "C",
+    "rows": [
+     19,
+     28,
+     29,
+     30,
+     31,
+     44,
+     45,
+     46
+    ],
+    "rule": "UI 全部不可见且无 PS 真值 → C。"
+   },
+   {
+    "legacy": "需校准-边界残差",
+    "grade": "A",
+    "rows": [
+     21
+    ],
+    "rule": "UI 可见且残差 103 px 可复跑 → A。"
+   }
+  ]
  },
  "counts": {
   "total": 47,
@@ -96,7 +290,46 @@
   },
   "with_ps_truth": 39,
   "without_ps_truth": 8,
-  "no_conclusion": 0
+  "no_conclusion": 0,
+  "by_evidence_grade": {
+   "A": 4,
+   "B": 6,
+   "C": 37
+  },
+  "by_evidence_types": {
+   "像素实测": 39,
+   "源码": 47,
+   "逆向静态": 8,
+   "逆向动态": 13,
+   "文档": 4,
+   "推断": 3
+  },
+  "by_ui_visibility": {
+   "有": 10,
+   "无": 37
+  },
+  "by_batch_evidence_grade": {
+   "A": {
+    "A": 2,
+    "B": 1,
+    "C": 13,
+    "合计": 16
+   },
+   "B": {
+    "A": 2,
+    "B": 3,
+    "C": 11,
+    "合计": 16
+   },
+   "C": {
+    "A": 0,
+    "B": 2,
+    "C": 13,
+    "合计": 15
+   }
+  },
+  "by_evidence_strength_note": "legacy 口径：按 evidence_strength_legacy（旧 evidence_strength）计数，任务 103 起仅留档，不再用于覆盖率统计。",
+  "by_evidence_types_note": "按 evidence_types 统计的「含该类型的行数」；一行可属多类，故合计大于 47。"
  },
  "collapse": {
   "definition": "把有 PS 真值的模式按「6 组 alpha_sha256 元组」分类；同类 = 在这 6 组参数下 PS 出的是同一张像素",
@@ -250,13 +483,21 @@
    "saturated_groups": 0,
    "judge_candidate": "跨模式候选",
    "evidence_strength": "弱-塌缩",
+   "evidence_strength_legacy": "弱-塌缩",
+   "evidence_grade": "C",
+   "evidence_types": [
+    "像素实测",
+    "源码"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for x in json.load(open('tests/baselines/mode-A/judge-result.json',encoding='utf-8'))['modes'] if x['order']==0][0];g=list(m['groups'].values());print(m['ps_member'],'best_ratio',[(x['best_ref'] or {}).get('diff_ratio') for x in g],'best_max_delta',[(x['best_ref'] or {}).get('max_delta') for x in g],'ps_saturated',sum(1 for x in g if x['ps']['saturated']))\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": false,
    "collapse_class": "P1",
    "collapse_class_size": 13,
    "premise": "PS 侧模式塌缩：本类 13 个 PS 模式出同一张像素；0.00% 只证明「本口径下不可区分」",
    "s1_premise": "不依赖",
    "batch_verdict": "A：直接可映射",
-   "note": "与 Mltp 同哈希；A 登记 mapping.py:64，B 批同名模式判退化（口径分歧见 37 报告 §三-1）",
+   "note": "与 Mltp 同哈希；A 登记 mapping.py:64，B 批同名模式判退化（口径分歧见 37 报告 §三-1）；【103 分级】C：PS UI 无此模式（PS「纹理 > 模式」下拉实测仅 10 项，不含本项）。",
    "rationale": "A 批按「PS 真值与 Mltp 真值 Alpha 同哈希 + 映射后 0.00%」登记为 0；B 批判 base=1 数学退化、不构成独立证据。37 统一：像素不可区分（base=1 退化等价类），按名字与默认算子登记为 0，不据此声称语义等价。",
    "changed_files": "src/brush_converter/mapping.py:64（新增 \"Nrml\": 0）"
   },
@@ -278,13 +519,21 @@
    "saturated_groups": 2,
    "judge_candidate": "跨模式候选",
    "evidence_strength": "结构性",
+   "evidence_strength_legacy": "结构性",
+   "evidence_grade": "C",
+   "evidence_types": [
+    "像素实测",
+    "源码"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for x in json.load(open('tests/baselines/mode-A/judge-result.json',encoding='utf-8'))['modes'] if x['order']==1][0];g=list(m['groups'].values());print(m['ps_member'],'best_ratio',[(x['best_ref'] or {}).get('diff_ratio') for x in g],'best_max_delta',[(x['best_ref'] or {}).get('max_delta') for x in g],'ps_saturated',sum(1 for x in g if x['ps']['saturated']))\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": true,
    "collapse_class": "P2",
    "collapse_class_size": 1,
    "premise": "Krita TexturingMode 只有 16 个成员（0..15），枚举里无该成员；最近候选也超 2% 门槛",
    "s1_premise": "不依赖",
    "batch_verdict": "A：结构性不可映射",
-   "note": "Krita 16 成员无随机算子；d60 两组 97–98%，d100 两组 0%（真值与满掩码同像素）",
+   "note": "Krita 16 成员无随机算子；d60 两组 97–98%，d100 两组 0%（真值与满掩码同像素）；【103 分级】C：PS UI 无此模式（PS「纹理 > 模式」下拉实测仅 10 项，不含本项）。",
    "rationale": "PS Dissolve 是随机抖动，Krita TexturingMode 16 成员全是确定性算子；d10 两组真值饱和、d60 两组 97.11%/98.42%。",
    "changed_files": "不改（保留回退 Multiply(0) + 警告）"
   },
@@ -306,13 +555,21 @@
    "saturated_groups": 0,
    "judge_candidate": "跨模式候选",
    "evidence_strength": "弱-塌缩",
+   "evidence_strength_legacy": "弱-塌缩",
+   "evidence_grade": "C",
+   "evidence_types": [
+    "像素实测",
+    "源码"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for x in json.load(open('tests/baselines/mode-A/judge-result.json',encoding='utf-8'))['modes'] if x['order']==2][0];g=list(m['groups'].values());print(m['ps_member'],'best_ratio',[(x['best_ref'] or {}).get('diff_ratio') for x in g],'best_max_delta',[(x['best_ref'] or {}).get('max_delta') for x in g],'ps_saturated',sum(1 for x in g if x['ps']['saturated']))\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": false,
    "collapse_class": "P1",
    "collapse_class_size": 13,
    "premise": "PS 侧模式塌缩：本类 13 个 PS 模式出同一张像素；0.00% 只证明「本口径下不可区分」",
    "s1_premise": "不依赖",
    "batch_verdict": "A：直接可映射",
-   "note": "与 Nrml/Mltp 同哈希（塌缩类 P1）",
+   "note": "与 Nrml/Mltp 同哈希（塌缩类 P1）；【103 分级】C：PS UI 无此模式（PS「纹理 > 模式」下拉实测仅 10 项，不含本项）。",
    "rationale": "与 order 0 同证据链：登记 0，但 0.00% 属塌缩/退化，不作语义等价。",
    "changed_files": "src/brush_converter/mapping.py:65（新增 \"Bhnd\": 0）"
   },
@@ -334,13 +591,21 @@
    "saturated_groups": 0,
    "judge_candidate": "跨模式候选",
    "evidence_strength": "弱-塌缩",
+   "evidence_strength_legacy": "弱-塌缩",
+   "evidence_grade": "C",
+   "evidence_types": [
+    "像素实测",
+    "源码"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for x in json.load(open('tests/baselines/mode-A/judge-result.json',encoding='utf-8'))['modes'] if x['order']==3][0];g=list(m['groups'].values());print(m['ps_member'],'best_ratio',[(x['best_ref'] or {}).get('diff_ratio') for x in g],'best_max_delta',[(x['best_ref'] or {}).get('max_delta') for x in g],'ps_saturated',sum(1 for x in g if x['ps']['saturated']))\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": false,
    "collapse_class": "P1",
    "collapse_class_size": 13,
    "premise": "PS 侧模式塌缩：本类 13 个 PS 模式出同一张像素；0.00% 只证明「本口径下不可区分」",
    "s1_premise": "不依赖",
    "batch_verdict": "A：直接可映射",
-   "note": "与 Nrml/Mltp 同哈希（塌缩类 P1）",
+   "note": "与 Nrml/Mltp 同哈希（塌缩类 P1）；【103 分级】C：PS UI 无此模式（PS「纹理 > 模式」下拉实测仅 10 项，不含本项）。",
    "rationale": "同 order 2。",
    "changed_files": "src/brush_converter/mapping.py:66（新增 \"Clar\": 0）"
   },
@@ -362,13 +627,21 @@
    "saturated_groups": 0,
    "judge_candidate": "自有渲染",
    "evidence_strength": "强",
+   "evidence_strength_legacy": "强",
+   "evidence_grade": "A",
+   "evidence_types": [
+    "像素实测",
+    "源码"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for x in json.load(open('tests/baselines/mode-A/judge-result.json',encoding='utf-8'))['modes'] if x['order']==4][0];g=list(m['groups'].values());print(m['ps_member'],'own_ratio',[x['own_krita']['diff_ratio'] for x in g],'own_max_delta',[x['own_krita']['max_delta'] for x in g],'ps_saturated',sum(1 for x in g if x['ps']['saturated']))\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": true,
    "collapse_class": "P1",
    "collapse_class_size": 13,
    "premise": "判据材料＝单笔尖满覆盖(base=1)+100% 倒相纹理+6 组参数；判定用自有 Krita 真机渲染，两侧非饱和",
    "s1_premise": "不依赖",
    "batch_verdict": "A：直接可映射",
-   "note": "自有 Krita 渲染 6/6 组 0.00%/max≤1；本批最强证据",
+   "note": "自有 Krita 渲染 6/6 组 0.00%/max≤1；本批最强证据；【103 分级】A：PS UI 可见（下拉第 1 项「正片叠底」）；自有 Krita MULTIPLY 渲染 6/6 组 0.00%/max≤1 且两侧非饱和，数字可复跑。",
    "rationale": "唯一同时具备「PS 真值 + Krita 同模式真机渲染」且两侧非饱和的模式；A 批用它当 G1 类的参照。",
    "changed_files": "src/brush_converter/mapping.py:63（新增 \"Mltp\": 0）"
   },
@@ -390,13 +663,21 @@
    "saturated_groups": 6,
    "judge_candidate": "跨模式候选",
    "evidence_strength": "结构性+饱和",
+   "evidence_strength_legacy": "结构性+饱和",
+   "evidence_grade": "C",
+   "evidence_types": [
+    "像素实测",
+    "源码"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for x in json.load(open('tests/baselines/mode-A/judge-result.json',encoding='utf-8'))['modes'] if x['order']==5][0];g=list(m['groups'].values());print(m['ps_member'],'best_ratio',[(x['best_ref'] or {}).get('diff_ratio') for x in g],'best_max_delta',[(x['best_ref'] or {}).get('max_delta') for x in g],'ps_saturated',sum(1 for x in g if x['ps']['saturated']))\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": false,
    "collapse_class": "P3",
    "collapse_class_size": 12,
    "premise": "枚举无该成员（硬证据）+ PS 真值饱和（像素证据无判别力）",
    "s1_premise": "不依赖",
    "batch_verdict": "A：不可判定（真值饱和）",
-   "note": "PS 真值 6/6 饱和；枚举无 SCREEN（A 原判不可判定，37 按枚举改判）",
+   "note": "PS 真值 6/6 饱和；枚举无 SCREEN（A 原判不可判定，37 按枚举改判）；【103 分级】C：PS UI 无此模式（PS「纹理 > 模式」下拉实测仅 10 项，不含本项）。",
    "rationale": "A 批判「不可判定（真值饱和）」；但 Krita 16 成员里没有 SCREEN 是独立于像素的结构事实，像素饱和只降低证据强度，不改变「无等价算子」的结论。37 统一口径：结构判定优先。",
    "changed_files": "不改（保留回退 Multiply(0) + 警告）"
   },
@@ -418,13 +699,21 @@
    "saturated_groups": 6,
    "judge_candidate": "自有渲染",
    "evidence_strength": "弱-饱和",
+   "evidence_strength_legacy": "弱-饱和",
+   "evidence_grade": "B",
+   "evidence_types": [
+    "像素实测",
+    "源码"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for x in json.load(open('tests/baselines/mode-A/judge-result.json',encoding='utf-8'))['modes'] if x['order']==6][0];g=list(m['groups'].values());print(m['ps_member'],'own_ratio',[x['own_krita']['diff_ratio'] for x in g],'own_max_delta',[x['own_krita']['max_delta'] for x in g],'ps_saturated',sum(1 for x in g if x['ps']['saturated']))\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": false,
    "collapse_class": "P3",
    "collapse_class_size": 12,
    "premise": "PS 真值 6/6 组饱和（u=1）；0.00% 只证明「不冲突」，不证明语义一致",
    "s1_premise": "不依赖",
    "batch_verdict": "A：不可判定（真值饱和）",
-   "note": "两侧 6/6 组饱和；已登记 Ovrl=5（A 原判不可判定，37 按「有成员+已登记」改判）",
+   "note": "两侧 6/6 组饱和；已登记 Ovrl=5（A 原判不可判定，37 按「有成员+已登记」改判）；【103 分级】B：PS UI 可见（下拉第 4 项「叠加」）；依赖假设「判据材料 6/6 组两侧饱和（u=1）时，0.00% 的『不冲突』可作为可接受映射」，无半透明口径证据。",
    "rationale": "与 order 5 相反的一侧：Krita 确有 OVERLAY(5) 且转换器早已登记，只是不透明笔尖下两侧都恒 255，像素证明不了。按 B/C 批对「有枚举成员 + 无冲突证据」的处理（CDdg/CBrn/linearDodge）统一为可映射·弱。",
    "changed_files": "不改（v1.2.1 已登记 mapping.py:38）"
   },
@@ -446,13 +735,21 @@
    "saturated_groups": 6,
    "judge_candidate": "跨模式候选",
    "evidence_strength": "结构性+饱和",
+   "evidence_strength_legacy": "结构性+饱和",
+   "evidence_grade": "C",
+   "evidence_types": [
+    "像素实测",
+    "源码"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for x in json.load(open('tests/baselines/mode-A/judge-result.json',encoding='utf-8'))['modes'] if x['order']==7][0];g=list(m['groups'].values());print(m['ps_member'],'best_ratio',[(x['best_ref'] or {}).get('diff_ratio') for x in g],'best_max_delta',[(x['best_ref'] or {}).get('max_delta') for x in g],'ps_saturated',sum(1 for x in g if x['ps']['saturated']))\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": false,
    "collapse_class": "P3",
    "collapse_class_size": 12,
    "premise": "枚举无该成员（硬证据）+ PS 真值饱和（像素证据无判别力）",
    "s1_premise": "不依赖",
    "batch_verdict": "A：不可判定（真值饱和）",
-   "note": "PS 真值 6/6 饱和；枚举无 SOFT_LIGHT",
+   "note": "PS 真值 6/6 饱和；枚举无 SOFT_LIGHT；【103 分级】C：PS UI 无此模式（PS「纹理 > 模式」下拉实测仅 10 项，不含本项）。",
    "rationale": "同 order 5。",
    "changed_files": "不改（保留回退 Multiply(0) + 警告）"
   },
@@ -474,13 +771,21 @@
    "saturated_groups": 0,
    "judge_candidate": "跨模式候选",
    "evidence_strength": "结构性",
+   "evidence_strength_legacy": "结构性",
+   "evidence_grade": "C",
+   "evidence_types": [
+    "像素实测",
+    "源码"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for x in json.load(open('tests/baselines/mode-A/judge-result.json',encoding='utf-8'))['modes'] if x['order']==8][0];g=list(m['groups'].values());print(m['ps_member'],'best_ratio',[(x['best_ref'] or {}).get('diff_ratio') for x in g],'best_max_delta',[(x['best_ref'] or {}).get('max_delta') for x in g],'ps_saturated',sum(1 for x in g if x['ps']['saturated']))\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": true,
    "collapse_class": "P4",
    "collapse_class_size": 1,
    "premise": "Krita TexturingMode 只有 16 个成员（0..15），枚举里无该成员；最近候选也超 2% 门槛",
    "s1_premise": "不依赖",
    "batch_verdict": "A：结构性不可映射",
-   "note": "枚举无 HARD_LIGHT；14 个候选最佳 2.79%（5/6 组 ≥13.13%）",
+   "note": "枚举无 HARD_LIGHT；14 个候选最佳 2.79%（5/6 组 ≥13.13%）；【103 分级】C：PS UI 无此模式（PS「纹理 > 模式」下拉实测仅 10 项，不含本项）。",
    "rationale": "有硬数字：把 14 个已渲染 Krita 模式全试一遍，最好的候选仍 2.79%–62.84%。",
    "changed_files": "不改（保留回退 Multiply(0) + 警告）"
   },
@@ -502,13 +807,21 @@
    "saturated_groups": 0,
    "judge_candidate": "自有渲染",
    "evidence_strength": "结构性",
+   "evidence_strength_legacy": "结构性",
+   "evidence_grade": "A",
+   "evidence_types": [
+    "像素实测",
+    "源码"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for x in json.load(open('tests/baselines/mode-A/judge-result.json',encoding='utf-8'))['modes'] if x['order']==9][0];g=list(m['groups'].values());print(m['ps_member'],'own_ratio',[x['own_krita']['diff_ratio'] for x in g],'own_max_delta',[x['own_krita']['max_delta'] for x in g],'ps_saturated',sum(1 for x in g if x['ps']['saturated']))\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": true,
    "collapse_class": "P5",
    "collapse_class_size": 1,
    "premise": "Krita TexturingMode 只有 16 个成员（0..15），枚举里无该成员；最近候选也超 2% 门槛",
    "s1_premise": "不依赖",
    "batch_verdict": "A：结构性不可映射（单一算子）",
-   "note": "自有 DARKEN 69.04–98.60%；PS 按深度换族 → 无单一算子覆盖",
+   "note": "自有 DARKEN 69.04–98.60%；PS 按深度换族 → 无单一算子覆盖；【103 分级】A：PS UI 可见（下拉第 3 项「变暗」）；自有 Krita DARKEN 4/6 组 69.04%–98.60%、最佳单候选 SUBTRACT 在 d100 两组 99.29%/98.65%，PS 真值换族有哈希证据，均可复跑。",
    "rationale": "PS 侧 Darken 在 d<100 与减去族同哈希、d=100 与正片叠底同哈希；Krita 无单一算子同时覆盖两段，最佳单候选 SUBTRACT 在 d100 两组 99.29%/98.65%。",
    "changed_files": "不改（保留回退 Multiply(0) + 警告）"
   },
@@ -530,13 +843,21 @@
    "saturated_groups": 6,
    "judge_candidate": "跨模式候选",
    "evidence_strength": "结构性+饱和",
+   "evidence_strength_legacy": "结构性+饱和",
+   "evidence_grade": "C",
+   "evidence_types": [
+    "像素实测",
+    "源码"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for x in json.load(open('tests/baselines/mode-A/judge-result.json',encoding='utf-8'))['modes'] if x['order']==10][0];g=list(m['groups'].values());print(m['ps_member'],'best_ratio',[(x['best_ref'] or {}).get('diff_ratio') for x in g],'best_max_delta',[(x['best_ref'] or {}).get('max_delta') for x in g],'ps_saturated',sum(1 for x in g if x['ps']['saturated']))\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": false,
    "collapse_class": "P3",
    "collapse_class_size": 12,
    "premise": "枚举无该成员（硬证据）+ PS 真值饱和（像素证据无判别力）",
    "s1_premise": "不依赖",
    "batch_verdict": "A：不可判定（真值饱和）",
-   "note": "PS 真值 6/6 饱和；枚举无 LIGHTEN",
+   "note": "PS 真值 6/6 饱和；枚举无 LIGHTEN；【103 分级】C：PS UI 无此模式（PS「纹理 > 模式」下拉实测仅 10 项，不含本项）。",
    "rationale": "同 order 5。",
    "changed_files": "不改（保留回退 Multiply(0) + 警告）"
   },
@@ -558,13 +879,21 @@
    "saturated_groups": 0,
    "judge_candidate": "跨模式候选",
    "evidence_strength": "中",
+   "evidence_strength_legacy": "中",
+   "evidence_grade": "C",
+   "evidence_types": [
+    "像素实测",
+    "源码"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for x in json.load(open('tests/baselines/mode-A/judge-result.json',encoding='utf-8'))['modes'] if x['order']==11][0];g=list(m['groups'].values());print(m['ps_member'],'best_ratio',[(x['best_ref'] or {}).get('diff_ratio') for x in g],'best_max_delta',[(x['best_ref'] or {}).get('max_delta') for x in g],'ps_saturated',sum(1 for x in g if x['ps']['saturated']))\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": true,
    "collapse_class": "P6",
    "collapse_class_size": 4,
    "premise": "判据材料＝单笔尖满覆盖(base=1)+100% 倒相纹理+6 组参数；判定用跨模式真机候选（两侧非饱和）",
    "s1_premise": "不依赖",
    "batch_verdict": "A：需分模式校准",
-   "note": "PS Difference ≡ PS Subtract；改映射 SUBTRACT(1) 后 6/6 组 0.00%/max≤1",
+   "note": "PS Difference ≡ PS Subtract；改映射 SUBTRACT(1) 后 6/6 组 0.00%/max≤1；【103 分级】C：PS UI 无此模式（PS「纹理 > 模式」下拉实测仅 10 项，不含本项）。",
    "rationale": "A 批称「需分模式校准」，但校准结果是一个常数枚举（1 = SUBTRACT），没有经验系数或残差，6/6 组全 0.00%/max≤1；按 37 的 verdict 定义归入「可映射」，原判记录在 batch_verdict。",
    "changed_files": "src/brush_converter/mapping.py:74（新增 \"Dfrn\": 1）"
   },
@@ -586,13 +915,21 @@
    "saturated_groups": 0,
    "judge_candidate": "跨模式候选",
    "evidence_strength": "弱-塌缩",
+   "evidence_strength_legacy": "弱-塌缩",
+   "evidence_grade": "C",
+   "evidence_types": [
+    "像素实测",
+    "源码"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for x in json.load(open('tests/baselines/mode-A/judge-result.json',encoding='utf-8'))['modes'] if x['order']==12][0];g=list(m['groups'].values());print(m['ps_member'],'best_ratio',[(x['best_ref'] or {}).get('diff_ratio') for x in g],'best_max_delta',[(x['best_ref'] or {}).get('max_delta') for x in g],'ps_saturated',sum(1 for x in g if x['ps']['saturated']))\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": false,
    "collapse_class": "P1",
    "collapse_class_size": 13,
    "premise": "PS 侧模式塌缩：本类 13 个 PS 模式出同一张像素；0.00% 只证明「本口径下不可区分」",
    "s1_premise": "不依赖",
    "batch_verdict": "A：直接可映射",
-   "note": "与 Mltp 同哈希（塌缩类 P1）",
+   "note": "与 Mltp 同哈希（塌缩类 P1）；【103 分级】C：PS UI 无此模式（PS「纹理 > 模式」下拉实测仅 10 项，不含本项）。",
    "rationale": "同 order 2。",
    "changed_files": "src/brush_converter/mapping.py:67（新增 \"H   \": 0）"
   },
@@ -614,13 +951,21 @@
    "saturated_groups": 0,
    "judge_candidate": "跨模式候选",
    "evidence_strength": "弱-塌缩",
+   "evidence_strength_legacy": "弱-塌缩",
+   "evidence_grade": "C",
+   "evidence_types": [
+    "像素实测",
+    "源码"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for x in json.load(open('tests/baselines/mode-A/judge-result.json',encoding='utf-8'))['modes'] if x['order']==13][0];g=list(m['groups'].values());print(m['ps_member'],'best_ratio',[(x['best_ref'] or {}).get('diff_ratio') for x in g],'best_max_delta',[(x['best_ref'] or {}).get('max_delta') for x in g],'ps_saturated',sum(1 for x in g if x['ps']['saturated']))\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": false,
    "collapse_class": "P1",
    "collapse_class_size": 13,
    "premise": "PS 侧模式塌缩：本类 13 个 PS 模式出同一张像素；0.00% 只证明「本口径下不可区分」",
    "s1_premise": "不依赖",
    "batch_verdict": "A：直接可映射",
-   "note": "与 Mltp 同哈希（塌缩类 P1）",
+   "note": "与 Mltp 同哈希（塌缩类 P1）；【103 分级】C：PS UI 无此模式（PS「纹理 > 模式」下拉实测仅 10 项，不含本项）。",
    "rationale": "同 order 2。",
    "changed_files": "src/brush_converter/mapping.py:68（新增 \"Strt\": 0）"
   },
@@ -642,13 +987,21 @@
    "saturated_groups": 0,
    "judge_candidate": "跨模式候选",
    "evidence_strength": "弱-塌缩",
+   "evidence_strength_legacy": "弱-塌缩",
+   "evidence_grade": "C",
+   "evidence_types": [
+    "像素实测",
+    "源码"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for x in json.load(open('tests/baselines/mode-A/judge-result.json',encoding='utf-8'))['modes'] if x['order']==14][0];g=list(m['groups'].values());print(m['ps_member'],'best_ratio',[(x['best_ref'] or {}).get('diff_ratio') for x in g],'best_max_delta',[(x['best_ref'] or {}).get('max_delta') for x in g],'ps_saturated',sum(1 for x in g if x['ps']['saturated']))\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": false,
    "collapse_class": "P1",
    "collapse_class_size": 13,
    "premise": "PS 侧模式塌缩：本类 13 个 PS 模式出同一张像素；0.00% 只证明「本口径下不可区分」",
    "s1_premise": "不依赖",
    "batch_verdict": "A：直接可映射",
-   "note": "与 Mltp 同哈希（塌缩类 P1）",
+   "note": "与 Mltp 同哈希（塌缩类 P1）；【103 分级】C：PS UI 无此模式（PS「纹理 > 模式」下拉实测仅 10 项，不含本项）。",
    "rationale": "同 order 2。",
    "changed_files": "src/brush_converter/mapping.py:69（新增 \"Clr \": 0）"
   },
@@ -670,13 +1023,21 @@
    "saturated_groups": 0,
    "judge_candidate": "跨模式候选",
    "evidence_strength": "弱-塌缩",
+   "evidence_strength_legacy": "弱-塌缩",
+   "evidence_grade": "C",
+   "evidence_types": [
+    "像素实测",
+    "源码"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for x in json.load(open('tests/baselines/mode-A/judge-result.json',encoding='utf-8'))['modes'] if x['order']==15][0];g=list(m['groups'].values());print(m['ps_member'],'best_ratio',[(x['best_ref'] or {}).get('diff_ratio') for x in g],'best_max_delta',[(x['best_ref'] or {}).get('max_delta') for x in g],'ps_saturated',sum(1 for x in g if x['ps']['saturated']))\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": false,
    "collapse_class": "P1",
    "collapse_class_size": 13,
    "premise": "PS 侧模式塌缩：本类 13 个 PS 模式出同一张像素；0.00% 只证明「本口径下不可区分」",
    "s1_premise": "不依赖",
    "batch_verdict": "A：直接可映射",
-   "note": "与 Mltp 同哈希（塌缩类 P1）",
+   "note": "与 Mltp 同哈希（塌缩类 P1）；【103 分级】C：PS UI 无此模式（PS「纹理 > 模式」下拉实测仅 10 项，不含本项）。",
    "rationale": "同 order 2。",
    "changed_files": "src/brush_converter/mapping.py:70（新增 \"Lmns\": 0）"
   },
@@ -698,13 +1059,21 @@
    "saturated_groups": 0,
    "judge_candidate": "跨模式候选",
    "evidence_strength": "结构性+退化",
+   "evidence_strength_legacy": "结构性+退化",
+   "evidence_grade": "C",
+   "evidence_types": [
+    "像素实测",
+    "源码"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for x in json.load(open('tests/baselines/mode-B/judge-result.json',encoding='utf-8'))['modes'] if x['order']==16][0];g=list(m['groups'].values());print(m['ps_member'],'best_ratio',[(x['best_ref'] or {}).get('diff_ratio') for x in g],'best_max_delta',[(x['best_ref'] or {}).get('max_delta') for x in g],'ps_saturated',sum(1 for x in g if x['ps']['saturated']))\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": false,
    "collapse_class": "P6",
    "collapse_class_size": 4,
    "premise": "枚举无该成员 + 跨模式候选 0.00% 属 base=1 退化（不作等价证据）",
    "s1_premise": "不依赖",
    "batch_verdict": "B：结构性不可映射",
-   "note": "枚举无 EXCLUSION；vs Sbtr 的 0.00% 属 base=1 退化（Exclusion(1,t)≡Subtract(1,t)）",
+   "note": "枚举无 EXCLUSION；vs Sbtr 的 0.00% 属 base=1 退化（Exclusion(1,t)≡Subtract(1,t)）；【103 分级】C：PS UI 无此模式（PS「纹理 > 模式」下拉实测仅 10 项，不含本项）。",
    "rationale": "B 批用「16 成员无该成员 + 0.00% 属退化」判不可映射；37 保留，并把退化写进证据强度。",
    "changed_files": "不改（保留回退 Multiply(0) + 警告）"
   },
@@ -726,13 +1095,21 @@
    "saturated_groups": 6,
    "judge_candidate": "自有渲染",
    "evidence_strength": "弱-饱和",
+   "evidence_strength_legacy": "弱-饱和",
+   "evidence_grade": "B",
+   "evidence_types": [
+    "像素实测",
+    "源码"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for x in json.load(open('tests/baselines/mode-B/judge-result.json',encoding='utf-8'))['modes'] if x['order']==17][0];g=list(m['groups'].values());print(m['ps_member'],'ps_vs_krita_ratio',[(x['ps_vs_krita'] or {}).get('diff_ratio') for x in g],'max_delta',[(x['ps_vs_krita'] or {}).get('max_delta') for x in g],'ps_saturated',sum(1 for x in g if x['ps']['saturated']))\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": false,
    "collapse_class": "P3",
    "collapse_class_size": 12,
    "premise": "PS 真值 6/6 组饱和（u=1）；0.00% 只证明「不冲突」，不证明语义一致",
    "s1_premise": "不依赖",
    "batch_verdict": "B：直接可映射",
-   "note": "自有渲染 0.00%；两侧 6/6 饱和（判别力弱，B 批已声明）",
+   "note": "自有渲染 0.00%；两侧 6/6 饱和（判别力弱，B 批已声明）；【103 分级】B：PS UI 可见（下拉第 5 项「颜色减淡」）；依赖假设「PS 与 Krita 6/6 组同时饱和、像素不可区分时，按枚举成员存在 + 无冲突接受映射」，不能证明语义等价。",
    "rationale": "Krita 有 COLOR_DODGE(6)、已登记；PS 侧 6/6 组恒 255、Krita 侧同，0.00% 只证明不冲突。",
    "changed_files": "不改（v1.2.1 已登记 mapping.py:39）"
   },
@@ -754,13 +1131,21 @@
    "saturated_groups": 6,
    "judge_candidate": "自有渲染",
    "evidence_strength": "弱-饱和",
+   "evidence_strength_legacy": "弱-饱和",
+   "evidence_grade": "B",
+   "evidence_types": [
+    "像素实测",
+    "源码"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for x in json.load(open('tests/baselines/mode-B/judge-result.json',encoding='utf-8'))['modes'] if x['order']==18][0];g=list(m['groups'].values());print(m['ps_member'],'ps_vs_krita_ratio',[(x['ps_vs_krita'] or {}).get('diff_ratio') for x in g],'max_delta',[(x['ps_vs_krita'] or {}).get('max_delta') for x in g],'ps_saturated',sum(1 for x in g if x['ps']['saturated']))\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": false,
    "collapse_class": "P3",
    "collapse_class_size": 12,
    "premise": "PS 真值 6/6 组饱和（u=1）；0.00% 只证明「不冲突」，不证明语义一致",
    "s1_premise": "不依赖",
    "batch_verdict": "B：直接可映射",
-   "note": "自有渲染 0.00%；两侧 6/6 饱和",
+   "note": "自有渲染 0.00%；两侧 6/6 饱和；【103 分级】B：PS UI 可见（下拉第 6 项「颜色加深」）；依赖假设「PS 与 Krita 6/6 组同时饱和、像素不可区分时，按枚举成员存在 + 无冲突接受映射」，不能证明语义等价。",
    "rationale": "同 order 17。",
    "changed_files": "不改（v1.2.1 已登记 mapping.py:40）"
   },
@@ -782,13 +1167,22 @@
    "saturated_groups": 0,
    "judge_candidate": "无",
    "evidence_strength": "结构性+无真值",
+   "evidence_strength_legacy": "结构性+无真值",
+   "evidence_grade": "C",
+   "evidence_types": [
+    "源码",
+    "逆向动态",
+    "文档"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for b in json.load(open('docs/数据/mode-batch.json',encoding='utf-8'))['batches'] for x in b['members'] if x['order']==19][0];print(m['ps_member'],'ps_truth',m['ps_truth']['status'],'error',m['ps_truth']['images'][0]['error'])\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": null,
    "collapse_class": null,
    "collapse_class_size": null,
    "premise": "PS 侧产不出真值（落笔报错 / 枚举被忽略 / 不接受该值）；结论由枚举与静态证据支撑",
    "s1_premise": "不依赖",
    "batch_verdict": "B：不可映射（无 PS 可比真值）",
-   "note": "PS 落笔报错（jsx 提示「无法用于此版本」）；Krita 无 ADD",
+   "note": "PS 落笔报错（jsx 提示「无法用于此版本」）；Krita 无 ADD；【103 分级】C：PS UI 无此模式（PS「纹理 > 模式」下拉实测仅 10 项，不含本项）。",
    "rationale": "两侧都判否：PS 产不出真值 + Krita 16 成员无 ADD。",
    "changed_files": "不改（保留回退 Multiply(0) + 警告）"
   },
@@ -810,13 +1204,21 @@
    "saturated_groups": 0,
    "judge_candidate": "自有渲染",
    "evidence_strength": "强",
+   "evidence_strength_legacy": "强",
+   "evidence_grade": "A",
+   "evidence_types": [
+    "像素实测",
+    "源码"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for x in json.load(open('tests/baselines/mode-B/judge-result.json',encoding='utf-8'))['modes'] if x['order']==20][0];g=list(m['groups'].values());print(m['ps_member'],'ps_vs_krita_ratio',[(x['ps_vs_krita'] or {}).get('diff_ratio') for x in g],'max_delta',[(x['ps_vs_krita'] or {}).get('max_delta') for x in g],'ps_saturated',sum(1 for x in g if x['ps']['saturated']))\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": true,
    "collapse_class": "P6",
    "collapse_class_size": 4,
    "premise": "判据材料＝单笔尖满覆盖(base=1)+100% 倒相纹理+6 组参数；判定用自有 Krita 真机渲染，两侧非饱和",
    "s1_premise": "不依赖",
    "batch_verdict": "B：直接可映射",
-   "note": "自有渲染 6/6 组 0.00%/max≤1，非饱和（u=14..221）",
+   "note": "自有渲染 6/6 组 0.00%/max≤1，非饱和（u=14..221）；【103 分级】A：PS UI 可见（下拉第 2 项「减去」）；自有 Krita SUBTRACT 渲染 6/6 组 0.00%/max≤1 且非饱和（u=14..221），数字可复跑。",
    "rationale": "B 批判别力最强的一条：两侧非饱和、同模式渲染逐像素一致。",
    "changed_files": "不改（v1.2.1 已登记 mapping.py:34）"
   },
@@ -838,13 +1240,21 @@
    "saturated_groups": 6,
    "judge_candidate": "自有渲染",
    "evidence_strength": "需校准-边界残差",
+   "evidence_strength_legacy": "需校准-边界残差",
+   "evidence_grade": "A",
+   "evidence_types": [
+    "像素实测",
+    "源码"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for x in json.load(open('tests/baselines/mode-B/judge-result.json',encoding='utf-8'))['modes'] if x['order']==21][0];g=list(m['groups'].values());print(m['ps_member'],'ps_vs_krita_ratio',[(x['ps_vs_krita'] or {}).get('diff_ratio') for x in g],'max_delta',[(x['ps_vs_krita'] or {}).get('max_delta') for x in g],'ps_saturated',sum(1 for x in g if x['ps']['saturated']))\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": true,
    "collapse_class": "P3",
    "collapse_class_size": 12,
    "premise": "PS 真值与 Krita 自有渲染只差 103 px（掩码 T==1 的边界，src==0 处 Krita 给 0、PS 给 255）；转换侧无参数可修",
    "s1_premise": "条件成立",
    "batch_verdict": "B：需分模式校准",
-   "note": "仅 d100_b0_c0 差 103 px（掩码 T==1 边界），1.03% / max 255；转换侧无参数可修",
+   "note": "仅 d100_b0_c0 差 103 px（掩码 T==1 边界），1.03% / max 255；转换侧无参数可修；【103 分级】A：PS UI 可见（下拉第 8 项「实色混合」）；5/6 组 0.00%，d100_b0_c0 残差 103 px/1.03%/max255 可复跑，且已定位到 Krita 算子严格 > 边界。",
    "rationale": "5/6 组 0.00%，残差定位到 Krita 算子严格 > 边界（src==0 处 Krita 给 0、PS 给 255）。按判据 max_delta≤2 未达标 → 需校准；不判不可映射，因为 Krita 确有该模式。",
    "changed_files": "不改（v1.2.1 已登记 mapping.py:46）"
   },
@@ -866,13 +1276,21 @@
    "saturated_groups": 6,
    "judge_candidate": "自有渲染",
    "evidence_strength": "弱-饱和",
+   "evidence_strength_legacy": "弱-饱和",
+   "evidence_grade": "C",
+   "evidence_types": [
+    "像素实测",
+    "源码"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for x in json.load(open('tests/baselines/mode-B/judge-result.json',encoding='utf-8'))['modes'] if x['order']==22][0];g=list(m['groups'].values());print(m['ps_member'],'best_ratio',[(x['best_ref'] or {}).get('diff_ratio') for x in g],'best_max_delta',[(x['best_ref'] or {}).get('max_delta') for x in g],'ps_saturated',sum(1 for x in g if x['ps']['saturated']))\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": false,
    "collapse_class": "P3",
    "collapse_class_size": 12,
    "premise": "PS 真值 6/6 组饱和（u=1）；0.00% 只证明「不冲突」，不证明语义一致",
    "s1_premise": "不依赖",
    "batch_verdict": "B：直接可映射 → 转正",
-   "note": "自有渲染 0.00%；两侧 6/6 饱和；原回退 Multiply 差 96.11%–100%（映射缺失是实质错误）",
+   "note": "自有渲染 0.00%；两侧 6/6 饱和；原回退 Multiply 差 96.11%–100%（映射缺失是实质错误）；【103 分级】C：PS UI 无此模式（PS「纹理 > 模式」下拉实测仅 10 项，不含本项）。",
    "rationale": "8 号 LINEAR_DODGE 在 base=1 走饱和类（全 255），与 t 类完全不同 → 即使饱和也能证明「缺失映射是错的」。",
    "changed_files": "src/brush_converter/mapping.py:56（新增 \"linearDodge\": 8）"
   },
@@ -894,13 +1312,22 @@
    "saturated_groups": 0,
    "judge_candidate": "自有渲染",
    "evidence_strength": "弱-退化",
+   "evidence_strength_legacy": "弱-退化",
+   "evidence_grade": "B",
+   "evidence_types": [
+    "像素实测",
+    "源码",
+    "逆向静态"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for x in json.load(open('tests/baselines/mode-B/judge-result.json',encoding='utf-8'))['modes'] if x['order']==23][0];g=list(m['groups'].values());print(m['ps_member'],'ps_vs_krita_ratio',[(x['ps_vs_krita'] or {}).get('diff_ratio') for x in g],'max_delta',[(x['ps_vs_krita'] or {}).get('max_delta') for x in g],'ps_saturated',sum(1 for x in g if x['ps']['saturated']))\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": false,
    "collapse_class": "P1",
    "collapse_class_size": 13,
    "premise": "base=1 数学退化：多个 Krita 算子在本材料上同像素；0.00% 不构成语义等价证据",
    "s1_premise": "不依赖",
    "batch_verdict": "B：直接可映射 → 转正",
-   "note": "自有渲染 0.00%/max≤1，非饱和；但 9（LINEAR_BURN）与 0 在本材料逐像素相同",
+   "note": "自有渲染 0.00%/max≤1，非饱和；但 9（LINEAR_BURN）与 0 在本材料逐像素相同；【103 分级】B：PS UI 可见（下拉第 7 项「线性加深」）；依赖假设「base=1 退化使 Krita 9 与 0 在本材料逐像素相同，按 mode-ids 静态对应 LINEAR_BURN + 无冲突接受映射」，像素不提供区分力。",
    "rationale": "B 批已声明：转正依据 = 静态对应（mode-ids LINEAR_BURN）+ 无冲突证据，不是像素区分力。",
    "changed_files": "src/brush_converter/mapping.py:57（新增 \"linearBurn\": 9）"
   },
@@ -922,13 +1349,21 @@
    "saturated_groups": 0,
    "judge_candidate": "跨模式候选",
    "evidence_strength": "结构性",
+   "evidence_strength_legacy": "结构性",
+   "evidence_grade": "C",
+   "evidence_types": [
+    "像素实测",
+    "源码"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for x in json.load(open('tests/baselines/mode-B/judge-result.json',encoding='utf-8'))['modes'] if x['order']==24][0];g=list(m['groups'].values());print(m['ps_member'],'best_ratio',[(x['best_ref'] or {}).get('diff_ratio') for x in g],'best_max_delta',[(x['best_ref'] or {}).get('max_delta') for x in g],'ps_saturated',sum(1 for x in g if x['ps']['saturated']))\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": true,
    "collapse_class": "P7",
    "collapse_class_size": 1,
    "premise": "Krita TexturingMode 只有 16 个成员（0..15），枚举里无该成员；最近候选也超 2% 门槛",
    "s1_premise": "不依赖",
    "batch_verdict": "B：结构性不可映射",
-   "note": "枚举无 LINEAR_LIGHT；最近候选 7.24%–63.20%（6/6 超阈）",
+   "note": "枚举无 LINEAR_LIGHT；最近候选 7.24%–63.20%（6/6 超阈）；【103 分级】C：PS UI 无此模式（PS「纹理 > 模式」下拉实测仅 10 项，不含本项）。",
    "rationale": "有硬数字：最近候选连 2% 都进不去。",
    "changed_files": "不改（保留回退 Multiply(0) + 警告）"
   },
@@ -950,13 +1385,21 @@
    "saturated_groups": 5,
    "judge_candidate": "跨模式候选",
    "evidence_strength": "结构性+饱和",
+   "evidence_strength_legacy": "结构性+饱和",
+   "evidence_grade": "C",
+   "evidence_types": [
+    "像素实测",
+    "源码"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for x in json.load(open('tests/baselines/mode-B/judge-result.json',encoding='utf-8'))['modes'] if x['order']==25][0];g=list(m['groups'].values());print(m['ps_member'],'best_ratio',[(x['best_ref'] or {}).get('diff_ratio') for x in g],'best_max_delta',[(x['best_ref'] or {}).get('max_delta') for x in g],'ps_saturated',sum(1 for x in g if x['ps']['saturated']))\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": false,
    "collapse_class": "P8",
    "collapse_class_size": 1,
    "premise": "枚举无该成员（硬证据）+ PS 真值饱和（像素证据无判别力）",
    "s1_premise": "不依赖",
    "batch_verdict": "B：不可映射",
-   "note": "PS 真值 6/6 饱和（u=1..2）；枚举无 VIVID_LIGHT",
+   "note": "PS 真值 6/6 饱和（u=1..2）；枚举无 VIVID_LIGHT；【103 分级】C：PS UI 无此模式（PS「纹理 > 模式」下拉实测仅 10 项，不含本项）。",
    "rationale": "B 批判「不可映射（Krita 无成员；数值无判别力）」；37 保留，饱和只进证据强度。",
    "changed_files": "不改（保留回退 Multiply(0) + 警告）"
   },
@@ -978,13 +1421,21 @@
    "saturated_groups": 0,
    "judge_candidate": "跨模式候选",
    "evidence_strength": "结构性",
+   "evidence_strength_legacy": "结构性",
+   "evidence_grade": "C",
+   "evidence_types": [
+    "像素实测",
+    "源码"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for x in json.load(open('tests/baselines/mode-B/judge-result.json',encoding='utf-8'))['modes'] if x['order']==26][0];g=list(m['groups'].values());print(m['ps_member'],'best_ratio',[(x['best_ref'] or {}).get('diff_ratio') for x in g],'best_max_delta',[(x['best_ref'] or {}).get('max_delta') for x in g],'ps_saturated',sum(1 for x in g if x['ps']['saturated']))\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": true,
    "collapse_class": "P9",
    "collapse_class_size": 1,
    "premise": "Krita TexturingMode 只有 16 个成员（0..15），枚举里无该成员；最近候选也超 2% 门槛",
    "s1_premise": "不依赖",
    "batch_verdict": "B：结构性不可映射",
-   "note": "枚举无 PIN_LIGHT；最近候选 2.79%–62.84%",
+   "note": "枚举无 PIN_LIGHT；最近候选 2.79%–62.84%；【103 分级】C：PS UI 无此模式（PS「纹理 > 模式」下拉实测仅 10 项，不含本项）。",
    "rationale": "有硬数字；与 order 8（HrdL）数字巧合，因为两者 PS 真值几乎同分布（见 37 报告 §四-5）。",
    "changed_files": "不改（保留回退 Multiply(0) + 警告）"
   },
@@ -1006,13 +1457,22 @@
    "saturated_groups": 0,
    "judge_candidate": "跨模式候选",
    "evidence_strength": "弱-塌缩",
+   "evidence_strength_legacy": "弱-塌缩",
+   "evidence_grade": "C",
+   "evidence_types": [
+    "像素实测",
+    "源码",
+    "文档"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for x in json.load(open('tests/baselines/mode-B/judge-result.json',encoding='utf-8'))['modes'] if x['order']==27][0];g=list(m['groups'].values());print(m['ps_member'],'best_ratio',[(x['best_ref'] or {}).get('diff_ratio') for x in g],'best_max_delta',[(x['best_ref'] or {}).get('max_delta') for x in g],'ps_saturated',sum(1 for x in g if x['ps']['saturated']))\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": false,
    "collapse_class": "P1",
    "collapse_class_size": 13,
    "premise": "PS 侧模式塌缩：本类 13 个 PS 模式出同一张像素；0.00% 只证明「本口径下不可区分」",
    "s1_premise": "不依赖",
    "batch_verdict": "B：结构性不可映射（退化不可判读）",
-   "note": "与 order 0 是同一 PS 模式（33 的批次分配重复）；B 批判退化不作证据",
+   "note": "与 order 0 是同一 PS 模式（33 的批次分配重复）；B 批判退化不作证据；【103 分级】C：PS UI 无此模式（PS「纹理 > 模式」下拉实测仅 10 项，不含本项）。",
    "rationale": "Nrml 在 mode-batch.json 里出现两次（order 0 / 27），属批次分配缺陷；37 保留两行以对齐 47 行清单，但两行结论必须一致：可映射（退化），不声称语义等价。分配缺陷记入 37 报告 §五。",
    "changed_files": "不改（保留回退 Multiply(0) + 警告）"
   },
@@ -1034,13 +1494,22 @@
    "saturated_groups": 0,
    "judge_candidate": "无",
    "evidence_strength": "结构性+无真值",
+   "evidence_strength_legacy": "结构性+无真值",
+   "evidence_grade": "C",
+   "evidence_types": [
+    "源码",
+    "逆向静态",
+    "逆向动态"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for b in json.load(open('docs/数据/mode-batch.json',encoding='utf-8'))['batches'] for x in b['members'] if x['order']==28][0];print(m['ps_member'],'ps_truth',m['ps_truth']['status'],'mode_read',m['ps_truth']['images'][0]['mode_read'])\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": null,
    "collapse_class": null,
    "collapse_class_size": null,
    "premise": "PS 侧产不出真值（落笔报错 / 枚举被忽略 / 不接受该值）；结论由枚举与静态证据支撑",
    "s1_premise": "不依赖",
    "batch_verdict": "B：不可映射（无 PS 可比真值）",
-   "note": "PS 忽略该枚举值（回读停在上一模式）；Krita 无 REVERT",
+   "note": "PS 忽略该枚举值（回读停在上一模式）；Krita 无 REVERT；【103 分级】C：PS UI 无此模式（PS「纹理 > 模式」下拉实测仅 10 项，不含本项）。",
    "rationale": "PS 写不进 + Krita 无成员，两侧都否。",
    "changed_files": "不改（保留回退 Multiply(0) + 警告）"
   },
@@ -1062,13 +1531,22 @@
    "saturated_groups": 0,
    "judge_candidate": "无",
    "evidence_strength": "结构性+无真值",
+   "evidence_strength_legacy": "结构性+无真值",
+   "evidence_grade": "C",
+   "evidence_types": [
+    "源码",
+    "逆向静态",
+    "逆向动态"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for b in json.load(open('docs/数据/mode-batch.json',encoding='utf-8'))['batches'] for x in b['members'] if x['order']==29][0];print(m['ps_member'],'ps_truth',m['ps_truth']['status'],'mode_read',m['ps_truth']['images'][0]['mode_read'])\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": null,
    "collapse_class": null,
    "collapse_class_size": null,
    "premise": "PS 侧产不出真值（落笔报错 / 枚举被忽略 / 不接受该值）；结论由枚举与静态证据支撑",
    "s1_premise": "不依赖",
    "batch_verdict": "B：不可映射（无 PS 可比真值）",
-   "note": "真名 DdgS（SgdD 是 Ghidra 小端反序伪名）；PS 忽略伪名",
+   "note": "真名 DdgS（SgdD 是 Ghidra 小端反序伪名）；PS 忽略伪名；【103 分级】C：PS UI 无此模式（PS「纹理 > 模式」下拉实测仅 10 项，不含本项）。",
    "rationale": "mode-ids.json name_corrections：SgdD→DdgS，喂伪名被 PS 忽略；Krita 无该成员。",
    "changed_files": "不改（保留回退 Multiply(0) + 警告）"
   },
@@ -1090,13 +1568,22 @@
    "saturated_groups": 0,
    "judge_candidate": "无",
    "evidence_strength": "结构性+无真值",
+   "evidence_strength_legacy": "结构性+无真值",
+   "evidence_grade": "C",
+   "evidence_types": [
+    "源码",
+    "逆向静态",
+    "逆向动态"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for b in json.load(open('docs/数据/mode-batch.json',encoding='utf-8'))['batches'] for x in b['members'] if x['order']==30][0];print(m['ps_member'],'ps_truth',m['ps_truth']['status'],'mode_read',m['ps_truth']['images'][0]['mode_read'])\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": null,
    "collapse_class": null,
    "collapse_class_size": null,
    "premise": "PS 侧产不出真值（落笔报错 / 枚举被忽略 / 不接受该值）；结论由枚举与静态证据支撑",
    "s1_premise": "不依赖",
    "batch_verdict": "B：不可映射（无 PS 可比真值）",
-   "note": "真名 DdgM（反序伪名）；Krita 无该成员",
+   "note": "真名 DdgM（反序伪名）；Krita 无该成员；【103 分级】C：PS UI 无此模式（PS「纹理 > 模式」下拉实测仅 10 项，不含本项）。",
    "rationale": "同 order 29。",
    "changed_files": "不改（保留回退 Multiply(0) + 警告）"
   },
@@ -1118,13 +1605,22 @@
    "saturated_groups": 0,
    "judge_candidate": "无",
    "evidence_strength": "结构性+无真值",
+   "evidence_strength_legacy": "结构性+无真值",
+   "evidence_grade": "C",
+   "evidence_types": [
+    "源码",
+    "逆向静态",
+    "逆向动态"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for b in json.load(open('docs/数据/mode-batch.json',encoding='utf-8'))['batches'] for x in b['members'] if x['order']==31][0];print(m['ps_member'],'ps_truth',m['ps_truth']['status'],'mode_read',m['ps_truth']['images'][0]['mode_read'])\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": null,
    "collapse_class": null,
    "collapse_class_size": null,
    "premise": "PS 侧产不出真值（落笔报错 / 枚举被忽略 / 不接受该值）；结论由枚举与静态证据支撑",
    "s1_premise": "不依赖",
    "batch_verdict": "B：不可映射（无 PS 可比真值）",
-   "note": "真名 DdgH（反序伪名）；Krita 无该成员",
+   "note": "真名 DdgH（反序伪名）；Krita 无该成员；【103 分级】C：PS UI 无此模式（PS「纹理 > 模式」下拉实测仅 10 项，不含本项）。",
    "rationale": "同 order 29。",
    "changed_files": "不改（保留回退 Multiply(0) + 警告）"
   },
@@ -1146,13 +1642,22 @@
    "saturated_groups": 6,
    "judge_candidate": "跨模式候选",
    "evidence_strength": "结构性+饱和",
+   "evidence_strength_legacy": "结构性+饱和",
+   "evidence_grade": "C",
+   "evidence_types": [
+    "像素实测",
+    "源码",
+    "逆向动态"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for x in json.load(open('tests/baselines/mode-C/judge-result.json',encoding='utf-8'))['modes'] if x['order']==32][0];g=list(m['groups'].values());print(m['ps_member'],'best_ratio',[(x['best_ref'] or {}).get('diff_ratio') for x in g],'best_max_delta',[(x['best_ref'] or {}).get('max_delta') for x in g],'ps_saturated',sum(1 for x in g if x['ps']['saturated']))\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": false,
    "collapse_class": "P3",
    "collapse_class_size": 12,
    "premise": "枚举无该成员（硬证据）+ PS 真值饱和（像素证据无判别力）",
    "s1_premise": "不依赖",
    "batch_verdict": "C：结构性不可映射",
-   "note": "真名 BrnS；33 判 PS 失败实为枚举写法错，改名重出后真值 = 常量 255",
+   "note": "真名 BrnS；33 判 PS 失败实为枚举写法错，改名重出后真值 = 常量 255；【103 分级】C：PS UI 无此模式（PS「纹理 > 模式」下拉实测仅 10 项，不含本项）。",
    "rationale": "C 批纠正：33 用 stringID 伪名被 PS 忽略，charID 真名成功（读回 burnInS）。真值是常量图（纹理结构丢失）+ Krita 无 SATURATE/BURN 类成员 → 不可映射。",
    "changed_files": "不改（保留回退 Multiply(0) + 警告）"
   },
@@ -1174,13 +1679,22 @@
    "saturated_groups": 6,
    "judge_candidate": "跨模式候选",
    "evidence_strength": "结构性+饱和",
+   "evidence_strength_legacy": "结构性+饱和",
+   "evidence_grade": "C",
+   "evidence_types": [
+    "像素实测",
+    "源码",
+    "逆向动态"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for x in json.load(open('tests/baselines/mode-C/judge-result.json',encoding='utf-8'))['modes'] if x['order']==33][0];g=list(m['groups'].values());print(m['ps_member'],'best_ratio',[(x['best_ref'] or {}).get('diff_ratio') for x in g],'best_max_delta',[(x['best_ref'] or {}).get('max_delta') for x in g],'ps_saturated',sum(1 for x in g if x['ps']['saturated']))\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": false,
    "collapse_class": "P3",
    "collapse_class_size": 12,
    "premise": "枚举无该成员（硬证据）+ PS 真值饱和（像素证据无判别力）",
    "s1_premise": "不依赖",
    "batch_verdict": "C：结构性不可映射",
-   "note": "真名 BrnM；改名重出后真值 = 常量 255",
+   "note": "真名 BrnM；改名重出后真值 = 常量 255；【103 分级】C：PS UI 无此模式（PS「纹理 > 模式」下拉实测仅 10 项，不含本项）。",
    "rationale": "同 order 32。",
    "changed_files": "不改（保留回退 Multiply(0) + 警告）"
   },
@@ -1202,13 +1716,22 @@
    "saturated_groups": 6,
    "judge_candidate": "跨模式候选",
    "evidence_strength": "结构性",
+   "evidence_strength_legacy": "结构性",
+   "evidence_grade": "C",
+   "evidence_types": [
+    "像素实测",
+    "源码",
+    "逆向动态"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for x in json.load(open('tests/baselines/mode-C/judge-result.json',encoding='utf-8'))['modes'] if x['order']==34][0];g=list(m['groups'].values());print(m['ps_member'],'best_ratio',[(x['best_ref'] or {}).get('diff_ratio') for x in g],'best_max_delta',[(x['best_ref'] or {}).get('max_delta') for x in g],'ps_saturated',sum(1 for x in g if x['ps']['saturated']))\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": true,
    "collapse_class": "P10",
    "collapse_class_size": 1,
    "premise": "Krita TexturingMode 只有 16 个成员（0..15），枚举里无该成员；最近候选也超 2% 门槛",
    "s1_premise": "不依赖",
    "batch_verdict": "C：结构性不可映射",
-   "note": "真名 BrnH；PS 真值 = 常量 242/178/127；最佳替代 59.80%–97.82%",
+   "note": "真名 BrnH；PS 真值 = 常量 242/178/127；最佳替代 59.80%–97.82%；【103 分级】C：PS UI 无此模式（PS「纹理 > 模式」下拉实测仅 10 项，不含本项）。",
    "rationale": "改名重出后有真值：6/6 组常量图（纹理结构丢失），最近候选 59.80% 起步。",
    "changed_files": "不改（保留回退 Multiply(0) + 警告）"
   },
@@ -1230,13 +1753,22 @@
    "saturated_groups": 6,
    "judge_candidate": "跨模式候选",
    "evidence_strength": "结构性",
+   "evidence_strength_legacy": "结构性",
+   "evidence_grade": "C",
+   "evidence_types": [
+    "像素实测",
+    "源码",
+    "逆向动态"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for x in json.load(open('tests/baselines/mode-C/judge-result.json',encoding='utf-8'))['modes'] if x['order']==35][0];g=list(m['groups'].values());print(m['ps_member'],'best_ratio',[(x['best_ref'] or {}).get('diff_ratio') for x in g],'best_max_delta',[(x['best_ref'] or {}).get('max_delta') for x in g],'ps_saturated',sum(1 for x in g if x['ps']['saturated']))\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": true,
    "collapse_class": "P11",
    "collapse_class_size": 1,
    "premise": "Krita TexturingMode 只有 16 个成员（0..15），枚举里无该成员；最近候选也超 2% 门槛",
    "s1_premise": "不依赖",
    "batch_verdict": "C：结构性不可映射",
-   "note": "真名 Dstt；PS 真值 = 常量 249/217/192；最佳替代 65.40%–97.52%",
+   "note": "真名 Dstt；PS 真值 = 常量 249/217/192；最佳替代 65.40%–97.52%；【103 分级】C：PS UI 无此模式（PS「纹理 > 模式」下拉实测仅 10 项，不含本项）。",
    "rationale": "同 order 34。",
    "changed_files": "不改（保留回退 Multiply(0) + 警告）"
   },
@@ -1258,13 +1790,22 @@
    "saturated_groups": 6,
    "judge_candidate": "跨模式候选",
    "evidence_strength": "结构性+饱和",
+   "evidence_strength_legacy": "结构性+饱和",
+   "evidence_grade": "C",
+   "evidence_types": [
+    "像素实测",
+    "源码",
+    "逆向动态"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for x in json.load(open('tests/baselines/mode-C/judge-result.json',encoding='utf-8'))['modes'] if x['order']==36][0];g=list(m['groups'].values());print(m['ps_member'],'best_ratio',[(x['best_ref'] or {}).get('diff_ratio') for x in g],'best_max_delta',[(x['best_ref'] or {}).get('max_delta') for x in g],'ps_saturated',sum(1 for x in g if x['ps']['saturated']))\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": false,
    "collapse_class": "P3",
    "collapse_class_size": 12,
    "premise": "枚举无该成员（硬证据）+ PS 真值饱和（像素证据无判别力）",
    "s1_premise": "不依赖",
    "batch_verdict": "C：结构性不可映射",
-   "note": "PS 真值 = 常量 255；Krita 无 SATURATE",
+   "note": "PS 真值 = 常量 255；Krita 无 SATURATE；【103 分级】C：PS UI 无此模式（PS「纹理 > 模式」下拉实测仅 10 项，不含本项）。",
    "rationale": "枚举写法修正后真值仍是常量 255（PS 侧纹理未生效）+ Krita 无成员。",
    "changed_files": "不改（保留回退 Multiply(0) + 警告）"
   },
@@ -1286,13 +1827,21 @@
    "saturated_groups": 0,
    "judge_candidate": "跨模式候选",
    "evidence_strength": "弱-塌缩",
+   "evidence_strength_legacy": "弱-塌缩",
+   "evidence_grade": "C",
+   "evidence_types": [
+    "像素实测",
+    "源码"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for x in json.load(open('tests/baselines/mode-C/judge-result.json',encoding='utf-8'))['modes'] if x['order']==37][0];g=list(m['groups'].values());print(m['ps_member'],'best_ratio',[(x['best_ref'] or {}).get('diff_ratio') for x in g],'best_max_delta',[(x['best_ref'] or {}).get('max_delta') for x in g],'ps_saturated',sum(1 for x in g if x['ps']['saturated']))\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": false,
    "collapse_class": "P1",
    "collapse_class_size": 13,
    "premise": "PS 侧模式塌缩：本类 13 个 PS 模式出同一张像素；0.00% 只证明「本口径下不可区分」",
    "s1_premise": "不依赖",
    "batch_verdict": "C：可直接映射 → Multiply(0)",
-   "note": "与 Mltp 同哈希（塌缩类 P1）；登记 passThrough=0",
+   "note": "与 Mltp 同哈希（塌缩类 P1）；登记 passThrough=0；【103 分级】C：PS UI 无此模式（PS「纹理 > 模式」下拉实测仅 10 项，不含本项）。",
    "rationale": "PS 真值与 Mltp 真值逐像素相同 → 映射 0 后 0.00%；塌缩口径下不能声称语义等价。",
    "changed_files": "src/brush_converter/mapping.py:80（新增 \"passThrough\": 0）"
   },
@@ -1314,13 +1863,22 @@
    "saturated_groups": 4,
    "judge_candidate": "自有渲染",
    "evidence_strength": "中",
+   "evidence_strength_legacy": "中",
+   "evidence_grade": "B",
+   "evidence_types": [
+    "像素实测",
+    "源码",
+    "文档"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for x in json.load(open('tests/baselines/mode-C/judge-result.json',encoding='utf-8'))['modes'] if x['order']==38][0];g=list(m['groups'].values());print(m['ps_member'],'ps_vs_krita_ratio',[(x['ps_vs_krita'] or {}).get('diff_ratio') for x in g],'max_delta',[(x['ps_vs_krita'] or {}).get('max_delta') for x in g],'ps_saturated',sum(1 for x in g if x['ps']['saturated']))\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": false,
    "collapse_class": "P12",
    "collapse_class_size": 2,
    "premise": "判据材料＝单笔尖满覆盖(base=1)+100% 倒相纹理+6 组参数；判定用自有 Krita 真机渲染，但部分组两侧饱和（只有非饱和组有判别力）",
    "s1_premise": "条件成立",
    "batch_verdict": "C：直接可映射（达标）",
-   "note": "自有渲染 0.00%/max2（判读只看 d10 两档）；与 39 在本口径不可区分",
+   "note": "自有渲染 0.00%/max2（判读只看 d10 两档）；与 39 在本口径不可区分；【103 分级】B：PS UI 可见（下拉第 10 项「高度」）；依赖假设「s=1（满覆盖、100% 深度）前提成立；d60/d100 两侧饱和，仅 d10 两档可判且 max_delta=2 压线；Krita 14 与 15 不可区分」。",
    "rationale": "height/linearHeight 两侧都逐像素不可区分（Krita 14 与 15 渲染 max Δ=0）→ 本行只能证明「映射到 14 与 PS 一致」，不能证明 14 比 15 更准。",
    "changed_files": "不改（v1.2.1 已登记 mapping.py:50）"
   },
@@ -1342,13 +1900,22 @@
    "saturated_groups": 4,
    "judge_candidate": "自有渲染",
    "evidence_strength": "中",
+   "evidence_strength_legacy": "中",
+   "evidence_grade": "B",
+   "evidence_types": [
+    "像素实测",
+    "源码",
+    "文档"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for x in json.load(open('tests/baselines/mode-C/judge-result.json',encoding='utf-8'))['modes'] if x['order']==39][0];g=list(m['groups'].values());print(m['ps_member'],'ps_vs_krita_ratio',[(x['ps_vs_krita'] or {}).get('diff_ratio') for x in g],'max_delta',[(x['ps_vs_krita'] or {}).get('max_delta') for x in g],'ps_saturated',sum(1 for x in g if x['ps']['saturated']))\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": false,
    "collapse_class": "P12",
    "collapse_class_size": 2,
    "premise": "判据材料＝单笔尖满覆盖(base=1)+100% 倒相纹理+6 组参数；判定用自有 Krita 真机渲染，但部分组两侧饱和（只有非饱和组有判别力）",
    "s1_premise": "条件成立",
    "batch_verdict": "C：直接可映射（达标）",
-   "note": "自有渲染 0.00%/max2；按 Krita 枚举 15 登记，与 14 不可区分",
+   "note": "自有渲染 0.00%/max2；按 Krita 枚举 15 登记，与 14 不可区分；【103 分级】B：PS UI 可见（下拉第 9 项「线性高度」）；依赖假设「s=1（满覆盖、100% 深度）前提成立；d60/d100 两侧饱和，仅 d10 两档可判且 max_delta=2 压线；Krita 15 与 14 不可区分」。",
    "rationale": "C 批明确：不能据此断言 15 比 14 准；37 改成「两者在当前口径下不可区分，按 Krita 枚举 14/15 分别登记」。",
    "changed_files": "不改（v1.2.1 已登记 mapping.py:49）"
   },
@@ -1370,13 +1937,21 @@
    "saturated_groups": 0,
    "judge_candidate": "跨模式候选",
    "evidence_strength": "弱-塌缩",
+   "evidence_strength_legacy": "弱-塌缩",
+   "evidence_grade": "C",
+   "evidence_types": [
+    "像素实测",
+    "源码"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for x in json.load(open('tests/baselines/mode-C/judge-result.json',encoding='utf-8'))['modes'] if x['order']==40][0];g=list(m['groups'].values());print(m['ps_member'],'best_ratio',[(x['best_ref'] or {}).get('diff_ratio') for x in g],'best_max_delta',[(x['best_ref'] or {}).get('max_delta') for x in g],'ps_saturated',sum(1 for x in g if x['ps']['saturated']))\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": false,
    "collapse_class": "P1",
    "collapse_class_size": 13,
    "premise": "PS 侧模式塌缩：本类 13 个 PS 模式出同一张像素；0.00% 只证明「本口径下不可区分」",
    "s1_premise": "不依赖",
    "batch_verdict": "C：可直接映射 → Multiply(0)",
-   "note": "与 Mltp 同哈希（塌缩类 P1）",
+   "note": "与 Mltp 同哈希（塌缩类 P1）；【103 分级】C：PS UI 无此模式（PS「纹理 > 模式」下拉实测仅 10 项，不含本项）。",
    "rationale": "同 order 37。",
    "changed_files": "src/brush_converter/mapping.py:81（新增 \"lighterColor\": 0）"
   },
@@ -1398,13 +1973,21 @@
    "saturated_groups": 0,
    "judge_candidate": "跨模式候选",
    "evidence_strength": "弱-塌缩",
+   "evidence_strength_legacy": "弱-塌缩",
+   "evidence_grade": "C",
+   "evidence_types": [
+    "像素实测",
+    "源码"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for x in json.load(open('tests/baselines/mode-C/judge-result.json',encoding='utf-8'))['modes'] if x['order']==41][0];g=list(m['groups'].values());print(m['ps_member'],'best_ratio',[(x['best_ref'] or {}).get('diff_ratio') for x in g],'best_max_delta',[(x['best_ref'] or {}).get('max_delta') for x in g],'ps_saturated',sum(1 for x in g if x['ps']['saturated']))\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": false,
    "collapse_class": "P1",
    "collapse_class_size": 13,
    "premise": "PS 侧模式塌缩：本类 13 个 PS 模式出同一张像素；0.00% 只证明「本口径下不可区分」",
    "s1_premise": "不依赖",
    "batch_verdict": "C：可直接映射 → Multiply(0)",
-   "note": "与 Mltp 同哈希（塌缩类 P1）",
+   "note": "与 Mltp 同哈希（塌缩类 P1）；【103 分级】C：PS UI 无此模式（PS「纹理 > 模式」下拉实测仅 10 项，不含本项）。",
    "rationale": "同 order 37。",
    "changed_files": "src/brush_converter/mapping.py:82（新增 \"darkerColor\": 0）"
   },
@@ -1426,13 +2009,21 @@
    "saturated_groups": 0,
    "judge_candidate": "跨模式候选",
    "evidence_strength": "中",
+   "evidence_strength_legacy": "中",
+   "evidence_grade": "C",
+   "evidence_types": [
+    "像素实测",
+    "源码"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for x in json.load(open('tests/baselines/mode-C/judge-result.json',encoding='utf-8'))['modes'] if x['order']==42][0];g=list(m['groups'].values());print(m['ps_member'],'best_ratio',[(x['best_ref'] or {}).get('diff_ratio') for x in g],'best_max_delta',[(x['best_ref'] or {}).get('max_delta') for x in g],'ps_saturated',sum(1 for x in g if x['ps']['saturated']))\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": true,
    "collapse_class": "P6",
    "collapse_class_size": 4,
    "premise": "判据材料＝单笔尖满覆盖(base=1)+100% 倒相纹理+6 组参数；判定用跨模式真机候选（两侧非饱和）",
    "s1_premise": "不依赖",
    "batch_verdict": "C：可直接映射 → Subtract(1)",
-   "note": "PS 真值与 Sbtr 同哈希；旧代码回退 Multiply 属映射错误，本批修正",
+   "note": "PS 真值与 Sbtr 同哈希；旧代码回退 Multiply 属映射错误，本批修正；【103 分级】C：PS UI 无此模式（PS「纹理 > 模式」下拉实测仅 10 项，不含本项）。",
    "rationale": "唯一「原来映射错」的：PS 的 blendSubtraction 真值 ≡ Sbtr 真值，映射到 1 后 6/6 组 0.00%。",
    "changed_files": "src/brush_converter/mapping.py:86（新增 \"blendSubtraction\": 1）"
   },
@@ -1454,13 +2045,21 @@
    "saturated_groups": 6,
    "judge_candidate": "跨模式候选",
    "evidence_strength": "结构性+饱和",
+   "evidence_strength_legacy": "结构性+饱和",
+   "evidence_grade": "C",
+   "evidence_types": [
+    "像素实测",
+    "源码"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=[x for x in json.load(open('tests/baselines/mode-C/judge-result.json',encoding='utf-8'))['modes'] if x['order']==43][0];g=list(m['groups'].values());print(m['ps_member'],'best_ratio',[(x['best_ref'] or {}).get('diff_ratio') for x in g],'best_max_delta',[(x['best_ref'] or {}).get('max_delta') for x in g],'ps_saturated',sum(1 for x in g if x['ps']['saturated']))\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": false,
    "collapse_class": "P3",
    "collapse_class_size": 12,
    "premise": "枚举无该成员（硬证据）+ PS 真值饱和（像素证据无判别力）",
    "s1_premise": "不依赖",
    "batch_verdict": "C：结构性不可映射",
-   "note": "PS 真值 6/6 饱和（恒 255）；Krita 无 DIVIDE",
+   "note": "PS 真值 6/6 饱和（恒 255）；Krita 无 DIVIDE；【103 分级】C：PS UI 无此模式（PS「纹理 > 模式」下拉实测仅 10 项，不含本项）。",
    "rationale": "PS 侧纹理未进入笔迹（常量 255）+ Krita 无成员。",
    "changed_files": "不改（保留回退 Multiply(0) + 警告）"
   },
@@ -1482,13 +2081,23 @@
    "saturated_groups": 0,
    "judge_candidate": "无",
    "evidence_strength": "结构性+无真值",
+   "evidence_strength_legacy": "结构性+无真值",
+   "evidence_grade": "C",
+   "evidence_types": [
+    "源码",
+    "逆向静态",
+    "逆向动态",
+    "推断"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=json.load(open('docs/数据/mode-ids.json',encoding='utf-8'))['modes'][44];print(m['ps_member'],'runtime_id',m['runtime_id'],'status',m['status'],'jsx',m['jsx_readback'])\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": null,
    "collapse_class": null,
    "collapse_class_size": null,
    "premise": "PS 侧产不出真值（落笔报错 / 枚举被忽略 / 不接受该值）；结论由枚举与静态证据支撑",
    "s1_premise": "不依赖",
    "batch_verdict": "C：结构性不可映射（无 PS 可比真值）",
-   "note": "PS 不接受该枚举值（回读停在上一模式）；Krita 2 保留、无 PS 依据",
+   "note": "PS 不接受该枚举值（回读停在上一模式）；Krita 2 保留、无 PS 依据；【103 分级】C：PS UI 无此模式（PS「纹理 > 模式」下拉实测仅 10 项，不含本项）。",
    "rationale": "mode-ids：PS 两张模式表都没有 Lght，ABR 值域出现 0 次；Krita 侧 6/6 组自身也退化成常量。",
    "changed_files": "不改（保留回退 Multiply(0) + 警告）"
   },
@@ -1510,13 +2119,23 @@
    "saturated_groups": 0,
    "judge_candidate": "无",
    "evidence_strength": "结构性+无真值",
+   "evidence_strength_legacy": "结构性+无真值",
+   "evidence_grade": "C",
+   "evidence_types": [
+    "源码",
+    "逆向静态",
+    "逆向动态",
+    "推断"
+   ],
+   "recheck_cmd": "PYTHONIOENCODING=utf-8 python -c \"import json;m=json.load(open('docs/数据/mode-ids.json',encoding='utf-8'))['modes'][45];print(m['ps_member'],'runtime_id',m['runtime_id'],'status',m['status'],'jsx',m['jsx_readback'])\"",
+   "recheck_at": "2026-11-20",
    "distinguishable": null,
    "collapse_class": null,
    "collapse_class_size": null,
    "premise": "PS 侧产不出真值（落笔报错 / 枚举被忽略 / 不接受该值）；结论由枚举与静态证据支撑",
    "s1_premise": "不依赖",
    "batch_verdict": "C：结构性不可映射（无 PS 可比真值）",
-   "note": "PS 不接受该枚举值；Krita 3 保留（GRADIENT 在预设里静默回退 SUBTRACT）",
+   "note": "PS 不接受该枚举值；Krita 3 保留（GRADIENT 在预设里静默回退 SUBTRACT）；【103 分级】C：PS UI 无此模式（PS「纹理 > 模式」下拉实测仅 10 项，不含本项）。",
    "rationale": "同 order 44；另加 kis_texture_option.cpp:74-76 的 GRADIENT→SUBTRACT 回退。",
    "changed_files": "不改（保留回退 Multiply(0) + 警告）"
   },
@@ -1538,13 +2157,23 @@
    "saturated_groups": 0,
    "judge_candidate": "无",
    "evidence_strength": "结构性+无真值",
+   "evidence_strength_legacy": "结构性+无真值",
+   "evidence_grade": "C",
+   "evidence_types": [
+    "源码",
+    "逆向静态",
+    "逆向动态",
+    "推断"
+   ],
+   "recheck_cmd": "暂无（待任务 104）",
+   "recheck_at": "2026-11-20",
    "distinguishable": null,
    "collapse_class": null,
    "collapse_class_size": null,
    "premise": "PS 侧产不出真值（落笔报错 / 枚举被忽略 / 不接受该值）；结论由枚举与静态证据支撑",
    "s1_premise": "不依赖",
    "batch_verdict": "C：结构性不可映射（无 PS 可比真值）",
-   "note": "PS 不接受该枚举值；Krita 11 保留（5 字符名，charID 只收 4 字符）",
+   "note": "PS 不接受该枚举值；Krita 11 保留（5 字符名，charID 只收 4 字符）；【103 分级】C：PS UI 无此模式（PS「纹理 > 模式」下拉实测仅 10 项，不含本项）。",
    "rationale": "同 order 44。",
    "changed_files": "不改（保留回退 Multiply(0) + 警告）"
   }
