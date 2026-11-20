@@ -9,10 +9,21 @@ sys.path 引导现位于 gui/__init__.py（打包后指向不存在的 src/，�
 """
 block_cipher = None
 
+# v1.3.1 打包修复：同 brushconverter-cli.spec —— 显式收集 libexpat.dll，
+# 否则打包后 GUI/CLI 的转换路径（xml.etree.ElementTree）会因 pyexpat 加载失败而崩溃。
+import sys as _sys
+from pathlib import Path as _Path
+
+_EXPAT_DLL_CANDIDATES = [
+    _Path(_sys.prefix) / "Library" / "bin" / "libexpat.dll",
+    _Path(_sys.prefix) / "DLLs" / "libexpat.dll",
+]
+binaries = [(str(p), ".") for p in _EXPAT_DLL_CANDIDATES if p.is_file()]
+
 a = Analysis(
     ['brushConverter_gui_entry.py'],
     pathex=['.', 'src'],
-    binaries=[],
+    binaries=binaries,
     datas=[],
     hiddenimports=[
         'PySide6.QtCore',
