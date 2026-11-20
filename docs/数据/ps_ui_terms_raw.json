@@ -1,0 +1,561 @@
+{
+  "schema_version": "1.0",
+  "generated_by": "tools/extract_ui_terms.py",
+  "source_file": "<LOCAL_APP_DIR>\\PS2025\\Adobe Photoshop 2025\\Locales\\zh_CN\\Support Files\\tw10428_Photoshop_zh_CN.dat",
+  "encoding_guess": "UTF-16LE（BOM FF FE，已去 BOM）",
+  "total_chinese_strings": 35021,
+  "terms": [
+    {
+      "term": "亮度",
+      "category": "control",
+      "matched_expected": "亮度",
+      "offset": 546,
+      "string_index": 15,
+      "raw": "\"$$$/CRaw/AETE/Brightness=亮度\""
+    },
+    {
+      "term": "对比度",
+      "category": "control",
+      "matched_expected": "对比度",
+      "offset": 1408,
+      "string_index": 34,
+      "raw": "\"$$$/CRaw/AETE/Contrast=对比度\""
+    },
+    {
+      "term": "深度",
+      "category": "control",
+      "matched_expected": "深度",
+      "offset": 2211,
+      "string_index": 56,
+      "raw": "\"$$$/CRaw/AETE/Depth=深度\""
+    },
+    {
+      "term": "关",
+      "category": "value",
+      "matched_expected": "关",
+      "offset": 6335,
+      "string_index": 156,
+      "raw": "\"$$$/CRaw/AETE/ResizeToFit/Off=关\""
+    },
+    {
+      "term": "大小",
+      "category": "control",
+      "matched_expected": "大小",
+      "offset": 7565,
+      "string_index": 187,
+      "raw": "\"$$$/CRaw/AETE/Size=大小\""
+    },
+    {
+      "term": "纹理",
+      "category": "tab",
+      "matched_expected": "纹理",
+      "offset": 7894,
+      "string_index": 195,
+      "raw": "\"$$$/CRaw/AETE/Texture=纹理\""
+    },
+    {
+      "term": "颜色",
+      "category": "value",
+      "matched_expected": "颜色",
+      "offset": 17038,
+      "string_index": 382,
+      "raw": "\"$$$/AETE/Common/Color=颜色\""
+    },
+    {
+      "term": "随机",
+      "category": "value",
+      "matched_expected": "随机",
+      "offset": 17206,
+      "string_index": 387,
+      "raw": "\"$$$/AETE/Extrude/Random=随机\""
+    },
+    {
+      "term": "模式",
+      "category": "control",
+      "matched_expected": "模式",
+      "offset": 17966,
+      "string_index": 407,
+      "raw": "\"$$$/AETE/SmartBlur/Mode=模式\""
+    },
+    {
+      "term": "缩放",
+      "category": "control",
+      "matched_expected": "缩放",
+      "offset": 49953,
+      "string_index": 945,
+      "raw": "\"$$$/AdobePlugin/Shared/Scaling=缩放\""
+    },
+    {
+      "term": "最小",
+      "category": "control",
+      "matched_expected": "最小",
+      "offset": 53659,
+      "string_index": 1023,
+      "raw": "\"$$$/AdobePlugin/Wave/Min=最小\""
+    },
+    {
+      "term": "方向",
+      "category": "value",
+      "matched_expected": "方向",
+      "offset": 54528,
+      "string_index": 1043,
+      "raw": "\"$$$/AdobePlugin/Wind/Direction=方向\""
+    },
+    {
+      "term": "画笔大小",
+      "category": "control",
+      "matched_expected": "画笔大小",
+      "offset": 61613,
+      "string_index": 1202,
+      "raw": "\"$$$/DryBrush/String202/BrushSize=画笔大小\""
+    },
+    {
+      "term": "压力",
+      "category": "control",
+      "matched_expected": "压力",
+      "offset": 106823,
+      "string_index": 1998,
+      "raw": "\"$$$/Liquify/BrushPane/BrushPressure=压力:\""
+    },
+    {
+      "term": "数量",
+      "category": "control",
+      "matched_expected": "数量",
+      "offset": 109311,
+      "string_index": 2052,
+      "raw": "\"$$$/Liquify/FilterDialog/Amount=数量\""
+    },
+    {
+      "term": "平滑",
+      "category": "checkbox",
+      "matched_expected": "平滑",
+      "offset": 111731,
+      "string_index": 2106,
+      "raw": "\"$$$/Liquify/ReconPane/Mode/Smooth=平滑\""
+    },
+    {
+      "term": "圆度",
+      "category": "control",
+      "matched_expected": "圆度",
+      "offset": 118699,
+      "string_index": 2255,
+      "raw": "\"$$$/MeasurementCorePlugin/DataPoint/Circularity/AbbreviatedName=圆度\""
+    },
+    {
+      "term": "旋转",
+      "category": "control",
+      "matched_expected": "旋转",
+      "offset": 127197,
+      "string_index": 2405,
+      "raw": "\"$$$/PlugIn/RadialBlur/Actions/enumSpin=旋转\""
+    },
+    {
+      "term": "杂色",
+      "category": "checkbox",
+      "matched_expected": "杂色",
+      "offset": 132489,
+      "string_index": 2492,
+      "raw": "\"$$$/Project/Bokeh/Dialog/Noise=杂色\""
+    },
+    {
+      "term": "连续",
+      "category": "value",
+      "matched_expected": "连续",
+      "offset": 159153,
+      "string_index": 2969,
+      "raw": "\"$$$/Project/Jp2k/Dialog/Order/Popup/PRogressive=连续\""
+    },
+    {
+      "term": "预览",
+      "category": "control",
+      "matched_expected": "预览",
+      "offset": 160917,
+      "string_index": 2988,
+      "raw": "\"$$$/Project/Jp2k/Dialog/Preview/PreviewButton=预览\""
+    },
+    {
+      "term": "硬度",
+      "category": "control",
+      "matched_expected": "硬度",
+      "offset": 195006,
+      "string_index": 3488,
+      "raw": "\"$$$/VanishingPoint/optionsbar/brush/hardness/label=硬度:\""
+    },
+    {
+      "term": "角度",
+      "category": "control",
+      "matched_expected": "角度",
+      "offset": 197296,
+      "string_index": 3525,
+      "raw": "\"$$$/VanishingPoint/optionsbar/shared/planeangle/label=角度:\""
+    },
+    {
+      "term": "喷枪",
+      "category": "checkbox",
+      "matched_expected": "喷枪",
+      "offset": 289545,
+      "string_index": 5252,
+      "raw": "\"$$$/Presets/Groups/Airbrushes=喷枪\""
+    },
+    {
+      "term": "反相",
+      "category": "control",
+      "matched_expected": "反相",
+      "offset": 492151,
+      "string_index": 8795,
+      "raw": "\"$$$/Actions/Class/Invert=反相\""
+    },
+    {
+      "term": "渐隐",
+      "category": "value",
+      "matched_expected": "渐隐",
+      "offset": 493914,
+      "string_index": 8836,
+      "raw": "\"$$$/Actions/Class/OpacityDissolveTransition=渐隐\""
+    },
+    {
+      "term": "间距",
+      "category": "control",
+      "matched_expected": "间距",
+      "offset": 603268,
+      "string_index": 11204,
+      "raw": "\"$$$/Actions/Key/Brush/Spacing=间距\""
+    },
+    {
+      "term": "控制",
+      "category": "control",
+      "matched_expected": "控制",
+      "offset": 610693,
+      "string_index": 11379,
+      "raw": "\"$$$/Actions/Key/Control=控制\""
+    },
+    {
+      "term": "初始方向",
+      "category": "value",
+      "matched_expected": "初始方向",
+      "offset": 739255,
+      "string_index": 14064,
+      "raw": "\"$$$/BrushDynamics/InitialDirection=初始方向\""
+    },
+    {
+      "term": "钢笔压力",
+      "category": "value",
+      "matched_expected": "钢笔压力",
+      "offset": 739324,
+      "string_index": 14066,
+      "raw": "\"$$$/BrushDynamics/PenPressureItem=钢笔压力\""
+    },
+    {
+      "term": "钢笔斜度",
+      "category": "value",
+      "matched_expected": "钢笔斜度",
+      "offset": 739362,
+      "string_index": 14067,
+      "raw": "\"$$$/BrushDynamics/PenTiltItem=钢笔斜度\""
+    },
+    {
+      "term": "光笔轮",
+      "category": "value",
+      "matched_expected": "光笔轮",
+      "offset": 739463,
+      "string_index": 14070,
+      "raw": "\"$$$/BrushDynamics/StylusWheel=光笔轮\""
+    },
+    {
+      "term": "建立",
+      "category": "checkbox",
+      "matched_expected": "喷枪",
+      "offset": 740610,
+      "string_index": 14094,
+      "raw": "\"$$$/BrushStylerIndex/AirbrushBuildup=建立\""
+    },
+    {
+      "term": "画笔笔势",
+      "category": "tab",
+      "matched_expected": "画笔姿势",
+      "offset": 740647,
+      "string_index": 14095,
+      "raw": "\"$$$/BrushStylerIndex/BrushPose=画笔笔势\""
+    },
+    {
+      "term": "画笔笔尖形状",
+      "category": "tab",
+      "matched_expected": "画笔笔尖形状",
+      "offset": 740690,
+      "string_index": 14096,
+      "raw": "\"$$$/BrushStylerIndex/BrushTipShape=画笔笔尖形状\""
+    },
+    {
+      "term": "颜色动态",
+      "category": "tab",
+      "matched_expected": "颜色动态",
+      "offset": 740735,
+      "string_index": 14097,
+      "raw": "\"$$$/BrushStylerIndex/ColorDynamics=颜色动态\""
+    },
+    {
+      "term": "双重画笔",
+      "category": "tab",
+      "matched_expected": "双重画笔",
+      "offset": 740774,
+      "string_index": 14098,
+      "raw": "\"$$$/BrushStylerIndex/DualBrush=双重画笔\""
+    },
+    {
+      "term": "保护纹理",
+      "category": "checkbox",
+      "matched_expected": "保护纹理",
+      "offset": 740851,
+      "string_index": 14100,
+      "raw": "\"$$$/BrushStylerIndex/ProtectTexture=保护纹理\""
+    },
+    {
+      "term": "散布",
+      "category": "tab",
+      "matched_expected": "散布",
+      "offset": 740891,
+      "string_index": 14101,
+      "raw": "\"$$$/BrushStylerIndex/Scattering=散布\""
+    },
+    {
+      "term": "形状动态",
+      "category": "tab",
+      "matched_expected": "形状动态",
+      "offset": 740932,
+      "string_index": 14102,
+      "raw": "\"$$$/BrushStylerIndex/ShapeDynamics=形状动态\""
+    },
+    {
+      "term": "传递",
+      "category": "tab",
+      "matched_expected": "传递",
+      "offset": 741042,
+      "string_index": 14105,
+      "raw": "\"$$$/BrushStylerIndex/Transfer=传递\""
+    },
+    {
+      "term": "湿边",
+      "category": "checkbox",
+      "matched_expected": "湿边",
+      "offset": 741078,
+      "string_index": 14106,
+      "raw": "\"$$$/BrushStylerIndex/WetEdges=湿边\""
+    },
+    {
+      "term": "拖移",
+      "category": "value",
+      "matched_expected": "拖移",
+      "offset": 803355,
+      "string_index": 15165,
+      "raw": "\"$$$/Commands/DragIntoView=拖移\""
+    },
+    {
+      "term": "角度抖动",
+      "category": "control",
+      "matched_expected": "角度抖动",
+      "offset": 925338,
+      "string_index": 17447,
+      "raw": "\"$$$/Dialog/BrushOptions/AngleJitter=角度抖动\""
+    },
+    {
+      "term": "两轴",
+      "category": "control",
+      "matched_expected": "两轴",
+      "offset": 925379,
+      "string_index": 17448,
+      "raw": "\"$$$/Dialog/BrushOptions/BothAxes=两轴\""
+    },
+    {
+      "term": "亮度抖动",
+      "category": "control",
+      "matched_expected": "亮度抖动",
+      "offset": 925426,
+      "string_index": 17449,
+      "raw": "\"$$$/Dialog/BrushOptions/BrightnessJitter=亮度抖动\""
+    },
+    {
+      "term": "前景/背景抖动",
+      "category": "control",
+      "matched_expected": "前景/背景抖动",
+      "offset": 925470,
+      "string_index": 17450,
+      "raw": "\"$$$/Dialog/BrushOptions/ColorJitter=前景/背景抖动\""
+    },
+    {
+      "term": "数量抖动",
+      "category": "control",
+      "matched_expected": "数量抖动",
+      "offset": 925517,
+      "string_index": 17451,
+      "raw": "\"$$$/Dialog/BrushOptions/CountJitter=数量抖动\""
+    },
+    {
+      "term": "深度抖动",
+      "category": "control",
+      "matched_expected": "深度抖动",
+      "offset": 925561,
+      "string_index": 17452,
+      "raw": "\"$$$/Dialog/BrushOptions/DepthJitter=深度抖动\""
+    },
+    {
+      "term": "流量抖动",
+      "category": "control",
+      "matched_expected": "流量抖动",
+      "offset": 925646,
+      "string_index": 17454,
+      "raw": "\"$$$/Dialog/BrushOptions/FlowJitter=流量抖动\""
+    },
+    {
+      "term": "色相抖动",
+      "category": "control",
+      "matched_expected": "色相抖动",
+      "offset": 925773,
+      "string_index": 17457,
+      "raw": "\"$$$/Dialog/BrushOptions/HueJitter=色相抖动\""
+    },
+    {
+      "term": "最小直径",
+      "category": "control",
+      "matched_expected": "最小直径",
+      "offset": 925955,
+      "string_index": 17461,
+      "raw": "\"$$$/Dialog/BrushOptions/MinDiameter=最小直径\""
+    },
+    {
+      "term": "最小圆度",
+      "category": "control",
+      "matched_expected": "最小圆度",
+      "offset": 926000,
+      "string_index": 17462,
+      "raw": "\"$$$/Dialog/BrushOptions/MinRoundness=最小圆度\""
+    },
+    {
+      "term": "混合抖动",
+      "category": "control",
+      "matched_expected": "混合抖动",
+      "offset": 926080,
+      "string_index": 17464,
+      "raw": "\"$$$/Dialog/BrushOptions/MixJitter=混合抖动\""
+    },
+    {
+      "term": "不透明度抖动",
+      "category": "control",
+      "matched_expected": "不透明度抖动",
+      "offset": 926126,
+      "string_index": 17465,
+      "raw": "\"$$$/Dialog/BrushOptions/OpacityJitter=不透明度抖动\""
+    },
+    {
+      "term": "纯度",
+      "category": "control",
+      "matched_expected": "纯度",
+      "offset": 926167,
+      "string_index": 17466,
+      "raw": "\"$$$/Dialog/BrushOptions/Purity=纯度\""
+    },
+    {
+      "term": "圆度抖动",
+      "category": "control",
+      "matched_expected": "圆度抖动",
+      "offset": 926254,
+      "string_index": 17468,
+      "raw": "\"$$$/Dialog/BrushOptions/RoundnessJitter=圆度抖动\""
+    },
+    {
+      "term": "饱和度抖动",
+      "category": "control",
+      "matched_expected": "饱和度抖动",
+      "offset": 926296,
+      "string_index": 17469,
+      "raw": "\"$$$/Dialog/BrushOptions/SatJitter=饱和度抖动\""
+    },
+    {
+      "term": "大小抖动",
+      "category": "control",
+      "matched_expected": "大小抖动",
+      "offset": 926414,
+      "string_index": 17472,
+      "raw": "\"$$$/Dialog/BrushOptions/SizeJitter=大小抖动\""
+    },
+    {
+      "term": "湿度抖动",
+      "category": "control",
+      "matched_expected": "湿度抖动",
+      "offset": 930595,
+      "string_index": 17546,
+      "raw": "\"$$$/Dialog/BrushOptions/WetnessJitter=湿度抖动\""
+    },
+    {
+      "term": "翻转 X",
+      "category": "control",
+      "matched_expected": "翻转 X",
+      "offset": 931446,
+      "string_index": 17566,
+      "raw": "\"$$$/Dialog/BrushStyler/FlipX=翻转 X\""
+    },
+    {
+      "term": "翻转 X 抖动",
+      "category": "control",
+      "matched_expected": "翻转 X 抖动",
+      "offset": 931489,
+      "string_index": 17567,
+      "raw": "\"$$$/Dialog/BrushStyler/FlipXJitter=翻转 X 抖动\""
+    },
+    {
+      "term": "翻转 Y",
+      "category": "control",
+      "matched_expected": "翻转 Y",
+      "offset": 931529,
+      "string_index": 17568,
+      "raw": "\"$$$/Dialog/BrushStyler/FlipY=翻转 Y\""
+    },
+    {
+      "term": "翻转 Y 抖动",
+      "category": "control",
+      "matched_expected": "翻转 Y 抖动",
+      "offset": 931572,
+      "string_index": 17569,
+      "raw": "\"$$$/Dialog/BrushStyler/FlipYJitter=翻转 Y 抖动\""
+    },
+    {
+      "term": "为每个笔尖设置纹理",
+      "category": "control",
+      "matched_expected": "为每个笔尖设置纹理",
+      "offset": 933857,
+      "string_index": 17610,
+      "raw": "\"$$$/Dialog/BrushStyler/TextureEachTip=为每个笔尖设置纹理               \""
+    },
+    {
+      "term": "倾斜缩放比例",
+      "category": "control",
+      "matched_expected": "倾斜缩放比例",
+      "offset": 933959,
+      "string_index": 17612,
+      "raw": "\"$$$/Dialog/BrushStyler/TiltScale=倾斜缩放比例\""
+    },
+    {
+      "term": "倾斜 X",
+      "category": "control",
+      "matched_expected": "倾斜 X",
+      "offset": 933998,
+      "string_index": 17613,
+      "raw": "\"$$$/Dialog/BrushStyler/TiltX=倾斜 X\""
+    },
+    {
+      "term": "倾斜 Y",
+      "category": "control",
+      "matched_expected": "倾斜 Y",
+      "offset": 934035,
+      "string_index": 17614,
+      "raw": "\"$$$/Dialog/BrushStyler/TiltY=倾斜 Y\""
+    },
+    {
+      "term": "倾斜",
+      "category": "value",
+      "matched_expected": "倾斜",
+      "offset": 1879968,
+      "string_index": 34435,
+      "raw": "\"$$$/VariableFont/RegisteredAxisNameSlant=倾斜\""
+    }
+  ]
+}

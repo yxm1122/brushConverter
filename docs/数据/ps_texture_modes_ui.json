@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "task": "101-补充",
+  "generated_at": "2026-11-20",
+  "ps_version": "26.9 (20250724.r.15 b15e8a4)",
+  "ui_path": "画笔设置 > 纹理 > 模式",
+  "selected_before": "线性高度",
+  "capture_method": "截图人工转录",
+  "evidence_screenshots": ["docs/截图/ui/09-纹理模式下拉.png"],
+  "count": 10,
+  "items": [
+    {"index": 1, "name_ui": "正片叠底", "disabled": false, "note": ""},
+    {"index": 2, "name_ui": "减去", "disabled": false, "note": ""},
+    {"index": 3, "name_ui": "变暗", "disabled": false, "note": ""},
+    {"index": 4, "name_ui": "叠加", "disabled": false, "note": ""},
+    {"index": 5, "name_ui": "颜色减淡", "disabled": false, "note": ""},
+    {"index": 6, "name_ui": "颜色加深", "disabled": false, "note": ""},
+    {"index": 7, "name_ui": "线性加深", "disabled": false, "note": ""},
+    {"index": 8, "name_ui": "实色混合", "disabled": false, "note": ""},
+    {"index": 9, "name_ui": "线性高度", "disabled": false, "note": "当前选中项（下拉中高亮，组合框显示「线性高度」）"},
+    {"index": 10, "name_ui": "高度", "disabled": false, "note": "列表最后一项"}
+  ],
+  "limitations": "① UIA 不可用：本次采集时 PS 主窗口处于最小化（OWL.ShadowView 面板仍可见），面板 PSViewC 子树枚举到 0 个 Text/ComboBox，展开后桌面根下只看到 ComboBox 的 Pane（ComboLBox），没有任何 ListItem/MenuItem；因此名称全部来自截图人工转录。② 采集路线与条数交叉验证：Win32 顶层窗口差分在展开后新增可见 ComboLBox（HWND=594446，矩形 1059,622,161x267），LB_GETCOUNT=10、条目高 26px（10×26=260≤267），与截图 10 项一致；但 LB_GETTEXT 对索引 0~9 全部返回同一乱码「鮐�ʵ」（PS 的列表框为 owner-draw，无字符串），不能作为名称来源。③ 10 项全部可见、无滚动条，故未做滚动采集、无 09b 文件。④ 本机右下角存在桌面浮层（桌宠，Chrome 窗口 dsh-pet），会压住面板内容区下缘，故截图纵向下缘统一裁到 1000px（面板内容区原高 1228px）；下拉列表完整区域在内容区坐标 y≈418~674，未被裁剪。⑤ disabled 为读图目视判定：10 项文字颜色一致，无灰色禁用项、无分隔线；列表框不提供逐项禁用状态接口。⑥ 展开/关闭：点击 ComboBox 中心展开，Esc 关闭且未选中任何项；像素比对组合框区域差 0、下方区域差 0、无新增可见窗口，笔刷设置未被改变。⑦ 页面状态：截图时左侧「纹理」行为选中高亮（第 4 行），组合框显示「线性高度」，与下拉中高亮项一致。"
+}

@@ -1,0 +1,1508 @@
+{
+  "schema_version": "1.0",
+  "task": "101",
+  "generated_at": "2026-11-20",
+  "ps_version": "26.9 (20250724.r.15 b15e8a4)",
+  "source_files": [
+    "docs/数据/ps_ui_terms_raw.json",
+    "docs/截图/ui/index.md",
+    "docs/截图/ui/uia_dump.txt",
+    "docs/截图/ui/*.png"
+  ],
+  "tabs": [
+    {
+      "tab_order": 1,
+      "tab": "画笔笔尖形状",
+      "task_book_name": "画笔笔尖形状",
+      "screenshot": "01-画笔笔尖形状.png",
+      "note": "00-全景.png 与 01 同为该页（PS 默认页签）；按 index.md 最近一次采集记录，01 的选中行像素校验已通过（第 1 行高亮），13 行文字带齐全"
+    },
+    {
+      "tab_order": 2,
+      "tab": "形状动态",
+      "task_book_name": "形状动态",
+      "screenshot": "02-形状动态.png",
+      "note": ""
+    },
+    {
+      "tab_order": 3,
+      "tab": "散布",
+      "task_book_name": "散布",
+      "screenshot": "03-散布.png",
+      "note": ""
+    },
+    {
+      "tab_order": 4,
+      "tab": "纹理",
+      "task_book_name": "纹理",
+      "screenshot": "04-纹理.png",
+      "note": ""
+    },
+    {
+      "tab_order": 5,
+      "tab": "双重画笔",
+      "task_book_name": "双重画笔",
+      "screenshot": "05-双重画笔.png",
+      "note": ""
+    },
+    {
+      "tab_order": 6,
+      "tab": "颜色动态",
+      "task_book_name": "颜色动态",
+      "screenshot": "06-颜色动态.png",
+      "note": ""
+    },
+    {
+      "tab_order": 7,
+      "tab": "传递",
+      "task_book_name": "传递",
+      "screenshot": "07-传递.png",
+      "note": ""
+    },
+    {
+      "tab_order": 8,
+      "tab": "画笔笔势",
+      "task_book_name": "画笔姿势",
+      "screenshot": "08-画笔姿势.png",
+      "note": "任务书旧称「画笔姿势」，界面原文是「画笔笔势」（语言包 $/BrushStylerIndex/BrushPose=画笔笔势）；截图文件名沿用任务书旧称，画面原文为「画笔笔势」"
+    }
+  ],
+  "checkboxes": [
+    {
+      "order": 9,
+      "control": "杂色",
+      "task_book_name": "杂色",
+      "screenshot": "00-全景.png"
+    },
+    {
+      "order": 10,
+      "control": "湿边",
+      "task_book_name": "湿边",
+      "screenshot": "00-全景.png"
+    },
+    {
+      "order": 11,
+      "control": "建立",
+      "task_book_name": "喷枪",
+      "screenshot": "00-全景.png"
+    },
+    {
+      "order": 12,
+      "control": "平滑",
+      "task_book_name": "平滑",
+      "screenshot": "00-全景.png"
+    },
+    {
+      "order": 13,
+      "control": "保护纹理",
+      "task_book_name": "保护纹理",
+      "screenshot": "00-全景.png"
+    }
+  ],
+  "controls": [
+    {
+      "id": "brushTip.tipGrid",
+      "tab": "画笔笔尖形状",
+      "tab_order": 1,
+      "control": "笔尖网格（预设笔尖列表）",
+      "ui_type": "图案选择",
+      "default_hint": "网格列出预设笔尖缩略图与直径数字（30/123/8/10/25/112…）；当前选中项在截图中未见明显高亮",
+      "range_hint": "界面未显示",
+      "source": "screenshot",
+      "confidence": "高",
+      "note": "UIA 里对应 Pane + ScrollBar（滚动条 IsEnabled=True）+ 自绘网格，语言包未收录「笔尖网格」；任务书控件词表未列此控件，但截图与 UIA 都存在，故登记",
+      "binding": {
+        "matrix_key": null,
+        "method": "无对应矩阵键（待 102 补行）",
+        "confidence": "中",
+        "note": "笔尖网格是「选择哪个预设笔尖」的入口，矩阵无同名键；疑与 sampledData（采样笔尖 UUID）或 Idnt（图案/笔尖 UUID）相关，需 102 判定，勿硬绑"
+      }
+    },
+    {
+      "id": "brushTip.size",
+      "tab": "画笔笔尖形状",
+      "tab_order": 1,
+      "control": "大小",
+      "ui_type": "数值+滑杆",
+      "default_hint": "494 像素（当前样本笔刷显示值，非出厂默认；UIA 原文「494 像素」）",
+      "range_hint": "界面未显示；范围见矩阵 Dmtr（ABR 实测 1..1920 px，PS 逆向未见 clamp）",
+      "source": "both",
+      "confidence": "高",
+      "note": "行内数值框左侧另有一个圆形箭头图标按钮（UIA 未暴露、无文字标签，用途未确认），本清单不单列该图标控件，见报告遗留",
+      "binding": {
+        "matrix_key": "Dmtr",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "矩阵语义「画笔主直径（px）」与界面「大小」一一对应"
+      }
+    },
+    {
+      "id": "brushTip.flipX",
+      "tab": "画笔笔尖形状",
+      "tab_order": 1,
+      "control": "翻转 X",
+      "ui_type": "复选",
+      "default_hint": "未勾选（当前样本）",
+      "range_hint": "勾选/未勾选（bool）",
+      "source": "both",
+      "confidence": "高",
+      "note": "界面原文带空格「翻转 X」（语言包 $/Dialog/BrushStyler/FlipX=翻转 X）",
+      "binding": {
+        "matrix_key": "flipX",
+        "method": "同名直配",
+        "confidence": "高",
+        "note": "键名与语义一致（笔尖 X 翻转）"
+      }
+    },
+    {
+      "id": "brushTip.flipY",
+      "tab": "画笔笔尖形状",
+      "tab_order": 1,
+      "control": "翻转 Y",
+      "ui_type": "复选",
+      "default_hint": "未勾选（当前样本）",
+      "range_hint": "勾选/未勾选（bool）",
+      "source": "both",
+      "confidence": "高",
+      "note": "界面原文带空格「翻转 Y」",
+      "binding": {
+        "matrix_key": "flipY",
+        "method": "同名直配",
+        "confidence": "高",
+        "note": "键名与语义一致（笔尖 Y 翻转）"
+      }
+    },
+    {
+      "id": "brushTip.angle",
+      "tab": "画笔笔尖形状",
+      "tab_order": 1,
+      "control": "角度",
+      "ui_type": "数值+滑杆",
+      "default_hint": "0°（当前样本）",
+      "range_hint": "界面未显示；范围见矩阵 Angl（ABR 实测 −33..90°，PS 逆向未取到 clamp）",
+      "source": "both",
+      "confidence": "高",
+      "note": "行末带圆形角度盘预览（截图可见），预览本身不是可取值控件",
+      "binding": {
+        "matrix_key": "Angl",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "矩阵语义「笔尖角度（度）」与界面「角度」对应"
+      }
+    },
+    {
+      "id": "brushTip.roundness",
+      "tab": "画笔笔尖形状",
+      "tab_order": 1,
+      "control": "圆度",
+      "ui_type": "数值+滑杆",
+      "default_hint": "100%（当前样本）",
+      "range_hint": "界面未显示；范围见矩阵 Rndn（ABR 实测 20..100）",
+      "source": "both",
+      "confidence": "高",
+      "note": "行末带圆形笔尖预览（十字 + 两控制点），预览不是独立取值控件",
+      "binding": {
+        "matrix_key": "Rndn",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "矩阵语义「笔尖圆度（%）」与界面「圆度」对应"
+      }
+    },
+    {
+      "id": "brushTip.hardness",
+      "tab": "画笔笔尖形状",
+      "tab_order": 1,
+      "control": "硬度",
+      "ui_type": "数值+滑杆",
+      "default_hint": "禁用灰显，数值框空白（当前样本笔刷不支持硬度）",
+      "range_hint": "界面未显示；范围见矩阵 Hrdn（ABR 实测 0..100）",
+      "source": "both",
+      "confidence": "高",
+      "note": "当前样本笔刷下禁用（UIA IsEnabled=False，标签与数值框均灰显）；禁用不等于界面不存在，照常登记",
+      "binding": {
+        "matrix_key": "Hrdn",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "矩阵语义「笔尖硬度（%）」与界面「硬度」对应"
+      }
+    },
+    {
+      "id": "brushTip.spacing",
+      "tab": "画笔笔尖形状",
+      "tab_order": 1,
+      "control": "间距",
+      "ui_type": "数值+滑杆",
+      "default_hint": "已勾选，10%（当前样本）",
+      "range_hint": "界面未显示；范围见矩阵 Spcn（ABR 实测 1..1000%）",
+      "source": "both",
+      "confidence": "高",
+      "note": "该行行首带启用勾选框（当前勾选），勾选后数值与滑杆才可编辑",
+      "binding": {
+        "matrix_key": "Spcn",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "矩阵语义「笔刷间距（%，直径占比）」与界面「间距」对应"
+      }
+    },
+    {
+      "id": "shapeDyn.sizeJitter",
+      "tab": "形状动态",
+      "tab_order": 2,
+      "control": "大小抖动",
+      "ui_type": "数值+滑杆",
+      "default_hint": "0%（当前样本）",
+      "range_hint": "界面未显示；范围见矩阵 szVr（Objc 容器，字段见 bVTy）",
+      "source": "both",
+      "confidence": "高",
+      "note": "行首有滑杆，截图与 UIA（Edit 0%）一致",
+      "binding": {
+        "matrix_key": "szVr",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "矩阵语义「大小动态对象」承载大小抖动的控制源与抖动值"
+      }
+    },
+    {
+      "id": "shapeDyn.sizeControl",
+      "tab": "形状动态",
+      "tab_order": 2,
+      "control": "控制",
+      "ui_type": "下拉",
+      "default_hint": "钢笔压力（当前值，未展开选项列表）",
+      "range_hint": "界面未显示选项全集；控制源枚举见矩阵 bVTy",
+      "source": "both",
+      "confidence": "高",
+      "note": "属于「大小抖动」的控制下拉；UIA Name 为「控制:」（带冒号），下拉右侧另有一个空白小按钮（UIA 中 IsEnabled=False），判为压力曲线入口、处于禁用态，不单列",
+      "binding": {
+        "matrix_key": "bVTy",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "这是大小抖动的控制源；bVTy 为动态控制源枚举（0关/1渐隐/2压力/3倾斜/4转轮/5旋转/6方向/7初始方向）"
+      }
+    },
+    {
+      "id": "shapeDyn.minimumDiameter",
+      "tab": "形状动态",
+      "tab_order": 2,
+      "control": "最小直径",
+      "ui_type": "数值+滑杆",
+      "default_hint": "94%（当前样本）",
+      "range_hint": "界面未显示；范围见矩阵 minimumDiameter（ABR 实测 0..94%）",
+      "source": "both",
+      "confidence": "高",
+      "note": "该行只有数值框，没有独立滑杆（与「大小抖动」共用的滑杆在其上方）",
+      "binding": {
+        "matrix_key": "minimumDiameter",
+        "method": "同名直配",
+        "confidence": "高",
+        "note": "键名与语义一致"
+      }
+    },
+    {
+      "id": "shapeDyn.tiltScale",
+      "tab": "形状动态",
+      "tab_order": 2,
+      "control": "倾斜缩放比例",
+      "ui_type": "数值+滑杆",
+      "default_hint": "禁用灰显，数值框空白",
+      "range_hint": "界面未显示；范围见矩阵 tiltScale（ABR 实测恒为 200）",
+      "source": "both",
+      "confidence": "高",
+      "note": "禁用（UIA IsEnabled=False，截图灰显）；该行只有数值框无滑杆；禁用不等于界面不存在，照常登记",
+      "binding": {
+        "matrix_key": "tiltScale",
+        "method": "同名直配",
+        "confidence": "高",
+        "note": "键名与语义一致（倾斜缩放 %）"
+      }
+    },
+    {
+      "id": "shapeDyn.angleJitter",
+      "tab": "形状动态",
+      "tab_order": 2,
+      "control": "角度抖动",
+      "ui_type": "数值+滑杆",
+      "default_hint": "0%（当前样本）",
+      "range_hint": "界面未显示；范围见矩阵 angleDynamics（Objc，字段见 bVTy/jitter/Mnm）",
+      "source": "both",
+      "confidence": "高",
+      "note": "语言包 $/Dialog/BrushOptions/AngleJitter=角度抖动",
+      "binding": {
+        "matrix_key": "angleDynamics",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "角度动态对象承载角度抖动的控制源与抖动值"
+      }
+    },
+    {
+      "id": "shapeDyn.angleControl",
+      "tab": "形状动态",
+      "tab_order": 2,
+      "control": "控制",
+      "ui_type": "下拉",
+      "default_hint": "关（当前值，未展开选项列表）",
+      "range_hint": "界面未显示选项全集；控制源枚举见矩阵 bVTy",
+      "source": "both",
+      "confidence": "高",
+      "note": "属于「角度抖动」的控制下拉，缩进在角度抖动行下方；UIA Name 为「控制:」",
+      "binding": {
+        "matrix_key": "bVTy",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "这是角度抖动的控制源，统一指向 bVTy 枚举"
+      }
+    },
+    {
+      "id": "shapeDyn.roundnessJitter",
+      "tab": "形状动态",
+      "tab_order": 2,
+      "control": "圆度抖动",
+      "ui_type": "数值+滑杆",
+      "default_hint": "0%（当前样本）",
+      "range_hint": "界面未显示；范围见矩阵 roundnessDynamics（Objc，字段见 bVTy/Mnm）",
+      "source": "both",
+      "confidence": "高",
+      "note": "语言包 $/Dialog/BrushOptions/RoundnessJitter=圆度抖动",
+      "binding": {
+        "matrix_key": "roundnessDynamics",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "圆度动态对象承载圆度抖动的控制源与抖动值"
+      }
+    },
+    {
+      "id": "shapeDyn.roundnessControl",
+      "tab": "形状动态",
+      "tab_order": 2,
+      "control": "控制",
+      "ui_type": "下拉",
+      "default_hint": "钢笔压力（当前值，未展开选项列表）",
+      "range_hint": "界面未显示选项全集；控制源枚举见矩阵 bVTy",
+      "source": "both",
+      "confidence": "高",
+      "note": "属于「圆度抖动」的控制下拉；UIA Name 为「控制:」",
+      "binding": {
+        "matrix_key": "bVTy",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "这是圆度抖动的控制源，统一指向 bVTy 枚举"
+      }
+    },
+    {
+      "id": "shapeDyn.minimumRoundness",
+      "tab": "形状动态",
+      "tab_order": 2,
+      "control": "最小圆度",
+      "ui_type": "数值+滑杆",
+      "default_hint": "1%（当前样本）",
+      "range_hint": "界面未显示；范围见矩阵 minimumRoundness（ABR 实测 1..50%）",
+      "source": "both",
+      "confidence": "高",
+      "note": "该行只有数值框，无独立滑杆",
+      "binding": {
+        "matrix_key": "minimumRoundness",
+        "method": "同名直配",
+        "confidence": "高",
+        "note": "键名与语义一致"
+      }
+    },
+    {
+      "id": "shapeDyn.flipXJitter",
+      "tab": "形状动态",
+      "tab_order": 2,
+      "control": "翻转 X 抖动",
+      "ui_type": "复选",
+      "default_hint": "未勾选（当前样本）",
+      "range_hint": "勾选/未勾选（bool）",
+      "source": "both",
+      "confidence": "高",
+      "note": "界面原文带空格（语言包 $/Dialog/BrushStyler/FlipXJitter=翻转 X 抖动）",
+      "binding": {
+        "matrix_key": null,
+        "method": "无对应矩阵键（待 102 补行）",
+        "confidence": "中",
+        "note": "矩阵只有 flipX（笔尖 X 翻转），未见「抖动」变体键；疑为独立 bool 槽位，待 102 逆向确认"
+      }
+    },
+    {
+      "id": "shapeDyn.flipYJitter",
+      "tab": "形状动态",
+      "tab_order": 2,
+      "control": "翻转 Y 抖动",
+      "ui_type": "复选",
+      "default_hint": "未勾选（当前样本）",
+      "range_hint": "勾选/未勾选（bool）",
+      "source": "both",
+      "confidence": "高",
+      "note": "界面原文带空格（语言包 $/Dialog/BrushStyler/FlipYJitter=翻转 Y 抖动）",
+      "binding": {
+        "matrix_key": null,
+        "method": "无对应矩阵键（待 102 补行）",
+        "confidence": "中",
+        "note": "矩阵只有 flipY（笔尖 Y 翻转），未见「抖动」变体键；待 102 逆向确认"
+      }
+    },
+    {
+      "id": "shapeDyn.brushProjection",
+      "tab": "形状动态",
+      "tab_order": 2,
+      "control": "画笔投影",
+      "ui_type": "复选",
+      "default_hint": "未勾选（当前样本）",
+      "range_hint": "勾选/未勾选（bool）",
+      "source": "screenshot",
+      "confidence": "高",
+      "note": "位于页签控件区最下方（与翻转 X/Y 抖动同一行组）；语言包未收录「画笔投影」、UIA 该页 22 条里也没有该复选项，来源只有截图，故 source=screenshot",
+      "binding": {
+        "matrix_key": "brushProjection",
+        "method": "同名直配",
+        "confidence": "高",
+        "note": "任务书初版把本项判为「无对应」，但矩阵里已有 brushProjection（语义=笔刷投影/笔尖投影开关，range=bool），键与界面语义一一对应，故按现有键直配，不新开漏项"
+      }
+    },
+    {
+      "id": "scatter.amount",
+      "tab": "散布",
+      "tab_order": 3,
+      "control": "散布",
+      "ui_type": "数值+滑杆",
+      "default_hint": "0%（当前样本）",
+      "range_hint": "界面未显示；范围见矩阵 scatterDynamics（jitter 实测 0..533%）",
+      "source": "both",
+      "confidence": "高",
+      "note": "「两轴」勾选框与「散布」同一行，位于数值框左侧；页签内另有「数量」「数量抖动」各自的数值",
+      "binding": {
+        "matrix_key": "scatterDynamics",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "界面散布量实际存于散布动态对象的 jitter（见矩阵 scatter 行 note）；scatter 是原始槽位，故绑动态对象"
+      }
+    },
+    {
+      "id": "scatter.bothAxes",
+      "tab": "散布",
+      "tab_order": 3,
+      "control": "两轴",
+      "ui_type": "复选",
+      "default_hint": "未勾选（当前样本）",
+      "range_hint": "勾选/未勾选（bool）",
+      "source": "both",
+      "confidence": "高",
+      "note": "与「散布」同行，位于数值框左侧；语言包 $/Dialog/BrushOptions/BothAxes=两轴",
+      "binding": {
+        "matrix_key": "bothAxes",
+        "method": "同名直配",
+        "confidence": "高",
+        "note": "矩阵键语义=散布两轴"
+      }
+    },
+    {
+      "id": "scatter.control",
+      "tab": "散布",
+      "tab_order": 3,
+      "control": "控制",
+      "ui_type": "下拉",
+      "default_hint": "钢笔压力（当前值，未展开选项列表）",
+      "range_hint": "界面未显示选项全集；控制源枚举见矩阵 bVTy",
+      "source": "both",
+      "confidence": "高",
+      "note": "属于「散布」的控制下拉，缩进在散布行下方；UIA Name 为「控制:」",
+      "binding": {
+        "matrix_key": "bVTy",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "这是散布量的控制源，统一指向 bVTy 枚举"
+      }
+    },
+    {
+      "id": "scatter.count",
+      "tab": "散布",
+      "tab_order": 3,
+      "control": "数量",
+      "ui_type": "数值+滑杆",
+      "default_hint": "1（当前样本）",
+      "range_hint": "界面未显示；范围见矩阵 count（PS 逆向 clamp [1,10]）",
+      "source": "both",
+      "confidence": "高",
+      "note": "语言包 $/Liquify/FilterDialog/Amount=数量（同词多命名空间共用）",
+      "binding": {
+        "matrix_key": "count",
+        "method": "同名直配",
+        "confidence": "高",
+        "note": "矩阵 count 语义=散布子对象的「数量」"
+      }
+    },
+    {
+      "id": "scatter.countJitter",
+      "tab": "散布",
+      "tab_order": 3,
+      "control": "数量抖动",
+      "ui_type": "数值+滑杆",
+      "default_hint": "0%（当前样本）",
+      "range_hint": "界面未显示；范围见矩阵 countDynamics（Objc）",
+      "source": "both",
+      "confidence": "高",
+      "note": "语言包 $/Dialog/BrushOptions/CountJitter=数量抖动",
+      "binding": {
+        "matrix_key": "countDynamics",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "数量动态对象承载数量抖动的控制源与抖动值"
+      }
+    },
+    {
+      "id": "scatter.countControl",
+      "tab": "散布",
+      "tab_order": 3,
+      "control": "控制",
+      "ui_type": "下拉",
+      "default_hint": "关（当前值，未展开选项列表）",
+      "range_hint": "界面未显示选项全集；控制源枚举见矩阵 bVTy",
+      "source": "both",
+      "confidence": "高",
+      "note": "属于「数量抖动」的控制下拉；UIA Name 为「控制:」",
+      "binding": {
+        "matrix_key": "bVTy",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "这是数量抖动的控制源，统一指向 bVTy 枚举"
+      }
+    },
+    {
+      "id": "texture.pattern",
+      "tab": "纹理",
+      "tab_order": 4,
+      "control": "纹理图案",
+      "ui_type": "图案选择",
+      "default_hint": "当前图案显示为一枚颗粒状缩略图，图案名称未在界面露出（下拉未展开）",
+      "range_hint": "界面未显示",
+      "source": "screenshot",
+      "confidence": "高",
+      "note": "任务书把本项写作「纹理」，界面是无文字标签的图案缩略图下拉，语言包无「纹理图案」原词；UIA 中未见该 ComboBox（纹理页仅 Mode 一个 ComboBox），故位置与形态以截图为准",
+      "binding": {
+        "matrix_key": "Txtr",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "Txtr 是纹理对象容器；具体选中哪个图案由 Txtr.Idnt（矩阵 Idnt，UUID 串）标识，102 若要落「图案名」应另用 Idnt"
+      }
+    },
+    {
+      "id": "texture.invert",
+      "tab": "纹理",
+      "tab_order": 4,
+      "control": "反相",
+      "ui_type": "复选",
+      "default_hint": "未勾选（当前样本）",
+      "range_hint": "勾选/未勾选（bool）",
+      "source": "both",
+      "confidence": "高",
+      "note": "与图案选择同一行；语言包 $/Actions/Class/Invert=反相（同词多命名空间共用）",
+      "binding": {
+        "matrix_key": "invertTexture",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "界面「反相」= 纹理反相；矩阵 invertTexture 语义即「纹理反相（PS 键名 invertTexture；ABR 容器写 InvT）」"
+      }
+    },
+    {
+      "id": "texture.patternAddButton",
+      "tab": "纹理",
+      "tab_order": 4,
+      "control": "＋（图案操作图标按钮）",
+      "ui_type": "按钮",
+      "default_hint": "仅显示「＋」图标，无文字标签",
+      "range_hint": "界面未显示",
+      "source": "screenshot",
+      "confidence": "中",
+      "note": "截图 04 中位于「反相」右侧、与图案选择同一行的方形＋按钮；UIA 该页 18 条里没有对应 Button（只有顶部「画笔」面板页签），语言包也无该标签，故只有截图一个出处；按位置疑为「从当前选区/图案新建图案」，用途未验证",
+      "binding": {
+        "matrix_key": null,
+        "method": "无对应矩阵键（待 102 补行）",
+        "confidence": "中",
+        "note": "疑点：该按钮若只是打开图案面板而非存笔刷参数，则不该进矩阵；102 判定前不要据此补行"
+      }
+    },
+    {
+      "id": "texture.scale",
+      "tab": "纹理",
+      "tab_order": 4,
+      "control": "缩放",
+      "ui_type": "数值+滑杆",
+      "default_hint": "52%（当前样本）",
+      "range_hint": "界面未显示；范围见矩阵 textureScale（PS 逆向 clamp [1,1000]）",
+      "source": "both",
+      "confidence": "高",
+      "note": "语言包 $/AdobePlugin/Shared/Scaling=缩放（同词多命名空间共用）",
+      "binding": {
+        "matrix_key": "textureScale",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "矩阵语义「纹理缩放（%）」"
+      }
+    },
+    {
+      "id": "texture.brightness",
+      "tab": "纹理",
+      "tab_order": 4,
+      "control": "亮度",
+      "ui_type": "数值+滑杆",
+      "default_hint": "-8（当前样本）",
+      "range_hint": "界面未显示；范围见矩阵 textureBrightness（ABR 实测 −55..53；PS 文档 ±150）",
+      "source": "both",
+      "confidence": "高",
+      "note": "与颜色动态的「亮度抖动」不是同一控件（那是亮度抖动，这里是纹理亮度）",
+      "binding": {
+        "matrix_key": "textureBrightness",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "矩阵语义「纹理亮度（PS 单位）」"
+      }
+    },
+    {
+      "id": "texture.contrast",
+      "tab": "纹理",
+      "tab_order": 4,
+      "control": "对比度",
+      "ui_type": "数值+滑杆",
+      "default_hint": "-40（当前样本）",
+      "range_hint": "界面未显示；范围见矩阵 textureContrast（ABR 实测 −50..84；PS 文档 −50..100）",
+      "source": "both",
+      "confidence": "高",
+      "note": "语言包 $/CRaw/AETE/Contrast=对比度（同词多命名空间共用）",
+      "binding": {
+        "matrix_key": "textureContrast",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "矩阵语义「纹理对比度（PS 单位）」"
+      }
+    },
+    {
+      "id": "texture.eachTip",
+      "tab": "纹理",
+      "tab_order": 4,
+      "control": "为每个笔尖设置纹理",
+      "ui_type": "复选",
+      "default_hint": "已勾选（当前样本）",
+      "range_hint": "勾选/未勾选（bool）",
+      "source": "both",
+      "confidence": "高",
+      "note": "语言包 $/Dialog/BrushStyler/TextureEachTip=「为每个笔尖设置纹理               」（原始串尾部带 15 个空格，已去尾空）",
+      "binding": {
+        "matrix_key": "TxtC",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "矩阵 TxtC 语义=「Texture Each Tip（每个笔尖独立取纹理）；ABR 专有键」，与界面文字一一对应"
+      }
+    },
+    {
+      "id": "texture.blendMode",
+      "tab": "纹理",
+      "tab_order": 4,
+      "control": "模式",
+      "ui_type": "下拉",
+      "default_hint": "线性高度（当前值；全量选项尚未采集，见报告遗留）",
+      "range_hint": "界面未显示选项全集；枚举见矩阵 textureBlendMode（47 个纹理模式已逐模式定论）",
+      "source": "both",
+      "confidence": "高",
+      "note": "UIA Name 为乱码 ComboBox（PS 无障碍编码问题），当前值「线性高度」按截图登记；下拉右侧有「:」冒号标签「模式:」",
+      "binding": {
+        "matrix_key": "textureBlendMode",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "矩阵 textureBlendMode 行已给出 22 可映射 / 1 需校准 / 24 不可映射的逐模式结论（详见 docs/数据/mode-table.json）"
+      }
+    },
+    {
+      "id": "texture.depth",
+      "tab": "纹理",
+      "tab_order": 4,
+      "control": "深度",
+      "ui_type": "数值+滑杆",
+      "default_hint": "10%（当前样本）",
+      "range_hint": "界面未显示；范围见矩阵 textureDepth（PS 逆向 clamp [0,100]）",
+      "source": "both",
+      "confidence": "高",
+      "note": "",
+      "binding": {
+        "matrix_key": "textureDepth",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "矩阵语义「纹理深度（%）」"
+      }
+    },
+    {
+      "id": "texture.minimumDepth",
+      "tab": "纹理",
+      "tab_order": 4,
+      "control": "最小深度",
+      "ui_type": "数值+滑杆",
+      "default_hint": "0%（当前样本）",
+      "range_hint": "界面未显示；范围见矩阵 minimumDepth（PS 逆向 clamp [0,100]）",
+      "source": "screenshot",
+      "confidence": "高",
+      "note": "该行只有数值框，无独立滑杆；语言包 69 词里没有「最小深度」（UIA 有「最小深度」Static），故 source=screenshot",
+      "binding": {
+        "matrix_key": "minimumDepth",
+        "method": "同名直配",
+        "confidence": "高",
+        "note": "键名与语义一致"
+      }
+    },
+    {
+      "id": "texture.depthJitter",
+      "tab": "纹理",
+      "tab_order": 4,
+      "control": "深度抖动",
+      "ui_type": "数值+滑杆",
+      "default_hint": "0%（当前样本）",
+      "range_hint": "界面未显示；范围见矩阵 textureDepthDynamics（Objc，字段见 bVTy/Mnm）",
+      "source": "both",
+      "confidence": "高",
+      "note": "语言包 $/Dialog/BrushOptions/DepthJitter=深度抖动",
+      "binding": {
+        "matrix_key": "textureDepthDynamics",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "纹理深度动态对象承载深度抖动的控制源与抖动值"
+      }
+    },
+    {
+      "id": "texture.depthControl",
+      "tab": "纹理",
+      "tab_order": 4,
+      "control": "控制",
+      "ui_type": "下拉",
+      "default_hint": "钢笔压力（当前值，未展开选项列表）",
+      "range_hint": "界面未显示选项全集；控制源枚举见矩阵 bVTy",
+      "source": "both",
+      "confidence": "高",
+      "note": "属于「深度抖动」的控制下拉；UIA Name 为「控制:」",
+      "binding": {
+        "matrix_key": "bVTy",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "这是深度抖动的控制源，统一指向 bVTy 枚举"
+      }
+    },
+    {
+      "id": "dualBrush.blendMode",
+      "tab": "双重画笔",
+      "tab_order": 5,
+      "control": "模式",
+      "ui_type": "下拉",
+      "default_hint": "颜色加深（当前值，未展开选项列表）",
+      "range_hint": "界面未显示选项全集；枚举见矩阵 BlnM（ABR 实测 44 种取值）",
+      "source": "both",
+      "confidence": "高",
+      "note": "位于页签最上方，与「翻转」同一行；UIA Name 为乱码 ComboBox",
+      "binding": {
+        "matrix_key": "BlnM",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "矩阵 BlnM 语义=「双笔刷混合模式（与纹理共用 BlnM 枚举类，语义不同）」；注意与纹理页的模式是同一枚举类但语义不同，不要混用"
+      }
+    },
+    {
+      "id": "dualBrush.flip",
+      "tab": "双重画笔",
+      "tab_order": 5,
+      "control": "翻转",
+      "ui_type": "复选",
+      "default_hint": "未勾选（当前样本）",
+      "range_hint": "勾选/未勾选（bool）",
+      "source": "screenshot",
+      "confidence": "高",
+      "note": "截图 05 顶部右侧「翻转」复选框；UIA 该页 12 条里没有该元素（自绘），语言包未见独立「翻转」词条，来源以截图为准；任务书控件词表未列本项",
+      "binding": {
+        "matrix_key": "Flip",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "矩阵 Flip 语义=「双笔刷翻转（4CC，位于 dualBrush 子对象）」；矩阵另有小写 flip（预设级，语义未定），此处按 dualBrush 子对象选大写 Flip"
+      }
+    },
+    {
+      "id": "dualBrush.tipGrid",
+      "tab": "双重画笔",
+      "tab_order": 5,
+      "control": "第二笔尖网格（预设笔尖列表）",
+      "ui_type": "图案选择",
+      "default_hint": "网格列出可选笔尖缩略图与数字；选中项在截图中未明显高亮（下方「大小」显示 25 像素）",
+      "range_hint": "界面未显示",
+      "source": "screenshot",
+      "confidence": "高",
+      "note": "UIA 该页含独立 ScrollBar（1336,343 24x609），与网格高度对应；语言包未收录此类词；任务书控件词表未列本项",
+      "binding": {
+        "matrix_key": null,
+        "method": "无对应矩阵键（待 102 补行）",
+        "confidence": "中",
+        "note": "第二笔尖的选择结果疑存于 dualBrush 子对象下的图案/笔尖标识，矩阵只有 dualBrush 容器键，无具体字段，待 102 逆向确认"
+      }
+    },
+    {
+      "id": "dualBrush.size",
+      "tab": "双重画笔",
+      "tab_order": 5,
+      "control": "大小",
+      "ui_type": "数值+滑杆",
+      "default_hint": "25 像素（当前样本）",
+      "range_hint": "界面未显示；主笔尖范围见矩阵 Dmtr（ABR 实测 1..1920 px）",
+      "source": "both",
+      "confidence": "高",
+      "note": "UIA 原文「25 像素」；与画笔笔尖形状页的「大小」是两个不同的笔尖，不要当成同一个控件",
+      "binding": {
+        "matrix_key": null,
+        "method": "无对应矩阵键（待 102 补行）",
+        "confidence": "中",
+        "note": "疑点：dualBrush 子对象内的大小没有独立矩阵键；顶层 Dmtr 属主笔尖，硬绑会把第二笔尖尺寸写进主笔尖，102 需补行"
+      }
+    },
+    {
+      "id": "dualBrush.spacing",
+      "tab": "双重画笔",
+      "tab_order": 5,
+      "control": "间距",
+      "ui_type": "数值+滑杆",
+      "default_hint": "25%（当前样本）",
+      "range_hint": "界面未显示；主笔尖范围见矩阵 Spcn（ABR 实测 1..1000%）",
+      "source": "both",
+      "confidence": "高",
+      "note": "第二笔尖的间距，与主笔尖的「间距」不是同一个值",
+      "binding": {
+        "matrix_key": null,
+        "method": "无对应矩阵键（待 102 补行）",
+        "confidence": "中",
+        "note": "疑点：dualBrush 子对象内间距无独立键（矩阵 Spcn 属主笔尖/顶层），待 102 补行"
+      }
+    },
+    {
+      "id": "dualBrush.scatter",
+      "tab": "双重画笔",
+      "tab_order": 5,
+      "control": "散布",
+      "ui_type": "数值+滑杆",
+      "default_hint": "0%（当前样本）",
+      "range_hint": "界面未显示；主笔尖散布范围见矩阵 scatterDynamics（jitter 实测 0..533%）",
+      "source": "both",
+      "confidence": "高",
+      "note": "第二笔尖的散布量；UIA 原文「散布」所在行宽 87px，右侧紧接「两轴」",
+      "binding": {
+        "matrix_key": null,
+        "method": "无对应矩阵键（待 102 补行）",
+        "confidence": "中",
+        "note": "疑点：dualBrush 内散布量无独立键，顶层 scatter/scatterDynamics 属散布页签，待 102 补行"
+      }
+    },
+    {
+      "id": "dualBrush.bothAxes",
+      "tab": "双重画笔",
+      "tab_order": 5,
+      "control": "两轴",
+      "ui_type": "复选",
+      "default_hint": "未勾选（当前样本）",
+      "range_hint": "勾选/未勾选（bool）",
+      "source": "both",
+      "confidence": "高",
+      "note": "与第二笔尖「散布」同行，位于其数值框左侧",
+      "binding": {
+        "matrix_key": null,
+        "method": "无对应矩阵键（待 102 补行）",
+        "confidence": "中",
+        "note": "疑点：矩阵 bothAxes 属散布页签的 scatter 子对象；双重画笔内的两轴标志无独立键，硬绑会串页，待 102 补行"
+      }
+    },
+    {
+      "id": "dualBrush.count",
+      "tab": "双重画笔",
+      "tab_order": 5,
+      "control": "数量",
+      "ui_type": "数值+滑杆",
+      "default_hint": "1（当前样本）",
+      "range_hint": "界面未显示；散布页数量范围见矩阵 count（PS 逆向 clamp [1,10]）",
+      "source": "both",
+      "confidence": "高",
+      "note": "第二笔尖的数量，位于页签控件区最下方",
+      "binding": {
+        "matrix_key": null,
+        "method": "无对应矩阵键（待 102 补行）",
+        "confidence": "中",
+        "note": "疑点：矩阵 count 明确属 scatter 子对象；双重画笔的数量无独立键，待 102 补行"
+      }
+    },
+    {
+      "id": "colorDyn.perTip",
+      "tab": "颜色动态",
+      "tab_order": 6,
+      "control": "应用每笔尖",
+      "ui_type": "复选",
+      "default_hint": "已勾选（当前样本）",
+      "range_hint": "勾选/未勾选（bool）",
+      "source": "screenshot",
+      "confidence": "高",
+      "note": "位于页签最上方；UIA 该页 14 条里没有该复选项（自绘），语言包未见「应用每笔尖」词条，来源以截图为准；任务书控件词表未列本项",
+      "binding": {
+        "matrix_key": "colorDynamicsPerTip",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "矩阵 colorDynamicsPerTip 语义=「每笔尖颜色动态（bool）」，与界面「应用每笔尖」对应"
+      }
+    },
+    {
+      "id": "colorDyn.fgBgJitter",
+      "tab": "颜色动态",
+      "tab_order": 6,
+      "control": "前景/背景抖动",
+      "ui_type": "数值+滑杆",
+      "default_hint": "0%（当前样本）",
+      "range_hint": "界面未显示；范围见矩阵 clVr（Objc 容器）",
+      "source": "both",
+      "confidence": "高",
+      "note": "语言包 $/Dialog/BrushOptions/ColorJitter=前景/背景抖动",
+      "binding": {
+        "matrix_key": "clVr",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "clVr 是颜色变化对象（颜色动态的抖动容器）；前景色/背景色本身由 foregroundColor / backgroundColor 两个键承载，本控件是「抖动幅度」故绑 clVr"
+      }
+    },
+    {
+      "id": "colorDyn.fgBgControl",
+      "tab": "颜色动态",
+      "tab_order": 6,
+      "control": "控制",
+      "ui_type": "下拉",
+      "default_hint": "关（当前值，未展开选项列表）",
+      "range_hint": "界面未显示选项全集；控制源枚举见矩阵 bVTy",
+      "source": "both",
+      "confidence": "高",
+      "note": "属于「前景/背景抖动」的控制下拉；UIA Name 为「控制:」",
+      "binding": {
+        "matrix_key": "bVTy",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "这是前景/背景抖动的控制源，统一指向 bVTy 枚举"
+      }
+    },
+    {
+      "id": "colorDyn.hueJitter",
+      "tab": "颜色动态",
+      "tab_order": 6,
+      "control": "色相抖动",
+      "ui_type": "数值+滑杆",
+      "default_hint": "5%（当前样本）",
+      "range_hint": "界面未显示；范围见矩阵 hue（未见 clamp 证据）",
+      "source": "both",
+      "confidence": "高",
+      "note": "语言包 $/Dialog/BrushOptions/HueJitter=色相抖动",
+      "binding": {
+        "matrix_key": "hue",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "矩阵同时存在 hue 与 4CC 键「H   」（键名带 3 个尾随空格，ABR 侧色相）；两者关系未证，本清单按可读的 hue 绑，102 若要按 ABR 键补行需自行判定"
+      }
+    },
+    {
+      "id": "colorDyn.saturationJitter",
+      "tab": "颜色动态",
+      "tab_order": 6,
+      "control": "饱和度抖动",
+      "ui_type": "数值+滑杆",
+      "default_hint": "3%（当前样本）",
+      "range_hint": "界面未显示；范围见矩阵 saturation（逆向无 clamp 证据）",
+      "source": "both",
+      "confidence": "高",
+      "note": "语言包 $/Dialog/BrushOptions/SatJitter=饱和度抖动",
+      "binding": {
+        "matrix_key": "saturation",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "矩阵另有 4CC 键「Strt」（语义标注「饱和度/起始值」，ABR 实测 0..3），与 saturation 的关系未证；本清单按可读的 saturation 绑"
+      }
+    },
+    {
+      "id": "colorDyn.brightnessJitter",
+      "tab": "颜色动态",
+      "tab_order": 6,
+      "control": "亮度抖动",
+      "ui_type": "数值+滑杆",
+      "default_hint": "4%（当前样本）",
+      "range_hint": "界面未显示；范围见矩阵 brightness（逆向无 clamp 证据）",
+      "source": "both",
+      "confidence": "高",
+      "note": "语言包 $/Dialog/BrushOptions/BrightnessJitter=亮度抖动；与纹理页「亮度」不是同一控件",
+      "binding": {
+        "matrix_key": "brightness",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "矩阵 brightness 语义=「亮度抖动（颜色动态，与纹理 textureBrightness 不同键）」；另有 4CC 键「Brgh」（ABR 实测 0..4）关系未证"
+      }
+    },
+    {
+      "id": "colorDyn.purity",
+      "tab": "颜色动态",
+      "tab_order": 6,
+      "control": "纯度",
+      "ui_type": "数值+滑杆",
+      "default_hint": "0%（当前样本）",
+      "range_hint": "界面未显示；范围见矩阵 purity（逆向无 clamp 证据）",
+      "source": "both",
+      "confidence": "高",
+      "note": "任务书写作「纯度抖动」，语言包与界面原文都是「纯度」（$/Dialog/BrushOptions/Purity=纯度），本清单按界面原文登记；界面无「纯度抖动」字样",
+      "binding": {
+        "matrix_key": "purity",
+        "method": "同名直配",
+        "confidence": "高",
+        "note": "键名与语义一致（纯度 %）"
+      }
+    },
+    {
+      "id": "transfer.opacityJitter",
+      "tab": "传递",
+      "tab_order": 7,
+      "control": "不透明度抖动",
+      "ui_type": "数值+滑杆",
+      "default_hint": "0%（当前样本）",
+      "range_hint": "界面未显示；范围见矩阵 opVr（Objc，字段见 bVTy/Mnm）",
+      "source": "both",
+      "confidence": "高",
+      "note": "语言包 $/Dialog/BrushOptions/OpacityJitter=不透明度抖动",
+      "binding": {
+        "matrix_key": "opVr",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "不透明度动态对象承载控制源、抖动值与最小值"
+      }
+    },
+    {
+      "id": "transfer.opacityControl",
+      "tab": "传递",
+      "tab_order": 7,
+      "control": "控制",
+      "ui_type": "下拉",
+      "default_hint": "钢笔压力（当前值，未展开选项列表）",
+      "range_hint": "界面未显示选项全集；控制源枚举见矩阵 bVTy",
+      "source": "both",
+      "confidence": "高",
+      "note": "属于「不透明度抖动」的控制下拉，行内带警告图标；UIA Name 为「控制:」",
+      "binding": {
+        "matrix_key": "bVTy",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "这是不透明度抖动的控制源，统一指向 bVTy 枚举"
+      }
+    },
+    {
+      "id": "transfer.opacityMin",
+      "tab": "传递",
+      "tab_order": 7,
+      "control": "最小",
+      "ui_type": "数值+滑杆",
+      "default_hint": "100%（当前样本）",
+      "range_hint": "界面未显示；范围见矩阵「Mnm 」（动态最小值 %）",
+      "source": "both",
+      "confidence": "高",
+      "note": "同一个界面词「最小」在传递页出现 4 次，本清单按所属抖动分别登记为 opacityMin / flowMin / wetnessMin / mixMin；本行属不透明度抖动",
+      "binding": {
+        "matrix_key": "Mnm ",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "① matrix_key 原文带 1 个尾随空格（PS 4CC 补齐），校验脚本按精确串比对，不是笔误；② 矩阵只有一个 Mnm，界面上 4 个「最小」共用它，102 若需区分四路最小值可能要新开键"
+      }
+    },
+    {
+      "id": "transfer.flowJitter",
+      "tab": "传递",
+      "tab_order": 7,
+      "control": "流量抖动",
+      "ui_type": "数值+滑杆",
+      "default_hint": "0%（当前样本）",
+      "range_hint": "界面未显示；范围见矩阵 prVr（Objc，字段见 bVTy/Mnm）",
+      "source": "both",
+      "confidence": "高",
+      "note": "语言包 $/Dialog/BrushOptions/FlowJitter=流量抖动",
+      "binding": {
+        "matrix_key": "prVr",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "流量动态对象承载控制源、抖动值与最小值"
+      }
+    },
+    {
+      "id": "transfer.flowControl",
+      "tab": "传递",
+      "tab_order": 7,
+      "control": "控制",
+      "ui_type": "下拉",
+      "default_hint": "钢笔压力（当前值，未展开选项列表）",
+      "range_hint": "界面未显示选项全集；控制源枚举见矩阵 bVTy",
+      "source": "both",
+      "confidence": "高",
+      "note": "属于「流量抖动」的控制下拉，行内带警告图标；UIA Name 为「控制:」",
+      "binding": {
+        "matrix_key": "bVTy",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "这是流量抖动的控制源，统一指向 bVTy 枚举"
+      }
+    },
+    {
+      "id": "transfer.flowMin",
+      "tab": "传递",
+      "tab_order": 7,
+      "control": "最小",
+      "ui_type": "数值+滑杆",
+      "default_hint": "0%（当前样本）",
+      "range_hint": "界面未显示；范围见矩阵「Mnm 」（动态最小值 %）",
+      "source": "both",
+      "confidence": "高",
+      "note": "本行属流量抖动；该行只有数值框，无独立滑杆",
+      "binding": {
+        "matrix_key": "Mnm ",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "同 transfer.opacityMin：矩阵键名带 1 个尾随空格；四路「最小」共用 Mnm"
+      }
+    },
+    {
+      "id": "transfer.wetnessJitter",
+      "tab": "传递",
+      "tab_order": 7,
+      "control": "湿度抖动",
+      "ui_type": "数值+滑杆",
+      "default_hint": "禁用灰显，数值框空白（当前样本笔刷不支持湿边）",
+      "range_hint": "界面未显示；范围见矩阵 wtVr（Objc，ABR 14 次）",
+      "source": "both",
+      "confidence": "高",
+      "note": "禁用（UIA IsEnabled=False，标签/滑杆/数值框全灰）；与底部勾选项「湿边」联动；禁用不等于界面不存在，照常登记",
+      "binding": {
+        "matrix_key": "wtVr",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "矩阵 wtVr 语义=「湿度动态对象（湿边关联，4CC）」"
+      }
+    },
+    {
+      "id": "transfer.wetnessControl",
+      "tab": "传递",
+      "tab_order": 7,
+      "control": "控制",
+      "ui_type": "下拉",
+      "default_hint": "关（禁用灰显，不可展开）",
+      "range_hint": "界面未显示选项全集；控制源枚举见矩阵 bVTy",
+      "source": "both",
+      "confidence": "高",
+      "note": "属于「湿度抖动」的控制下拉，当前禁用（UIA IsEnabled=False）；UIA Name 为「控制:」",
+      "binding": {
+        "matrix_key": "bVTy",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "这是湿度抖动的控制源，统一指向 bVTy 枚举；注意该行在当前样本下禁用"
+      }
+    },
+    {
+      "id": "transfer.wetnessMin",
+      "tab": "传递",
+      "tab_order": 7,
+      "control": "最小",
+      "ui_type": "数值+滑杆",
+      "default_hint": "禁用灰显，数值框空白",
+      "range_hint": "界面未显示；范围见矩阵「Mnm 」（动态最小值 %）",
+      "source": "both",
+      "confidence": "高",
+      "note": "本行属湿度抖动，当前禁用；UIA 中该 Edit 为 IsEnabled=False 且无文本",
+      "binding": {
+        "matrix_key": "Mnm ",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "同 transfer.opacityMin：矩阵键名带 1 个尾随空格；四路「最小」共用 Mnm"
+      }
+    },
+    {
+      "id": "transfer.mixJitter",
+      "tab": "传递",
+      "tab_order": 7,
+      "control": "混合抖动",
+      "ui_type": "数值+滑杆",
+      "default_hint": "禁用灰显，数值框空白（当前样本笔刷不支持混合）",
+      "range_hint": "界面未显示；范围见矩阵 mxVr（Objc，ABR 14 次）",
+      "source": "both",
+      "confidence": "高",
+      "note": "禁用（UIA IsEnabled=False，标签/滑杆/数值框全灰）；语言包 $/Dialog/BrushOptions/MixJitter=混合抖动；禁用不等于界面不存在，照常登记",
+      "binding": {
+        "matrix_key": "mxVr",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "矩阵 mxVr 语义=「混合动态对象（Transfer 的 mix，4CC）」"
+      }
+    },
+    {
+      "id": "transfer.mixControl",
+      "tab": "传递",
+      "tab_order": 7,
+      "control": "控制",
+      "ui_type": "下拉",
+      "default_hint": "关（禁用灰显，不可展开）",
+      "range_hint": "界面未显示选项全集；控制源枚举见矩阵 bVTy",
+      "source": "both",
+      "confidence": "高",
+      "note": "属于「混合抖动」的控制下拉，当前禁用（UIA IsEnabled=False）；UIA Name 为「控制:」",
+      "binding": {
+        "matrix_key": "bVTy",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "这是混合抖动的控制源，统一指向 bVTy 枚举；注意该行在当前样本下禁用"
+      }
+    },
+    {
+      "id": "transfer.mixMin",
+      "tab": "传递",
+      "tab_order": 7,
+      "control": "最小",
+      "ui_type": "数值+滑杆",
+      "default_hint": "禁用灰显，数值框空白",
+      "range_hint": "界面未显示；范围见矩阵「Mnm 」（动态最小值 %）",
+      "source": "both",
+      "confidence": "高",
+      "note": "本行属混合抖动，当前禁用；UIA 中该 Edit 为 IsEnabled=False 且无文本",
+      "binding": {
+        "matrix_key": "Mnm ",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "同 transfer.opacityMin：矩阵键名带 1 个尾随空格；四路「最小」共用 Mnm"
+      }
+    },
+    {
+      "id": "brushPose.tiltX",
+      "tab": "画笔笔势",
+      "tab_order": 8,
+      "control": "倾斜 X",
+      "ui_type": "数值+滑杆",
+      "default_hint": "0%（当前样本）",
+      "range_hint": "界面未显示；范围见矩阵 brushPoseTiltX（ABR 实测 0..0，int32）",
+      "source": "both",
+      "confidence": "高",
+      "note": "界面原文带空格（语言包 $/Dialog/BrushStyler/TiltX=倾斜 X）",
+      "binding": {
+        "matrix_key": "brushPoseTiltX",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "矩阵语义「笔刷姿态-倾角 X」"
+      }
+    },
+    {
+      "id": "brushPose.overrideTiltX",
+      "tab": "画笔笔势",
+      "tab_order": 8,
+      "control": "覆盖倾斜 X",
+      "ui_type": "复选",
+      "default_hint": "未勾选（当前样本）",
+      "range_hint": "勾选/未勾选（bool）",
+      "source": "screenshot",
+      "confidence": "高",
+      "note": "UIA 该页 9 条里没有 4 个「覆盖」复选项（自绘），语言包未见「覆盖倾斜 X」词条，来源以截图为准；任务书控件词表有列本项",
+      "binding": {
+        "matrix_key": "overridePoseTiltX",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "矩阵语义「姿态覆盖-倾角 X」"
+      }
+    },
+    {
+      "id": "brushPose.tiltY",
+      "tab": "画笔笔势",
+      "tab_order": 8,
+      "control": "倾斜 Y",
+      "ui_type": "数值+滑杆",
+      "default_hint": "0%（当前样本）",
+      "range_hint": "界面未显示；范围见矩阵 brushPoseTiltY（ABR 实测 0..0，int32）",
+      "source": "both",
+      "confidence": "高",
+      "note": "界面原文带空格（语言包 $/Dialog/BrushStyler/TiltY=倾斜 Y）",
+      "binding": {
+        "matrix_key": "brushPoseTiltY",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "矩阵语义「笔刷姿态-倾角 Y」"
+      }
+    },
+    {
+      "id": "brushPose.overrideTiltY",
+      "tab": "画笔笔势",
+      "tab_order": 8,
+      "control": "覆盖倾斜 Y",
+      "ui_type": "复选",
+      "default_hint": "未勾选（当前样本）",
+      "range_hint": "勾选/未勾选（bool）",
+      "source": "screenshot",
+      "confidence": "高",
+      "note": "UIA 未暴露该复选项（自绘），语言包未见该词条，来源以截图为准",
+      "binding": {
+        "matrix_key": "overridePoseTiltY",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "矩阵语义「姿态覆盖-倾角 Y」"
+      }
+    },
+    {
+      "id": "brushPose.angle",
+      "tab": "画笔笔势",
+      "tab_order": 8,
+      "control": "旋转",
+      "ui_type": "数值+滑杆",
+      "default_hint": "0°（当前样本）",
+      "range_hint": "界面未显示；范围见矩阵 brushPoseAngle（ABR 实测 0..0，int32）",
+      "source": "both",
+      "confidence": "高",
+      "note": "界面上这一行叫「旋转」（不是「角度」）；语言包 $/PlugIn/RadialBlur/Actions/enumSpin=旋转（同词多命名空间共用）",
+      "binding": {
+        "matrix_key": "brushPoseAngle",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "矩阵语义「笔刷姿态-角度」与界面「旋转」对应"
+      }
+    },
+    {
+      "id": "brushPose.overrideAngle",
+      "tab": "画笔笔势",
+      "tab_order": 8,
+      "control": "覆盖旋转",
+      "ui_type": "复选",
+      "default_hint": "未勾选（当前样本）",
+      "range_hint": "勾选/未勾选（bool）",
+      "source": "screenshot",
+      "confidence": "高",
+      "note": "UIA 未暴露该复选项（自绘），语言包未见该词条，来源以截图为准",
+      "binding": {
+        "matrix_key": "overridePoseAngle",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "矩阵语义「姿态覆盖-角度」"
+      }
+    },
+    {
+      "id": "brushPose.pressure",
+      "tab": "画笔笔势",
+      "tab_order": 8,
+      "control": "压力",
+      "ui_type": "数值+滑杆",
+      "default_hint": "100%（当前样本）",
+      "range_hint": "界面未显示；范围见矩阵 brushPosePressure（ABR 实测 100..100，int32）",
+      "source": "both",
+      "confidence": "高",
+      "note": "语言包 $/Liquify/BrushPane/BrushPressure=压力:（带冒号，同词多命名空间共用）",
+      "binding": {
+        "matrix_key": "brushPosePressure",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "矩阵语义「笔刷姿态-压感」"
+      }
+    },
+    {
+      "id": "brushPose.overridePressure",
+      "tab": "画笔笔势",
+      "tab_order": 8,
+      "control": "覆盖压力",
+      "ui_type": "复选",
+      "default_hint": "未勾选（当前样本）",
+      "range_hint": "勾选/未勾选（bool）",
+      "source": "screenshot",
+      "confidence": "高",
+      "note": "UIA 未暴露该复选项（自绘），语言包未见该词条，来源以截图为准",
+      "binding": {
+        "matrix_key": "overridePosePressure",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "矩阵语义「姿态覆盖-压感」"
+      }
+    },
+    {
+      "id": "bottom.noise",
+      "tab": "底部（勾选项）",
+      "tab_order": 9,
+      "control": "杂色",
+      "ui_type": "复选",
+      "default_hint": "未勾选（当前样本）",
+      "range_hint": "勾选/未勾选（bool）",
+      "source": "both",
+      "confidence": "高",
+      "note": "左侧列表第 9 行；语言包 $/Project/Bokeh/Dialog/Noise=杂色（同词多命名空间共用）；PS 该复选项是「杂色（添加噪点）」勾选项",
+      "binding": {
+        "matrix_key": "noise",
+        "method": "同名直配",
+        "confidence": "高",
+        "note": "矩阵 noise 语义=噪点（喷枪特性）"
+      }
+    },
+    {
+      "id": "bottom.wetEdges",
+      "tab": "底部（勾选项）",
+      "tab_order": 9,
+      "control": "湿边",
+      "ui_type": "复选",
+      "default_hint": "未勾选（当前样本）",
+      "range_hint": "勾选/未勾选（bool）",
+      "source": "both",
+      "confidence": "高",
+      "note": "左侧列表第 10 行；与传递页「湿度抖动」联动（该页湿度抖动当前禁用）",
+      "binding": {
+        "matrix_key": "wetEdges",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "矩阵 wetEdges 语义=湿边；另有 wetEdgesLock（锁定标志），非本项"
+      }
+    },
+    {
+      "id": "bottom.buildup",
+      "tab": "底部（勾选项）",
+      "tab_order": 9,
+      "control": "建立",
+      "ui_type": "复选",
+      "default_hint": "未勾选（当前样本）",
+      "range_hint": "勾选/未勾选（bool）",
+      "source": "both",
+      "confidence": "高",
+      "note": "左侧列表第 11 行；任务书旧称「喷枪」，界面原文是「建立」（语言包 $/BrushStylerIndex/AirbrushBuildup=建立）；语言包里另有「喷枪」一词，但对应的是 $/Presets/Groups/Airbrushes（预设组名），不是本复选项",
+      "binding": {
+        "matrix_key": null,
+        "method": "无对应矩阵键（待 102 补行）",
+        "confidence": "中",
+        "note": "疑点：任务书按「喷枪」理解，矩阵里与喷枪相关的键是 Nose（喷嘴）、Rpt （重复）与 repeat；「建立」对应 PS 的 Airbrush/Buildup 语义，是否等于 Nose/Rpt 无实测证据，102 需逆向确认后补行"
+      }
+    },
+    {
+      "id": "bottom.smoothing",
+      "tab": "底部（勾选项）",
+      "tab_order": 9,
+      "control": "平滑",
+      "ui_type": "复选",
+      "default_hint": "已勾选（当前样本默认勾选）",
+      "range_hint": "勾选/未勾选（bool）",
+      "source": "both",
+      "confidence": "高",
+      "note": "左侧列表第 12 行；语言包 $/Liquify/ReconPane/Mode/Smooth=平滑（同词多命名空间共用）",
+      "binding": {
+        "matrix_key": "smoothing",
+        "method": "文档+语义推定",
+        "confidence": "中",
+        "note": "矩阵 smoothing 的语义写的是「平滑（工具选项开关）」，本项是画笔设置面板底部的同名勾选项；两者是否同一存储位置无实测证据，故绑定置信度只给中"
+      }
+    },
+    {
+      "id": "bottom.protectTexture",
+      "tab": "底部（勾选项）",
+      "tab_order": 9,
+      "control": "保护纹理",
+      "ui_type": "复选",
+      "default_hint": "未勾选（当前样本）",
+      "range_hint": "勾选/未勾选（bool）",
+      "source": "both",
+      "confidence": "高",
+      "note": "左侧列表第 13 行；语言包 $/BrushStylerIndex/ProtectTexture=保护纹理",
+      "binding": {
+        "matrix_key": "protectTexture",
+        "method": "文档+语义推定",
+        "confidence": "高",
+        "note": "矩阵 protectTexture 语义=保护纹理（缩放时锁定图案坐标）；另有 protectTextureLock（面板锁定状态），非本项"
+      }
+    }
+  ]
+}

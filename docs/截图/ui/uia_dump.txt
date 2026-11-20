@@ -1,0 +1,227 @@
+# Photoshop「画笔设置」UIAutomation 控件树导出（任务 101-B）
+# 采集时间：2026-11-20 19:06:37
+# Photoshop 版本：26.9 (20250724.r.15 b15e8a4)
+# 采集脚本：tools/capture_ps_ui.ps1（只读，不修改 PS 的任何设置）
+# 屏幕：2560x1600（物理像素，进程已 SetProcessDPIAware）
+# 面板窗口：OWL.ShadowView HWND=267194 矩形=808,216,574,1242
+# 说明 1：字段顺序 = 缩进(树形) | ControlType | Name | AutomationId | ClassName | IsEnabled | IsOffscreen | BoundingRectangle(X,Y,WxH) | 支持的UIA模式 | 层级
+# 说明 2：Photoshop 左侧 13 项页签列表是自绘控件，UIA（含原始视图）里没有对应元素；页签只能靠截图/坐标点击。
+# 说明 3：IsOffscreen=False 但 Y 坐标在 19000 左右的条目来自隐藏面板（PS 把未显示的页留在离屏位置），不是当前可见界面。
+# 说明 4：ComboBox（形状/控制下拉）的 Name 由 PS 提供，可能显示为乱码，属 PS 无障碍信息的编码问题。
+
+## 一、PS 主窗口原始视图树（含画笔设置面板）
+主窗口 name=[Adobe Photoshop 2025] cls=Photoshop pid=7224 rect=0,0,0x0
+  Pane			OWL.ShadowView	True	False	808,216,574x1242		1
+    Pane			OWL.Dock	True	False	816,219,558x1228		2
+      Pane			OWL.TabPane	True	False	816,238,558x1208		3
+        Pane			OWL.TabGroup	True	False	816,238,558x1196		4
+          Pane			OWL.Palette	True	False	817,283,555x1150		5
+            Pane			OWL.ResizeGripper	True	False	1350,1410,23x23		6
+            Pane			PSViewC	True	False	817,283,555x1150		6
+              Pane	100%	6490	Edit	True	False	1233,614,81x21		7
+              Pane	压力	6489	Static	True	False	1003,614,219x19		7
+              Pane	0°	6488	Edit	True	False	1233,510,81x21		7
+              Pane	旋转	6487	Static	True	False	1003,510,219x19		7
+              Pane	0%	6486	Edit	True	False	1233,406,81x21		7
+              Pane	倾斜 Y	6485	Static	True	False	1003,406,219x19		7
+              Pane	0%	6484	Edit	True	False	1233,302,81x21		7
+              Pane	倾斜 X	6483	Static	True	False	1003,303,219x19		7
+              Pane	画笔	6355	Button	True	False	869,296,75x37		7
+
+## 二、页签「画笔笔尖形状」右侧控件（UIA 枚举，TSV：ControlType | Name | AutomationId | ClassName | IsEnabled | IsOffscreen | X | Y | W | H | 模式）
+# 条目数=41
+Pane	画笔	6355	Button	True	False	869	296	75	37	
+Pane		6356	ScrollBar	True	False	1336	299	24	512	
+Pane	大小	6357	Static	True	False	1003	828	168	19	
+Pane	494 像素	6358	Edit	True	False	1224	828	90	21	
+Pane	角度:	6359	Static	True	False	1037	941	50	19	
+Pane	0°	6360	Edit	True	False	1098	941	81	21	
+Pane	圆度:	6361	Static	True	False	1037	986	50	19	
+Pane	100%	6362	Edit	True	False	1098	986	81	21	
+Pane	硬度	6363	Static	False	False	1003	1025	219	19	
+Pane		6364	Edit	False	False	1233	1025	81	21	
+Pane	10%	6365	Edit	True	False	1233	1094	81	21	
+Pane	0%	6379	Edit	True	False	1480	19077	97	25	
+Pane	1%	6384	Edit	True	False	1480	19077	97	25	
+Pane	柔和度:	6378	Static	True	False	1204	19078	83	23	
+Pane	硬度:	6383	Static	True	False	1248	19078	60	23	
+Pane	볠�ʵ	1362	ComboBox	False	False	1312	19112	260	38	
+Pane	形状:	6366	Static	False	False	1246	19117	59	23	
+Pane	렀�ʵ	1363	ComboBox	False	False	1294	19117	162	38	
+Pane	形状:	6380	Static	False	False	1228	19123	59	23	
+Pane	30%	6386	Edit	True	False	1480	19124	97	25	
+Pane	扭曲度:	6385	Static	True	False	1226	19125	83	23	
+Pane	锐化笔尖	6381	Button	True	False	1325	19159	136	44	
+Pane	硬毛刷: 	6367	Static	False	False	1222	19161	83	23	
+Pane		6368	Edit	False	False	1462	19161	97	25	
+Pane	10%	6388	Edit	True	False	1480	19171	97	25	
+Pane	粒度:	6387	Static	True	False	1248	19172	60	23	
+Pane	长度:	6369	Static	False	False	1244	19208	60	23	
+Pane		6370	Edit	False	False	1462	19208	97	25	
+Pane		6390	Edit	False	False	1480	19218	97	25	
+Pane	喷溅大小:	6389	Static	False	False	1204	19219	104	23	
+Pane	10%	6382	Edit	True	False	1480	19219	97	25	
+Pane	粗细: 	6371	Static	False	False	1244	19255	60	23	
+Pane		6372	Edit	False	False	1462	19255	97	25	
+Pane		6392	Edit	False	False	1480	19264	97	25	
+Pane	喷溅量:	6391	Static	False	False	1226	19266	83	23	
+Pane	硬度: 	6373	Static	False	False	1244	19302	60	23	
+Pane		6374	Edit	False	False	1462	19302	97	25	
+Pane	10%	6393	Edit	True	False	1480	19311	97	25	
+Pane	角度:	6375	Static	False	False	1244	19348	60	23	
+Pane		6376	Edit	False	False	1462	19348	97	25	
+Pane	10%	6377	Edit	True	False	1480	19413	97	25	
+
+## 二、页签「形状动态」右侧控件（UIA 枚举，TSV：ControlType | Name | AutomationId | ClassName | IsEnabled | IsOffscreen | X | Y | W | H | 模式）
+# 条目数=22
+Pane	画笔	6355	Button	True	False	869	296	75	37	
+Pane	0%	6395	Edit	True	False	1233	302	81	21	
+Pane	大小抖动	6394	Static	True	False	1003	303	219	19	
+Pane	鴰�ʵ	1351	ComboBox	True	False	1105	367	117	32	
+Pane		6397	Edit	False	False	1233	371	81	21	
+Pane	控制:	6396	Static	True	False	1050	372	49	19	
+Pane	94%	6399	Edit	True	False	1233	410	81	21	
+Pane	最小直径	6398	Static	True	False	1003	411	219	19	
+Pane		6401	Edit	False	False	1233	479	81	21	
+Pane	倾斜缩放比例	6400	Static	False	False	1003	480	219	19	
+Pane	0%	6403	Edit	True	False	1233	557	81	21	
+Pane	角度抖动	6402	Static	True	False	1003	558	219	19	
+Pane	낰�ʵ	1355	ComboBox	True	False	1105	622	117	32	
+Pane		6405	Edit	False	False	1233	626	81	21	
+Pane	控制:	6404	Static	True	False	1050	627	49	19	
+Pane	0%	6407	Edit	True	False	1233	674	81	21	
+Pane	圆度抖动	6406	Static	True	False	1003	675	219	19	
+Pane	꛰�ʵ	1358	ComboBox	True	False	1105	739	117	32	
+Pane		6409	Edit	False	False	1233	743	81	21	
+Pane	控制:	6408	Static	True	False	1051	744	49	19	
+Pane	1%	6411	Edit	True	False	1233	782	81	21	
+Pane	最小圆度	6410	Static	True	False	1003	783	219	19	
+
+## 二、页签「散布」右侧控件（UIA 枚举，TSV：ControlType | Name | AutomationId | ClassName | IsEnabled | IsOffscreen | X | Y | W | H | 模式）
+# 条目数=13
+Pane	画笔	6355	Button	True	False	869	296	75	37	
+Pane	0%	6413	Edit	True	False	1233	302	81	21	
+Pane	散布	6412	Static	True	False	1003	303	91	19	
+Pane	며�ʵ	1359	ComboBox	True	False	1105	367	117	32	
+Pane		6415	Edit	False	False	1233	371	81	21	
+Pane	控制:	6414	Static	True	False	1050	372	49	19	
+Pane	1	6417	Edit	True	False	1233	419	81	21	
+Pane	数量	6416	Static	True	False	1003	420	219	19	
+Pane	0%	6419	Edit	True	False	1233	488	81	21	
+Pane	数量抖动	6418	Static	True	False	1003	489	219	19	
+Pane	ꒀ�ʵ	1356	ComboBox	True	False	1105	553	117	32	
+Pane		6421	Edit	False	False	1233	557	81	21	
+Pane	控制:	6420	Static	True	False	1050	558	49	19	
+
+## 二、页签「纹理」右侧控件（UIA 枚举，TSV：ControlType | Name | AutomationId | ClassName | IsEnabled | IsOffscreen | X | Y | W | H | 模式）
+# 条目数=18
+Pane	画笔	6355	Button	True	False	869	296	75	37	
+Pane	52%	6423	Edit	True	False	1233	356	81	21	
+Pane	缩放	6422	Static	True	False	1003	357	219	19	
+Pane	亮度	6424	Static	True	False	1003	424	219	19	
+Pane	-8	6425	Edit	True	False	1233	425	81	18	
+Pane	对比度	6426	Static	True	False	1003	490	219	19	
+Pane	-40	6427	Edit	True	False	1233	491	81	18	
+Pane	鮐�ʵ	805	ComboBox	True	False	1058	592	161	32	
+Pane	模式:   	6428	Static	True	False	1003	596	49	19	
+Pane	深度	6429	Static	True	False	1003	633	219	19	
+Pane	10%	6430	Edit	True	False	1233	633	81	21	
+Pane	最小深度	6431	Static	True	False	1003	702	219	19	
+Pane	0%	6432	Edit	True	False	1233	702	81	21	
+Pane	深度抖动	6433	Static	True	False	1003	771	219	19	
+Pane	0%	6434	Edit	True	False	1233	771	81	21	
+Pane	龠�ʵ	1357	ComboBox	True	False	1105	836	117	32	
+Pane	控制:	6435	Static	True	False	1050	840	49	19	
+Pane		6436	Edit	False	False	1233	840	81	21	
+
+## 二、页签「双重画笔」右侧控件（UIA 枚举，TSV：ControlType | Name | AutomationId | ClassName | IsEnabled | IsOffscreen | X | Y | W | H | 模式）
+# 条目数=12
+Pane	画笔	6355	Button	True	False	869	296	75	37	
+Pane	蠐�ʵ	806	ComboBox	True	False	1051	296	161	32	
+Pane	模式:   	6437	Static	True	False	996	301	49	19	
+Pane		6438	ScrollBar	True	False	1336	343	24	609	
+Pane	25 像素	6440	Edit	True	False	1224	969	90	21	
+Pane	大小	6439	Static	True	False	1003	970	168	19	
+Pane	25%	6442	Edit	True	False	1224	1039	90	21	
+Pane	间距	6441	Static	True	False	1003	1040	210	19	
+Pane	0%	6444	Edit	True	False	1224	1108	90	21	
+Pane	散布	6443	Static	True	False	1003	1109	87	19	
+Pane	1	6446	Edit	True	False	1224	1177	90	21	
+Pane	数量	6445	Static	True	False	1003	1178	210	19	
+
+## 二、页签「颜色动态」右侧控件（UIA 枚举，TSV：ControlType | Name | AutomationId | ClassName | IsEnabled | IsOffscreen | X | Y | W | H | 模式）
+# 条目数=14
+Pane	画笔	6355	Button	True	False	869	296	75	37	
+Pane	前景/背景抖动	6447	Static	True	False	1003	328	219	19	
+Pane	0%	6448	Edit	True	False	1233	328	81	21	
+Pane	ꈐ�ʵ	1353	ComboBox	True	False	1105	393	117	32	
+Pane	控制:	6449	Static	True	False	1050	397	49	19	
+Pane		6450	Edit	False	False	1233	397	81	21	
+Pane	色相抖动	6451	Static	True	False	1003	445	193	19	
+Pane	5%	6452	Edit	True	False	1233	445	81	21	
+Pane	饱和度抖动	6453	Static	True	False	1003	514	193	19	
+Pane	3%	6454	Edit	True	False	1233	514	81	21	
+Pane	亮度抖动	6455	Static	True	False	1003	583	193	19	
+Pane	4%	6456	Edit	True	False	1233	583	81	21	
+Pane	纯度	6457	Static	True	False	1003	652	193	19	
+Pane	0%	6458	Edit	True	False	1233	652	81	21	
+
+## 二、页签「传递」右侧控件（UIA 枚举，TSV：ControlType | Name | AutomationId | ClassName | IsEnabled | IsOffscreen | X | Y | W | H | 模式）
+# 条目数=29
+Pane	画笔	6355	Button	True	False	869	296	75	37	
+Pane	0%	6460	Edit	True	False	1233	302	81	21	
+Pane	不透明度抖动	6459	Static	True	False	1003	303	219	19	
+Pane	ꯐ�ʵ	1352	ComboBox	True	False	1105	367	117	32	
+Pane		6462	Edit	False	False	1233	371	81	21	
+Pane	控制:	6461	Static	True	False	1050	372	49	19	
+Pane	100%	6464	Edit	True	False	1233	410	81	21	
+Pane	最小	6463	Static	True	False	1003	411	44	19	
+Pane	0%	6466	Edit	True	False	1233	458	81	21	
+Pane	流量抖动	6465	Static	True	False	1003	459	219	19	
+Pane	김�ʵ	1354	ComboBox	True	False	1105	523	117	32	
+Pane		6468	Edit	False	False	1233	527	81	21	
+Pane	控制:	6467	Static	True	False	1050	528	49	19	
+Pane	0%	6470	Edit	True	False	1233	566	81	21	
+Pane	最小	6469	Static	True	False	1003	567	44	19	
+Pane		6472	Edit	False	False	1233	614	81	21	
+Pane	湿度抖动	6471	Static	False	False	1003	615	219	19	
+Pane	댠�ʵ	1360	ComboBox	False	False	1105	679	117	32	
+Pane		6474	Edit	False	False	1233	683	81	21	
+Pane	控制:	6473	Static	False	False	1050	684	49	19	
+Pane		6476	Edit	False	False	1233	722	81	21	
+Pane	最小	6475	Static	False	False	1003	723	44	19	
+Pane		6478	Edit	False	False	1233	770	81	21	
+Pane	混合抖动	6477	Static	False	False	1003	771	219	19	
+Pane	떐�ʵ	1361	ComboBox	False	False	1105	835	117	32	
+Pane		6480	Edit	False	False	1233	839	81	21	
+Pane	控制:	6479	Static	False	False	1050	840	49	19	
+Pane		6482	Edit	False	False	1233	878	81	21	
+Pane	最小	6481	Static	False	False	1003	879	44	19	
+
+## 二、页签「画笔笔势」右侧控件（UIA 枚举，TSV：ControlType | Name | AutomationId | ClassName | IsEnabled | IsOffscreen | X | Y | W | H | 模式）
+# 条目数=9
+Pane	画笔	6355	Button	True	False	869	296	75	37	
+Pane	0%	6484	Edit	True	False	1233	302	81	21	
+Pane	倾斜 X	6483	Static	True	False	1003	303	219	19	
+Pane	倾斜 Y	6485	Static	True	False	1003	406	219	19	
+Pane	0%	6486	Edit	True	False	1233	406	81	21	
+Pane	旋转	6487	Static	True	False	1003	510	219	19	
+Pane	0°	6488	Edit	True	False	1233	510	81	21	
+Pane	压力	6489	Static	True	False	1003	614	219	19	
+Pane	100%	6490	Edit	True	False	1233	614	81	21	
+
+## 三、左侧页签/勾选项原文（UIA 未暴露，来源=本脚本截图人工读图）
+# 行号	界面原文	类型
+1	画笔笔尖形状	页签（画笔笔尖形状）
+2	形状动态	页签（动态项，带勾选框）
+3	散布	页签（动态项，带勾选框）
+4	纹理	页签（动态项，带勾选框）
+5	双重画笔	页签（动态项，带勾选框）
+6	颜色动态	页签（动态项，带勾选框）
+7	传递	页签（动态项，带勾选框）
+8	画笔笔势	页签（动态项，带勾选框）
+9	杂色	底部勾选项
+10	湿边	底部勾选项
+11	建立	底部勾选项
+12	平滑	底部勾选项
+13	保护纹理	底部勾选项
