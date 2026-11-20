@@ -103,6 +103,51 @@ def build_kpp(preset_xml: str, preview_rgba: np.ndarray) -> bytes:
     return bytes(out)
 
 
+def read_preset_xml(kpp_bytes: bytes) -> str:
+    """从 .kpp 字节回读预设 XML（iTXt keyword="preset"）。
+
+    与 build_kpp() 严格对称，供写出后回读校验（verify_bundle）与 GUI 摘要
+    （纹理计数）使用。任何结构不符都抛 ValueError：宁可报错，不要把
+    「读不出来」当成「没有纹理」。
+
+    校验三件事：PNG 签名、块长度不越界、iTXt 块自身 CRC32 正确。
+    """
+    if not kpp_bytes.startswith(b"\x89PNG\r\n\x1a\n"):
+        raise ValueError("不是 PNG 容器（缺少 PNG 签名）")
+    pos = 8
+    total = len(kpp_bytes)
+    while pos + 8 <= total:
+        length = struct.unpack(">I", kpp_bytes[pos:pos + 4])[0]
+        ctype = kpp_bytes[pos + 4:pos + 8]
+        end = pos + 8 + length
+        if end + 4 > total:
+            raise ValueError(f"PNG 块 {ctype!r} 被截断（需要 {length} 字节）")
+        payload = kpp_bytes[pos + 8:end]
+        crc = struct.unpack(">I", kpp_bytes[end:end + 4])[0]
+        if ctype == b"iTXt":
+            if crc != (zlib.crc32(ctype + payload) & 0xFFFFFFFF):
+                raise ValueError("iTXt 块 CRC 校验失败（字节已损坏）")
+            keyword, _, rest = payload.partition(b"\x00")
+            if keyword == b"preset":
+                if len(rest) < 2:
+                    raise ValueError("iTXt 预设块缺少压缩标志")
+                flag = rest[0]
+                body = rest[2:]
+                # language tag + translated keyword：本工具写出时都是空串
+                _lang, _, body = body.partition(b"\x00")
+                _trans, _, data = body.partition(b"\x00")
+                if flag == 1:
+                    try:
+                        data = zlib.decompress(data)
+                    except zlib.error as exc:
+                        raise ValueError(f"iTXt 预设块解压失败：{exc}") from exc
+                elif flag != 0:
+                    raise ValueError(f"iTXt 压缩标志非法：{flag}")
+                return data.decode("utf-8")
+        pos = end + 4
+    raise ValueError("未找到 iTXt 预设块（不是 .kpp）")
+
+
 def write_kpp(path: str, preset_xml: str, preview_rgba: np.ndarray) -> str:
     with open(path, "wb") as f:
         f.write(build_kpp(preset_xml, preview_rgba))

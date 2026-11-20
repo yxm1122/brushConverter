@@ -2,20 +2,30 @@
 
 from __future__ import annotations
 
+import base64
 import hashlib
 import io
 import re
+import struct
+import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
 from pathlib import Path
 
 import numpy as np
 from PIL import Image, PngImagePlugin
 
+from . import __version__
 from .abr import AbrFile
 from .mapping import BrushPreset, TextureSettings, map_presets, _TEXTURING_MODE
 from .kpp import TextureXml, build_preset_xml, write_kpp, write_bundle
+from .kpp.bundle import (
+    BundleVerifyResult,
+    bundle_content_hash8,
+    bundle_content_hash8_of_file,
+    verify_bundle,
+)
 from .kpp.preset_xml import texture_brightness_contrast
-from .kpp.kpp_writer import render_tip_preview
+from .kpp.kpp_writer import read_preset_xml, render_tip_preview
 
 
 def _png_bytes(gray: np.ndarray) -> bytes:
@@ -218,6 +228,88 @@ class ConvertResult:
     out_dir: str = ""
     presets: list[BrushPreset] = field(default_factory=list)
     skipped: list[str] = field(default_factory=list)
+    # --- v1.3.1 产物加固 ---
+    content_hash8: str = ""            # 产物名的逻辑内容短哈希（只在有 bundle 时有值）
+    texture_count: int = 0             # 含真实纹理的预设数（Enabled=true 且非 1x1）
+    bundle_reused: bool = False        # 命中「已存在同内容产物」→ 未重复写入
+    bundle_renamed: bool = False       # 目标同名但内容不同 → 自动加 _2/_3 后缀
+    warnings: list[str] = field(default_factory=list)  # 需展示给用户的提示（防呆等）
+    verify: BundleVerifyResult | None = None  # 写出后回读校验结论
+
+
+
+# ---------------------------------------------------------------------------
+# v1.3.1 产物加固：内容短哈希命名 / 覆盖防呆 / 回读校验 / 纹理计数
+# 依据 docs/验收报告/缺陷-纹理丢失-v1.3.1-代码加固.md（使用者批准的 4 条）。
+# ---------------------------------------------------------------------------
+
+
+def _png_size(png: bytes) -> tuple[int, int]:
+    """只读 PNG 的 IHDR 取宽高（不解码像素：3MB 纹理也能瞬间判尺寸）。"""
+    if not png.startswith(b"\x89PNG\r\n\x1a\n"):
+        raise ValueError("不是 PNG 字节（缺少 PNG 签名）")
+    if len(png) < 24 or png[12:16] != b"IHDR":
+        raise ValueError("PNG 缺少 IHDR 块")
+    return struct.unpack(">II", png[16:24])
+
+
+def kpp_has_real_texture(kpp_bytes: bytes) -> bool:
+    """判定单个 .kpp 是否带「真实纹理」。
+
+    口径（使用者批准）：Texture/Pattern/Enabled=true，且内嵌 patterns 资源
+    不是 1x1 占位图。1x1 是 ABR 里「纹理参数开着但图案缺内容」的产物，
+    Krita 加载后视觉上等于没有纹理，不能计入「含真实纹理」。
+    """
+    root = ET.fromstring(read_preset_xml(kpp_bytes))
+    enabled = False
+    for param in root.iter("param"):
+        if param.get("name") == "Texture/Pattern/Enabled":
+            enabled = (param.text or "").strip().lower() == "true"
+            break
+    if not enabled:
+        return False
+    for res in root.iter("resource"):
+        if res.get("type") != "patterns":
+            continue
+        payload = (res.text or "").strip()
+        if not payload:
+            continue
+        try:
+            png = base64.b64decode(payload)
+        except (ValueError, TypeError):
+            continue
+        try:
+            width, height = _png_size(png)
+        except ValueError:
+            continue
+        if width > 1 or height > 1:
+            return True
+    return False
+
+
+def count_real_textures(kpp_files: list[tuple[str, bytes]]) -> int:
+    """统计产物里「含真实纹理」的预设个数（GUI 摘要与回归测试共用同一口径）。"""
+    return sum(1 for _, data in kpp_files if kpp_has_real_texture(data))
+
+
+def _resolve_bundle_path(target: Path, content_hash8: str) -> tuple[Path, str]:
+    """决定 .bundle 落盘路径，绝不静默覆盖。
+
+    返回 (路径, 状态)，状态取 "new" / "reused" / "renamed"：
+    - 目标不存在 → 直接写；
+    - 目标已存在且逻辑内容哈希相同 → 复用（不重复写，避免白写几十 MB）；
+    - 目标已存在但内容不同（旧产物 / 手工放的坏文件 / 哈希前缀撞车）
+      → 依次试 名字_2、名字_3…，并对调用方发出「已重命名」警告。
+    """
+    if not target.exists():
+        return target, "new"
+    if bundle_content_hash8_of_file(target) == content_hash8:
+        return target, "reused"
+    for index in range(2, 1000):
+        candidate = target.with_name(f"{target.stem}_{index}{target.suffix}")
+        if not candidate.exists():
+            return candidate, "renamed"
+    raise OSError(f"同名产物过多，无法为 {target.name} 找到可写文件名")
 
 
 def convert(abr_path: str, out_dir: str, make_bundle: bool = True,
@@ -298,9 +390,37 @@ def convert_presets(abr: AbrFile, presets: list[BrushPreset], out_dir: str,
         if make_standalone:
             write_kpp(str(kpp_dir / fname), xml, preview)
 
+    result.texture_count = count_real_textures(result.kpp_files)
+
     if make_bundle and result.kpp_files:
         stem = getattr(abr, "name", None) or "converted"
-        result.bundle_path = write_bundle(str(out / f"{stem}.bundle"), result.kpp_files)
+        # v1.3.1：产物名带版本号 + 逻辑内容短哈希，让「同名 ⇒ 同内容」成立。
+        # 版本号让不同版本的产物不会互相覆盖，hash8 让同内容可被识别复用。
+        result.content_hash8 = bundle_content_hash8(result.kpp_files)
+        base = out / f"{stem}_v{__version__}_{result.content_hash8}.bundle"
+        target, state = _resolve_bundle_path(base, result.content_hash8)
+        result.bundle_reused = state == "reused"
+        if result.bundle_reused:
+            # 同内容产物已存在：直接复用，绝不再写一遍（写盘会改 mtime，
+            # 也会让「未重复写入」这句提示变成假话）。
+            result.bundle_path = str(target)
+        else:
+            result.bundle_path = write_bundle(str(target), result.kpp_files)
+        result.bundle_renamed = state == "renamed"
+        if state == "reused":
+            result.warnings.append("已存在同内容产物，未重复写入")
+        elif state == "renamed":
+            result.warnings.append(
+                f"目标同名文件内容不同，已重命名为 {target.name}（原文件未覆盖）")
+        # 旧版命名（stem.bundle）留在同目录时只提示，不覆盖也不删：
+        # 「主要针对旧版 stem.bundle」的防呆落在这里最安全。
+        legacy = out / f"{stem}.bundle"
+        if legacy.exists():
+            result.warnings.append(
+                f"检测到旧版命名产物 {legacy.name}：v1.3.1 不覆盖旧文件，"
+                f"新产物为 {target.name}")
+        # 写出后回读校验（verify_bundle 不抛异常，失败结论进 result.verify）
+        result.verify = verify_bundle(result.bundle_path)
     return result
 
 

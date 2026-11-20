@@ -58,7 +58,13 @@ _STRINGS: dict[str, dict[str, str]] = {
         "convert_failed": "转换失败",
         "done_status": "完成：{n} 支笔刷",
         "done_title": "转换完成",
-        "done_body": "成功转换 {n} 支笔刷。\n\n输出位置：\n{paths}",
+        "done_body": "输出位置：\n{paths}",
+        # v1.3.1 产物加固：摘要带真实纹理数、产物文件名与内容短哈希
+        "done_summary": "预设 {n} 个（含真实纹理 {tex} 个）",
+        "done_bundle": "资源包：{name}（短哈希 {hash}）",
+        "renamed_notice": "产物已重命名以避免覆盖：{path}",
+        "reused_notice": "已存在同内容产物，未重复写入：{path}",
+        "verify_failed": "产物回读校验失败：{detail}",
     },
     "en": {
         "window_title": "brushConverter — ABR → Krita Brush Converter",
@@ -104,7 +110,13 @@ _STRINGS: dict[str, dict[str, str]] = {
         "convert_failed": "Conversion Failed",
         "done_status": "Done: {n} brushes",
         "done_title": "Conversion Complete",
-        "done_body": "Successfully converted {n} brushes.\n\nOutput location:\n{paths}",
+        "done_body": "Output location:\n{paths}",
+        # v1.3.1 output hardening: real-texture count, bundle name and content hash
+        "done_summary": "Presets: {n} (with real texture: {tex})",
+        "done_bundle": "Bundle: {name} (short hash {hash})",
+        "renamed_notice": "Output renamed to avoid overwriting: {path}",
+        "reused_notice": "An identical output already exists; not rewritten: {path}",
+        "verify_failed": "Output read-back verification failed: {detail}",
     },
 }
 

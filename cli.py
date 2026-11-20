@@ -20,6 +20,7 @@ sys.path.insert(0, str(Path(__file__).parent / "src"))
 
 from brush_converter.abr import AbrFile  # noqa: E402
 from brush_converter.convert import convert  # noqa: E402
+from brush_converter.kpp.bundle import verify_bundle  # noqa: E402
 
 
 def cmd_gui(args: argparse.Namespace) -> int:
@@ -34,15 +35,33 @@ def cmd_convert(args: argparse.Namespace) -> int:
     result = convert(args.file, args.output,
                      make_bundle=not args.no_bundle,
                      make_standalone=not args.no_standalone)
-    print(f"转换完成：{len(result.kpp_files)} 个预设")
+    print(f"转换完成：{len(result.kpp_files)} 个预设"
+          f"（含真实纹理 {result.texture_count} 个）")
     for fname, _ in result.kpp_files:
         print(f"  - {fname}")
     if result.bundle_path:
         print(f"资源包：{result.bundle_path}")
+    # 覆盖防呆的提示（已存在同内容未重复写入 / 已重命名 / 旧版命名产物）
+    for warning in result.warnings:
+        print(f"  ! {warning}")
     if result.skipped:
         print("跳过：")
         for s in result.skipped:
             print(f"  - {s}")
+    if result.bundle_path:
+        # v1.3.1：写出后回读校验。失败必须非 0 退出（返回 3），
+        # 而不是打印一行然后照常返回 0 —— 否则脚本会误判转换成功。
+        verified = result.verify
+        if verified is None:
+            verified = verify_bundle(result.bundle_path)
+        if verified.ok:
+            print(f"输出校验：OK（{verified.preset_count} 个预设，"
+                  f"sha256={verified.sha256}，大小={verified.size}B）")
+        else:
+            print("输出校验：失败", file=sys.stderr)
+            for reason in verified.errors:
+                print(f"  - {reason}", file=sys.stderr)
+            return 3
     return 0
 
 

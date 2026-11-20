@@ -412,10 +412,23 @@ class MainWindow(QMainWindow):
             paths.append(r.bundle_path)
         if r.kpp_files and not r.bundle_path:
             paths.append(str(Path(r.out_dir) / "kpp"))
+        # v1.3.1 摘要：预设数（含真实纹理数）+ 产物文件名/短哈希，
+        # 并把「已重命名以避免覆盖」「已存在同内容未重复写入」「回读校验失败」
+        # 这三类结果明确摆给用户看，不能只在命令行里静默。
+        lines = [tr("done_summary", n=len(r.kpp_files), tex=r.texture_count)]
+        if r.bundle_path:
+            lines.append(tr("done_bundle", name=Path(r.bundle_path).name,
+                            hash=r.content_hash8 or "—"))
+            if r.bundle_renamed:
+                lines.append(tr("renamed_notice", path=r.bundle_path))
+            if r.bundle_reused:
+                lines.append(tr("reused_notice", path=r.bundle_path))
+            if r.verify is not None and not r.verify.ok:
+                lines.append(tr("verify_failed", detail="；".join(r.verify.errors)))
+        lines.append(tr("done_body", paths="\n".join(paths)))
         self._set_status("done_status", n=len(r.kpp_files))
         QMessageBox.information(
-            self, tr("done_title"),
-            tr("done_body", n=len(r.kpp_files), paths="\n".join(paths)))
+            self, tr("done_title"), "\n\n".join(lines))
 
 
     def closeEvent(self, event) -> None:

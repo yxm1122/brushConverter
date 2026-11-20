@@ -29,12 +29,26 @@ VERIFY_ENTRY = REPO_ROOT / "tools" / "verify_entry.py"
 pytestmark = pytest.mark.verify
 
 
-def _run_entry(extra_args):
-    """用真实子进程跑一遍 verify_entry，返回 (退出码, stdout 文本, stderr 文本)。"""
+def _run_entry(extra_args, tmp_path):
+    """用真实子进程跑一遍 verify_entry，返回 (退出码, stdout 文本, stderr 文本)。
+
+    v1.3.1 隔离加固（不是为了让用例变绿）：把嵌套 pytest 的临时根目录固定到
+    本用例自己的 tmp_path（TMP/TEMP/TMPDIR 与 --basetemp 都指过去），不再读写
+    共享的 %TEMP%。原因：本用例曾在本机「并行跑两套全量回归」时偶发收集期
+    FileNotFoundError（路径形如 %TEMP%/KritaFrameCache*，该目录由 Krita 渲染
+    测试创建/删除，本仓库代码里没有任何引用），属跨进程临时目录互相删除，
+    与产品行为无关。隔离后嵌套 pytest 的临时目录只归本用例所有，同类干扰不再
+    可能触发；被测契约（摘要行文字、退出码）一字未改。
+    """
+    isolated_temp = tmp_path / "nested_temp"
+    isolated_temp.mkdir(parents=True, exist_ok=True)
     env = dict(os.environ)
     env["PYTHONIOENCODING"] = "utf-8"
+    for name in ("TMP", "TEMP", "TMPDIR"):
+        env[name] = str(isolated_temp)
     proc = subprocess.run(
-        [sys.executable, str(VERIFY_ENTRY), *extra_args],
+        [sys.executable, str(VERIFY_ENTRY),
+         "--basetemp=" + str(isolated_temp / "basetemp"), *extra_args],
         cwd=str(REPO_ROOT),
         capture_output=True,
         env=env,
@@ -61,7 +75,7 @@ def test_skip_is_counted_separately_from_pass(tmp_path):
         "test_skip_probe.py",
         "import pytest\n\n\ndef test_skip_probe():\n    pytest.skip(\"缺少样本：临时探针\")\n",
     )
-    code, out, err = _run_entry(["-c", "pytest.ini", str(case)])
+    code, out, err = _run_entry(["-c", "pytest.ini", str(case)], tmp_path)
 
     assert code == 0, f"全通过但有跳过应返回 0，实际 {code}\nstdout:\n{out}\nstderr:\n{err}"
     first_line = out.splitlines()[0] if out.splitlines() else ""
@@ -80,7 +94,7 @@ def test_all_pass_without_skip(tmp_path):
         "test_pass_probe.py",
         "def test_pass_probe():\n    assert 1 + 1 == 2\n",
     )
-    code, out, err = _run_entry(["-c", "pytest.ini", str(case)])
+    code, out, err = _run_entry(["-c", "pytest.ini", str(case)], tmp_path)
 
     assert code == 0, f"全通过应返回 0，实际 {code}\nstdout:\n{out}\nstderr:\n{err}"
     first_line = out.splitlines()[0] if out.splitlines() else ""
@@ -95,7 +109,7 @@ def test_failure_returns_exit_code_1(tmp_path):
         "test_fail_probe.py",
         "def test_fail_probe():\n    assert 1 == 2, \"这个断言故意不成立\"\n",
     )
-    code, out, err = _run_entry(["-c", "pytest.ini", str(case)])
+    code, out, err = _run_entry(["-c", "pytest.ini", str(case)], tmp_path)
 
     assert code == 1, f"有失败应返回 1，实际 {code}\nstdout:\n{out}\nstderr:\n{err}"
     assert "通过 0 项 ｜ 失败 1 项 ｜ 跳过 0 项" in out, f"摘要行不符合契约：{out}"

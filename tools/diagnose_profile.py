@@ -4,6 +4,12 @@
 用途：排查「bundle 文件明明在、Krita 里却笔刷不可见 / 纹理静默丢失」这类零报错问题。
 所有结论都来自 resourcecache.sqlite 的只读副本与 bundle 文件本身，不做任何写操作。
 
+本工具重点提示两类「把原始 .abr 直接导入 Krita」造成的伪缺陷：
+  - storages 里 storage_type=4（Adobe Brush Library）的 ABR 直读库：Krita 5.3 会直读 .abr，
+    生成一套没有经过本工具转换的同款笔刷（无纹理映射、参数不同），与 .bundle 产物混在同一
+    列表里，看起来就像「纹理全丢 / 笔刷不可见」；
+  - 跨 storage 同名预设：同名会互相遮蔽/混淆，实际生效的未必是转换产物那份。
+
 典型用法：
     python tools/diagnose_profile.py --krita-dir "%APPDATA%/krita"
     python tools/diagnose_profile.py --krita-dir "%APPDATA%/krita" --bundle <某个.bundle>
@@ -11,7 +17,8 @@
 
 退出码：
     0 = 一切正常
-    1 = 发现问题（cache 损坏 / 悬空 storage / bundle 缺失或不完整 / bundle 未注册 / 纹理解析失败）
+    1 = 发现问题（cache 损坏 / ABR 直读库 / 跨 storage 同名预设 / 悬空 storage /
+        bundle 缺失或不完整 / bundle 未注册 / 纹理解析失败）
     2 = 参数或读取错误（目录不存在、sqlite 打不开等）
 """
 from __future__ import annotations
@@ -101,7 +108,7 @@ def section(title):
 
 
 def check_integrity(con, issues):
-    section("[1/6] resourcecache.sqlite 完整性（PRAGMA integrity_check）")
+    section("[1/8] resourcecache.sqlite 完整性（PRAGMA integrity_check）")
     try:
         rows = [str(r[0]) for r in con.execute("PRAGMA integrity_check")]
     except Exception as exc:
@@ -122,7 +129,7 @@ def check_integrity(con, issues):
 
 
 def list_storages(con):
-    section("[2/6] storages 概览")
+    section("[2/8] storages 概览")
     rows = list(con.execute("select id, storage_type_id, location, active from storages order by id"))
     if not rows:
         print("  （空：DB 里没有任何 storage 记录）")
@@ -133,8 +140,116 @@ def list_storages(con):
             sid, name, active, location or "(资源目录根)"))
 
 
+DEFAULT_DUP_GROUP_LIMIT = 20
+
+
+def storage_label(storage_type_id):
+    """storage 类型标签；未知类型原样显示 typeN。"""
+    return STORAGE_TYPES.get(storage_type_id, "type%s" % storage_type_id)
+
+
+def check_adobe_libraries(con, issues):
+    """ABR 直读库（storage_type_id=4，Adobe Brush Library）检测。
+
+    Krita 5.3 会把 .abr 当 Adobe Brush Library 直接读，生成一套**没有经过本工具转换**的同款
+    笔刷（无纹理映射、参数不同）。它和 .bundle 里的转换产物混在同一列表里，看起来就像
+    「纹理全丢 / 笔刷不可见」。实测移除该 .abr 后转换产物的纹理即恢复。
+    """
+    section("[3/8] ABR 直读库检测（storage 类型 = Adobe Brush Library）")
+    rows = [tuple(row) for row in con.execute(
+        "select id, storage_type_id, location, active from storages "
+        "where storage_type_id = 4 order by id")]
+    print("  Adobe Brush Library（ABR 直读库）记录：%d 个" % len(rows))
+    if not rows:
+        print("  未发现 ABR 直读库：Krita 里没有直接读入的 .abr。")
+        print("  （正常姿态：ABR 只经本工具转换成 .bundle，不要把原始 .abr 放进 Krita 资源目录）")
+        return
+    print("")
+    print("  ⚠ 检测到 %d 个 ABR 直读库，可能与转换产物冲突（建议移除后重启 Krita）" % len(rows))
+    for sid, _stype, location, active in rows:
+        counts = [tuple(x) for x in con.execute(
+            "select "
+            "sum(case when resource_type_id = 7 then 1 else 0 end), "
+            "sum(case when resource_type_id = 9 then 1 else 0 end), "
+            "count(*) from resources where storage_id = ?", (sid,))][0]
+        print("    id=%-4s active=%s  位置=%s" % (sid, active, location or "(空)"))
+        print("           该库资源：预设(paintoppresets)=%s / 图案(patterns)=%s / 全部=%s"
+              % (counts[0] or 0, counts[1] or 0, counts[2] or 0))
+    print("")
+    print("  影响：Krita 5.3 把 ABR 当 Adobe Brush Library 直读，生成的是一套**没有经过本工具")
+    print("        转换**的同款笔刷（没有纹理映射、参数与本工具产物不同）。它和 .bundle 里的转换")
+    print("        产物混在同一列表里，看起来就像「纹理全丢 / 笔刷不可见」——本缺陷实测有效的成因。")
+    print("  处理：① Krita 资源管理器里移除这些 ABR 库；或 ② 退出 Krita 后把 %APPDATA%/krita 下")
+    print("        的 .abr 文件移到备份目录，再重启 Krita。移除后转换产物的纹理即恢复。")
+    issues.append("检测到 %d 个 ABR 直读库（Adobe Brush Library），可能与转换产物冲突" % len(rows))
+
+
+def _preset_sources(con, name):
+    """某个预设名在各 storage 里的来源（storage id / 类型 / 位置）。"""
+    return [tuple(row) for row in con.execute(
+        "select r.storage_id, s.storage_type_id, s.location from resources r "
+        "join storages s on s.id = r.storage_id "
+        "where r.resource_type_id = 7 and r.name = ? group by r.storage_id "
+        "order by r.storage_id", (name,))]
+
+
+def format_sources(sources):
+    parts = []
+    for sid, stype, location in sources:
+        parts.append("[id=%s %s %s]" % (sid, storage_label(stype), location or "(资源目录根)"))
+    return " ".join(parts)
+
+
+def check_duplicate_presets(con, issues):
+    """跨 storage 同名预设检测。
+
+    同名会互相遮蔽：Krita 只显示一份，实际取哪一份取决于扫描顺序与 cache 状态；转换产物被
+    另一个库的同名项遮蔽时，看起来就是「笔刷在、纹理却没了」。
+    「资源目录根(Folder, type=2)」与 Krita 自带 bundle 同名属于常规镜像，单独归为提示，不算问题。
+    """
+    section("[4/8] 跨 storage 同名预设（可能互相遮蔽 / 混淆）")
+    rows = [tuple(row) for row in con.execute(
+        "select r.name, count(distinct r.storage_id) from resources r "
+        "where r.resource_type_id = 7 and r.name is not null and r.name != '' "
+        "group by r.name having count(distinct r.storage_id) > 1 "
+        "order by 2 desc, 1")]
+    print("  跨 storage 同名的预设（paintoppresets）：%d 组" % len(rows))
+    if not rows:
+        print("  未发现同名预设。")
+        return
+    conflicts = []
+    benign = []
+    for name, _count in rows:
+        sources = _preset_sources(con, name)
+        non_folder = [item for item in sources if item[1] != 2]
+        has_adobe = any(item[1] == 4 for item in sources)
+        if has_adobe or len(non_folder) >= 2:
+            conflicts.append((name, sources))
+        else:
+            benign.append((name, sources))
+    if conflicts:
+        print("")
+        print("  ⚠ 同名预设可能互相遮蔽/混淆（需要处理的 %d 组）" % len(conflicts))
+        for name, sources in conflicts[:DEFAULT_DUP_GROUP_LIMIT]:
+            print("    %s" % name)
+            print("        来源：%s" % format_sources(sources))
+        if len(conflicts) > DEFAULT_DUP_GROUP_LIMIT:
+            print("    …… 其余 %d 组省略" % (len(conflicts) - DEFAULT_DUP_GROUP_LIMIT))
+        print("")
+        print("  影响：同名时 Krita 只显示一份，实际生效的未必是转换产物那份；被 ABR 直读库同名")
+        print("        项遮蔽时就表现为「纹理全丢」。")
+        print("  处理：移除或停用其中一个来源（多半是 ABR 直读库），或给其中一份改名。")
+        issues.append("发现 %d 组跨 storage 同名预设（可能互相遮蔽/混淆）" % len(conflicts))
+    if benign:
+        print("")
+        print("  提示：另有 %d 组同名只发生在「资源目录根(Folder)」与 Krita 自带库之间，" % len(benign))
+        print("        属于 Krita 常规镜像，通常无害（最多列 5 组）：")
+        for name, sources in benign[:5]:
+            print("    %s → %s" % (name, format_sources(sources)))
+
+
 def check_dangling(con, krita_dir, issues):
-    section("[3/6] 悬空 storage（DB 有记录、磁盘文件不存在）")
+    section("[5/8] 悬空 storage（DB 有记录、磁盘文件不存在）")
     dangling = []
     for sid, stype, location in list(con.execute("select id, storage_type_id, location from storages order by id")):
         if stype in (6, 7):  # Memory / Font Storage 是虚拟 storage，不检查文件
@@ -154,7 +269,7 @@ def check_dangling(con, krita_dir, issues):
 
 
 def check_bundle(con, bundle_path, issues):
-    section("[4/6] bundle 完整性")
+    section("[6/8] bundle 完整性")
     if not os.path.isfile(bundle_path):
         print("  文件不存在：%s" % bundle_path)
         issues.append("bundle 文件不存在")
@@ -221,13 +336,13 @@ def check_bundle(con, bundle_path, issues):
     else:
         print("  DB 注册状态：未注册（storages 表里找不到该文件名的行）")
         print("  判定：Krita 没有扫描/登记这个 bundle——资源库里自然看不到它的预设。")
-        print("        覆盖 bundle 后必须完整重启 Krita；若已重启仍未注册，见 [1/6] cache 完整性。")
+        print("        覆盖 bundle 后必须完整重启 Krita；若已重启仍未注册，见 [1/8] cache 完整性。")
         issues.append("bundle 未在 storages 表注册")
     return zf, presets
 
 
 def count_resources(con):
-    section("[5/6] 预设 / 图案计数")
+    section("[7/8] 预设 / 图案计数")
     for type_id, type_name in ((7, "paintoppresets"), (9, "patterns")):
         total = list(con.execute(
             "select count(*), sum(case when status=1 then 1 else 0 end) from resources where resource_type_id=?",
@@ -289,7 +404,7 @@ def texture_visibility(compute_mask, pixels, params):
 
 
 def predict_textures(con, zf, presets, issues):
-    section("[6/6] 纹理解析预测（按 Krita 5.x 源码语义推演，不启动 Krita）")
+    section("[8/8] 纹理解析预测（按 Krita 5.x 源码语义推演，不启动 Krita）")
     compute_mask = load_texture_mask_module()
     if compute_mask is None:
         print("  提示：未找到 tools/texture_mask.py 或缺少 numpy，可见度只做粗略估计。")
@@ -362,14 +477,19 @@ def main(argv=None):
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description=(
             "Krita 资源库只读诊断：排查「bundle 文件在、Krita 里却笔刷不可见 / 纹理静默丢失」这类零报错问题。\n"
-            "本工具只读：先把 resourcecache.sqlite 复制到临时目录再读，不启动 Krita、不写用户 profile。"
+            "本工具只读：先把 resourcecache.sqlite 复制到临时目录再读，不启动 Krita、不写用户 profile。\n"
+            "分节检查：cache 完整性 → storages → ABR 直读库（Adobe Brush Library）→ 跨 storage 同名预设 →"
+            " 悬空 storage → bundle 完整性 → 预设/图案计数 → 纹理解析预测。"
         ),
         epilog=(
             "示例：\n"
             "  python tools/diagnose_profile.py --krita-dir \"%APPDATA%/krita\"\n"
             "  python tools/diagnose_profile.py --krita-dir \"%APPDATA%/krita\" --bundle converted/xxx.bundle\n"
             "  python tools/diagnose_profile.py --krita-dir \"%APPDATA%/krita\" --bundle converted/xxx.bundle --predict\n"
-            "\n退出码：0=正常，1=发现问题，2=参数或读取错误。"
+            "\n本工具会醒目提示两类「把原始 .abr 直接导入 Krita」造成的伪缺陷："
+            "\n  - storages 里 type=4（Adobe Brush Library）的 ABR 直读库——建议移除后重启 Krita；"
+            "\n  - 跨 storage 同名预设——同名会互相遮蔽，看起来像纹理丢失。"
+            "\n\n退出码：0=正常，1=发现问题（含上述两类冲突），2=参数或读取错误。"
         ),
     )
     parser.add_argument("-h", "--help", action="help", help="显示本帮助并退出")
@@ -401,22 +521,24 @@ def main(argv=None):
         print("Krita 资源目录：%s" % krita_dir)
         check_integrity(con, issues)
         list_storages(con)
+        check_adobe_libraries(con, issues)
+        check_duplicate_presets(con, issues)
         check_dangling(con, krita_dir, issues)
         bundle_handle = None
         if bundle_path:
             bundle_handle = check_bundle(con, bundle_path, issues)
         else:
-            section("[4/6] bundle 完整性")
+            section("[6/8] bundle 完整性")
             print("  未指定 --bundle，跳过。")
         count_resources(con)
         if bundle_path and args.predict:
             if bundle_handle:
                 predict_textures(con, bundle_handle[0], bundle_handle[1], issues)
             else:
-                section("[6/6] 纹理解析预测")
+                section("[8/8] 纹理解析预测")
                 print("  bundle 不可用，跳过。")
         else:
-            section("[6/6] 纹理解析预测")
+            section("[8/8] 纹理解析预测")
             print("  未启用（加 --bundle 与 --predict 可做逐预设纹理预测）。")
     finally:
         con.close()
@@ -427,9 +549,13 @@ def main(argv=None):
         for item in issues:
             print("  - " + item)
         print("")
-        print("建议顺序：① 核对 bundle 完整性（大小/条目数/manifest md5）；② 若 cache 损坏，")
-        print("退出 Krita → 备份并删除 resourcecache.sqlite → 重启让 Krita 重建 → 重新导入 bundle；")
-        print("③ 覆盖产物时先退出 Krita，复制完成后重启，不要在 Krita 运行时覆盖。")
+        print("建议顺序（先做代价最小的）：")
+        print("① 先确认没有把原始 .abr 直接导入 Krita——ABR 直读库会生成无纹理转换的同款笔刷，")
+        print("   与转换产物混淆（本工具 [3/8]/[4/8] 已列出具体库与同名项）；")
+        print("② 核对 bundle 完整性（大小/条目数/manifest md5）；")
+        print("③ 只有上面两步都正常才考虑 cache：退出 Krita → 备份并删除 resourcecache.sqlite")
+        print("   → 重启让 Krita 重建 → 重新导入 bundle（会丢自定义预设标签/分组，资源文件不丢）；")
+        print("④ 覆盖产物时先退出 Krita，复制完成后重启，不要在 Krita 运行时覆盖。")
         return 1
     print("未发现问题。")
     return 0
