@@ -1,0 +1,145 @@
+{
+ "param": "size",
+ "group": "computed",
+ "points": [
+  {
+   "param": "size",
+   "group": "computed",
+   "value": 20.0,
+   "ps_file": "docs/数据/偏差/ps/size__computed__v20.png",
+   "kt_file": "docs/数据/偏差/krita/size__computed__v20.png",
+   "pixel": {
+    "diff_pixels": 4344,
+    "diff_ratio": 0.01696875,
+    "max_delta": 255,
+    "mean_abs_delta": 1.0747734375,
+    "pass": false
+   },
+   "ps_idat_sha256": "e431deb503833b347a2c9365dc0b666fddf6b9b96c624f5b0f9adcbc6de5be77",
+   "kt_idat_sha256": "30515bd7dd87b1d9f97d3514f235b390bf053c2c4e0145c9323337556a7abb67",
+   "consistent": true,
+   "metric": {
+    "ps": {
+     "width50": 19.455284552845526,
+     "width50_max": 19.864864864864863,
+     "width50_top10": 19.864864864864863,
+     "width50_median_all": 15.618870066714894,
+     "n_columns": 500,
+     "bbox_height": 22,
+     "thr": 127.5
+    },
+    "kt": {
+     "width50": 19.93181818181818,
+     "width50_max": 19.93181818181818,
+     "width50_top10": 19.93181818181818,
+     "width50_median_all": 15.198757763975156,
+     "n_columns": 456,
+     "bbox_height": 20,
+     "thr": 127.5
+    },
+    "rel_err_width": 0.024493788701895683,
+    "width_ratio_kt_over_ps": 1.0244937887018957,
+    "abs_diff_px": 0.4765336289726534,
+    "nominal_diameter": 20.0,
+    "ps_width_vs_nominal_rel": 0.027235772357723675,
+    "kt_width_vs_nominal_rel": 0.003409090909091006,
+    "consistent_by_rel": false,
+    "consistent_by_abs": true
+   }
+  },
+  {
+   "param": "size",
+   "group": "computed",
+   "value": 100.0,
+   "ps_file": "docs/数据/偏差/ps/size__computed__v100.png",
+   "kt_file": "docs/数据/偏差/krita/size__computed__v100.png",
+   "pixel": {
+    "diff_pixels": 4435,
+    "diff_ratio": 0.01732421875,
+    "max_delta": 158,
+    "mean_abs_delta": 0.69464453125,
+    "pass": false
+   },
+   "ps_idat_sha256": "5f8c0d39d7c82246770b18b650c9a6ef666fcc39e14cda6fa246ea6ea61be75c",
+   "kt_idat_sha256": "503ea5227684d0757d272ab33d300cf796b912da16173b264d725e6cfb8764eb",
+   "consistent": true,
+   "metric": {
+    "ps": {
+     "width50": 97.04272131147542,
+     "width50_max": 99.9457411957412,
+     "width50_top10": 99.73192814718237,
+     "width50_median_all": 85.14441635061104,
+     "n_columns": 500,
+     "bbox_height": 102,
+     "thr": 127.5
+    },
+    "kt": {
+     "width50": 96.5344827586207,
+     "width50_max": 99.9921875,
+     "width50_top10": 97.24350680467703,
+     "width50_median_all": 84.80864197530863,
+     "n_columns": 495,
+     "bbox_height": 100,
+     "thr": 127.5
+    },
+    "rel_err_width": 0.005237266082259184,
+    "width_ratio_kt_over_ps": 0.9947627339177408,
+    "abs_diff_px": 0.5082385528547206,
+    "nominal_diameter": 100.0,
+    "ps_width_vs_nominal_rel": 0.029572786885245818,
+    "kt_width_vs_nominal_rel": 0.034655172413793026,
+    "consistent_by_rel": true,
+    "consistent_by_abs": true
+   }
+  },
+  {
+   "param": "size",
+   "group": "computed",
+   "value": 300.0,
+   "ps_file": "docs/数据/偏差/ps/size__computed__v300.png",
+   "kt_file": "docs/数据/偏差/krita/size__computed__v300.png",
+   "pixel": {
+    "diff_pixels": 4505,
+    "diff_ratio": 0.01759765625,
+    "max_delta": 140,
+    "mean_abs_delta": 0.590421875,
+    "pass": false
+   },
+   "ps_idat_sha256": "52857b4daa63b9d2699b6a856a6ef54dcce33dded0a527acf258b658a4334ad5",
+   "kt_idat_sha256": "4c2581908c3f1219911b4e8ca375317b4bc160553b0fb4737124d3f4e1178dc5",
+   "consistent": true,
+   "metric": {
+    "ps": {
+     "width50": 294.39736274825935,
+     "width50_max": 297.98177648040036,
+     "width50_top10": 296.9837398373984,
+     "width50_median_all": 267.9805349324196,
+     "n_columns": 527,
+     "bbox_height": 302,
+     "thr": 127.5
+    },
+    "kt": {
+     "width50": 294.6507936507936,
+     "width50_max": 299.9921875,
+     "width50_top10": 296.81395348837214,
+     "width50_median_all": 266.125,
+     "n_columns": 529,
+     "bbox_height": 300,
+     "thr": 127.5
+    },
+    "rel_err_width": 0.0008608463750097255,
+    "width_ratio_kt_over_ps": 1.0008608463750097,
+    "abs_diff_px": 0.25343090253426226,
+    "nominal_diameter": 300.0,
+    "ps_width_vs_nominal_rel": 0.018675457505802153,
+    "kt_width_vs_nominal_rel": 0.017830687830687943,
+    "consistent_by_rel": true,
+    "consistent_by_abs": true
+   }
+  }
+ ],
+ "conclusion_detail": {
+  "conclusion": "不偏",
+  "reason": "全部已测取值点均在阈值内"
+ }
+}

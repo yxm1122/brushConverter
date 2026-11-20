@@ -1,0 +1,91 @@
+{
+ "param": "scale",
+ "group": "exp",
+ "points": [
+  {
+   "param": "scale",
+   "group": "exp",
+   "value": 50.0,
+   "ps_file": "tests/baselines/exp/ps/exp__ps__multiply__d100_s50_b0_c0.png",
+   "kt_file": "tests/baselines/exp/krita/exp__krita__conv__multiply__d100_s50_b0_c0.png",
+   "pixel": {
+    "diff_pixels": 0,
+    "diff_ratio": 0.0,
+    "max_delta": 1,
+    "mean_abs_delta": 0.5029,
+    "pass": true
+   },
+   "ps_idat_sha256": "8bb0908b8ccaa7f1148118bc330cda258a40adf1940a04f1675b12386d0284c5",
+   "kt_idat_sha256": "00106871fa0d41be07b5f3ed5668097dd40814eaa28e58d2dc23d7a7a8c3941c",
+   "metric": {
+    "kind": "image_diff",
+    "curve": {
+     "residual_mean_abs": 0.5029,
+     "residual_max_abs": 1,
+     "mean_abs_R_ps": 63.4517,
+     "rel_residual": 0.007925713574261998,
+     "note": "R(s)=A(s)-A(100)，s=100 为锚点（R≡0 属定义）"
+    }
+   },
+   "consistent": true
+  },
+  {
+   "param": "scale",
+   "group": "exp",
+   "value": 100.0,
+   "ps_file": "tests/baselines/exp/ps/exp__ps__multiply__d100_s100_b0_c0.png",
+   "kt_file": "tests/baselines/exp/krita/exp__krita__conv__multiply__d100_s100_b0_c0.png",
+   "pixel": {
+    "diff_pixels": 0,
+    "diff_ratio": 0.0,
+    "max_delta": 0,
+    "mean_abs_delta": 0.0,
+    "pass": true
+   },
+   "ps_idat_sha256": "1d14a8b9e0b87fbfd3cdc97f74be218ede7a09d679302965d289accae795c537",
+   "kt_idat_sha256": "eaf395c4aae3ea2614c4d85a76849a036a3bc53aeda819160e530c18b69525a1",
+   "metric": {
+    "kind": "image_diff",
+    "curve": {
+     "residual_mean_abs": 0.0,
+     "residual_max_abs": 0,
+     "mean_abs_R_ps": 0.0,
+     "rel_residual": null,
+     "note": "R(s)=A(s)-A(100)，s=100 为锚点（R≡0 属定义）"
+    }
+   },
+   "consistent": true
+  },
+  {
+   "param": "scale",
+   "group": "exp",
+   "value": 200.0,
+   "ps_file": "tests/baselines/exp/ps/exp__ps__multiply__d100_s200_b0_c0.png",
+   "kt_file": "tests/baselines/exp/krita/exp__krita__conv__multiply__d100_s200_b0_c0.png",
+   "pixel": {
+    "diff_pixels": 9372,
+    "diff_ratio": 0.9372,
+    "max_delta": 93,
+    "mean_abs_delta": 22.5279,
+    "pass": false
+   },
+   "ps_idat_sha256": "1ca4d5fe2ad024ed834c8e69ae59bde6d69bad8781d768fef3a5e2d30074f901",
+   "kt_idat_sha256": "cf3c9b1a442adb8c9328b38f35ff4d6f787d4c8a4cb038e86298860c2d254f04",
+   "metric": {
+    "kind": "image_diff",
+    "curve": {
+     "residual_mean_abs": 22.5279,
+     "residual_max_abs": 93,
+     "mean_abs_R_ps": 69.6302,
+     "rel_residual": 0.3235363391172221,
+     "note": "R(s)=A(s)-A(100)，s=100 为锚点（R≡0 属定义）"
+    }
+   },
+   "consistent": false
+  }
+ ],
+ "conclusion_detail": {
+  "conclusion": "真偏",
+  "reason": "缩放 200% 处整图差异比例 >2% 或 max_delta>2（s=100 锚点一致）"
+ }
+}

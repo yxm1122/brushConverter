@@ -1,0 +1,116 @@
+{
+ "param": "hardness",
+ "group": "computed",
+ "points": [
+  {
+   "param": "hardness",
+   "group": "computed",
+   "value": 0.0,
+   "ps_file": "docs/数据/偏差/ps/hardness__computed__v0.png",
+   "kt_file": "docs/数据/偏差/krita/hardness__computed__v0.png",
+   "pixel": {
+    "diff_pixels": 60848,
+    "diff_ratio": 0.3803,
+    "max_delta": 54,
+    "mean_abs_delta": 8.15441875,
+    "pass": false
+   },
+   "ps_idat_sha256": "3311c40668c1c4e9bd570db322e111a2fa9ab538607d108cd78b7669e22490b3",
+   "kt_idat_sha256": "b3c99df61b5335138485fd0af952c361b011483e955a47200bfc573a197238ba",
+   "consistent": false,
+   "metric": {
+    "ps": {
+     "edge_width": 78.75,
+     "peak_alpha": 255.0,
+     "centroid_row": 200,
+     "right_10_90": 78.75
+    },
+    "kt": {
+     "edge_width": 63.14999999999999,
+     "peak_alpha": 255.0,
+     "centroid_row": 199,
+     "right_10_90": 63.14999999999998
+    },
+    "abs_diff_px": 15.600000000000009,
+    "rel_err": 0.1980952380952382,
+    "consistent_by_rel": false,
+    "consistent_by_abs": false
+   }
+  },
+  {
+   "param": "hardness",
+   "group": "computed",
+   "value": 50.0,
+   "ps_file": "docs/数据/偏差/ps/hardness__computed__v50.png",
+   "kt_file": "docs/数据/偏差/krita/hardness__computed__v50.png",
+   "pixel": {
+    "diff_pixels": 39847,
+    "diff_ratio": 0.24904375,
+    "max_delta": 82,
+    "mean_abs_delta": 9.74744375,
+    "pass": false
+   },
+   "ps_idat_sha256": "7997225881c7b120553f1e2318f1602080ce0928f7234a3d0b27e05311049be2",
+   "kt_idat_sha256": "75b45232154d57c9f121bd42f895708308eae87f1cd29c8790ef1d2608357d54",
+   "consistent": false,
+   "metric": {
+    "ps": {
+     "edge_width": 32.379166666666684,
+     "peak_alpha": 255.0,
+     "centroid_row": 201,
+     "right_10_90": 32.4666666666667
+    },
+    "kt": {
+     "edge_width": 39.70833333333332,
+     "peak_alpha": 255.0,
+     "centroid_row": 199,
+     "right_10_90": 39.708333333333314
+    },
+    "abs_diff_px": 7.329166666666637,
+    "rel_err": 0.22635439454381573,
+    "consistent_by_rel": false,
+    "consistent_by_abs": false
+   }
+  },
+  {
+   "param": "hardness",
+   "group": "computed",
+   "value": 100.0,
+   "ps_file": "docs/数据/偏差/ps/hardness__computed__v100.png",
+   "kt_file": "docs/数据/偏差/krita/hardness__computed__v100.png",
+   "pixel": {
+    "diff_pixels": 1819,
+    "diff_ratio": 0.01136875,
+    "max_delta": 147,
+    "mean_abs_delta": 0.46995,
+    "pass": false
+   },
+   "ps_idat_sha256": "ae10d6f2624117cac34d036167792968f5fb57692fcb1526eb7733719094d3f8",
+   "kt_idat_sha256": "8e0f17ebe57c37a1bfc53ea3619079b3a44171a4af734d0133112eced04d0421",
+   "consistent": true,
+   "metric": {
+    "ps": {
+     "edge_width": 1.8805555555555458,
+     "peak_alpha": 255.0,
+     "centroid_row": 199,
+     "right_10_90": 1.8805555555555316
+    },
+    "kt": {
+     "edge_width": 0.8095238095238031,
+     "peak_alpha": 255.0,
+     "centroid_row": 199,
+     "right_10_90": 0.809523809523796
+    },
+    "abs_diff_px": 1.0710317460317427,
+    "rel_err": 0.5695294365899991,
+    "consistent_by_rel": false,
+    "consistent_by_abs": true
+   }
+  }
+ ],
+ "conclusion_detail": {
+  "conclusion": "真偏",
+  "reason": "至少一点超阈（2/3 点超阈）",
+  "detail": "0={'ps': {'edge_width': 78.75, 'peak_alpha': 255.0, 'centroid_row': 200, 'right_10_90': np.float64(78.75)}, 'kt': {'edge_width': 63.14999999999999, 'peak_alpha': 255.0, 'centroid_row': 199, 'right_10_90': np.float64(63.14999999999998)}, 'abs_diff_px': 15.600000000000009, 'rel_err': 0.1980952380952382, 'consistent_by_rel': False, 'consistent_by_abs': False}；50={'ps': {'edge_width': 32.379166666666684, 'peak_alpha': 255.0, 'centroid_row': 201, 'right_10_90': np.float64(32.4666666666667)}, 'kt': {'edge_width': 39.70833333333332, 'peak_alpha': 255.0, 'centroid_row': 199, 'right_10_90': np.float64(39.708333333333314)}, 'abs_diff_px': 7.329166666666637, 'rel_err': 0.22635439454381573, 'consistent_by_rel': False, 'consistent_by_abs': False}"
+ }
+}

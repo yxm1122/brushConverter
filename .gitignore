@@ -67,3 +67,7 @@ tests/baselines/exp/**/_work/
 tests/baselines/**/_work/
 # ---- v1.2.1 渲染回归脚手架（结论与数字已进报告；脚本改过本机 kritarc，不入库）----
 tests/baselines/exp/regress/
+
+# ---- 任务 106 偏差测量（PS 通信临时目录与 Krita 渲染标记，含本机绝对路径，不入库）----
+docs/数据/偏差/work/
+docs/数据/偏差/krita/*.png.result.json

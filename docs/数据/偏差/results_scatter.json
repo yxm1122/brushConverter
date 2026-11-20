@@ -1,0 +1,135 @@
+{
+ "param": "scatter",
+ "group": "computed",
+ "points": [
+  {
+   "param": "scatter",
+   "group": "computed",
+   "value": 0.0,
+   "ps_file": "docs/数据/偏差/ps/scatter__computed__v0.png",
+   "kt_file": "docs/数据/偏差/krita/scatter__computed__v0.png",
+   "pixel": {
+    "diff_pixels": 3698,
+    "diff_ratio": 0.010318080357142857,
+    "max_delta": 146,
+    "mean_abs_delta": 0.3380245535714286,
+    "pass": false
+   },
+   "ps_idat_sha256": "7f9fe1a36a613f7d3f67e22bf9db4062e73cb84219d465daea2030c50521e9c7",
+   "kt_idat_sha256": "fcae00e3ab034cbe5cee89d3834cb3de28569aab6ecf847f874cea6901567933",
+   "metric": {
+    "ps": {
+     "band_height": 102,
+     "y_std": 27.531985309477154,
+     "y_mean_spread": 0.0015769427038848866,
+     "x_range": [
+      166,
+      443
+     ]
+    },
+    "kt": {
+     "band_height": 100,
+     "y_std": 27.370948232055248,
+     "y_mean_spread": 0.0,
+     "x_range": [
+      168,
+      442
+     ]
+    }
+   },
+   "consistent": null
+  },
+  {
+   "param": "scatter",
+   "group": "computed",
+   "value": 100.0,
+   "ps_file": "docs/数据/偏差/ps/scatter__computed__v100.png",
+   "kt_file": "docs/数据/偏差/krita/scatter__computed__v100.png",
+   "pixel": {
+    "diff_pixels": 19990,
+    "diff_ratio": 0.05577566964285714,
+    "max_delta": 255,
+    "mean_abs_delta": 12.233024553571429,
+    "pass": false
+   },
+   "ps_idat_sha256": "807b40e55d2783c27e2ec503145d8d90649e030bb1d4fe04cf05e8a8cf2a3093",
+   "kt_idat_sha256": "544de1375cfd3ebe16a82657c26954cebbcd9b7e7371c0477083481a7d289435",
+   "metric": {
+    "ps": {
+     "band_height": 165,
+     "y_std": 31.76627837284986,
+     "y_mean_spread": 14.050645656692819,
+     "x_range": [
+      166,
+      443
+     ]
+    },
+    "kt": {
+     "band_height": 138,
+     "y_std": 27.654463995667648,
+     "y_mean_spread": 5.094730774022294,
+     "x_range": [
+      175,
+      445
+     ]
+    }
+   },
+   "consistent": null
+  },
+  {
+   "param": "scatter",
+   "group": "computed",
+   "value": 300.0,
+   "ps_file": "docs/数据/偏差/ps/scatter__computed__v300.png",
+   "kt_file": "docs/数据/偏差/krita/scatter__computed__v300.png",
+   "pixel": {
+    "diff_pixels": 95166,
+    "diff_ratio": 0.26553013392857144,
+    "max_delta": 255,
+    "mean_abs_delta": 64.12116908482143,
+    "pass": false
+   },
+   "ps_idat_sha256": "0980e9cc6e03c92c1f3b98c72ea2c17a062249f8598b13995fa30fb0087706b8",
+   "kt_idat_sha256": "7dea220a0720b352f0d7011d873f3dcd1389b14e023eb5f50d79f91585714eb3",
+   "metric": {
+    "ps": {
+     "band_height": 376,
+     "y_std": 77.54964336057694,
+     "y_mean_spread": 57.60568668537845,
+     "x_range": [
+      166,
+      443
+     ]
+    },
+    "kt": {
+     "band_height": 234,
+     "y_std": 34.993093765577704,
+     "y_mean_spread": 38.46311641942219,
+     "x_range": [
+      171,
+      443
+     ]
+    }
+   },
+   "consistent": null
+  }
+ ],
+ "scatter_growth": [
+  {
+   "value": 100.0,
+   "grow_ps": 63,
+   "grow_kt": 38,
+   "rel_err": 0.3968253968253968
+  },
+  {
+   "value": 300.0,
+   "grow_ps": 274,
+   "grow_kt": 134,
+   "rel_err": 0.5109489051094891
+  }
+ ],
+ "conclusion_detail": {
+  "conclusion": "真偏",
+  "reason": "散布增量（band_height(v)-band_height(0)）相对误差最大 51.1%（PS 增量 vs Krita 增量）"
+ }
+}

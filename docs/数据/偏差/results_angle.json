@@ -1,0 +1,154 @@
+{
+ "param": "angle",
+ "group": "computed",
+ "points": [
+  {
+   "param": "angle",
+   "group": "computed",
+   "value": 0.0,
+   "ps_file": "docs/数据/偏差/ps/angle__computed__v0.png",
+   "kt_file": "docs/数据/偏差/krita/angle__computed__v0.png",
+   "pixel": {
+    "diff_pixels": 950,
+    "diff_ratio": 0.0059375,
+    "max_delta": 144,
+    "mean_abs_delta": 0.37695,
+    "pass": false
+   },
+   "ps_idat_sha256": "b57420df59c86f9a0cb031595b4d18a06c2243e9f2e5c6ff099dd7504b90b185",
+   "kt_idat_sha256": "e53ebd124b4c98f70d241304c4a6bf7c6a40b5d024773927aa0e94d8ea94b5cb",
+   "consistent": true,
+   "metric": {
+    "ps": {
+     "angle_deg": 0.0001406463683882657,
+     "moment_xx": 2486.728507635396,
+     "moment_yy": 225.30900894945938,
+     "moment_xy": 0.0055512018965118036,
+     "axis_ratio": 3.3221933756397526,
+     "major_px": 199.46843389966332,
+     "minor_px": 60.041187054998524,
+     "centroid": [
+      199.5,
+      199.5
+     ]
+    },
+    "kt": {
+     "angle_deg": 0.0,
+     "moment_xx": 2455.6747013921918,
+     "moment_yy": 216.94584771771596,
+     "moment_xy": 0.0,
+     "axis_ratio": 3.3644164435441226,
+     "major_px": 198.21905867568606,
+     "minor_px": 58.91632679897361,
+     "centroid": [
+      199.0,
+      199.5
+     ]
+    },
+    "angle_diff_deg": 0.0001406463683882657,
+    "axis_ratio_ps": 3.3221933756397526,
+    "axis_ratio_kt": 3.3644164435441226
+   }
+  },
+  {
+   "param": "angle",
+   "group": "computed",
+   "value": 45.0,
+   "ps_file": "docs/数据/偏差/ps/angle__computed__v45.png",
+   "kt_file": "docs/数据/偏差/krita/angle__computed__v45.png",
+   "pixel": {
+    "diff_pixels": 988,
+    "diff_ratio": 0.006175,
+    "max_delta": 194,
+    "mean_abs_delta": 0.40285625,
+    "pass": false
+   },
+   "ps_idat_sha256": "bb83d252c08d93a17c2899f0d37fdd746006cdf6605f3303b50d8d6980775d29",
+   "kt_idat_sha256": "a379e2613c8d9fb4d30be2b90163ec55fa7c1232b170a1356981e552395a53c9",
+   "consistent": true,
+   "metric": {
+    "ps": {
+     "angle_deg": 134.99980027299506,
+     "moment_xx": 1355.4159700241796,
+     "moment_yy": 1355.4317186594433,
+     "moment_xy": -1129.4545947747895,
+     "axis_ratio": 3.316102165723434,
+     "major_px": 199.39422014267313,
+     "minor_px": 60.129094393921875,
+     "centroid": [
+      199.5,
+      199.5
+     ]
+    },
+    "kt": {
+     "angle_deg": 135.0014290753761,
+     "moment_xx": 1336.6147487134567,
+     "moment_yy": 1336.5030384320596,
+     "moment_xy": -1119.697350097175,
+     "axis_ratio": 3.3654687720392995,
+     "major_px": 198.24252803323816,
+     "minor_px": 58.90487817930738,
+     "centroid": [
+      199.0,
+      199.5
+     ]
+    },
+    "angle_diff_deg": 0.0016288023810488994,
+    "axis_ratio_ps": 3.316102165723434,
+    "axis_ratio_kt": 3.3654687720392995
+   }
+  },
+  {
+   "param": "angle",
+   "group": "computed",
+   "value": 90.0,
+   "ps_file": "docs/数据/偏差/ps/angle__computed__v90.png",
+   "kt_file": "docs/数据/偏差/krita/angle__computed__v90.png",
+   "pixel": {
+    "diff_pixels": 992,
+    "diff_ratio": 0.0062,
+    "max_delta": 204,
+    "mean_abs_delta": 0.42005625,
+    "pass": false
+   },
+   "ps_idat_sha256": "70b44199d33ac7eff9dcd9cd7b8f291197e7b968ba9f60a7285a8e0728f6d3b3",
+   "kt_idat_sha256": "18dbaa477c89de58cc21fe5eb235f31e68ca4630ad34ea0de263be8f60a97cb4",
+   "consistent": true,
+   "metric": {
+    "ps": {
+     "angle_deg": 90.00012099730345,
+     "moment_xx": 225.2934120110978,
+     "moment_yy": 2486.6891110184843,
+     "moment_xy": -0.004775618448192297,
+     "axis_ratio": 3.322282053072496,
+     "major_px": 199.46685382904374,
+     "minor_px": 60.039108854281,
+     "centroid": [
+      199.5,
+      199.5
+     ]
+    },
+    "kt": {
+     "angle_deg": 89.99964176078514,
+     "moment_xx": 216.84496465824014,
+     "moment_yy": 2456.2819516852674,
+     "moment_xy": 0.014001976320514538,
+     "axis_ratio": 3.365615024211236,
+     "major_px": 198.24356541478218,
+     "minor_px": 58.90262670824702,
+     "centroid": [
+      199.0,
+      199.5
+     ]
+    },
+    "angle_diff_deg": 0.0004792365183163838,
+    "axis_ratio_ps": 3.322282053072496,
+    "axis_ratio_kt": 3.365615024211236
+   }
+  }
+ ],
+ "conclusion_detail": {
+  "conclusion": "不偏",
+  "reason": "全部已测取值点均在阈值内"
+ }
+}

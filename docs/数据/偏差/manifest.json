@@ -1,0 +1,3294 @@
+{
+ "brushes": {
+  "computed": {
+   "abr": "tests/定量测试专用.abr",
+   "name": "定量测试用",
+   "note": "唯一一支计算笔刷 Dmtr=200/Hrdn=100/Rndn=100，笔尖无位图、无补白"
+  },
+  "nonsquare": {
+   "abr": "tests/测试用.abr",
+   "name": "KYLE 额外厚实炭笔",
+   "note": "采样笔尖 183x143（长宽比 1.28），补白后 183x183"
+  },
+  "square": {
+   "abr": "tests/测试用.abr",
+   "name": "Kyle 的终极粉彩派对",
+   "note": "采样笔尖 86x84（长宽比 1.02），补白后 86x86"
+  }
+ },
+ "created": "2026-11-20 19:50:37",
+ "criteria": {
+  "geometry": "相对误差≤2% 视为一致；角度按 2%×180°=3.6°；绝对差≤2px 亦算一致",
+  "idat": "判像素只认 PNG IDAT 块的 sha256（文件 sha256 会被 iTXt/XMP 影响）",
+  "pixel": "差异点=|Δalpha|>2，分母=宽×高；一致=差异比例≤2% 且 max_delta≤2"
+ },
+ "images": [
+  {
+   "bytes": 2387,
+   "cmd": "python tools/measure_deviation.py --param angle --values 0 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/krita/angle__computed__v0.png",
+   "group": "computed",
+   "height": 400,
+   "idat_sha256": "e53ebd124b4c98f70d241304c4a6bf7c6a40b5d024773927aa0e94d8ea94b5cb",
+   "krita_preset": "docs/数据/偏差/kpp/angle__computed__v0.kpp",
+   "krita_readback": {
+    "AxisX": "false",
+    "AxisY": "true",
+    "PressureScatter": "false",
+    "ScatterValue": "0",
+    "angle": "0",
+    "diameter": "200",
+    "hfade": "1",
+    "ratio": "0.3",
+    "spacing": "5",
+    "xml_bytes": "11605"
+   },
+   "mtime": "2026-11-20 19:41:47",
+   "param": "angle",
+   "side": "krita",
+   "value": 0.0,
+   "width": 400
+  },
+  {
+   "bytes": 642077,
+   "cmd": "python tools/measure_deviation.py --param angle --values 0 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/ps/angle__computed__v0.png",
+   "group": "computed",
+   "height": 400,
+   "idat_sha256": "b57420df59c86f9a0cb031595b4d18a06c2243e9f2e5c6ff099dd7504b90b185",
+   "mtime": "2026-11-20 19:48:26",
+   "param": "angle",
+   "ps_ok": true,
+   "ps_readback": {
+    "angle": "0",
+    "brush": "定量测试用",
+    "diameter": "200",
+    "hardness": "100",
+    "jitter": "ABSENT",
+    "roundness": "30",
+    "spacing": "500",
+    "useScatter": "false",
+    "useTexture": "false",
+    "useTipDynamics": "false"
+   },
+   "side": "ps",
+   "value": 0.0,
+   "width": 400
+  },
+  {
+   "bytes": 2854,
+   "cmd": "python tools/measure_deviation.py --param angle --values 45 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/krita/angle__computed__v45.png",
+   "group": "computed",
+   "height": 400,
+   "idat_sha256": "a379e2613c8d9fb4d30be2b90163ec55fa7c1232b170a1356981e552395a53c9",
+   "krita_preset": "docs/数据/偏差/kpp/angle__computed__v45.kpp",
+   "krita_readback": {
+    "AxisX": "false",
+    "AxisY": "true",
+    "PressureScatter": "false",
+    "ScatterValue": "0",
+    "angle": "0.785398",
+    "diameter": "200",
+    "hfade": "1",
+    "ratio": "0.3",
+    "spacing": "5",
+    "xml_bytes": "11613"
+   },
+   "mtime": "2026-11-20 19:42:00",
+   "param": "angle",
+   "side": "krita",
+   "value": 45.0,
+   "width": 400
+  },
+  {
+   "bytes": 642077,
+   "cmd": "python tools/measure_deviation.py --param angle --values 45 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/ps/angle__computed__v45.png",
+   "group": "computed",
+   "height": 400,
+   "idat_sha256": "bb83d252c08d93a17c2899f0d37fdd746006cdf6605f3303b50d8d6980775d29",
+   "mtime": "2026-11-20 19:48:27",
+   "param": "angle",
+   "ps_ok": true,
+   "ps_readback": {
+    "angle": "45",
+    "brush": "定量测试用",
+    "diameter": "200",
+    "hardness": "100",
+    "jitter": "ABSENT",
+    "roundness": "30",
+    "spacing": "500",
+    "useScatter": "false",
+    "useTexture": "false",
+    "useTipDynamics": "false"
+   },
+   "side": "ps",
+   "value": 45.0,
+   "width": 400
+  },
+  {
+   "bytes": 3102,
+   "cmd": "python tools/measure_deviation.py --param angle --values 90 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/krita/angle__computed__v90.png",
+   "group": "computed",
+   "height": 400,
+   "idat_sha256": "18dbaa477c89de58cc21fe5eb235f31e68ca4630ad34ea0de263be8f60a97cb4",
+   "krita_preset": "docs/数据/偏差/kpp/angle__computed__v90.kpp",
+   "krita_readback": {
+    "AxisX": "false",
+    "AxisY": "true",
+    "PressureScatter": "false",
+    "ScatterValue": "0",
+    "angle": "1.5708",
+    "diameter": "200",
+    "hfade": "1",
+    "ratio": "0.3",
+    "spacing": "5",
+    "xml_bytes": "11611"
+   },
+   "mtime": "2026-11-20 19:42:13",
+   "param": "angle",
+   "side": "krita",
+   "value": 90.0,
+   "width": 400
+  },
+  {
+   "bytes": 642077,
+   "cmd": "python tools/measure_deviation.py --param angle --values 90 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/ps/angle__computed__v90.png",
+   "group": "computed",
+   "height": 400,
+   "idat_sha256": "70b44199d33ac7eff9dcd9cd7b8f291197e7b968ba9f60a7285a8e0728f6d3b3",
+   "mtime": "2026-11-20 19:48:28",
+   "param": "angle",
+   "ps_ok": true,
+   "ps_readback": {
+    "angle": "90",
+    "brush": "定量测试用",
+    "diameter": "200",
+    "hardness": "100",
+    "jitter": "ABSENT",
+    "roundness": "30",
+    "spacing": "500",
+    "useScatter": "false",
+    "useTexture": "false",
+    "useTipDynamics": "false"
+   },
+   "side": "ps",
+   "value": 90.0,
+   "width": 400
+  },
+  {
+   "bytes": 10409,
+   "cmd": "python tools/measure_deviation.py --param hardness --values 0 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/krita/hardness__computed__v0.png",
+   "group": "computed",
+   "height": 400,
+   "idat_sha256": "b3c99df61b5335138485fd0af952c361b011483e955a47200bfc573a197238ba",
+   "krita_preset": "docs/数据/偏差/kpp/hardness__computed__v0.kpp",
+   "krita_readback": {
+    "AxisX": "false",
+    "AxisY": "true",
+    "PressureScatter": "false",
+    "ScatterValue": "0",
+    "angle": "0",
+    "diameter": "200",
+    "hfade": "0",
+    "ratio": "1",
+    "spacing": "5",
+    "xml_bytes": "11606"
+   },
+   "mtime": "2026-11-20 19:40:43",
+   "param": "hardness",
+   "side": "krita",
+   "value": 0.0,
+   "width": 400
+  },
+  {
+   "bytes": 642077,
+   "cmd": "python tools/measure_deviation.py --param hardness --values 0 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/ps/hardness__computed__v0.png",
+   "group": "computed",
+   "height": 400,
+   "idat_sha256": "3311c40668c1c4e9bd570db322e111a2fa9ab538607d108cd78b7669e22490b3",
+   "mtime": "2026-11-20 19:48:17",
+   "param": "hardness",
+   "ps_ok": true,
+   "ps_readback": {
+    "angle": "0",
+    "brush": "定量测试用",
+    "diameter": "200",
+    "hardness": "0",
+    "jitter": "ABSENT",
+    "roundness": "100",
+    "spacing": "500",
+    "useScatter": "false",
+    "useTexture": "false",
+    "useTipDynamics": "false"
+   },
+   "side": "ps",
+   "value": 0.0,
+   "width": 400
+  },
+  {
+   "bytes": 8658,
+   "cmd": "python tools/measure_deviation.py --param hardness --values 50 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/krita/hardness__computed__v50.png",
+   "group": "computed",
+   "height": 400,
+   "idat_sha256": "75b45232154d57c9f121bd42f895708308eae87f1cd29c8790ef1d2608357d54",
+   "krita_preset": "docs/数据/偏差/kpp/hardness__computed__v50.kpp",
+   "krita_readback": {
+    "AxisX": "false",
+    "AxisY": "true",
+    "PressureScatter": "false",
+    "ScatterValue": "0",
+    "angle": "0",
+    "diameter": "200",
+    "hfade": "0.5",
+    "ratio": "1",
+    "spacing": "5",
+    "xml_bytes": "11611"
+   },
+   "mtime": "2026-11-20 19:37:05",
+   "param": "hardness",
+   "side": "krita",
+   "value": 50.0,
+   "width": 400
+  },
+  {
+   "bytes": 642077,
+   "cmd": "python tools/measure_deviation.py --param hardness --values 50 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/ps/hardness__computed__v50.png",
+   "group": "computed",
+   "height": 400,
+   "idat_sha256": "7997225881c7b120553f1e2318f1602080ce0928f7234a3d0b27e05311049be2",
+   "mtime": "2026-11-20 19:48:18",
+   "param": "hardness",
+   "ps_ok": true,
+   "ps_readback": {
+    "angle": "0",
+    "brush": "定量测试用",
+    "diameter": "200",
+    "hardness": "50",
+    "jitter": "ABSENT",
+    "roundness": "100",
+    "spacing": "500",
+    "useScatter": "false",
+    "useTexture": "false",
+    "useTipDynamics": "false"
+   },
+   "side": "ps",
+   "value": 50.0,
+   "width": 400
+  },
+  {
+   "bytes": 4211,
+   "cmd": "python tools/measure_deviation.py --param hardness --values 100 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/krita/hardness__computed__v100.png",
+   "group": "computed",
+   "height": 400,
+   "idat_sha256": "8e0f17ebe57c37a1bfc53ea3619079b3a44171a4af734d0133112eced04d0421",
+   "krita_preset": "docs/数据/偏差/kpp/hardness__computed__v100.kpp",
+   "krita_readback": {
+    "AxisX": "false",
+    "AxisY": "true",
+    "PressureScatter": "false",
+    "ScatterValue": "0",
+    "angle": "0",
+    "diameter": "200",
+    "hfade": "1",
+    "ratio": "1",
+    "spacing": "5",
+    "xml_bytes": "11608"
+   },
+   "mtime": "2026-11-20 19:40:56",
+   "param": "hardness",
+   "side": "krita",
+   "value": 100.0,
+   "width": 400
+  },
+  {
+   "bytes": 642077,
+   "cmd": "python tools/measure_deviation.py --param hardness --values 100 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/ps/hardness__computed__v100.png",
+   "group": "computed",
+   "height": 400,
+   "idat_sha256": "ae10d6f2624117cac34d036167792968f5fb57692fcb1526eb7733719094d3f8",
+   "mtime": "2026-11-20 19:48:19",
+   "param": "hardness",
+   "ps_ok": true,
+   "ps_readback": {
+    "angle": "0",
+    "brush": "定量测试用",
+    "diameter": "200",
+    "hardness": "100",
+    "jitter": "ABSENT",
+    "roundness": "100",
+    "spacing": "500",
+    "useScatter": "false",
+    "useTexture": "false",
+    "useTipDynamics": "false"
+   },
+   "side": "ps",
+   "value": 100.0,
+   "width": 400
+  },
+  {
+   "bytes": 2297,
+   "cmd": "python tools/measure_deviation.py --param scale --values 50 --analyze",
+   "exists": true,
+   "file": "tests/baselines/exp/krita/exp__krita__conv__multiply__d100_s50_b0_c0.png",
+   "group": "exp",
+   "height": 100,
+   "idat_sha256": "00106871fa0d41be07b5f3ed5668097dd40814eaa28e58d2dc23d7a7a8c3941c",
+   "mtime": "2026-11-19 15:01:59",
+   "param": "scale",
+   "side": "krita",
+   "value": 50.0,
+   "width": 100
+  },
+  {
+   "bytes": 41687,
+   "cmd": "python tools/measure_deviation.py --param scale --values 50 --analyze",
+   "exists": true,
+   "file": "tests/baselines/exp/ps/exp__ps__multiply__d100_s50_b0_c0.png",
+   "group": "exp",
+   "height": 100,
+   "idat_sha256": "8bb0908b8ccaa7f1148118bc330cda258a40adf1940a04f1675b12386d0284c5",
+   "mtime": "2026-11-19 14:40:15",
+   "param": "scale",
+   "side": "ps",
+   "value": 50.0,
+   "width": 100
+  },
+  {
+   "bytes": 7021,
+   "cmd": "python tools/measure_deviation.py --param scale --values 100 --analyze",
+   "exists": true,
+   "file": "tests/baselines/exp/krita/exp__krita__conv__multiply__d100_s100_b0_c0.png",
+   "group": "exp",
+   "height": 100,
+   "idat_sha256": "eaf395c4aae3ea2614c4d85a76849a036a3bc53aeda819160e530c18b69525a1",
+   "mtime": "2026-11-19 14:58:56",
+   "param": "scale",
+   "side": "krita",
+   "value": 100.0,
+   "width": 100
+  },
+  {
+   "bytes": 41687,
+   "cmd": "python tools/measure_deviation.py --param scale --values 100 --analyze",
+   "exists": true,
+   "file": "tests/baselines/exp/ps/exp__ps__multiply__d100_s100_b0_c0.png",
+   "group": "exp",
+   "height": 100,
+   "idat_sha256": "1d14a8b9e0b87fbfd3cdc97f74be218ede7a09d679302965d289accae795c537",
+   "mtime": "2026-11-19 14:40:16",
+   "param": "scale",
+   "side": "ps",
+   "value": 100.0,
+   "width": 100
+  },
+  {
+   "bytes": 12615,
+   "cmd": "python tools/measure_deviation.py --param scale --values 200 --analyze",
+   "exists": true,
+   "file": "tests/baselines/exp/krita/exp__krita__conv__multiply__d100_s200_b0_c0.png",
+   "group": "exp",
+   "height": 100,
+   "idat_sha256": "cf3c9b1a442adb8c9328b38f35ff4d6f787d4c8a4cb038e86298860c2d254f04",
+   "mtime": "2026-11-19 15:02:29",
+   "param": "scale",
+   "side": "krita",
+   "value": 200.0,
+   "width": 100
+  },
+  {
+   "bytes": 41687,
+   "cmd": "python tools/measure_deviation.py --param scale --values 200 --analyze",
+   "exists": true,
+   "file": "tests/baselines/exp/ps/exp__ps__multiply__d100_s200_b0_c0.png",
+   "group": "exp",
+   "height": 100,
+   "idat_sha256": "1ca4d5fe2ad024ed834c8e69ae59bde6d69bad8781d768fef3a5e2d30074f901",
+   "mtime": "2026-11-19 14:40:19",
+   "param": "scale",
+   "side": "ps",
+   "value": 200.0,
+   "width": 100
+  },
+  {
+   "bytes": 3662,
+   "cmd": "python tools/measure_deviation.py --param scatter --values 0 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/krita/scatter__computed__v0.png",
+   "group": "computed",
+   "height": 560,
+   "idat_sha256": "fcae00e3ab034cbe5cee89d3834cb3de28569aab6ecf847f874cea6901567933",
+   "krita_preset": "docs/数据/偏差/kpp/scatter__computed__v0.kpp",
+   "krita_readback": {
+    "AxisX": "false",
+    "AxisY": "true",
+    "PressureScatter": "true",
+    "ScatterValue": "0",
+    "angle": "0",
+    "diameter": "100",
+    "hfade": "1",
+    "ratio": "1",
+    "spacing": "0.5",
+    "xml_bytes": "11607"
+   },
+   "mtime": "2026-11-20 19:41:09",
+   "param": "scatter",
+   "side": "krita",
+   "value": 0.0,
+   "width": 640
+  },
+  {
+   "bytes": 1435969,
+   "cmd": "python tools/measure_deviation.py --param scatter --values 0 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/ps/scatter__computed__v0.png",
+   "group": "computed",
+   "height": 560,
+   "idat_sha256": "7f9fe1a36a613f7d3f67e22bf9db4062e73cb84219d465daea2030c50521e9c7",
+   "mtime": "2026-11-20 19:48:21",
+   "param": "scatter",
+   "ps_ok": true,
+   "ps_readback": {
+    "angle": "0",
+    "brush": "定量测试用",
+    "diameter": "100",
+    "hardness": "100",
+    "jitter": "0",
+    "roundness": "100",
+    "spacing": "50",
+    "useScatter": "true",
+    "useTexture": "false",
+    "useTipDynamics": "false"
+   },
+   "side": "ps",
+   "value": 0.0,
+   "width": 640
+  },
+  {
+   "bytes": 7165,
+   "cmd": "python tools/measure_deviation.py --param scatter --values 100 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/krita/scatter__computed__v100.png",
+   "group": "computed",
+   "height": 560,
+   "idat_sha256": "544de1375cfd3ebe16a82657c26954cebbcd9b7e7371c0477083481a7d289435",
+   "krita_preset": "docs/数据/偏差/kpp/scatter__computed__v100.kpp",
+   "krita_readback": {
+    "AxisX": "false",
+    "AxisY": "true",
+    "PressureScatter": "true",
+    "ScatterValue": "0.25",
+    "angle": "0",
+    "diameter": "100",
+    "hfade": "1",
+    "ratio": "1",
+    "spacing": "0.5",
+    "xml_bytes": "11612"
+   },
+   "mtime": "2026-11-20 19:41:22",
+   "param": "scatter",
+   "side": "krita",
+   "value": 100.0,
+   "width": 640
+  },
+  {
+   "bytes": 1435969,
+   "cmd": "python tools/measure_deviation.py --param scatter --values 100 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/ps/scatter__computed__v100.png",
+   "group": "computed",
+   "height": 560,
+   "idat_sha256": "807b40e55d2783c27e2ec503145d8d90649e030bb1d4fe04cf05e8a8cf2a3093",
+   "mtime": "2026-11-20 19:48:23",
+   "param": "scatter",
+   "ps_ok": true,
+   "ps_readback": {
+    "angle": "0",
+    "brush": "定量测试用",
+    "diameter": "100",
+    "hardness": "100",
+    "jitter": "100",
+    "roundness": "100",
+    "spacing": "50",
+    "useScatter": "true",
+    "useTexture": "false",
+    "useTipDynamics": "false"
+   },
+   "side": "ps",
+   "value": 100.0,
+   "width": 640
+  },
+  {
+   "bytes": 10851,
+   "cmd": "python tools/measure_deviation.py --param scatter --values 300 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/krita/scatter__computed__v300.png",
+   "group": "computed",
+   "height": 560,
+   "idat_sha256": "7dea220a0720b352f0d7011d873f3dcd1389b14e023eb5f50d79f91585714eb3",
+   "krita_preset": "docs/数据/偏差/kpp/scatter__computed__v300.kpp",
+   "krita_readback": {
+    "AxisX": "false",
+    "AxisY": "true",
+    "PressureScatter": "true",
+    "ScatterValue": "0.75",
+    "angle": "0",
+    "diameter": "100",
+    "hfade": "1",
+    "ratio": "1",
+    "spacing": "0.5",
+    "xml_bytes": "11612"
+   },
+   "mtime": "2026-11-20 19:41:35",
+   "param": "scatter",
+   "side": "krita",
+   "value": 300.0,
+   "width": 640
+  },
+  {
+   "bytes": 1435969,
+   "cmd": "python tools/measure_deviation.py --param scatter --values 300 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/ps/scatter__computed__v300.png",
+   "group": "computed",
+   "height": 560,
+   "idat_sha256": "0980e9cc6e03c92c1f3b98c72ea2c17a062249f8598b13995fa30fb0087706b8",
+   "mtime": "2026-11-20 19:48:24",
+   "param": "scatter",
+   "ps_ok": true,
+   "ps_readback": {
+    "angle": "0",
+    "brush": "定量测试用",
+    "diameter": "100",
+    "hardness": "100",
+    "jitter": "300",
+    "roundness": "100",
+    "spacing": "50",
+    "useScatter": "true",
+    "useTexture": "false",
+    "useTipDynamics": "false"
+   },
+   "side": "ps",
+   "value": 300.0,
+   "width": 640
+  },
+  {
+   "bytes": 1480,
+   "cmd": "python tools/measure_deviation.py --param size --values 20 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/krita/size__computed__v20.png",
+   "group": "computed",
+   "height": 400,
+   "idat_sha256": "30515bd7dd87b1d9f97d3514f235b390bf053c2c4e0145c9323337556a7abb67",
+   "krita_preset": "docs/数据/偏差/kpp/size__computed__v20.kpp",
+   "krita_readback": {
+    "AxisX": "false",
+    "AxisY": "true",
+    "PressureScatter": "false",
+    "ScatterValue": "0",
+    "angle": "0",
+    "diameter": "20",
+    "hfade": "1",
+    "ratio": "1",
+    "spacing": "1",
+    "xml_bytes": "11602"
+   },
+   "mtime": "2026-11-20 19:40:05",
+   "param": "size",
+   "side": "krita",
+   "value": 20.0,
+   "width": 640
+  },
+  {
+   "bytes": 1026132,
+   "cmd": "python tools/measure_deviation.py --param size --values 20 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/ps/size__computed__v20.png",
+   "group": "computed",
+   "height": 400,
+   "idat_sha256": "e431deb503833b347a2c9365dc0b666fddf6b9b96c624f5b0f9adcbc6de5be77",
+   "mtime": "2026-11-20 19:48:12",
+   "param": "size",
+   "ps_ok": true,
+   "ps_readback": {
+    "angle": "0",
+    "brush": "定量测试用",
+    "diameter": "20",
+    "hardness": "100",
+    "jitter": "ABSENT",
+    "roundness": "100",
+    "spacing": "100",
+    "useScatter": "false",
+    "useTexture": "false",
+    "useTipDynamics": "false"
+   },
+   "side": "ps",
+   "value": 20.0,
+   "width": 640
+  },
+  {
+   "bytes": 3848,
+   "cmd": "python tools/measure_deviation.py --param size --values 100 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/krita/size__computed__v100.png",
+   "group": "computed",
+   "height": 400,
+   "idat_sha256": "503ea5227684d0757d272ab33d300cf796b912da16173b264d725e6cfb8764eb",
+   "krita_preset": "docs/数据/偏差/kpp/size__computed__v100.kpp",
+   "krita_readback": {
+    "AxisX": "false",
+    "AxisY": "true",
+    "PressureScatter": "false",
+    "ScatterValue": "0",
+    "angle": "0",
+    "diameter": "100",
+    "hfade": "1",
+    "ratio": "1",
+    "spacing": "1",
+    "xml_bytes": "11604"
+   },
+   "mtime": "2026-11-20 19:40:17",
+   "param": "size",
+   "side": "krita",
+   "value": 100.0,
+   "width": 640
+  },
+  {
+   "bytes": 1026132,
+   "cmd": "python tools/measure_deviation.py --param size --values 100 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/ps/size__computed__v100.png",
+   "group": "computed",
+   "height": 400,
+   "idat_sha256": "5f8c0d39d7c82246770b18b650c9a6ef666fcc39e14cda6fa246ea6ea61be75c",
+   "mtime": "2026-11-20 19:48:14",
+   "param": "size",
+   "ps_ok": true,
+   "ps_readback": {
+    "angle": "0",
+    "brush": "定量测试用",
+    "diameter": "100",
+    "hardness": "100",
+    "jitter": "ABSENT",
+    "roundness": "100",
+    "spacing": "100",
+    "useScatter": "false",
+    "useTexture": "false",
+    "useTipDynamics": "false"
+   },
+   "side": "ps",
+   "value": 100.0,
+   "width": 640
+  },
+  {
+   "bytes": 7614,
+   "cmd": "python tools/measure_deviation.py --param size --values 300 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/krita/size__computed__v300.png",
+   "group": "computed",
+   "height": 400,
+   "idat_sha256": "4c2581908c3f1219911b4e8ca375317b4bc160553b0fb4737124d3f4e1178dc5",
+   "krita_preset": "docs/数据/偏差/kpp/size__computed__v300.kpp",
+   "krita_readback": {
+    "AxisX": "false",
+    "AxisY": "true",
+    "PressureScatter": "false",
+    "ScatterValue": "0",
+    "angle": "0",
+    "diameter": "300",
+    "hfade": "1",
+    "ratio": "1",
+    "spacing": "1",
+    "xml_bytes": "11604"
+   },
+   "mtime": "2026-11-20 19:40:30",
+   "param": "size",
+   "side": "krita",
+   "value": 300.0,
+   "width": 640
+  },
+  {
+   "bytes": 1026132,
+   "cmd": "python tools/measure_deviation.py --param size --values 300 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/ps/size__computed__v300.png",
+   "group": "computed",
+   "height": 400,
+   "idat_sha256": "52857b4daa63b9d2699b6a856a6ef54dcce33dded0a527acf258b658a4334ad5",
+   "mtime": "2026-11-20 19:48:15",
+   "param": "size",
+   "ps_ok": true,
+   "ps_readback": {
+    "angle": "0",
+    "brush": "定量测试用",
+    "diameter": "300",
+    "hardness": "100",
+    "jitter": "ABSENT",
+    "roundness": "100",
+    "spacing": "100",
+    "useScatter": "false",
+    "useTexture": "false",
+    "useTipDynamics": "false"
+   },
+   "side": "ps",
+   "value": 300.0,
+   "width": 640
+  },
+  {
+   "bytes": 15223,
+   "cmd": "python tools/measure_deviation.py --param spacing --values 10 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/krita/spacing__computed__v10.png",
+   "group": "computed",
+   "height": 320,
+   "idat_sha256": "5f0f7ef94fb4bf12e475c31cd5d2358c67bd2f3cfdeee9248e2fcdf37958d847",
+   "krita_preset": "docs/数据/偏差/kpp/spacing__computed__v10.kpp",
+   "krita_readback": {
+    "AxisX": "false",
+    "AxisY": "true",
+    "PressureScatter": "false",
+    "ScatterValue": "0",
+    "angle": "0",
+    "diameter": "200",
+    "hfade": "0.5",
+    "ratio": "1",
+    "spacing": "0.1",
+    "xml_bytes": "11612"
+   },
+   "mtime": "2026-11-20 19:38:09",
+   "param": "spacing",
+   "side": "krita",
+   "value": 10.0,
+   "width": 640
+  },
+  {
+   "bytes": 821222,
+   "cmd": "python tools/measure_deviation.py --param spacing --values 10 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/ps/spacing__computed__v10.png",
+   "group": "computed",
+   "height": 320,
+   "idat_sha256": "c164a18824a33fcb8360400cd6b37c398372b6055f3bc3fd800448dfe2497104",
+   "mtime": "2026-11-20 19:47:59",
+   "param": "spacing",
+   "ps_ok": true,
+   "ps_readback": {
+    "angle": "0",
+    "brush": "定量测试用",
+    "diameter": "200",
+    "hardness": "50",
+    "jitter": "ABSENT",
+    "roundness": "100",
+    "spacing": "10",
+    "useScatter": "false",
+    "useTexture": "false",
+    "useTipDynamics": "false"
+   },
+   "side": "ps",
+   "value": 10.0,
+   "width": 640
+  },
+  {
+   "bytes": 13205,
+   "cmd": "python tools/measure_deviation.py --param spacing --values 50 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/krita/spacing__computed__v50.png",
+   "group": "computed",
+   "height": 320,
+   "idat_sha256": "5c78f61b192ebb0655151e9852c5b76729ec01b90eab44fe4bd8cf2e77b182f6",
+   "krita_preset": "docs/数据/偏差/kpp/spacing__computed__v50.kpp",
+   "krita_readback": {
+    "AxisX": "false",
+    "AxisY": "true",
+    "PressureScatter": "false",
+    "ScatterValue": "0",
+    "angle": "0",
+    "diameter": "200",
+    "hfade": "0.5",
+    "ratio": "1",
+    "spacing": "0.5",
+    "xml_bytes": "11612"
+   },
+   "mtime": "2026-11-20 19:38:22",
+   "param": "spacing",
+   "side": "krita",
+   "value": 50.0,
+   "width": 640
+  },
+  {
+   "bytes": 821222,
+   "cmd": "python tools/measure_deviation.py --param spacing --values 50 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/ps/spacing__computed__v50.png",
+   "group": "computed",
+   "height": 320,
+   "idat_sha256": "c2b0707cd5fecc33c175d7cb97b4241cb15209e38934f979dd46773986c80afe",
+   "mtime": "2026-11-20 19:48:01",
+   "param": "spacing",
+   "ps_ok": true,
+   "ps_readback": {
+    "angle": "0",
+    "brush": "定量测试用",
+    "diameter": "200",
+    "hardness": "50",
+    "jitter": "ABSENT",
+    "roundness": "100",
+    "spacing": "50",
+    "useScatter": "false",
+    "useTexture": "false",
+    "useTipDynamics": "false"
+   },
+   "side": "ps",
+   "value": 50.0,
+   "width": 640
+  },
+  {
+   "bytes": 11467,
+   "cmd": "python tools/measure_deviation.py --param spacing --values 100 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/krita/spacing__computed__v100.png",
+   "group": "computed",
+   "height": 320,
+   "idat_sha256": "534961efc7ccb3d4850135d7314510ff09b37a491c23eb2cbb9e6a8ef1e017af",
+   "krita_preset": "docs/数据/偏差/kpp/spacing__computed__v100.kpp",
+   "krita_readback": {
+    "AxisX": "false",
+    "AxisY": "true",
+    "PressureScatter": "false",
+    "ScatterValue": "0",
+    "angle": "0",
+    "diameter": "200",
+    "hfade": "0.5",
+    "ratio": "1",
+    "spacing": "1",
+    "xml_bytes": "11611"
+   },
+   "mtime": "2026-11-20 19:38:34",
+   "param": "spacing",
+   "side": "krita",
+   "value": 100.0,
+   "width": 640
+  },
+  {
+   "bytes": 821222,
+   "cmd": "python tools/measure_deviation.py --param spacing --values 100 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/ps/spacing__computed__v100.png",
+   "group": "computed",
+   "height": 320,
+   "idat_sha256": "8e5189ebfd27e4c3e95d7e2c814c816b2ef76f24eeacb475c916b3a0865f15f1",
+   "mtime": "2026-11-20 19:48:02",
+   "param": "spacing",
+   "ps_ok": true,
+   "ps_readback": {
+    "angle": "0",
+    "brush": "定量测试用",
+    "diameter": "200",
+    "hardness": "50",
+    "jitter": "ABSENT",
+    "roundness": "100",
+    "spacing": "100",
+    "useScatter": "false",
+    "useTexture": "false",
+    "useTipDynamics": "false"
+   },
+   "side": "ps",
+   "value": 100.0,
+   "width": 640
+  },
+  {
+   "bytes": 23653,
+   "cmd": "python tools/measure_deviation.py --param spacing --values 10 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/krita/spacing__nonsquare__v10.png",
+   "group": "nonsquare",
+   "height": 320,
+   "idat_sha256": "43d6974756815095de0133ad1c718a3ececf6f6c9c6f4ee02b86fb981b707b4d",
+   "krita_preset": "docs/数据/偏差/kpp/spacing__nonsquare__v10.kpp",
+   "krita_readback": {
+    "AxisX": "false",
+    "AxisY": "true",
+    "PressureScatter": "false",
+    "ScatterValue": "0",
+    "angle": "0",
+    "diameter": "",
+    "hfade": "",
+    "ratio": "",
+    "spacing": "0.1",
+    "xml_bytes": "29033"
+   },
+   "mtime": "2026-11-20 19:39:26",
+   "param": "spacing",
+   "side": "krita",
+   "value": 10.0,
+   "width": 640
+  },
+  {
+   "bytes": 821222,
+   "cmd": "python tools/measure_deviation.py --param spacing --values 10 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/ps/spacing__nonsquare__v10.png",
+   "group": "nonsquare",
+   "height": 320,
+   "idat_sha256": "c1bb1b51b8c5376ca6df1ed180548e02e207af4ab51d4c7333557b66b3ca5158",
+   "mtime": "2026-11-20 19:48:08",
+   "param": "spacing",
+   "ps_ok": true,
+   "ps_readback": {
+    "angle": "0",
+    "brush": "KYLE 额外厚实炭笔",
+    "diameter": "112",
+    "hardness": "ABSENT",
+    "jitter": "ABSENT",
+    "roundness": "100",
+    "spacing": "10",
+    "useScatter": "false",
+    "useTexture": "false",
+    "useTipDynamics": "false"
+   },
+   "side": "ps",
+   "value": 10.0,
+   "width": 640
+  },
+  {
+   "bytes": 15299,
+   "cmd": "python tools/measure_deviation.py --param spacing --values 50 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/krita/spacing__nonsquare__v50.png",
+   "group": "nonsquare",
+   "height": 320,
+   "idat_sha256": "e7117cc84495703bb9b07db037764d8fd5d2341553325e87018eee808ad6bca5",
+   "krita_preset": "docs/数据/偏差/kpp/spacing__nonsquare__v50.kpp",
+   "krita_readback": {
+    "AxisX": "false",
+    "AxisY": "true",
+    "PressureScatter": "false",
+    "ScatterValue": "0",
+    "angle": "0",
+    "diameter": "",
+    "hfade": "",
+    "ratio": "",
+    "spacing": "0.5",
+    "xml_bytes": "29033"
+   },
+   "mtime": "2026-11-20 19:39:39",
+   "param": "spacing",
+   "side": "krita",
+   "value": 50.0,
+   "width": 640
+  },
+  {
+   "bytes": 821222,
+   "cmd": "python tools/measure_deviation.py --param spacing --values 50 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/ps/spacing__nonsquare__v50.png",
+   "group": "nonsquare",
+   "height": 320,
+   "idat_sha256": "abd67e18602e5f2e6c4f43ae1f7005d24694cd4512f444b4009161bbc7c121e9",
+   "mtime": "2026-11-20 19:48:09",
+   "param": "spacing",
+   "ps_ok": true,
+   "ps_readback": {
+    "angle": "0",
+    "brush": "KYLE 额外厚实炭笔",
+    "diameter": "112",
+    "hardness": "ABSENT",
+    "jitter": "ABSENT",
+    "roundness": "100",
+    "spacing": "50",
+    "useScatter": "false",
+    "useTexture": "false",
+    "useTipDynamics": "false"
+   },
+   "side": "ps",
+   "value": 50.0,
+   "width": 640
+  },
+  {
+   "bytes": 12195,
+   "cmd": "python tools/measure_deviation.py --param spacing --values 100 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/krita/spacing__nonsquare__v100.png",
+   "group": "nonsquare",
+   "height": 320,
+   "idat_sha256": "8cff5b5409cb1fe2f91433cd2458b7c85ada8ba3114cc3754d41758d2aa31f7a",
+   "krita_preset": "docs/数据/偏差/kpp/spacing__nonsquare__v100.kpp",
+   "krita_readback": {
+    "AxisX": "false",
+    "AxisY": "true",
+    "PressureScatter": "false",
+    "ScatterValue": "0",
+    "angle": "0",
+    "diameter": "",
+    "hfade": "",
+    "ratio": "",
+    "spacing": "1",
+    "xml_bytes": "29032"
+   },
+   "mtime": "2026-11-20 19:39:52",
+   "param": "spacing",
+   "side": "krita",
+   "value": 100.0,
+   "width": 640
+  },
+  {
+   "bytes": 821222,
+   "cmd": "python tools/measure_deviation.py --param spacing --values 100 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/ps/spacing__nonsquare__v100.png",
+   "group": "nonsquare",
+   "height": 320,
+   "idat_sha256": "6116996525894365b08a967266b0bac09c136bc2361383c33f1a0c6911118c1c",
+   "mtime": "2026-11-20 19:48:11",
+   "param": "spacing",
+   "ps_ok": true,
+   "ps_readback": {
+    "angle": "0",
+    "brush": "KYLE 额外厚实炭笔",
+    "diameter": "112",
+    "hardness": "ABSENT",
+    "jitter": "ABSENT",
+    "roundness": "100",
+    "spacing": "100",
+    "useScatter": "false",
+    "useTexture": "false",
+    "useTipDynamics": "false"
+   },
+   "side": "ps",
+   "value": 100.0,
+   "width": 640
+  },
+  {
+   "bytes": 7928,
+   "cmd": "python tools/measure_deviation.py --param spacing --values 10 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/krita/spacing__square__v10.png",
+   "group": "square",
+   "height": 320,
+   "idat_sha256": "9e1af9b10dcff4ee5b376289a7ca81c8f6935176f9a98a4de1b3a60a905cd2a5",
+   "krita_preset": "docs/数据/偏差/kpp/spacing__square__v10.kpp",
+   "krita_readback": {
+    "AxisX": "false",
+    "AxisY": "true",
+    "PressureScatter": "false",
+    "ScatterValue": "0",
+    "angle": "0",
+    "diameter": "",
+    "hfade": "",
+    "ratio": "",
+    "spacing": "0.1",
+    "xml_bytes": "18622"
+   },
+   "mtime": "2026-11-20 19:38:47",
+   "param": "spacing",
+   "side": "krita",
+   "value": 10.0,
+   "width": 640
+  },
+  {
+   "bytes": 821222,
+   "cmd": "python tools/measure_deviation.py --param spacing --values 10 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/ps/spacing__square__v10.png",
+   "group": "square",
+   "height": 320,
+   "idat_sha256": "ba9c12c6c12e2a1356876b7c57d462503ba16fb4783fefde2126ee9560ea3f90",
+   "mtime": "2026-11-20 19:48:04",
+   "param": "spacing",
+   "ps_ok": true,
+   "ps_readback": {
+    "angle": "0",
+    "brush": "Kyle 的终极粉彩派对",
+    "diameter": "60",
+    "hardness": "ABSENT",
+    "jitter": "ABSENT",
+    "roundness": "100",
+    "spacing": "10",
+    "useScatter": "false",
+    "useTexture": "false",
+    "useTipDynamics": "false"
+   },
+   "side": "ps",
+   "value": 10.0,
+   "width": 640
+  },
+  {
+   "bytes": 8876,
+   "cmd": "python tools/measure_deviation.py --param spacing --values 50 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/krita/spacing__square__v50.png",
+   "group": "square",
+   "height": 320,
+   "idat_sha256": "74027174bb0fbb4340cf3b2a768d375238441fccdab639a51c765a4702d10d2d",
+   "krita_preset": "docs/数据/偏差/kpp/spacing__square__v50.kpp",
+   "krita_readback": {
+    "AxisX": "false",
+    "AxisY": "true",
+    "PressureScatter": "false",
+    "ScatterValue": "0",
+    "angle": "0",
+    "diameter": "",
+    "hfade": "",
+    "ratio": "",
+    "spacing": "0.5",
+    "xml_bytes": "18622"
+   },
+   "mtime": "2026-11-20 19:39:00",
+   "param": "spacing",
+   "side": "krita",
+   "value": 50.0,
+   "width": 640
+  },
+  {
+   "bytes": 821222,
+   "cmd": "python tools/measure_deviation.py --param spacing --values 50 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/ps/spacing__square__v50.png",
+   "group": "square",
+   "height": 320,
+   "idat_sha256": "bc18e87aa3fea4af6c972d500b77e5f0fc8d3f3475271ab8dc9e3e4425f3fa7b",
+   "mtime": "2026-11-20 19:48:05",
+   "param": "spacing",
+   "ps_ok": true,
+   "ps_readback": {
+    "angle": "0",
+    "brush": "Kyle 的终极粉彩派对",
+    "diameter": "60",
+    "hardness": "ABSENT",
+    "jitter": "ABSENT",
+    "roundness": "100",
+    "spacing": "50",
+    "useScatter": "false",
+    "useTexture": "false",
+    "useTipDynamics": "false"
+   },
+   "side": "ps",
+   "value": 50.0,
+   "width": 640
+  },
+  {
+   "bytes": 7227,
+   "cmd": "python tools/measure_deviation.py --param spacing --values 100 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/krita/spacing__square__v100.png",
+   "group": "square",
+   "height": 320,
+   "idat_sha256": "9e7a368189afc42a8561e85a4732b77cdb45a271119a0a509d63060f4104d7a7",
+   "krita_preset": "docs/数据/偏差/kpp/spacing__square__v100.kpp",
+   "krita_readback": {
+    "AxisX": "false",
+    "AxisY": "true",
+    "PressureScatter": "false",
+    "ScatterValue": "0",
+    "angle": "0",
+    "diameter": "",
+    "hfade": "",
+    "ratio": "",
+    "spacing": "1",
+    "xml_bytes": "18621"
+   },
+   "mtime": "2026-11-20 19:39:13",
+   "param": "spacing",
+   "side": "krita",
+   "value": 100.0,
+   "width": 640
+  },
+  {
+   "bytes": 821222,
+   "cmd": "python tools/measure_deviation.py --param spacing --values 100 --analyze",
+   "exists": true,
+   "file": "docs/数据/偏差/ps/spacing__square__v100.png",
+   "group": "square",
+   "height": 320,
+   "idat_sha256": "db1b9e472e92eb5057dcefc88c97babc276745212b41ec7ac6ea29436a575b8f",
+   "mtime": "2026-11-20 19:48:07",
+   "param": "spacing",
+   "ps_ok": true,
+   "ps_readback": {
+    "angle": "0",
+    "brush": "Kyle 的终极粉彩派对",
+    "diameter": "60",
+    "hardness": "ABSENT",
+    "jitter": "ABSENT",
+    "roundness": "100",
+    "spacing": "100",
+    "useScatter": "false",
+    "useTexture": "false",
+    "useTipDynamics": "false"
+   },
+   "side": "ps",
+   "value": 100.0,
+   "width": 640
+  }
+ ],
+ "krita": {
+  "exe": "krita.com",
+  "route": "GUI 真实渲染（krita_render_runner.py）",
+  "serial": true
+ },
+ "ps": {
+  "elapsed_s": 33.1,
+  "exe": "Photoshop.exe",
+  "session": "一个 PS 会话串行出图；已有实例时复用且不退出",
+  "version": "26.9.0"
+ },
+ "results": {
+  "angle": {
+   "conclusion_detail": {
+    "conclusion": "不偏",
+    "reason": "全部已测取值点均在阈值内"
+   },
+   "group": "computed",
+   "param": "angle",
+   "points": [
+    {
+     "consistent": true,
+     "group": "computed",
+     "kt_file": "docs/数据/偏差/krita/angle__computed__v0.png",
+     "kt_idat_sha256": "e53ebd124b4c98f70d241304c4a6bf7c6a40b5d024773927aa0e94d8ea94b5cb",
+     "metric": {
+      "angle_diff_deg": 0.0001406463683882657,
+      "axis_ratio_kt": 3.3644164435441226,
+      "axis_ratio_ps": 3.3221933756397526,
+      "kt": {
+       "angle_deg": 0.0,
+       "axis_ratio": 3.3644164435441226,
+       "centroid": [
+        199.0,
+        199.5
+       ],
+       "major_px": 198.21905867568606,
+       "minor_px": 58.91632679897361,
+       "moment_xx": 2455.6747013921918,
+       "moment_xy": 0.0,
+       "moment_yy": 216.94584771771596
+      },
+      "ps": {
+       "angle_deg": 0.0001406463683882657,
+       "axis_ratio": 3.3221933756397526,
+       "centroid": [
+        199.5,
+        199.5
+       ],
+       "major_px": 199.46843389966332,
+       "minor_px": 60.041187054998524,
+       "moment_xx": 2486.728507635396,
+       "moment_xy": 0.0055512018965118036,
+       "moment_yy": 225.30900894945938
+      }
+     },
+     "param": "angle",
+     "pixel": {
+      "diff_pixels": 950,
+      "diff_ratio": 0.0059375,
+      "max_delta": 144,
+      "mean_abs_delta": 0.37695,
+      "pass": false
+     },
+     "ps_file": "docs/数据/偏差/ps/angle__computed__v0.png",
+     "ps_idat_sha256": "b57420df59c86f9a0cb031595b4d18a06c2243e9f2e5c6ff099dd7504b90b185",
+     "value": 0.0
+    },
+    {
+     "consistent": true,
+     "group": "computed",
+     "kt_file": "docs/数据/偏差/krita/angle__computed__v45.png",
+     "kt_idat_sha256": "a379e2613c8d9fb4d30be2b90163ec55fa7c1232b170a1356981e552395a53c9",
+     "metric": {
+      "angle_diff_deg": 0.0016288023810488994,
+      "axis_ratio_kt": 3.3654687720392995,
+      "axis_ratio_ps": 3.316102165723434,
+      "kt": {
+       "angle_deg": 135.0014290753761,
+       "axis_ratio": 3.3654687720392995,
+       "centroid": [
+        199.0,
+        199.5
+       ],
+       "major_px": 198.24252803323816,
+       "minor_px": 58.90487817930738,
+       "moment_xx": 1336.6147487134567,
+       "moment_xy": -1119.697350097175,
+       "moment_yy": 1336.5030384320596
+      },
+      "ps": {
+       "angle_deg": 134.99980027299506,
+       "axis_ratio": 3.316102165723434,
+       "centroid": [
+        199.5,
+        199.5
+       ],
+       "major_px": 199.39422014267313,
+       "minor_px": 60.129094393921875,
+       "moment_xx": 1355.4159700241796,
+       "moment_xy": -1129.4545947747895,
+       "moment_yy": 1355.4317186594433
+      }
+     },
+     "param": "angle",
+     "pixel": {
+      "diff_pixels": 988,
+      "diff_ratio": 0.006175,
+      "max_delta": 194,
+      "mean_abs_delta": 0.40285625,
+      "pass": false
+     },
+     "ps_file": "docs/数据/偏差/ps/angle__computed__v45.png",
+     "ps_idat_sha256": "bb83d252c08d93a17c2899f0d37fdd746006cdf6605f3303b50d8d6980775d29",
+     "value": 45.0
+    },
+    {
+     "consistent": true,
+     "group": "computed",
+     "kt_file": "docs/数据/偏差/krita/angle__computed__v90.png",
+     "kt_idat_sha256": "18dbaa477c89de58cc21fe5eb235f31e68ca4630ad34ea0de263be8f60a97cb4",
+     "metric": {
+      "angle_diff_deg": 0.0004792365183163838,
+      "axis_ratio_kt": 3.365615024211236,
+      "axis_ratio_ps": 3.322282053072496,
+      "kt": {
+       "angle_deg": 89.99964176078514,
+       "axis_ratio": 3.365615024211236,
+       "centroid": [
+        199.0,
+        199.5
+       ],
+       "major_px": 198.24356541478218,
+       "minor_px": 58.90262670824702,
+       "moment_xx": 216.84496465824014,
+       "moment_xy": 0.014001976320514538,
+       "moment_yy": 2456.2819516852674
+      },
+      "ps": {
+       "angle_deg": 90.00012099730345,
+       "axis_ratio": 3.322282053072496,
+       "centroid": [
+        199.5,
+        199.5
+       ],
+       "major_px": 199.46685382904374,
+       "minor_px": 60.039108854281,
+       "moment_xx": 225.2934120110978,
+       "moment_xy": -0.004775618448192297,
+       "moment_yy": 2486.6891110184843
+      }
+     },
+     "param": "angle",
+     "pixel": {
+      "diff_pixels": 992,
+      "diff_ratio": 0.0062,
+      "max_delta": 204,
+      "mean_abs_delta": 0.42005625,
+      "pass": false
+     },
+     "ps_file": "docs/数据/偏差/ps/angle__computed__v90.png",
+     "ps_idat_sha256": "70b44199d33ac7eff9dcd9cd7b8f291197e7b968ba9f60a7285a8e0728f6d3b3",
+     "value": 90.0
+    }
+   ]
+  },
+  "hardness": {
+   "conclusion_detail": {
+    "conclusion": "真偏",
+    "detail": "0={'ps': {'edge_width': 78.75, 'peak_alpha': 255.0, 'centroid_row': 200, 'right_10_90': np.float64(78.75)}, 'kt': {'edge_width': 63.14999999999999, 'peak_alpha': 255.0, 'centroid_row': 199, 'right_10_90': np.float64(63.14999999999998)}, 'abs_diff_px': 15.600000000000009, 'rel_err': 0.1980952380952382, 'consistent_by_rel': False, 'consistent_by_abs': False}；50={'ps': {'edge_width': 32.379166666666684, 'peak_alpha': 255.0, 'centroid_row': 201, 'right_10_90': np.float64(32.4666666666667)}, 'kt': {'edge_width': 39.70833333333332, 'peak_alpha': 255.0, 'centroid_row': 199, 'right_10_90': np.float64(39.708333333333314)}, 'abs_diff_px': 7.329166666666637, 'rel_err': 0.22635439454381573, 'consistent_by_rel': False, 'consistent_by_abs': False}",
+    "reason": "至少一点超阈（2/3 点超阈）"
+   },
+   "group": "computed",
+   "param": "hardness",
+   "points": [
+    {
+     "consistent": false,
+     "group": "computed",
+     "kt_file": "docs/数据/偏差/krita/hardness__computed__v0.png",
+     "kt_idat_sha256": "b3c99df61b5335138485fd0af952c361b011483e955a47200bfc573a197238ba",
+     "metric": {
+      "abs_diff_px": 15.600000000000009,
+      "consistent_by_abs": false,
+      "consistent_by_rel": false,
+      "kt": {
+       "centroid_row": 199,
+       "edge_width": 63.14999999999999,
+       "peak_alpha": 255.0,
+       "right_10_90": 63.14999999999998
+      },
+      "ps": {
+       "centroid_row": 200,
+       "edge_width": 78.75,
+       "peak_alpha": 255.0,
+       "right_10_90": 78.75
+      },
+      "rel_err": 0.1980952380952382
+     },
+     "param": "hardness",
+     "pixel": {
+      "diff_pixels": 60848,
+      "diff_ratio": 0.3803,
+      "max_delta": 54,
+      "mean_abs_delta": 8.15441875,
+      "pass": false
+     },
+     "ps_file": "docs/数据/偏差/ps/hardness__computed__v0.png",
+     "ps_idat_sha256": "3311c40668c1c4e9bd570db322e111a2fa9ab538607d108cd78b7669e22490b3",
+     "value": 0.0
+    },
+    {
+     "consistent": false,
+     "group": "computed",
+     "kt_file": "docs/数据/偏差/krita/hardness__computed__v50.png",
+     "kt_idat_sha256": "75b45232154d57c9f121bd42f895708308eae87f1cd29c8790ef1d2608357d54",
+     "metric": {
+      "abs_diff_px": 7.329166666666637,
+      "consistent_by_abs": false,
+      "consistent_by_rel": false,
+      "kt": {
+       "centroid_row": 199,
+       "edge_width": 39.70833333333332,
+       "peak_alpha": 255.0,
+       "right_10_90": 39.708333333333314
+      },
+      "ps": {
+       "centroid_row": 201,
+       "edge_width": 32.379166666666684,
+       "peak_alpha": 255.0,
+       "right_10_90": 32.4666666666667
+      },
+      "rel_err": 0.22635439454381573
+     },
+     "param": "hardness",
+     "pixel": {
+      "diff_pixels": 39847,
+      "diff_ratio": 0.24904375,
+      "max_delta": 82,
+      "mean_abs_delta": 9.74744375,
+      "pass": false
+     },
+     "ps_file": "docs/数据/偏差/ps/hardness__computed__v50.png",
+     "ps_idat_sha256": "7997225881c7b120553f1e2318f1602080ce0928f7234a3d0b27e05311049be2",
+     "value": 50.0
+    },
+    {
+     "consistent": true,
+     "group": "computed",
+     "kt_file": "docs/数据/偏差/krita/hardness__computed__v100.png",
+     "kt_idat_sha256": "8e0f17ebe57c37a1bfc53ea3619079b3a44171a4af734d0133112eced04d0421",
+     "metric": {
+      "abs_diff_px": 1.0710317460317427,
+      "consistent_by_abs": true,
+      "consistent_by_rel": false,
+      "kt": {
+       "centroid_row": 199,
+       "edge_width": 0.8095238095238031,
+       "peak_alpha": 255.0,
+       "right_10_90": 0.809523809523796
+      },
+      "ps": {
+       "centroid_row": 199,
+       "edge_width": 1.8805555555555458,
+       "peak_alpha": 255.0,
+       "right_10_90": 1.8805555555555316
+      },
+      "rel_err": 0.5695294365899991
+     },
+     "param": "hardness",
+     "pixel": {
+      "diff_pixels": 1819,
+      "diff_ratio": 0.01136875,
+      "max_delta": 147,
+      "mean_abs_delta": 0.46995,
+      "pass": false
+     },
+     "ps_file": "docs/数据/偏差/ps/hardness__computed__v100.png",
+     "ps_idat_sha256": "ae10d6f2624117cac34d036167792968f5fb57692fcb1526eb7733719094d3f8",
+     "value": 100.0
+    }
+   ]
+  },
+  "scale": {
+   "conclusion_detail": {
+    "conclusion": "真偏",
+    "reason": "缩放 200% 处整图差异比例 >2% 或 max_delta>2（s=100 锚点一致）"
+   },
+   "group": "exp",
+   "param": "scale",
+   "points": [
+    {
+     "consistent": true,
+     "group": "exp",
+     "kt_file": "tests/baselines/exp/krita/exp__krita__conv__multiply__d100_s50_b0_c0.png",
+     "kt_idat_sha256": "00106871fa0d41be07b5f3ed5668097dd40814eaa28e58d2dc23d7a7a8c3941c",
+     "metric": {
+      "curve": {
+       "mean_abs_R_ps": 63.4517,
+       "note": "R(s)=A(s)-A(100)，s=100 为锚点（R≡0 属定义）",
+       "rel_residual": 0.007925713574261998,
+       "residual_max_abs": 1,
+       "residual_mean_abs": 0.5029
+      },
+      "kind": "image_diff"
+     },
+     "param": "scale",
+     "pixel": {
+      "diff_pixels": 0,
+      "diff_ratio": 0.0,
+      "max_delta": 1,
+      "mean_abs_delta": 0.5029,
+      "pass": true
+     },
+     "ps_file": "tests/baselines/exp/ps/exp__ps__multiply__d100_s50_b0_c0.png",
+     "ps_idat_sha256": "8bb0908b8ccaa7f1148118bc330cda258a40adf1940a04f1675b12386d0284c5",
+     "value": 50.0
+    },
+    {
+     "consistent": true,
+     "group": "exp",
+     "kt_file": "tests/baselines/exp/krita/exp__krita__conv__multiply__d100_s100_b0_c0.png",
+     "kt_idat_sha256": "eaf395c4aae3ea2614c4d85a76849a036a3bc53aeda819160e530c18b69525a1",
+     "metric": {
+      "curve": {
+       "mean_abs_R_ps": 0.0,
+       "note": "R(s)=A(s)-A(100)，s=100 为锚点（R≡0 属定义）",
+       "rel_residual": null,
+       "residual_max_abs": 0,
+       "residual_mean_abs": 0.0
+      },
+      "kind": "image_diff"
+     },
+     "param": "scale",
+     "pixel": {
+      "diff_pixels": 0,
+      "diff_ratio": 0.0,
+      "max_delta": 0,
+      "mean_abs_delta": 0.0,
+      "pass": true
+     },
+     "ps_file": "tests/baselines/exp/ps/exp__ps__multiply__d100_s100_b0_c0.png",
+     "ps_idat_sha256": "1d14a8b9e0b87fbfd3cdc97f74be218ede7a09d679302965d289accae795c537",
+     "value": 100.0
+    },
+    {
+     "consistent": false,
+     "group": "exp",
+     "kt_file": "tests/baselines/exp/krita/exp__krita__conv__multiply__d100_s200_b0_c0.png",
+     "kt_idat_sha256": "cf3c9b1a442adb8c9328b38f35ff4d6f787d4c8a4cb038e86298860c2d254f04",
+     "metric": {
+      "curve": {
+       "mean_abs_R_ps": 69.6302,
+       "note": "R(s)=A(s)-A(100)，s=100 为锚点（R≡0 属定义）",
+       "rel_residual": 0.3235363391172221,
+       "residual_max_abs": 93,
+       "residual_mean_abs": 22.5279
+      },
+      "kind": "image_diff"
+     },
+     "param": "scale",
+     "pixel": {
+      "diff_pixels": 9372,
+      "diff_ratio": 0.9372,
+      "max_delta": 93,
+      "mean_abs_delta": 22.5279,
+      "pass": false
+     },
+     "ps_file": "tests/baselines/exp/ps/exp__ps__multiply__d100_s200_b0_c0.png",
+     "ps_idat_sha256": "1ca4d5fe2ad024ed834c8e69ae59bde6d69bad8781d768fef3a5e2d30074f901",
+     "value": 200.0
+    }
+   ]
+  },
+  "scatter": {
+   "conclusion_detail": {
+    "conclusion": "真偏",
+    "reason": "散布增量（band_height(v)-band_height(0)）相对误差最大 51.1%（PS 增量 vs Krita 增量）"
+   },
+   "group": "computed",
+   "param": "scatter",
+   "points": [
+    {
+     "consistent": null,
+     "group": "computed",
+     "kt_file": "docs/数据/偏差/krita/scatter__computed__v0.png",
+     "kt_idat_sha256": "fcae00e3ab034cbe5cee89d3834cb3de28569aab6ecf847f874cea6901567933",
+     "metric": {
+      "kt": {
+       "band_height": 100,
+       "x_range": [
+        168,
+        442
+       ],
+       "y_mean_spread": 0.0,
+       "y_std": 27.370948232055248
+      },
+      "ps": {
+       "band_height": 102,
+       "x_range": [
+        166,
+        443
+       ],
+       "y_mean_spread": 0.0015769427038848866,
+       "y_std": 27.531985309477154
+      }
+     },
+     "param": "scatter",
+     "pixel": {
+      "diff_pixels": 3698,
+      "diff_ratio": 0.010318080357142857,
+      "max_delta": 146,
+      "mean_abs_delta": 0.3380245535714286,
+      "pass": false
+     },
+     "ps_file": "docs/数据/偏差/ps/scatter__computed__v0.png",
+     "ps_idat_sha256": "7f9fe1a36a613f7d3f67e22bf9db4062e73cb84219d465daea2030c50521e9c7",
+     "value": 0.0
+    },
+    {
+     "consistent": null,
+     "group": "computed",
+     "kt_file": "docs/数据/偏差/krita/scatter__computed__v100.png",
+     "kt_idat_sha256": "544de1375cfd3ebe16a82657c26954cebbcd9b7e7371c0477083481a7d289435",
+     "metric": {
+      "kt": {
+       "band_height": 138,
+       "x_range": [
+        175,
+        445
+       ],
+       "y_mean_spread": 5.094730774022294,
+       "y_std": 27.654463995667648
+      },
+      "ps": {
+       "band_height": 165,
+       "x_range": [
+        166,
+        443
+       ],
+       "y_mean_spread": 14.050645656692819,
+       "y_std": 31.76627837284986
+      }
+     },
+     "param": "scatter",
+     "pixel": {
+      "diff_pixels": 19990,
+      "diff_ratio": 0.05577566964285714,
+      "max_delta": 255,
+      "mean_abs_delta": 12.233024553571429,
+      "pass": false
+     },
+     "ps_file": "docs/数据/偏差/ps/scatter__computed__v100.png",
+     "ps_idat_sha256": "807b40e55d2783c27e2ec503145d8d90649e030bb1d4fe04cf05e8a8cf2a3093",
+     "value": 100.0
+    },
+    {
+     "consistent": null,
+     "group": "computed",
+     "kt_file": "docs/数据/偏差/krita/scatter__computed__v300.png",
+     "kt_idat_sha256": "7dea220a0720b352f0d7011d873f3dcd1389b14e023eb5f50d79f91585714eb3",
+     "metric": {
+      "kt": {
+       "band_height": 234,
+       "x_range": [
+        171,
+        443
+       ],
+       "y_mean_spread": 38.46311641942219,
+       "y_std": 34.993093765577704
+      },
+      "ps": {
+       "band_height": 376,
+       "x_range": [
+        166,
+        443
+       ],
+       "y_mean_spread": 57.60568668537845,
+       "y_std": 77.54964336057694
+      }
+     },
+     "param": "scatter",
+     "pixel": {
+      "diff_pixels": 95166,
+      "diff_ratio": 0.26553013392857144,
+      "max_delta": 255,
+      "mean_abs_delta": 64.12116908482143,
+      "pass": false
+     },
+     "ps_file": "docs/数据/偏差/ps/scatter__computed__v300.png",
+     "ps_idat_sha256": "0980e9cc6e03c92c1f3b98c72ea2c17a062249f8598b13995fa30fb0087706b8",
+     "value": 300.0
+    }
+   ],
+   "scatter_growth": [
+    {
+     "grow_kt": 38,
+     "grow_ps": 63,
+     "rel_err": 0.3968253968253968,
+     "value": 100.0
+    },
+    {
+     "grow_kt": 134,
+     "grow_ps": 274,
+     "rel_err": 0.5109489051094891,
+     "value": 300.0
+    }
+   ]
+  },
+  "size": {
+   "conclusion_detail": {
+    "conclusion": "不偏",
+    "reason": "全部已测取值点均在阈值内"
+   },
+   "group": "computed",
+   "param": "size",
+   "points": [
+    {
+     "consistent": true,
+     "group": "computed",
+     "kt_file": "docs/数据/偏差/krita/size__computed__v20.png",
+     "kt_idat_sha256": "30515bd7dd87b1d9f97d3514f235b390bf053c2c4e0145c9323337556a7abb67",
+     "metric": {
+      "abs_diff_px": 0.4765336289726534,
+      "consistent_by_abs": true,
+      "consistent_by_rel": false,
+      "kt": {
+       "bbox_height": 20,
+       "n_columns": 456,
+       "thr": 127.5,
+       "width50": 19.93181818181818,
+       "width50_max": 19.93181818181818,
+       "width50_median_all": 15.198757763975156,
+       "width50_top10": 19.93181818181818
+      },
+      "kt_width_vs_nominal_rel": 0.003409090909091006,
+      "nominal_diameter": 20.0,
+      "ps": {
+       "bbox_height": 22,
+       "n_columns": 500,
+       "thr": 127.5,
+       "width50": 19.455284552845526,
+       "width50_max": 19.864864864864863,
+       "width50_median_all": 15.618870066714894,
+       "width50_top10": 19.864864864864863
+      },
+      "ps_width_vs_nominal_rel": 0.027235772357723675,
+      "rel_err_width": 0.024493788701895683,
+      "width_ratio_kt_over_ps": 1.0244937887018957
+     },
+     "param": "size",
+     "pixel": {
+      "diff_pixels": 4344,
+      "diff_ratio": 0.01696875,
+      "max_delta": 255,
+      "mean_abs_delta": 1.0747734375,
+      "pass": false
+     },
+     "ps_file": "docs/数据/偏差/ps/size__computed__v20.png",
+     "ps_idat_sha256": "e431deb503833b347a2c9365dc0b666fddf6b9b96c624f5b0f9adcbc6de5be77",
+     "value": 20.0
+    },
+    {
+     "consistent": true,
+     "group": "computed",
+     "kt_file": "docs/数据/偏差/krita/size__computed__v100.png",
+     "kt_idat_sha256": "503ea5227684d0757d272ab33d300cf796b912da16173b264d725e6cfb8764eb",
+     "metric": {
+      "abs_diff_px": 0.5082385528547206,
+      "consistent_by_abs": true,
+      "consistent_by_rel": true,
+      "kt": {
+       "bbox_height": 100,
+       "n_columns": 495,
+       "thr": 127.5,
+       "width50": 96.5344827586207,
+       "width50_max": 99.9921875,
+       "width50_median_all": 84.80864197530863,
+       "width50_top10": 97.24350680467703
+      },
+      "kt_width_vs_nominal_rel": 0.034655172413793026,
+      "nominal_diameter": 100.0,
+      "ps": {
+       "bbox_height": 102,
+       "n_columns": 500,
+       "thr": 127.5,
+       "width50": 97.04272131147542,
+       "width50_max": 99.9457411957412,
+       "width50_median_all": 85.14441635061104,
+       "width50_top10": 99.73192814718237
+      },
+      "ps_width_vs_nominal_rel": 0.029572786885245818,
+      "rel_err_width": 0.005237266082259184,
+      "width_ratio_kt_over_ps": 0.9947627339177408
+     },
+     "param": "size",
+     "pixel": {
+      "diff_pixels": 4435,
+      "diff_ratio": 0.01732421875,
+      "max_delta": 158,
+      "mean_abs_delta": 0.69464453125,
+      "pass": false
+     },
+     "ps_file": "docs/数据/偏差/ps/size__computed__v100.png",
+     "ps_idat_sha256": "5f8c0d39d7c82246770b18b650c9a6ef666fcc39e14cda6fa246ea6ea61be75c",
+     "value": 100.0
+    },
+    {
+     "consistent": true,
+     "group": "computed",
+     "kt_file": "docs/数据/偏差/krita/size__computed__v300.png",
+     "kt_idat_sha256": "4c2581908c3f1219911b4e8ca375317b4bc160553b0fb4737124d3f4e1178dc5",
+     "metric": {
+      "abs_diff_px": 0.25343090253426226,
+      "consistent_by_abs": true,
+      "consistent_by_rel": true,
+      "kt": {
+       "bbox_height": 300,
+       "n_columns": 529,
+       "thr": 127.5,
+       "width50": 294.6507936507936,
+       "width50_max": 299.9921875,
+       "width50_median_all": 266.125,
+       "width50_top10": 296.81395348837214
+      },
+      "kt_width_vs_nominal_rel": 0.017830687830687943,
+      "nominal_diameter": 300.0,
+      "ps": {
+       "bbox_height": 302,
+       "n_columns": 527,
+       "thr": 127.5,
+       "width50": 294.39736274825935,
+       "width50_max": 297.98177648040036,
+       "width50_median_all": 267.9805349324196,
+       "width50_top10": 296.9837398373984
+      },
+      "ps_width_vs_nominal_rel": 0.018675457505802153,
+      "rel_err_width": 0.0008608463750097255,
+      "width_ratio_kt_over_ps": 1.0008608463750097
+     },
+     "param": "size",
+     "pixel": {
+      "diff_pixels": 4505,
+      "diff_ratio": 0.01759765625,
+      "max_delta": 140,
+      "mean_abs_delta": 0.590421875,
+      "pass": false
+     },
+     "ps_file": "docs/数据/偏差/ps/size__computed__v300.png",
+     "ps_idat_sha256": "52857b4daa63b9d2699b6a856a6ef54dcce33dded0a527acf258b658a4334ad5",
+     "value": 300.0
+    }
+   ]
+  },
+  "spacing": {
+   "conclusion_detail": {
+    "conclusion": "真偏",
+    "reason": "步长相对误差超 2% 的点：square v50=2.0%、nonsquare v10=25.3%、nonsquare v50=28.1%、nonsquare v100=32.5%（共 4/8 点超阈）；分组：computed 最大 1.88%；square 最大 2.01%；nonsquare 最大 32.46%；1 点不可判读：computed v10"
+   },
+   "group": "多组",
+   "padding_conclusion": {
+    "conclusion": "与补平方有关",
+    "points": {
+     "computed": [
+      {
+       "band_height_ratio": 0.8097165991902834,
+       "band_kt": 200,
+       "band_ps": 247,
+       "rel_err_step": 0.018779799552398488,
+       "rel_err_step_over_band": 0.2118069475527878,
+       "step_kt": 100.84,
+       "step_ps": 102.77,
+       "value": 50.0
+      },
+      {
+       "band_height_ratio": 0.8064516129032258,
+       "band_kt": 200,
+       "band_ps": 248,
+       "rel_err_step": 0.005520425574626089,
+       "rel_err_step_over_band": 0.23315467228746364,
+       "step_kt": 198.16,
+       "step_ps": 199.26,
+       "value": 100.0
+      }
+     ],
+     "nonsquare": [
+      {
+       "band_height_ratio": 1.353846153846154,
+       "band_kt": 88,
+       "band_ps": 65,
+       "rel_err_step": 0.25284738041002286,
+       "rel_err_step_over_band": 0.07460136674259674,
+       "step_kt": 11.0,
+       "step_ps": 8.78,
+       "value": 10.0
+      },
+      {
+       "band_height_ratio": 1.3384615384615384,
+       "band_kt": 87,
+       "band_ps": 65,
+       "rel_err_step": 0.28087831655992684,
+       "rel_err_step_over_band": 0.04302194739775585,
+       "step_kt": 56.0,
+       "step_ps": 43.72,
+       "value": 50.0
+      },
+      {
+       "band_height_ratio": 1.45,
+       "band_kt": 87,
+       "band_ps": 60,
+       "rel_err_step": 0.32457697313927336,
+       "rel_err_step_over_band": 0.08649863921429425,
+       "step_kt": 111.94,
+       "step_ps": 84.51,
+       "value": 100.0
+      }
+     ],
+     "square": [
+      {
+       "band_height_ratio": 1.1346153846153846,
+       "band_kt": 59,
+       "band_ps": 52,
+       "rel_err_step": 0.01694915254237282,
+       "rel_err_step_over_band": 0.1037058316575697,
+       "step_kt": 6.0,
+       "step_ps": 5.9,
+       "value": 10.0
+      },
+      {
+       "band_height_ratio": 1.475,
+       "band_kt": 59,
+       "band_ps": 40,
+       "rel_err_step": 0.02005438477226376,
+       "rel_err_step_over_band": 0.3084377052391432,
+       "step_kt": 30.01,
+       "step_ps": 29.42,
+       "value": 50.0
+      },
+      {
+       "band_height_ratio": 1.84375,
+       "band_kt": 59,
+       "band_ps": 32,
+       "rel_err_step": 0.013000168833361525,
+       "rel_err_step_over_band": 0.45057617961580393,
+       "step_kt": 60.0,
+       "step_ps": 59.23,
+       "value": 100.0
+      }
+     ]
+    },
+    "reason": "非方形最大步长相对误差 32.46% 超阈且 ≥2×方形 2.01%；计算笔刷（无补白）最大 1.88%",
+    "worst_rel_err_step": {
+     "computed": 0.018779799552398488,
+     "nonsquare": 0.32457697313927336,
+     "square": 0.02005438477226376
+    }
+   },
+   "param": "spacing",
+   "points": [
+    {
+     "consistent": null,
+     "group": "computed",
+     "kt_file": "docs/数据/偏差/krita/spacing__computed__v10.png",
+     "kt_idat_sha256": "5f0f7ef94fb4bf12e475c31cd5d2358c67bd2f3cfdeee9248e2fcdf37958d847",
+     "metric": {
+      "kt": {
+       "band_height": 200,
+       "candidate_methods": [
+        "scallop/mass",
+        "dft/mass/raw",
+        "dft/cnt8/raw",
+        "dft/cnt8/hp",
+        "dft/cnt64/raw",
+        "dft/cnt64/hp",
+        "dft/cnt160/raw",
+        "dft/cnt160/hp"
+       ],
+       "candidate_steps": [
+        20.0,
+        48.21,
+        48.17,
+        35.3,
+        48.47,
+        42.07,
+        43.04,
+        43.7
+       ],
+       "candidates": 8,
+       "footprint": {
+        "height": 200,
+        "width_est": null
+       },
+       "nominal_step_px": 20.0,
+       "note": "不可判读：最大轮廓调制 0.05% < 0.5%，周期候选来自包络伪峰",
+       "profile_len": 640,
+       "ripple_pct": {
+        "cnt160": 0.0,
+        "cnt64": 0.0,
+        "cnt8": 0.0,
+        "mass": 0.05
+       },
+       "step_px": null,
+       "stroke_length": 640,
+       "votes": 3
+      },
+      "ps": {
+       "band_height": 258,
+       "candidate_methods": [
+        "scallop/mass",
+        "scallop/cnt8",
+        "scallop/cnt64",
+        "dft/mass/raw",
+        "dft/cnt8/raw",
+        "dft/cnt8/hp",
+        "dft/cnt64/raw",
+        "dft/cnt64/hp",
+        "dft/cnt160/raw"
+       ],
+       "candidate_steps": [
+        18.0,
+        20.0,
+        12.0,
+        48.23,
+        20.11,
+        20.14,
+        10.01,
+        42.7,
+        39.34
+       ],
+       "candidates": 9,
+       "cluster_methods": [
+        "scallop/cnt8",
+        "dft/cnt8/raw",
+        "dft/cnt8/hp"
+       ],
+       "footprint": {
+        "first_peak_x": 24,
+        "height": 258,
+        "width_est": 48.0
+       },
+       "nominal_step_px": 20.0,
+       "profile_len": 640,
+       "ripple_pct": {
+        "cnt160": 0.0,
+        "cnt64": 0.92,
+        "cnt8": 0.82,
+        "mass": 0.06
+       },
+       "spread_pct": 0.67,
+       "step_px": 20.11,
+       "stroke_length": 640,
+       "votes": 3
+      }
+     },
+     "param": "spacing",
+     "pixel": {
+      "diff_pixels": 85805,
+      "diff_ratio": 0.4189697265625,
+      "max_delta": 202,
+      "mean_abs_delta": 24.637353515625,
+      "pass": false
+     },
+     "ps_file": "docs/数据/偏差/ps/spacing__computed__v10.png",
+     "ps_idat_sha256": "c164a18824a33fcb8360400cd6b37c398372b6055f3bc3fd800448dfe2497104",
+     "unmeasurable": {
+      "kt": "不可判读：最大轮廓调制 0.05% < 0.5%，周期候选来自包络伪峰",
+      "ps": "step=20.11"
+     },
+     "value": 10.0
+    },
+    {
+     "consistent": true,
+     "group": "computed",
+     "kt_file": "docs/数据/偏差/krita/spacing__computed__v50.png",
+     "kt_idat_sha256": "5c78f61b192ebb0655151e9852c5b76729ec01b90eab44fe4bd8cf2e77b182f6",
+     "metric": {
+      "band_height_ratio_kt_over_ps": 0.8097165991902834,
+      "kt": {
+       "band_height": 200,
+       "candidate_methods": [
+        "scallop/mass",
+        "scallop/cnt8",
+        "scallop/cnt64",
+        "scallop/cnt160",
+        "dft/mass/raw",
+        "dft/mass/hp",
+        "dft/cnt8/raw",
+        "dft/cnt8/hp",
+        "dft/cnt64/raw",
+        "dft/cnt64/hp",
+        "dft/cnt160/raw",
+        "dft/cnt160/hp"
+       ],
+       "candidate_steps": [
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        101.07,
+        100.84,
+        100.78,
+        101.49,
+        100.92,
+        101.18,
+        101.53,
+        199.4
+       ],
+       "candidates": 12,
+       "cluster_methods": [
+        "scallop/mass",
+        "scallop/cnt8",
+        "scallop/cnt64",
+        "scallop/cnt160",
+        "dft/cnt8/raw",
+        "dft/mass/hp",
+        "dft/cnt64/raw",
+        "dft/mass/raw",
+        "dft/cnt64/hp",
+        "dft/cnt8/hp",
+        "dft/cnt160/raw"
+       ],
+       "footprint": {
+        "first_peak_x": 74,
+        "height": 200,
+        "width_est": 148.0
+       },
+       "nominal_step_px": 100.0,
+       "profile_len": 580,
+       "ripple_pct": {
+        "cnt160": 7.35,
+        "cnt64": 11.49,
+        "cnt8": 13.07,
+        "mass": 11.37
+       },
+       "spread_pct": 1.52,
+       "step_px": 100.84,
+       "stroke_length": 580,
+       "votes": 11
+      },
+      "kt_step_vs_nominal_rel": 0.008400000000000034,
+      "nominal_step_px": 100.0,
+      "ps": {
+       "band_height": 247,
+       "candidate_methods": [
+        "scallop/mass",
+        "scallop/cnt8",
+        "scallop/cnt64",
+        "scallop/cnt160",
+        "dft/mass/raw",
+        "dft/mass/hp",
+        "dft/cnt8/raw",
+        "dft/cnt8/hp",
+        "dft/cnt64/raw",
+        "dft/cnt64/hp",
+        "dft/cnt160/raw",
+        "dft/cnt160/hp"
+       ],
+       "candidate_steps": [
+        100.0,
+        100.0,
+        100.0,
+        99.5,
+        103.57,
+        103.11,
+        102.77,
+        217.92,
+        103.53,
+        211.98,
+        103.86,
+        206.49
+       ],
+       "candidates": 12,
+       "cluster_methods": [
+        "scallop/cnt160",
+        "scallop/mass",
+        "scallop/cnt8",
+        "scallop/cnt64",
+        "dft/cnt8/raw",
+        "dft/mass/hp",
+        "dft/cnt64/raw",
+        "dft/mass/raw",
+        "dft/cnt160/raw"
+       ],
+       "footprint": {
+        "first_peak_x": 69,
+        "height": 247,
+        "width_est": 138.0
+       },
+       "nominal_step_px": 100.0,
+       "profile_len": 603,
+       "ripple_pct": {
+        "cnt160": 8.64,
+        "cnt64": 6.38,
+        "cnt8": 5.36,
+        "mass": 8.22
+       },
+       "spread_pct": 4.25,
+       "step_px": 102.77,
+       "stroke_length": 603,
+       "votes": 9
+      },
+      "ps_step_vs_nominal_rel": 0.02769999999999996,
+      "rel_err_step": 0.018779799552398488,
+      "rel_err_step_over_band": 0.2118069475527878,
+      "rel_err_step_over_diameter": 0.018779799552398488,
+      "step_over_band_kt": 0.5042,
+      "step_over_band_ps": 0.4160728744939271,
+      "step_over_diameter_kt": 0.5042,
+      "step_over_diameter_ps": 0.51385,
+      "step_ratio_kt_over_ps": 0.9812202004476015
+     },
+     "param": "spacing",
+     "pixel": {
+      "diff_pixels": 97512,
+      "diff_ratio": 0.4761328125,
+      "max_delta": 90,
+      "mean_abs_delta": 19.502822265625,
+      "pass": false
+     },
+     "ps_file": "docs/数据/偏差/ps/spacing__computed__v50.png",
+     "ps_idat_sha256": "c2b0707cd5fecc33c175d7cb97b4241cb15209e38934f979dd46773986c80afe",
+     "value": 50.0
+    },
+    {
+     "consistent": true,
+     "group": "computed",
+     "kt_file": "docs/数据/偏差/krita/spacing__computed__v100.png",
+     "kt_idat_sha256": "534961efc7ccb3d4850135d7314510ff09b37a491c23eb2cbb9e6a8ef1e017af",
+     "metric": {
+      "band_height_ratio_kt_over_ps": 0.8064516129032258,
+      "kt": {
+       "band_height": 200,
+       "candidate_methods": [
+        "dft/mass/raw",
+        "dft/mass/hp",
+        "dft/cnt8/raw",
+        "dft/cnt8/hp",
+        "dft/cnt64/raw",
+        "dft/cnt64/hp",
+        "dft/cnt160/raw",
+        "dft/cnt160/hp"
+       ],
+       "candidate_steps": [
+        199.81,
+        196.21,
+        199.42,
+        193.54,
+        199.37,
+        194.95,
+        199.85,
+        196.95
+       ],
+       "candidates": 8,
+       "cluster_methods": [
+        "dft/cnt8/hp",
+        "dft/cnt64/hp",
+        "dft/mass/hp",
+        "dft/cnt160/hp",
+        "dft/cnt64/raw",
+        "dft/cnt8/raw",
+        "dft/mass/raw",
+        "dft/cnt160/raw"
+       ],
+       "footprint": {
+        "first_peak_x": 74,
+        "height": 200,
+        "width_est": 148.0
+       },
+       "nominal_step_px": 200.0,
+       "profile_len": 580,
+       "ripple_pct": {
+        "cnt160": 208.7,
+        "cnt64": 141.73,
+        "cnt8": 99.34,
+        "mass": 185.54
+       },
+       "spread_pct": 3.18,
+       "step_px": 198.16,
+       "stroke_length": 580,
+       "votes": 8
+      },
+      "kt_step_vs_nominal_rel": 0.009200000000000017,
+      "nominal_step_px": 200.0,
+      "ps": {
+       "band_height": 248,
+       "candidate_methods": [
+        "dft/mass/raw",
+        "dft/mass/hp",
+        "dft/cnt8/raw",
+        "dft/cnt64/raw",
+        "dft/cnt64/hp",
+        "dft/cnt160/raw",
+        "dft/cnt160/hp"
+       ],
+       "candidate_steps": [
+        199.39,
+        196.34,
+        199.27,
+        199.26,
+        195.26,
+        199.37,
+        196.9
+       ],
+       "candidates": 7,
+       "cluster_methods": [
+        "dft/cnt64/hp",
+        "dft/mass/hp",
+        "dft/cnt160/hp",
+        "dft/cnt64/raw",
+        "dft/cnt8/raw",
+        "dft/cnt160/raw",
+        "dft/mass/raw"
+       ],
+       "footprint": {
+        "first_peak_x": 69,
+        "height": 248,
+        "width_est": 138.0
+       },
+       "nominal_step_px": 200.0,
+       "profile_len": 604,
+       "ripple_pct": {
+        "cnt160": 141.53,
+        "cnt64": 88.21,
+        "cnt8": 48.22,
+        "mass": 112.72
+       },
+       "spread_pct": 2.07,
+       "step_px": 199.26,
+       "stroke_length": 604,
+       "votes": 7
+      },
+      "ps_step_vs_nominal_rel": 0.0037000000000000453,
+      "rel_err_step": 0.005520425574626089,
+      "rel_err_step_over_band": 0.23315467228746364,
+      "rel_err_step_over_diameter": 0.005520425574626089,
+      "step_over_band_kt": 0.9908,
+      "step_over_band_ps": 0.8034677419354839,
+      "step_over_diameter_kt": 0.9908,
+      "step_over_diameter_ps": 0.9963,
+      "step_ratio_kt_over_ps": 0.9944795744253739
+     },
+     "param": "spacing",
+     "pixel": {
+      "diff_pixels": 105097,
+      "diff_ratio": 0.5131689453125,
+      "max_delta": 91,
+      "mean_abs_delta": 21.9291455078125,
+      "pass": false
+     },
+     "ps_file": "docs/数据/偏差/ps/spacing__computed__v100.png",
+     "ps_idat_sha256": "8e5189ebfd27e4c3e95d7e2c814c816b2ef76f24eeacb475c916b3a0865f15f1",
+     "value": 100.0
+    },
+    {
+     "consistent": true,
+     "group": "square",
+     "kt_file": "docs/数据/偏差/krita/spacing__square__v10.png",
+     "kt_idat_sha256": "9e1af9b10dcff4ee5b376289a7ca81c8f6935176f9a98a4de1b3a60a905cd2a5",
+     "metric": {
+      "band_height_ratio_kt_over_ps": 1.1346153846153846,
+      "kt": {
+       "band_height": 59,
+       "candidate_methods": [
+        "scallop/mass",
+        "scallop/cnt8",
+        "scallop/cnt64",
+        "scallop/cnt160",
+        "dft/mass/raw",
+        "dft/mass/hp",
+        "dft/cnt8/raw",
+        "dft/cnt8/hp",
+        "dft/cnt64/raw",
+        "dft/cnt64/hp",
+        "dft/cnt160/raw",
+        "dft/cnt160/hp"
+       ],
+       "candidate_steps": [
+        6.0,
+        6.0,
+        6.0,
+        6.0,
+        6.0,
+        6.0,
+        6.0,
+        6.0,
+        6.0,
+        6.0,
+        6.0,
+        6.0
+       ],
+       "candidates": 12,
+       "cluster_methods": [
+        "dft/cnt160/raw",
+        "dft/cnt160/hp",
+        "scallop/mass",
+        "scallop/cnt8",
+        "scallop/cnt64",
+        "scallop/cnt160",
+        "dft/cnt64/hp",
+        "dft/cnt64/raw",
+        "dft/mass/raw",
+        "dft/mass/hp",
+        "dft/cnt8/hp",
+        "dft/cnt8/raw"
+       ],
+       "footprint": {
+        "first_peak_x": 57,
+        "height": 59,
+        "width_est": 14.0
+       },
+       "nominal_step_px": 6.0,
+       "profile_len": 535,
+       "ripple_pct": {
+        "cnt160": 3.7,
+        "cnt64": 3.51,
+        "cnt8": 1.69,
+        "mass": 1.82
+       },
+       "spread_pct": 0.01,
+       "step_px": 6.0,
+       "stroke_length": 535,
+       "votes": 12
+      },
+      "kt_step_vs_nominal_rel": 0.0,
+      "nominal_step_px": 6.0,
+      "ps": {
+       "band_height": 52,
+       "candidate_methods": [
+        "scallop/mass",
+        "scallop/cnt8",
+        "scallop/cnt64",
+        "scallop/cnt160",
+        "dft/mass/raw",
+        "dft/mass/hp",
+        "dft/cnt8/raw",
+        "dft/cnt8/hp",
+        "dft/cnt64/raw",
+        "dft/cnt64/hp",
+        "dft/cnt160/raw",
+        "dft/cnt160/hp"
+       ],
+       "candidate_steps": [
+        6.0,
+        6.0,
+        6.0,
+        6.0,
+        5.9,
+        5.9,
+        5.9,
+        5.9,
+        5.9,
+        5.9,
+        5.89,
+        5.89
+       ],
+       "candidates": 12,
+       "cluster_methods": [
+        "dft/cnt160/raw",
+        "dft/cnt160/hp",
+        "dft/mass/hp",
+        "dft/mass/raw",
+        "dft/cnt8/raw",
+        "dft/cnt8/hp",
+        "dft/cnt64/raw",
+        "dft/cnt64/hp",
+        "scallop/mass",
+        "scallop/cnt8",
+        "scallop/cnt64",
+        "scallop/cnt160"
+       ],
+       "footprint": {
+        "first_peak_x": 71,
+        "height": 52,
+        "width_est": 14.0
+       },
+       "nominal_step_px": 6.0,
+       "profile_len": 513,
+       "ripple_pct": {
+        "cnt160": 11.63,
+        "cnt64": 4.17,
+        "cnt8": 6.12,
+        "mass": 6.17
+       },
+       "spread_pct": 1.78,
+       "step_px": 5.9,
+       "stroke_length": 513,
+       "votes": 12
+      },
+      "ps_step_vs_nominal_rel": 0.016666666666666607,
+      "rel_err_step": 0.01694915254237282,
+      "rel_err_step_over_band": 0.1037058316575697,
+      "rel_err_step_over_diameter": 0.01694915254237282,
+      "step_over_band_kt": 0.1016949152542373,
+      "step_over_band_ps": 0.11346153846153847,
+      "step_over_diameter_kt": 0.1,
+      "step_over_diameter_ps": 0.09833333333333334,
+      "step_ratio_kt_over_ps": 1.0169491525423728
+     },
+     "param": "spacing",
+     "pixel": {
+      "diff_pixels": 14600,
+      "diff_ratio": 0.0712890625,
+      "max_delta": 255,
+      "mean_abs_delta": 8.135927734375,
+      "pass": false
+     },
+     "ps_file": "docs/数据/偏差/ps/spacing__square__v10.png",
+     "ps_idat_sha256": "ba9c12c6c12e2a1356876b7c57d462503ba16fb4783fefde2126ee9560ea3f90",
+     "value": 10.0
+    },
+    {
+     "consistent": false,
+     "group": "square",
+     "kt_file": "docs/数据/偏差/krita/spacing__square__v50.png",
+     "kt_idat_sha256": "74027174bb0fbb4340cf3b2a768d375238441fccdab639a51c765a4702d10d2d",
+     "metric": {
+      "band_height_ratio_kt_over_ps": 1.475,
+      "kt": {
+       "band_height": 59,
+       "candidate_methods": [
+        "scallop/mass",
+        "scallop/cnt8",
+        "scallop/cnt64",
+        "scallop/cnt160",
+        "dft/mass/raw",
+        "dft/mass/hp",
+        "dft/cnt8/raw",
+        "dft/cnt8/hp",
+        "dft/cnt160/raw",
+        "dft/cnt160/hp"
+       ],
+       "candidate_steps": [
+        30.0,
+        30.0,
+        15.0,
+        30.0,
+        30.02,
+        30.01,
+        30.01,
+        30.01,
+        30.02,
+        30.01
+       ],
+       "candidates": 10,
+       "cluster_methods": [
+        "scallop/mass",
+        "scallop/cnt8",
+        "scallop/cnt160",
+        "dft/cnt8/raw",
+        "dft/mass/hp",
+        "dft/cnt8/hp",
+        "dft/cnt160/hp",
+        "dft/cnt160/raw",
+        "dft/mass/raw"
+       ],
+       "footprint": {
+        "first_peak_x": 75,
+        "height": 59,
+        "width_est": 50.0
+       },
+       "nominal_step_px": 30.0,
+       "profile_len": 511,
+       "ripple_pct": {
+        "cnt160": 56.76,
+        "cnt64": 18.0,
+        "cnt8": 14.55,
+        "mass": 28.36
+       },
+       "spread_pct": 0.06,
+       "step_px": 30.01,
+       "stroke_length": 511,
+       "votes": 9
+      },
+      "kt_step_vs_nominal_rel": 0.0003333333333333854,
+      "nominal_step_px": 30.0,
+      "ps": {
+       "band_height": 40,
+       "candidate_methods": [
+        "scallop/mass",
+        "scallop/cnt8",
+        "scallop/cnt64",
+        "scallop/cnt160",
+        "dft/mass/raw",
+        "dft/mass/hp",
+        "dft/cnt8/raw",
+        "dft/cnt8/hp",
+        "dft/cnt64/raw",
+        "dft/cnt64/hp",
+        "dft/cnt160/raw",
+        "dft/cnt160/hp"
+       ],
+       "candidate_steps": [
+        29.5,
+        29.0,
+        30.0,
+        29.0,
+        29.44,
+        29.43,
+        29.34,
+        29.33,
+        29.4,
+        29.4,
+        29.48,
+        29.48
+       ],
+       "candidates": 12,
+       "cluster_methods": [
+        "scallop/cnt8",
+        "scallop/cnt160",
+        "dft/cnt8/hp",
+        "dft/cnt8/raw",
+        "dft/cnt64/hp",
+        "dft/cnt64/raw",
+        "dft/mass/hp",
+        "dft/mass/raw",
+        "dft/cnt160/hp",
+        "dft/cnt160/raw",
+        "scallop/mass",
+        "scallop/cnt64"
+       ],
+       "footprint": {
+        "first_peak_x": 101,
+        "height": 40,
+        "width_est": 64.0
+       },
+       "nominal_step_px": 30.0,
+       "profile_len": 497,
+       "ripple_pct": {
+        "cnt160": 107.14,
+        "cnt64": 60.0,
+        "cnt8": 45.45,
+        "mass": 75.64
+       },
+       "spread_pct": 3.4,
+       "step_px": 29.42,
+       "stroke_length": 497,
+       "votes": 12
+      },
+      "ps_step_vs_nominal_rel": 0.019333333333333275,
+      "rel_err_step": 0.02005438477226376,
+      "rel_err_step_over_band": 0.3084377052391432,
+      "rel_err_step_over_diameter": 0.02005438477226376,
+      "step_over_band_kt": 0.5086440677966102,
+      "step_over_band_ps": 0.7355,
+      "step_over_diameter_kt": 0.5001666666666666,
+      "step_over_diameter_ps": 0.49033333333333334,
+      "step_ratio_kt_over_ps": 1.0200543847722638
+     },
+     "param": "spacing",
+     "pixel": {
+      "diff_pixels": 27324,
+      "diff_ratio": 0.13341796875,
+      "max_delta": 254,
+      "mean_abs_delta": 15.412197265625,
+      "pass": false
+     },
+     "ps_file": "docs/数据/偏差/ps/spacing__square__v50.png",
+     "ps_idat_sha256": "bc18e87aa3fea4af6c972d500b77e5f0fc8d3f3475271ab8dc9e3e4425f3fa7b",
+     "value": 50.0
+    },
+    {
+     "consistent": true,
+     "group": "square",
+     "kt_file": "docs/数据/偏差/krita/spacing__square__v100.png",
+     "kt_idat_sha256": "9e7a368189afc42a8561e85a4732b77cdb45a271119a0a509d63060f4104d7a7",
+     "metric": {
+      "band_height_ratio_kt_over_ps": 1.84375,
+      "kt": {
+       "band_height": 59,
+       "candidate_methods": [
+        "scallop/mass",
+        "scallop/cnt8",
+        "scallop/cnt64",
+        "scallop/cnt160",
+        "dft/mass/raw",
+        "dft/mass/hp",
+        "dft/cnt8/raw",
+        "dft/cnt8/hp",
+        "dft/cnt64/raw",
+        "dft/cnt64/hp",
+        "dft/cnt160/raw",
+        "dft/cnt160/hp"
+       ],
+       "candidate_steps": [
+        60.0,
+        60.0,
+        60.0,
+        60.0,
+        60.0,
+        59.9,
+        60.0,
+        59.88,
+        59.99,
+        59.89,
+        60.0,
+        59.91
+       ],
+       "candidates": 12,
+       "cluster_methods": [
+        "dft/cnt8/hp",
+        "dft/cnt64/hp",
+        "dft/mass/hp",
+        "dft/cnt160/hp",
+        "dft/cnt64/raw",
+        "dft/cnt160/raw",
+        "dft/mass/raw",
+        "dft/cnt8/raw",
+        "scallop/mass",
+        "scallop/cnt8",
+        "scallop/cnt64",
+        "scallop/cnt160"
+       ],
+       "footprint": {
+        "first_peak_x": 75,
+        "height": 59,
+        "width_est": 50.0
+       },
+       "nominal_step_px": 60.0,
+       "profile_len": 481,
+       "ripple_pct": {
+        "cnt160": 152.63,
+        "cnt64": 115.38,
+        "cnt8": 100.0,
+        "mass": 121.63
+       },
+       "spread_pct": 0.2,
+       "step_px": 60.0,
+       "stroke_length": 481,
+       "votes": 12
+      },
+      "kt_step_vs_nominal_rel": 0.0,
+      "nominal_step_px": 60.0,
+      "ps": {
+       "band_height": 32,
+       "candidate_methods": [
+        "scallop/mass",
+        "scallop/cnt8",
+        "scallop/cnt64",
+        "scallop/cnt160",
+        "dft/mass/raw",
+        "dft/mass/hp",
+        "dft/cnt8/raw",
+        "dft/cnt64/raw",
+        "dft/cnt64/hp",
+        "dft/cnt160/raw",
+        "dft/cnt160/hp"
+       ],
+       "candidate_steps": [
+        59.0,
+        60.5,
+        60.5,
+        58.5,
+        59.23,
+        59.3,
+        59.36,
+        59.14,
+        59.24,
+        59.06,
+        59.06
+       ],
+       "candidates": 11,
+       "cluster_methods": [
+        "scallop/cnt160",
+        "scallop/mass",
+        "dft/cnt160/hp",
+        "dft/cnt160/raw",
+        "dft/cnt64/raw",
+        "dft/mass/raw",
+        "dft/cnt64/hp",
+        "dft/mass/hp",
+        "dft/cnt8/raw",
+        "scallop/cnt8",
+        "scallop/cnt64"
+       ],
+       "footprint": {
+        "first_peak_x": 117,
+        "height": 32,
+        "width_est": 88.0
+       },
+       "nominal_step_px": 60.0,
+       "profile_len": 493,
+       "ripple_pct": {
+        "cnt160": 225.0,
+        "cnt64": 108.33,
+        "cnt8": 81.25,
+        "mass": 118.68
+       },
+       "spread_pct": 3.38,
+       "step_px": 59.23,
+       "stroke_length": 493,
+       "votes": 11
+      },
+      "ps_step_vs_nominal_rel": 0.012833333333333386,
+      "rel_err_step": 0.013000168833361525,
+      "rel_err_step_over_band": 0.45057617961580393,
+      "rel_err_step_over_diameter": 0.013000168833361525,
+      "step_over_band_kt": 1.0169491525423728,
+      "step_over_band_ps": 1.8509375,
+      "step_over_diameter_kt": 1.0,
+      "step_over_diameter_ps": 0.9871666666666666,
+      "step_ratio_kt_over_ps": 1.0130001688333616
+     },
+     "param": "spacing",
+     "pixel": {
+      "diff_pixels": 21842,
+      "diff_ratio": 0.106650390625,
+      "max_delta": 252,
+      "mean_abs_delta": 11.6397802734375,
+      "pass": false
+     },
+     "ps_file": "docs/数据/偏差/ps/spacing__square__v100.png",
+     "ps_idat_sha256": "db1b9e472e92eb5057dcefc88c97babc276745212b41ec7ac6ea29436a575b8f",
+     "value": 100.0
+    },
+    {
+     "consistent": false,
+     "group": "nonsquare",
+     "kt_file": "docs/数据/偏差/krita/spacing__nonsquare__v10.png",
+     "kt_idat_sha256": "43d6974756815095de0133ad1c718a3ececf6f6c9c6f4ee02b86fb981b707b4d",
+     "metric": {
+      "band_height_ratio_kt_over_ps": 1.353846153846154,
+      "kt": {
+       "band_height": 88,
+       "candidate_methods": [
+        "scallop/mass",
+        "scallop/cnt8",
+        "scallop/cnt64",
+        "scallop/cnt160",
+        "dft/cnt8/raw",
+        "dft/cnt8/hp"
+       ],
+       "candidate_steps": [
+        11.0,
+        11.0,
+        6.0,
+        11.0,
+        11.2,
+        11.2
+       ],
+       "candidates": 6,
+       "cluster_methods": [
+        "scallop/mass",
+        "scallop/cnt8",
+        "scallop/cnt160",
+        "dft/cnt8/hp",
+        "dft/cnt8/raw"
+       ],
+       "footprint": {
+        "first_peak_x": 39,
+        "height": 88,
+        "width_est": 26.0
+       },
+       "nominal_step_px": 11.200000000000001,
+       "profile_len": 576,
+       "ripple_pct": {
+        "cnt160": 12.07,
+        "cnt64": 4.14,
+        "cnt8": 8.22,
+        "mass": 5.9
+       },
+       "spread_pct": 1.85,
+       "step_px": 11.0,
+       "stroke_length": 576,
+       "votes": 5
+      },
+      "kt_step_vs_nominal_rel": 0.01785714285714295,
+      "nominal_step_px": 11.200000000000001,
+      "ps": {
+       "band_height": 65,
+       "candidate_methods": [
+        "scallop/mass",
+        "scallop/cnt8",
+        "scallop/cnt64",
+        "scallop/cnt160",
+        "dft/mass/raw",
+        "dft/mass/hp",
+        "dft/cnt8/raw",
+        "dft/cnt8/hp",
+        "dft/cnt64/raw",
+        "dft/cnt64/hp",
+        "dft/cnt160/raw",
+        "dft/cnt160/hp"
+       ],
+       "candidate_steps": [
+        12.0,
+        9.0,
+        9.0,
+        10.0,
+        27.28,
+        26.94,
+        8.79,
+        8.78,
+        8.76,
+        8.76,
+        26.51,
+        21.91
+       ],
+       "candidates": 12,
+       "cluster_methods": [
+        "dft/cnt64/hp",
+        "dft/cnt64/raw",
+        "dft/cnt8/hp",
+        "dft/cnt8/raw",
+        "scallop/cnt8",
+        "scallop/cnt64"
+       ],
+       "footprint": {
+        "first_peak_x": 48,
+        "height": 65,
+        "width_est": 22.0
+       },
+       "nominal_step_px": 11.200000000000001,
+       "profile_len": 556,
+       "ripple_pct": {
+        "cnt160": 20.0,
+        "cnt64": 10.0,
+        "cnt8": 8.2,
+        "mass": 17.48
+       },
+       "spread_pct": 2.72,
+       "step_px": 8.78,
+       "stroke_length": 556,
+       "votes": 6
+      },
+      "ps_step_vs_nominal_rel": 0.2160714285714287,
+      "rel_err_step": 0.25284738041002286,
+      "rel_err_step_over_band": 0.07460136674259674,
+      "rel_err_step_over_diameter": 0.25284738041002286,
+      "step_over_band_kt": 0.125,
+      "step_over_band_ps": 0.13507692307692307,
+      "step_over_diameter_kt": 0.09821428571428571,
+      "step_over_diameter_ps": 0.07839285714285714,
+      "step_ratio_kt_over_ps": 1.2528473804100229
+     },
+     "param": "spacing",
+     "pixel": {
+      "diff_pixels": 42271,
+      "diff_ratio": 0.2064013671875,
+      "max_delta": 253,
+      "mean_abs_delta": 8.873623046875,
+      "pass": false
+     },
+     "ps_file": "docs/数据/偏差/ps/spacing__nonsquare__v10.png",
+     "ps_idat_sha256": "c1bb1b51b8c5376ca6df1ed180548e02e207af4ab51d4c7333557b66b3ca5158",
+     "value": 10.0
+    },
+    {
+     "consistent": false,
+     "group": "nonsquare",
+     "kt_file": "docs/数据/偏差/krita/spacing__nonsquare__v50.png",
+     "kt_idat_sha256": "e7117cc84495703bb9b07db037764d8fd5d2341553325e87018eee808ad6bca5",
+     "metric": {
+      "band_height_ratio_kt_over_ps": 1.3384615384615384,
+      "kt": {
+       "band_height": 87,
+       "candidate_methods": [
+        "scallop/mass",
+        "scallop/cnt8",
+        "scallop/cnt64",
+        "scallop/cnt160",
+        "dft/mass/raw",
+        "dft/mass/hp",
+        "dft/cnt8/raw",
+        "dft/cnt8/hp",
+        "dft/cnt64/raw",
+        "dft/cnt64/hp",
+        "dft/cnt160/raw",
+        "dft/cnt160/hp"
+       ],
+       "candidate_steps": [
+        56.0,
+        56.0,
+        56.0,
+        56.0,
+        56.02,
+        56.01,
+        56.0,
+        56.0,
+        56.02,
+        56.01,
+        56.03,
+        56.01
+       ],
+       "candidates": 12,
+       "cluster_methods": [
+        "dft/cnt8/raw",
+        "scallop/mass",
+        "scallop/cnt8",
+        "scallop/cnt64",
+        "scallop/cnt160",
+        "dft/cnt8/hp",
+        "dft/cnt64/hp",
+        "dft/mass/hp",
+        "dft/cnt160/hp",
+        "dft/cnt64/raw",
+        "dft/mass/raw",
+        "dft/cnt160/raw"
+       ],
+       "footprint": {
+        "first_peak_x": 65,
+        "height": 87,
+        "width_est": 78.0
+       },
+       "nominal_step_px": 56.0,
+       "profile_len": 557,
+       "ripple_pct": {
+        "cnt160": 325.0,
+        "cnt64": 150.0,
+        "cnt8": 48.08,
+        "mass": 150.4
+       },
+       "spread_pct": 0.06,
+       "step_px": 56.0,
+       "stroke_length": 557,
+       "votes": 12
+      },
+      "kt_step_vs_nominal_rel": 0.0,
+      "nominal_step_px": 56.0,
+      "ps": {
+       "band_height": 65,
+       "candidate_methods": [
+        "scallop/mass",
+        "scallop/cnt8",
+        "scallop/cnt64",
+        "scallop/cnt160",
+        "dft/mass/raw",
+        "dft/mass/hp",
+        "dft/cnt8/raw",
+        "dft/cnt8/hp",
+        "dft/cnt64/raw",
+        "dft/cnt64/hp",
+        "dft/cnt160/raw",
+        "dft/cnt160/hp"
+       ],
+       "candidate_steps": [
+        47.5,
+        46.0,
+        47.0,
+        47.0,
+        43.69,
+        43.7,
+        43.75,
+        43.75,
+        43.73,
+        43.74,
+        43.63,
+        43.65
+       ],
+       "candidates": 12,
+       "cluster_methods": [
+        "dft/cnt160/raw",
+        "dft/cnt160/hp",
+        "dft/mass/raw",
+        "dft/mass/hp",
+        "dft/cnt64/raw",
+        "dft/cnt64/hp",
+        "dft/cnt8/raw",
+        "dft/cnt8/hp"
+       ],
+       "footprint": {
+        "first_peak_x": 74,
+        "height": 65,
+        "width_est": 74.0
+       },
+       "nominal_step_px": 56.0,
+       "profile_len": 522,
+       "ripple_pct": {
+        "cnt160": 211.11,
+        "cnt64": 171.43,
+        "cnt8": 160.83,
+        "mass": 187.34
+       },
+       "spread_pct": 0.28,
+       "step_px": 43.72,
+       "stroke_length": 522,
+       "votes": 8
+      },
+      "ps_step_vs_nominal_rel": 0.2192857142857143,
+      "rel_err_step": 0.28087831655992684,
+      "rel_err_step_over_band": 0.04302194739775585,
+      "rel_err_step_over_diameter": 0.28087831655992684,
+      "step_over_band_kt": 0.6436781609195402,
+      "step_over_band_ps": 0.6726153846153846,
+      "step_over_diameter_kt": 0.5,
+      "step_over_diameter_ps": 0.39035714285714285,
+      "step_ratio_kt_over_ps": 1.280878316559927
+     },
+     "param": "spacing",
+     "pixel": {
+      "diff_pixels": 35198,
+      "diff_ratio": 0.171865234375,
+      "max_delta": 255,
+      "mean_abs_delta": 13.542802734375,
+      "pass": false
+     },
+     "ps_file": "docs/数据/偏差/ps/spacing__nonsquare__v50.png",
+     "ps_idat_sha256": "abd67e18602e5f2e6c4f43ae1f7005d24694cd4512f444b4009161bbc7c121e9",
+     "value": 50.0
+    },
+    {
+     "consistent": false,
+     "group": "nonsquare",
+     "kt_file": "docs/数据/偏差/krita/spacing__nonsquare__v100.png",
+     "kt_idat_sha256": "8cff5b5409cb1fe2f91433cd2458b7c85ada8ba3114cc3754d41758d2aa31f7a",
+     "metric": {
+      "band_height_ratio_kt_over_ps": 1.45,
+      "kt": {
+       "band_height": 87,
+       "candidate_methods": [
+        "scallop/mass",
+        "scallop/cnt8",
+        "scallop/cnt64",
+        "scallop/cnt160",
+        "dft/mass/raw",
+        "dft/mass/hp",
+        "dft/cnt8/raw",
+        "dft/cnt8/hp",
+        "dft/cnt64/raw",
+        "dft/cnt64/hp"
+       ],
+       "candidate_steps": [
+        112.0,
+        112.0,
+        112.0,
+        112.0,
+        111.92,
+        111.33,
+        111.95,
+        111.35,
+        111.93,
+        111.38
+       ],
+       "candidates": 10,
+       "cluster_methods": [
+        "dft/mass/hp",
+        "dft/cnt8/hp",
+        "dft/cnt64/hp",
+        "dft/mass/raw",
+        "dft/cnt64/raw",
+        "dft/cnt8/raw",
+        "scallop/mass",
+        "scallop/cnt8",
+        "scallop/cnt64",
+        "scallop/cnt160"
+       ],
+       "footprint": {
+        "first_peak_x": 98,
+        "height": 87,
+        "width_est": 144.0
+       },
+       "nominal_step_px": 112.0,
+       "profile_len": 557,
+       "ripple_pct": {
+        "cnt160": 325.0,
+        "cnt64": 256.11,
+        "cnt8": 142.86,
+        "mass": 212.63
+       },
+       "spread_pct": 0.6,
+       "step_px": 111.94,
+       "stroke_length": 557,
+       "votes": 10
+      },
+      "kt_step_vs_nominal_rel": 0.000535714285714306,
+      "nominal_step_px": 112.0,
+      "ps": {
+       "band_height": 60,
+       "candidate_methods": [
+        "scallop/mass",
+        "scallop/cnt8",
+        "scallop/cnt64",
+        "scallop/cnt160",
+        "dft/mass/raw",
+        "dft/mass/hp",
+        "dft/cnt8/raw",
+        "dft/cnt8/hp",
+        "dft/cnt64/raw",
+        "dft/cnt64/hp",
+        "dft/cnt160/raw",
+        "dft/cnt160/hp"
+       ],
+       "candidate_steps": [
+        90.0,
+        89.0,
+        90.0,
+        91.0,
+        84.64,
+        84.49,
+        84.53,
+        84.33,
+        84.35,
+        84.21,
+        85.13,
+        85.0
+       ],
+       "candidates": 12,
+       "cluster_methods": [
+        "dft/cnt64/hp",
+        "dft/cnt8/hp",
+        "dft/cnt64/raw",
+        "dft/mass/hp",
+        "dft/cnt8/raw",
+        "dft/mass/raw",
+        "dft/cnt160/hp",
+        "dft/cnt160/raw"
+       ],
+       "footprint": {
+        "first_peak_x": 113,
+        "height": 60,
+        "width_est": 152.0
+       },
+       "nominal_step_px": 112.0,
+       "profile_len": 521,
+       "ripple_pct": {
+        "cnt160": 400.0,
+        "cnt64": 340.0,
+        "cnt8": 271.43,
+        "mass": 366.4
+       },
+       "spread_pct": 1.1,
+       "step_px": 84.51,
+       "stroke_length": 521,
+       "votes": 8
+      },
+      "ps_step_vs_nominal_rel": 0.24544642857142854,
+      "rel_err_step": 0.32457697313927336,
+      "rel_err_step_over_band": 0.08649863921429425,
+      "rel_err_step_over_diameter": 0.32457697313927336,
+      "step_over_band_kt": 1.2866666666666666,
+      "step_over_band_ps": 1.4085,
+      "step_over_diameter_kt": 0.9994642857142857,
+      "step_over_diameter_ps": 0.7545535714285715,
+      "step_ratio_kt_over_ps": 1.3245769731392734
+     },
+     "param": "spacing",
+     "pixel": {
+      "diff_pixels": 26630,
+      "diff_ratio": 0.130029296875,
+      "max_delta": 255,
+      "mean_abs_delta": 8.65244140625,
+      "pass": false
+     },
+     "ps_file": "docs/数据/偏差/ps/spacing__nonsquare__v100.png",
+     "ps_idat_sha256": "6116996525894365b08a967266b0bac09c136bc2361383c33f1a0c6911118c1c",
+     "value": 100.0
+    }
+   ]
+  }
+ },
+ "schema": "brushconverter/deviation-106@1"
+}
