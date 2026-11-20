@@ -16,7 +16,7 @@
    "note": "采样笔尖 86x84（长宽比 1.02），补白后 86x86"
   }
  },
- "created": "2026-11-20 19:50:37",
+ "created": "2026-11-20 20:23:51",
  "criteria": {
   "geometry": "相对误差≤2% 视为一致；角度按 2%×180°=3.6°；绝对差≤2px 亦算一致",
   "idat": "判像素只认 PNG IDAT 块的 sha256（文件 sha256 会被 iTXt/XMP 影响）",
@@ -776,7 +776,7 @@
     "spacing": "0.1",
     "xml_bytes": "11612"
    },
-   "mtime": "2026-11-20 19:38:09",
+   "mtime": "2026-11-20 20:17:54",
    "param": "spacing",
    "side": "krita",
    "value": 10.0,
@@ -830,7 +830,7 @@
     "spacing": "0.5",
     "xml_bytes": "11612"
    },
-   "mtime": "2026-11-20 19:38:22",
+   "mtime": "2026-11-20 20:18:05",
    "param": "spacing",
    "side": "krita",
    "value": 50.0,
@@ -884,7 +884,7 @@
     "spacing": "1",
     "xml_bytes": "11611"
    },
-   "mtime": "2026-11-20 19:38:34",
+   "mtime": "2026-11-20 20:18:17",
    "param": "spacing",
    "side": "krita",
    "value": 100.0,
@@ -918,13 +918,13 @@
    "width": 640
   },
   {
-   "bytes": 23653,
+   "bytes": 35896,
    "cmd": "python tools/measure_deviation.py --param spacing --values 10 --analyze",
    "exists": true,
    "file": "docs/数据/偏差/krita/spacing__nonsquare__v10.png",
    "group": "nonsquare",
    "height": 320,
-   "idat_sha256": "43d6974756815095de0133ad1c718a3ececf6f6c9c6f4ee02b86fb981b707b4d",
+   "idat_sha256": "615e1509222222ac0e9ee7c6f0cb7575d6a13f9d0559c3e54661382cb5bbb1d6",
    "krita_preset": "docs/数据/偏差/kpp/spacing__nonsquare__v10.kpp",
    "krita_readback": {
     "AxisX": "false",
@@ -935,10 +935,10 @@
     "diameter": "",
     "hfade": "",
     "ratio": "",
-    "spacing": "0.1",
-    "xml_bytes": "29033"
+    "spacing": "0.0781421",
+    "xml_bytes": "29039"
    },
-   "mtime": "2026-11-20 19:39:26",
+   "mtime": "2026-11-20 20:19:03",
    "param": "spacing",
    "side": "krita",
    "value": 10.0,
@@ -972,13 +972,13 @@
    "width": 640
   },
   {
-   "bytes": 15299,
+   "bytes": 50190,
    "cmd": "python tools/measure_deviation.py --param spacing --values 50 --analyze",
    "exists": true,
    "file": "docs/数据/偏差/krita/spacing__nonsquare__v50.png",
    "group": "nonsquare",
    "height": 320,
-   "idat_sha256": "e7117cc84495703bb9b07db037764d8fd5d2341553325e87018eee808ad6bca5",
+   "idat_sha256": "8246c3f82b268b0e0463fcd2c89d65adbb6dcc03438fc83e03f653cb5f7cb9ee",
    "krita_preset": "docs/数据/偏差/kpp/spacing__nonsquare__v50.kpp",
    "krita_readback": {
     "AxisX": "false",
@@ -989,10 +989,10 @@
     "diameter": "",
     "hfade": "",
     "ratio": "",
-    "spacing": "0.5",
-    "xml_bytes": "29033"
+    "spacing": "0.39071",
+    "xml_bytes": "29037"
    },
-   "mtime": "2026-11-20 19:39:39",
+   "mtime": "2026-11-20 20:19:14",
    "param": "spacing",
    "side": "krita",
    "value": 50.0,
@@ -1026,13 +1026,13 @@
    "width": 640
   },
   {
-   "bytes": 12195,
+   "bytes": 44406,
    "cmd": "python tools/measure_deviation.py --param spacing --values 100 --analyze",
    "exists": true,
    "file": "docs/数据/偏差/krita/spacing__nonsquare__v100.png",
    "group": "nonsquare",
    "height": 320,
-   "idat_sha256": "8cff5b5409cb1fe2f91433cd2458b7c85ada8ba3114cc3754d41758d2aa31f7a",
+   "idat_sha256": "4e7f3e5764ca6aad7949f696bc60f2381a6840fe85d07c439cc22b3e62f9d1d6",
    "krita_preset": "docs/数据/偏差/kpp/spacing__nonsquare__v100.kpp",
    "krita_readback": {
     "AxisX": "false",
@@ -1043,10 +1043,10 @@
     "diameter": "",
     "hfade": "",
     "ratio": "",
-    "spacing": "1",
-    "xml_bytes": "29032"
+    "spacing": "0.781421",
+    "xml_bytes": "29039"
    },
-   "mtime": "2026-11-20 19:39:52",
+   "mtime": "2026-11-20 20:19:25",
    "param": "spacing",
    "side": "krita",
    "value": 100.0,
@@ -1080,13 +1080,13 @@
    "width": 640
   },
   {
-   "bytes": 7928,
+   "bytes": 12765,
    "cmd": "python tools/measure_deviation.py --param spacing --values 10 --analyze",
    "exists": true,
    "file": "docs/数据/偏差/krita/spacing__square__v10.png",
    "group": "square",
    "height": 320,
-   "idat_sha256": "9e1af9b10dcff4ee5b376289a7ca81c8f6935176f9a98a4de1b3a60a905cd2a5",
+   "idat_sha256": "81dbf20acfd9bd1321d12d8226b62610357341d03cba652e9b7d6fc284e5f47c",
    "krita_preset": "docs/数据/偏差/kpp/spacing__square__v10.kpp",
    "krita_readback": {
     "AxisX": "false",
@@ -1097,10 +1097,10 @@
     "diameter": "",
     "hfade": "",
     "ratio": "",
-    "spacing": "0.1",
-    "xml_bytes": "18622"
+    "spacing": "0.0976744",
+    "xml_bytes": "18628"
    },
-   "mtime": "2026-11-20 19:38:47",
+   "mtime": "2026-11-20 20:18:29",
    "param": "spacing",
    "side": "krita",
    "value": 10.0,
@@ -1134,13 +1134,13 @@
    "width": 640
   },
   {
-   "bytes": 8876,
+   "bytes": 40827,
    "cmd": "python tools/measure_deviation.py --param spacing --values 50 --analyze",
    "exists": true,
    "file": "docs/数据/偏差/krita/spacing__square__v50.png",
    "group": "square",
    "height": 320,
-   "idat_sha256": "74027174bb0fbb4340cf3b2a768d375238441fccdab639a51c765a4702d10d2d",
+   "idat_sha256": "78add5707f2f457fe1e37513d885503677123578a11097dbc6dfe2a352d5dd65",
    "krita_preset": "docs/数据/偏差/kpp/spacing__square__v50.kpp",
    "krita_readback": {
     "AxisX": "false",
@@ -1151,10 +1151,10 @@
     "diameter": "",
     "hfade": "",
     "ratio": "",
-    "spacing": "0.5",
-    "xml_bytes": "18622"
+    "spacing": "0.488372",
+    "xml_bytes": "18627"
    },
-   "mtime": "2026-11-20 19:39:00",
+   "mtime": "2026-11-20 20:18:40",
    "param": "spacing",
    "side": "krita",
    "value": 50.0,
@@ -1188,13 +1188,13 @@
    "width": 640
   },
   {
-   "bytes": 7227,
+   "bytes": 37430,
    "cmd": "python tools/measure_deviation.py --param spacing --values 100 --analyze",
    "exists": true,
    "file": "docs/数据/偏差/krita/spacing__square__v100.png",
    "group": "square",
    "height": 320,
-   "idat_sha256": "9e7a368189afc42a8561e85a4732b77cdb45a271119a0a509d63060f4104d7a7",
+   "idat_sha256": "257045ef7c267017cb6e0a1be5b1e51bee099674e08e8ce4125ee458f34ca3aa",
    "krita_preset": "docs/数据/偏差/kpp/spacing__square__v100.kpp",
    "krita_readback": {
     "AxisX": "false",
@@ -1205,10 +1205,10 @@
     "diameter": "",
     "hfade": "",
     "ratio": "",
-    "spacing": "1",
-    "xml_bytes": "18621"
+    "spacing": "0.976744",
+    "xml_bytes": "18628"
    },
-   "mtime": "2026-11-20 19:39:13",
+   "mtime": "2026-11-20 20:18:51",
    "param": "spacing",
    "side": "krita",
    "value": 100.0,
@@ -1898,7 +1898,7 @@
   "spacing": {
    "conclusion_detail": {
     "conclusion": "真偏",
-    "reason": "步长相对误差超 2% 的点：square v50=2.0%、nonsquare v10=25.3%、nonsquare v50=28.1%、nonsquare v100=32.5%（共 4/8 点超阈）；分组：computed 最大 1.88%；square 最大 2.01%；nonsquare 最大 32.46%；1 点不可判读：computed v10"
+    "reason": "步长相对误差超 2% 的点：nonsquare v100=3.5%（共 1/8 点超阈）；分组：computed 最大 1.88%；square 最大 1.18%；nonsquare 最大 3.53%；1 点不可判读：computed v10"
    },
    "group": "多组",
    "padding_conclusion": {
@@ -1931,71 +1931,71 @@
        "band_height_ratio": 1.353846153846154,
        "band_kt": 88,
        "band_ps": 65,
-       "rel_err_step": 0.25284738041002286,
-       "rel_err_step_over_band": 0.07460136674259674,
-       "step_kt": 11.0,
+       "rel_err_step": 0.0011389521640090875,
+       "rel_err_step_over_band": 0.26220490784841577,
+       "step_kt": 8.77,
        "step_ps": 8.78,
        "value": 10.0
       },
       {
-       "band_height_ratio": 1.3384615384615384,
-       "band_kt": 87,
+       "band_height_ratio": 1.353846153846154,
+       "band_kt": 88,
        "band_ps": 65,
-       "rel_err_step": 0.28087831655992684,
-       "rel_err_step_over_band": 0.04302194739775585,
-       "step_kt": 56.0,
+       "rel_err_step": 0.0018298261665141422,
+       "rel_err_step_over_band": 0.26001206021791573,
+       "step_kt": 43.8,
        "step_ps": 43.72,
        "value": 50.0
       },
       {
-       "band_height_ratio": 1.45,
-       "band_kt": 87,
+       "band_height_ratio": 1.4666666666666666,
+       "band_kt": 88,
        "band_ps": 60,
-       "rel_err_step": 0.32457697313927336,
-       "rel_err_step_over_band": 0.08649863921429425,
-       "step_kt": 111.94,
+       "rel_err_step": 0.035262099159862614,
+       "rel_err_step_over_band": 0.2941394778455482,
+       "step_kt": 87.49,
        "step_ps": 84.51,
        "value": 100.0
       }
      ],
      "square": [
       {
-       "band_height_ratio": 1.1346153846153846,
-       "band_kt": 59,
+       "band_height_ratio": 1.1538461538461537,
+       "band_kt": 60,
        "band_ps": 52,
-       "rel_err_step": 0.01694915254237282,
-       "rel_err_step_over_band": 0.1037058316575697,
-       "step_kt": 6.0,
+       "rel_err_step": 0.006779661016949158,
+       "rel_err_step_over_band": 0.13920903954802272,
+       "step_kt": 5.86,
        "step_ps": 5.9,
        "value": 10.0
       },
       {
-       "band_height_ratio": 1.475,
-       "band_kt": 59,
+       "band_height_ratio": 1.5,
+       "band_kt": 60,
        "band_ps": 40,
-       "rel_err_step": 0.02005438477226376,
-       "rel_err_step_over_band": 0.3084377052391432,
-       "step_kt": 30.01,
+       "rel_err_step": 0.0037389530931340237,
+       "rel_err_step_over_band": 0.335825968728756,
+       "step_kt": 29.31,
        "step_ps": 29.42,
        "value": 50.0
       },
       {
-       "band_height_ratio": 1.84375,
-       "band_kt": 59,
+       "band_height_ratio": 1.875,
+       "band_kt": 60,
        "band_ps": 32,
-       "rel_err_step": 0.013000168833361525,
-       "rel_err_step_over_band": 0.45057617961580393,
-       "step_kt": 60.0,
+       "rel_err_step": 0.011818335303055812,
+       "rel_err_step_over_band": 0.47296977882829644,
+       "step_kt": 58.53,
        "step_ps": 59.23,
        "value": 100.0
       }
      ]
     },
-    "reason": "非方形最大步长相对误差 32.46% 超阈且 ≥2×方形 2.01%；计算笔刷（无补白）最大 1.88%",
+    "reason": "非方形最大步长相对误差 3.53% 超阈且 ≥2×方形 1.18%；计算笔刷（无补白）最大 1.88%",
     "worst_rel_err_step": {
      "computed": 0.018779799552398488,
-     "nonsquare": 0.32457697313927336,
-     "square": 0.02005438477226376
+     "nonsquare": 0.035262099159862614,
+     "square": 0.011818335303055812
     }
    },
    "param": "spacing",
@@ -2398,11 +2398,11 @@
      "consistent": true,
      "group": "square",
      "kt_file": "docs/数据/偏差/krita/spacing__square__v10.png",
-     "kt_idat_sha256": "9e1af9b10dcff4ee5b376289a7ca81c8f6935176f9a98a4de1b3a60a905cd2a5",
+     "kt_idat_sha256": "81dbf20acfd9bd1321d12d8226b62610357341d03cba652e9b7d6fc284e5f47c",
      "metric": {
-      "band_height_ratio_kt_over_ps": 1.1346153846153846,
+      "band_height_ratio_kt_over_ps": 1.1538461538461537,
       "kt": {
-       "band_height": 59,
+       "band_height": 60,
        "candidate_methods": [
         "scallop/mass",
         "scallop/cnt8",
@@ -2422,49 +2422,49 @@
         6.0,
         6.0,
         6.0,
-        6.0,
-        6.0,
-        6.0,
-        6.0,
-        6.0,
-        6.0,
-        6.0,
-        6.0
+        5.86,
+        5.86,
+        5.86,
+        5.86,
+        5.86,
+        5.86,
+        5.86,
+        5.86
        ],
        "candidates": 12,
        "cluster_methods": [
         "dft/cnt160/raw",
         "dft/cnt160/hp",
-        "scallop/mass",
-        "scallop/cnt8",
-        "scallop/cnt64",
-        "scallop/cnt160",
         "dft/cnt64/hp",
         "dft/cnt64/raw",
         "dft/mass/raw",
         "dft/mass/hp",
         "dft/cnt8/hp",
-        "dft/cnt8/raw"
+        "dft/cnt8/raw",
+        "scallop/mass",
+        "scallop/cnt8",
+        "scallop/cnt64",
+        "scallop/cnt160"
        ],
        "footprint": {
         "first_peak_x": 57,
-        "height": 59,
+        "height": 60,
         "width_est": 14.0
        },
        "nominal_step_px": 6.0,
-       "profile_len": 535,
+       "profile_len": 536,
        "ripple_pct": {
-        "cnt160": 3.7,
+        "cnt160": 1.82,
         "cnt64": 3.51,
         "cnt8": 1.69,
-        "mass": 1.82
+        "mass": 1.69
        },
-       "spread_pct": 0.01,
-       "step_px": 6.0,
-       "stroke_length": 535,
+       "spread_pct": 2.38,
+       "step_px": 5.86,
+       "stroke_length": 536,
        "votes": 12
       },
-      "kt_step_vs_nominal_rel": 0.0,
+      "kt_step_vs_nominal_rel": 0.02333333333333328,
       "nominal_step_px": 6.0,
       "ps": {
        "band_height": 52,
@@ -2530,21 +2530,21 @@
        "votes": 12
       },
       "ps_step_vs_nominal_rel": 0.016666666666666607,
-      "rel_err_step": 0.01694915254237282,
-      "rel_err_step_over_band": 0.1037058316575697,
-      "rel_err_step_over_diameter": 0.01694915254237282,
-      "step_over_band_kt": 0.1016949152542373,
+      "rel_err_step": 0.006779661016949158,
+      "rel_err_step_over_band": 0.13920903954802272,
+      "rel_err_step_over_diameter": 0.006779661016949158,
+      "step_over_band_kt": 0.09766666666666667,
       "step_over_band_ps": 0.11346153846153847,
-      "step_over_diameter_kt": 0.1,
+      "step_over_diameter_kt": 0.09766666666666667,
       "step_over_diameter_ps": 0.09833333333333334,
-      "step_ratio_kt_over_ps": 1.0169491525423728
+      "step_ratio_kt_over_ps": 0.9932203389830508
      },
      "param": "spacing",
      "pixel": {
-      "diff_pixels": 14600,
-      "diff_ratio": 0.0712890625,
+      "diff_pixels": 14528,
+      "diff_ratio": 0.0709375,
       "max_delta": 255,
-      "mean_abs_delta": 8.135927734375,
+      "mean_abs_delta": 8.2168603515625,
       "pass": false
      },
      "ps_file": "docs/数据/偏差/ps/spacing__square__v10.png",
@@ -2552,14 +2552,14 @@
      "value": 10.0
     },
     {
-     "consistent": false,
+     "consistent": true,
      "group": "square",
      "kt_file": "docs/数据/偏差/krita/spacing__square__v50.png",
-     "kt_idat_sha256": "74027174bb0fbb4340cf3b2a768d375238441fccdab639a51c765a4702d10d2d",
+     "kt_idat_sha256": "78add5707f2f457fe1e37513d885503677123578a11097dbc6dfe2a352d5dd65",
      "metric": {
-      "band_height_ratio_kt_over_ps": 1.475,
+      "band_height_ratio_kt_over_ps": 1.5,
       "kt": {
-       "band_height": 59,
+       "band_height": 60,
        "candidate_methods": [
         "scallop/mass",
         "scallop/cnt8",
@@ -2573,48 +2573,49 @@
         "dft/cnt160/hp"
        ],
        "candidate_steps": [
-        30.0,
-        30.0,
-        15.0,
-        30.0,
-        30.02,
-        30.01,
-        30.01,
-        30.01,
-        30.02,
-        30.01
+        29.0,
+        29.0,
+        29.0,
+        29.0,
+        29.32,
+        29.31,
+        29.31,
+        29.31,
+        29.32,
+        29.31
        ],
        "candidates": 10,
        "cluster_methods": [
         "scallop/mass",
         "scallop/cnt8",
+        "scallop/cnt64",
         "scallop/cnt160",
         "dft/cnt8/raw",
-        "dft/mass/hp",
         "dft/cnt8/hp",
         "dft/cnt160/hp",
+        "dft/mass/hp",
         "dft/cnt160/raw",
         "dft/mass/raw"
        ],
        "footprint": {
         "first_peak_x": 75,
-        "height": 59,
+        "height": 60,
         "width_est": 50.0
        },
        "nominal_step_px": 30.0,
-       "profile_len": 511,
+       "profile_len": 530,
        "ripple_pct": {
-        "cnt160": 56.76,
+        "cnt160": 44.44,
         "cnt64": 18.0,
-        "cnt8": 14.55,
-        "mass": 28.36
+        "cnt8": 12.73,
+        "mass": 26.09
        },
-       "spread_pct": 0.06,
-       "step_px": 30.01,
-       "stroke_length": 511,
-       "votes": 9
+       "spread_pct": 1.1,
+       "step_px": 29.31,
+       "stroke_length": 530,
+       "votes": 10
       },
-      "kt_step_vs_nominal_rel": 0.0003333333333333854,
+      "kt_step_vs_nominal_rel": 0.02300000000000004,
       "nominal_step_px": 30.0,
       "ps": {
        "band_height": 40,
@@ -2680,21 +2681,21 @@
        "votes": 12
       },
       "ps_step_vs_nominal_rel": 0.019333333333333275,
-      "rel_err_step": 0.02005438477226376,
-      "rel_err_step_over_band": 0.3084377052391432,
-      "rel_err_step_over_diameter": 0.02005438477226376,
-      "step_over_band_kt": 0.5086440677966102,
+      "rel_err_step": 0.0037389530931340237,
+      "rel_err_step_over_band": 0.335825968728756,
+      "rel_err_step_over_diameter": 0.0037389530931340237,
+      "step_over_band_kt": 0.4885,
       "step_over_band_ps": 0.7355,
-      "step_over_diameter_kt": 0.5001666666666666,
+      "step_over_diameter_kt": 0.4885,
       "step_over_diameter_ps": 0.49033333333333334,
-      "step_ratio_kt_over_ps": 1.0200543847722638
+      "step_ratio_kt_over_ps": 0.996261046906866
      },
      "param": "spacing",
      "pixel": {
-      "diff_pixels": 27324,
-      "diff_ratio": 0.13341796875,
+      "diff_pixels": 28129,
+      "diff_ratio": 0.1373486328125,
       "max_delta": 254,
-      "mean_abs_delta": 15.412197265625,
+      "mean_abs_delta": 15.22810546875,
       "pass": false
      },
      "ps_file": "docs/数据/偏差/ps/spacing__square__v50.png",
@@ -2705,11 +2706,11 @@
      "consistent": true,
      "group": "square",
      "kt_file": "docs/数据/偏差/krita/spacing__square__v100.png",
-     "kt_idat_sha256": "9e7a368189afc42a8561e85a4732b77cdb45a271119a0a509d63060f4104d7a7",
+     "kt_idat_sha256": "257045ef7c267017cb6e0a1be5b1e51bee099674e08e8ce4125ee458f34ca3aa",
      "metric": {
-      "band_height_ratio_kt_over_ps": 1.84375,
+      "band_height_ratio_kt_over_ps": 1.875,
       "kt": {
-       "band_height": 59,
+       "band_height": 60,
        "candidate_methods": [
         "scallop/mass",
         "scallop/cnt8",
@@ -2725,53 +2726,53 @@
         "dft/cnt160/hp"
        ],
        "candidate_steps": [
-        60.0,
-        60.0,
-        60.0,
-        60.0,
-        60.0,
-        59.9,
-        60.0,
-        59.88,
-        59.99,
-        59.89,
-        60.0,
-        59.91
+        58.5,
+        58.5,
+        58.0,
+        58.0,
+        58.6,
+        58.53,
+        58.6,
+        58.52,
+        58.61,
+        58.54,
+        58.63,
+        58.57
        ],
        "candidates": 12,
        "cluster_methods": [
-        "dft/cnt8/hp",
-        "dft/cnt64/hp",
-        "dft/mass/hp",
-        "dft/cnt160/hp",
-        "dft/cnt64/raw",
-        "dft/cnt160/raw",
-        "dft/mass/raw",
-        "dft/cnt8/raw",
+        "scallop/cnt64",
+        "scallop/cnt160",
         "scallop/mass",
         "scallop/cnt8",
-        "scallop/cnt64",
-        "scallop/cnt160"
+        "dft/cnt8/hp",
+        "dft/mass/hp",
+        "dft/cnt64/hp",
+        "dft/cnt160/hp",
+        "dft/mass/raw",
+        "dft/cnt8/raw",
+        "dft/cnt64/raw",
+        "dft/cnt160/raw"
        ],
        "footprint": {
         "first_peak_x": 75,
-        "height": 59,
+        "height": 60,
         "width_est": 50.0
        },
        "nominal_step_px": 60.0,
-       "profile_len": 481,
+       "profile_len": 530,
        "ripple_pct": {
-        "cnt160": 152.63,
-        "cnt64": 115.38,
-        "cnt8": 100.0,
-        "mass": 121.63
+        "cnt160": 130.0,
+        "cnt64": 104.38,
+        "cnt8": 78.0,
+        "mass": 100.61
        },
-       "spread_pct": 0.2,
-       "step_px": 60.0,
-       "stroke_length": 481,
+       "spread_pct": 1.08,
+       "step_px": 58.53,
+       "stroke_length": 530,
        "votes": 12
       },
-      "kt_step_vs_nominal_rel": 0.0,
+      "kt_step_vs_nominal_rel": 0.02449999999999998,
       "nominal_step_px": 60.0,
       "ps": {
        "band_height": 32,
@@ -2834,21 +2835,21 @@
        "votes": 11
       },
       "ps_step_vs_nominal_rel": 0.012833333333333386,
-      "rel_err_step": 0.013000168833361525,
-      "rel_err_step_over_band": 0.45057617961580393,
-      "rel_err_step_over_diameter": 0.013000168833361525,
-      "step_over_band_kt": 1.0169491525423728,
+      "rel_err_step": 0.011818335303055812,
+      "rel_err_step_over_band": 0.47296977882829644,
+      "rel_err_step_over_diameter": 0.011818335303055812,
+      "step_over_band_kt": 0.9755,
       "step_over_band_ps": 1.8509375,
-      "step_over_diameter_kt": 1.0,
+      "step_over_diameter_kt": 0.9755,
       "step_over_diameter_ps": 0.9871666666666666,
-      "step_ratio_kt_over_ps": 1.0130001688333616
+      "step_ratio_kt_over_ps": 0.9881816646969442
      },
      "param": "spacing",
      "pixel": {
-      "diff_pixels": 21842,
-      "diff_ratio": 0.106650390625,
-      "max_delta": 252,
-      "mean_abs_delta": 11.6397802734375,
+      "diff_pixels": 23768,
+      "diff_ratio": 0.1160546875,
+      "max_delta": 253,
+      "mean_abs_delta": 11.775146484375,
       "pass": false
      },
      "ps_file": "docs/数据/偏差/ps/spacing__square__v100.png",
@@ -2856,10 +2857,10 @@
      "value": 100.0
     },
     {
-     "consistent": false,
+     "consistent": true,
      "group": "nonsquare",
      "kt_file": "docs/数据/偏差/krita/spacing__nonsquare__v10.png",
-     "kt_idat_sha256": "43d6974756815095de0133ad1c718a3ececf6f6c9c6f4ee02b86fb981b707b4d",
+     "kt_idat_sha256": "615e1509222222ac0e9ee7c6f0cb7575d6a13f9d0559c3e54661382cb5bbb1d6",
      "metric": {
       "band_height_ratio_kt_over_ps": 1.353846153846154,
       "kt": {
@@ -2869,44 +2870,63 @@
         "scallop/cnt8",
         "scallop/cnt64",
         "scallop/cnt160",
+        "dft/mass/raw",
+        "dft/mass/hp",
         "dft/cnt8/raw",
-        "dft/cnt8/hp"
+        "dft/cnt8/hp",
+        "dft/cnt64/raw",
+        "dft/cnt64/hp",
+        "dft/cnt160/raw",
+        "dft/cnt160/hp"
        ],
        "candidate_steps": [
-        11.0,
-        11.0,
-        6.0,
-        11.0,
-        11.2,
-        11.2
+        9.0,
+        9.0,
+        9.0,
+        9.0,
+        8.77,
+        8.77,
+        8.76,
+        8.76,
+        8.75,
+        8.75,
+        8.77,
+        8.77
        ],
-       "candidates": 6,
+       "candidates": 12,
        "cluster_methods": [
+        "dft/cnt64/raw",
+        "dft/cnt64/hp",
+        "dft/cnt8/hp",
+        "dft/cnt8/raw",
+        "dft/cnt160/hp",
+        "dft/cnt160/raw",
+        "dft/mass/raw",
+        "dft/mass/hp",
         "scallop/mass",
         "scallop/cnt8",
-        "scallop/cnt160",
-        "dft/cnt8/hp",
-        "dft/cnt8/raw"
+        "scallop/cnt64",
+        "scallop/cnt160"
        ],
        "footprint": {
-        "first_peak_x": 39,
+        "first_peak_x": 35,
         "height": 88,
-        "width_est": 26.0
+        "width_est": 18.0
        },
        "nominal_step_px": 11.200000000000001,
-       "profile_len": 576,
+       "profile_len": 579,
        "ripple_pct": {
-        "cnt160": 12.07,
-        "cnt64": 4.14,
-        "cnt8": 8.22,
-        "mass": 5.9
+        "cnt160": 6.56,
+        "cnt64": 3.08,
+        "cnt8": 4.67,
+        "mass": 2.57
        },
-       "spread_pct": 1.85,
-       "step_px": 11.0,
-       "stroke_length": 576,
-       "votes": 5
+       "spread_pct": 2.81,
+       "step_px": 8.77,
+       "stroke_length": 579,
+       "votes": 12
       },
-      "kt_step_vs_nominal_rel": 0.01785714285714295,
+      "kt_step_vs_nominal_rel": 0.21696428571428583,
       "nominal_step_px": 11.200000000000001,
       "ps": {
        "band_height": 65,
@@ -2966,21 +2986,21 @@
        "votes": 6
       },
       "ps_step_vs_nominal_rel": 0.2160714285714287,
-      "rel_err_step": 0.25284738041002286,
-      "rel_err_step_over_band": 0.07460136674259674,
-      "rel_err_step_over_diameter": 0.25284738041002286,
-      "step_over_band_kt": 0.125,
+      "rel_err_step": 0.0011389521640090875,
+      "rel_err_step_over_band": 0.26220490784841577,
+      "rel_err_step_over_diameter": 0.0011389521640090875,
+      "step_over_band_kt": 0.0996590909090909,
       "step_over_band_ps": 0.13507692307692307,
-      "step_over_diameter_kt": 0.09821428571428571,
+      "step_over_diameter_kt": 0.07830357142857143,
       "step_over_diameter_ps": 0.07839285714285714,
-      "step_ratio_kt_over_ps": 1.2528473804100229
+      "step_ratio_kt_over_ps": 0.998861047835991
      },
      "param": "spacing",
      "pixel": {
-      "diff_pixels": 42271,
-      "diff_ratio": 0.2064013671875,
-      "max_delta": 253,
-      "mean_abs_delta": 8.873623046875,
+      "diff_pixels": 41080,
+      "diff_ratio": 0.2005859375,
+      "max_delta": 252,
+      "mean_abs_delta": 8.6609716796875,
       "pass": false
      },
      "ps_file": "docs/数据/偏差/ps/spacing__nonsquare__v10.png",
@@ -2988,14 +3008,14 @@
      "value": 10.0
     },
     {
-     "consistent": false,
+     "consistent": true,
      "group": "nonsquare",
      "kt_file": "docs/数据/偏差/krita/spacing__nonsquare__v50.png",
-     "kt_idat_sha256": "e7117cc84495703bb9b07db037764d8fd5d2341553325e87018eee808ad6bca5",
+     "kt_idat_sha256": "8246c3f82b268b0e0463fcd2c89d65adbb6dcc03438fc83e03f653cb5f7cb9ee",
      "metric": {
-      "band_height_ratio_kt_over_ps": 1.3384615384615384,
+      "band_height_ratio_kt_over_ps": 1.353846153846154,
       "kt": {
-       "band_height": 87,
+       "band_height": 88,
        "candidate_methods": [
         "scallop/mass",
         "scallop/cnt8",
@@ -3011,53 +3031,53 @@
         "dft/cnt160/hp"
        ],
        "candidate_steps": [
-        56.0,
-        56.0,
-        56.0,
-        56.0,
-        56.02,
-        56.01,
-        56.0,
-        56.0,
-        56.02,
-        56.01,
-        56.03,
-        56.01
+        44.0,
+        44.0,
+        44.0,
+        44.0,
+        43.8,
+        43.79,
+        43.78,
+        43.78,
+        43.8,
+        43.79,
+        43.79,
+        43.78
        ],
        "candidates": 12,
        "cluster_methods": [
+        "dft/cnt160/hp",
         "dft/cnt8/raw",
+        "dft/cnt8/hp",
+        "dft/mass/hp",
+        "dft/cnt64/hp",
+        "dft/cnt160/raw",
+        "dft/mass/raw",
+        "dft/cnt64/raw",
         "scallop/mass",
         "scallop/cnt8",
         "scallop/cnt64",
-        "scallop/cnt160",
-        "dft/cnt8/hp",
-        "dft/cnt64/hp",
-        "dft/mass/hp",
-        "dft/cnt160/hp",
-        "dft/cnt64/raw",
-        "dft/mass/raw",
-        "dft/cnt160/raw"
+        "scallop/cnt160"
        ],
        "footprint": {
         "first_peak_x": 65,
-        "height": 87,
+        "height": 88,
         "width_est": 78.0
        },
        "nominal_step_px": 56.0,
-       "profile_len": 557,
+       "profile_len": 544,
        "ripple_pct": {
-        "cnt160": 325.0,
-        "cnt64": 150.0,
-        "cnt8": 48.08,
-        "mass": 150.4
+        "cnt160": 195.77,
+        "cnt64": 117.95,
+        "cnt8": 37.93,
+        "mass": 108.0
        },
-       "spread_pct": 0.06,
-       "step_px": 56.0,
-       "stroke_length": 557,
+       "spread_pct": 0.51,
+       "step_px": 43.8,
+       "stroke_length": 544,
        "votes": 12
       },
-      "kt_step_vs_nominal_rel": 0.0,
+      "kt_step_vs_nominal_rel": 0.21785714285714292,
       "nominal_step_px": 56.0,
       "ps": {
        "band_height": 65,
@@ -3119,21 +3139,21 @@
        "votes": 8
       },
       "ps_step_vs_nominal_rel": 0.2192857142857143,
-      "rel_err_step": 0.28087831655992684,
-      "rel_err_step_over_band": 0.04302194739775585,
-      "rel_err_step_over_diameter": 0.28087831655992684,
-      "step_over_band_kt": 0.6436781609195402,
+      "rel_err_step": 0.0018298261665141422,
+      "rel_err_step_over_band": 0.26001206021791573,
+      "rel_err_step_over_diameter": 0.0018298261665141422,
+      "step_over_band_kt": 0.4977272727272727,
       "step_over_band_ps": 0.6726153846153846,
-      "step_over_diameter_kt": 0.5,
+      "step_over_diameter_kt": 0.39107142857142857,
       "step_over_diameter_ps": 0.39035714285714285,
-      "step_ratio_kt_over_ps": 1.280878316559927
+      "step_ratio_kt_over_ps": 1.0018298261665142
      },
      "param": "spacing",
      "pixel": {
-      "diff_pixels": 35198,
-      "diff_ratio": 0.171865234375,
-      "max_delta": 255,
-      "mean_abs_delta": 13.542802734375,
+      "diff_pixels": 35826,
+      "diff_ratio": 0.174931640625,
+      "max_delta": 251,
+      "mean_abs_delta": 11.720986328125,
       "pass": false
      },
      "ps_file": "docs/数据/偏差/ps/spacing__nonsquare__v50.png",
@@ -3144,11 +3164,11 @@
      "consistent": false,
      "group": "nonsquare",
      "kt_file": "docs/数据/偏差/krita/spacing__nonsquare__v100.png",
-     "kt_idat_sha256": "8cff5b5409cb1fe2f91433cd2458b7c85ada8ba3114cc3754d41758d2aa31f7a",
+     "kt_idat_sha256": "4e7f3e5764ca6aad7949f696bc60f2381a6840fe85d07c439cc22b3e62f9d1d6",
      "metric": {
-      "band_height_ratio_kt_over_ps": 1.45,
+      "band_height_ratio_kt_over_ps": 1.4666666666666666,
       "kt": {
-       "band_height": 87,
+       "band_height": 88,
        "candidate_methods": [
         "scallop/mass",
         "scallop/cnt8",
@@ -3159,52 +3179,58 @@
         "dft/cnt8/raw",
         "dft/cnt8/hp",
         "dft/cnt64/raw",
-        "dft/cnt64/hp"
+        "dft/cnt64/hp",
+        "dft/cnt160/raw",
+        "dft/cnt160/hp"
        ],
        "candidate_steps": [
-        112.0,
-        112.0,
-        112.0,
-        112.0,
-        111.92,
-        111.33,
-        111.95,
-        111.35,
-        111.93,
-        111.38
+        87.5,
+        87.5,
+        87.5,
+        87.5,
+        87.48,
+        87.39,
+        87.48,
+        87.45,
+        87.55,
+        87.45,
+        87.57,
+        87.41
        ],
-       "candidates": 10,
+       "candidates": 12,
        "cluster_methods": [
         "dft/mass/hp",
-        "dft/cnt8/hp",
+        "dft/cnt160/hp",
         "dft/cnt64/hp",
-        "dft/mass/raw",
-        "dft/cnt64/raw",
+        "dft/cnt8/hp",
         "dft/cnt8/raw",
+        "dft/mass/raw",
         "scallop/mass",
         "scallop/cnt8",
         "scallop/cnt64",
-        "scallop/cnt160"
+        "scallop/cnt160",
+        "dft/cnt64/raw",
+        "dft/cnt160/raw"
        ],
        "footprint": {
         "first_peak_x": 98,
-        "height": 87,
+        "height": 88,
         "width_est": 144.0
        },
        "nominal_step_px": 112.0,
-       "profile_len": 557,
+       "profile_len": 544,
        "ripple_pct": {
-        "cnt160": 325.0,
-        "cnt64": 256.11,
-        "cnt8": 142.86,
-        "mass": 212.63
+        "cnt160": 336.25,
+        "cnt64": 217.25,
+        "cnt8": 109.3,
+        "mass": 191.28
        },
-       "spread_pct": 0.6,
-       "step_px": 111.94,
-       "stroke_length": 557,
-       "votes": 10
+       "spread_pct": 0.2,
+       "step_px": 87.49,
+       "stroke_length": 544,
+       "votes": 12
       },
-      "kt_step_vs_nominal_rel": 0.000535714285714306,
+      "kt_step_vs_nominal_rel": 0.21883928571428576,
       "nominal_step_px": 112.0,
       "ps": {
        "band_height": 60,
@@ -3266,21 +3292,21 @@
        "votes": 8
       },
       "ps_step_vs_nominal_rel": 0.24544642857142854,
-      "rel_err_step": 0.32457697313927336,
-      "rel_err_step_over_band": 0.08649863921429425,
-      "rel_err_step_over_diameter": 0.32457697313927336,
-      "step_over_band_kt": 1.2866666666666666,
+      "rel_err_step": 0.035262099159862614,
+      "rel_err_step_over_band": 0.2941394778455482,
+      "rel_err_step_over_diameter": 0.035262099159862614,
+      "step_over_band_kt": 0.9942045454545454,
       "step_over_band_ps": 1.4085,
-      "step_over_diameter_kt": 0.9994642857142857,
+      "step_over_diameter_kt": 0.7811607142857142,
       "step_over_diameter_ps": 0.7545535714285715,
-      "step_ratio_kt_over_ps": 1.3245769731392734
+      "step_ratio_kt_over_ps": 1.0352620991598627
      },
      "param": "spacing",
      "pixel": {
-      "diff_pixels": 26630,
-      "diff_ratio": 0.130029296875,
+      "diff_pixels": 30316,
+      "diff_ratio": 0.14802734375,
       "max_delta": 255,
-      "mean_abs_delta": 8.65244140625,
+      "mean_abs_delta": 7.81427734375,
       "pass": false
      },
      "ps_file": "docs/数据/偏差/ps/spacing__nonsquare__v100.png",

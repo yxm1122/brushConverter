@@ -338,6 +338,7 @@ def _render_preset(bp: BrushPreset, index: int) -> tuple[str, str, np.ndarray]:
     else:
         # Krita 对非正方形 png_brush 的编辑器尺寸显示存在偏差；
         # 与映射时的 max(width,height) 基准保持一致，内嵌正方形笔尖。
+        # 间距基准补偿在 _sampled_brush_def 里做（spacing × 短边/长边）。
         square_tip = _square_tip(bp.tip_gray)
         tip_png = _png_bytes(square_tip)
         res_name = _safe_filename(bp.name, index).rsplit(".", 1)[0]
@@ -425,10 +426,21 @@ def convert_presets(abr: AbrFile, presets: list[BrushPreset], out_dir: str,
 
 
 def _sampled_brush_def(res_name: str, tip_png: bytes, bp: BrushPreset) -> str:
-    """生成采样笔尖的 png_brush <Brush> 定义（filename + md5sum 引用内嵌 PNG）。"""
+    """生成采样笔尖的 png_brush <Brush> 定义（filename + md5sum 引用内嵌 PNG）。
+
+    spacing 在这里乘 `bp.spacing_basis`（= 原始笔尖短边/长边，任务 107）：
+    Krita 的 png_brush 尺寸/间距基准是补白后的正方形画布边长（=长边），而 PS 对
+    非方形笔尖的间距基准是「渲染后短边」。任务 106 §4 实测 Krita/PS 步长比
+    ≈ 笔尖长宽比（非方形 1.253/1.281/1.325，长宽比 1.280；方形 1.013–1.020）。
+    补白是绕 Krita 尺寸显示的刻意做法（铁律 17，不动），只在间距换算这一层
+    把基准补回短边。严格正方形笔尖（宽=高）比值 = 1 → 输出与改动前逐字节一致；
+    近方形按实际短/长边微调（如 84/86 = 0.977），计算笔刷不变。
+    """
     from .kpp.preset_xml import sampled_brush_definition
     md5 = hashlib.md5(tip_png).hexdigest()
-    return sampled_brush_definition(res_name + ".png", md5, bp.spacing, bp.angle, bp.scale)
+    basis = bp.spacing_basis if bp.spacing_basis else 1.0
+    return sampled_brush_definition(res_name + ".png", md5, bp.spacing * basis,
+                                    bp.angle, bp.scale)
 
 
 def _computed_brush_def(bp: BrushPreset) -> str:

@@ -481,8 +481,10 @@ def build_preset_xml(
             set_internal("ScatterUseCurve", "true")
         else:
             set_internal("ScatterUseCurve", "false")
-        # 散布量换算：PS jitter(0..1000%) → Krita ScatterValue(0..5.0=500%)
-        # 实测锚点：PS 145% ≈ Krita 35%（即 ScatterValue 0.35），系数 ≈ 1/4
+        # 散布量换算：PS jitter(0..1000%) → Krita ScatterValue(0..5.0)
+        # 任务 107 实测结论：线性系数无法同时对上 100%/300%（PS 响应超线性、Krita 线性），
+        # 且 300% 点的带高统计复现性 ±13%，无法证明 ≤2% → 保留 106 时的系数并标「需校准」。
+        # 依据与残差见 docs/研究报告/参数偏差-2026-11-20.md §3.5 与 docs/验收报告/107-报告.md。
         if scatter_amount is not None:
             set_internal("ScatterValue", f"{scatter_amount / 400.0:g}")
         # PS bothAxes → Krita 两个轴都开；否则只在 Y 轴（垂直笔迹方向）

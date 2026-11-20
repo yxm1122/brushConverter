@@ -2,7 +2,8 @@
 
 映射策略（对照用户手动转换的 Krita 5.x 参考预设逐项校准）：
   - 尺寸：scale = Dmtr / 笔尖宽度（尊重 Photoshop 主直径）
-  - 间距 / 角度：直接映射
+  - 间距 / 角度：间距 = Spcn/100，采样笔刷再乘「短边/长边」补回 PS 的间距基准
+    （任务 107；补白把 Krita 基准换成长边，见 BrushPreset.spacing_basis）；角度直接映射
   - 压感→大小：minimumDiameter（szVr.bVTy==2 压力）
   - 压感→不透明度：opVr.Mnm（opVr.bVTy==2）
   - 压感→流量：prVr.Mnm（prVr.bVTy==2）
@@ -118,6 +119,11 @@ class BrushPreset:
     diameter: float | None = None  # px（计算笔刷用）
     hardness: float | None = None  # 0..100（计算笔刷用）
     scale: float = 1.0             # 采样笔刷的缩放（Dmtr / 笔尖宽度）
+    #: 间距基准补偿系数 = 原始笔尖短边 / 长边（方形=1，计算笔刷=1）。
+    #: PS 对采样笔尖的间距基准是「渲染后短边」，而补白后的正方形画布把 Krita 的
+    #: 尺寸/间距基准换成长边 → 非方形笔尖的步长被放大 1/该比值（任务 106 §4 实测：
+    #: Krita/PS 步长比 ≈ 长宽比 1.28，方形组 1.01）。换算在 convert._sampled_brush_def。
+    spacing_basis: float = 1.0
     tip_gray: np.ndarray | None = None   # 采样笔尖蒙版（255=墨）
     uuid: str | None = None
     is_computed: bool = False
@@ -258,10 +264,16 @@ def map_presets(abr: AbrFile) -> list[BrushPreset]:
         tip = tip_by_uuid.get(_norm_uuid(uuid_raw)) if uuid_raw else None
 
         scale = 1.0
+        spacing_basis = 1.0
         if tip is not None and diameter is not None:
             # Krita sampled brush 的 scale 以方形笔尖画布为基准；非正方形
             # 若仍使用 width，会导致预设编辑器显示尺寸与实际绘图区不一致。
             scale = diameter / max(1, tip.width, tip.height)
+            # 间距基准补偿（任务 107）：补白把 Krita 的间距基准由「短边」改成「长边」，
+            # 这里记下短边/长边比值，由 convert._sampled_brush_def 乘回 spacing。
+            # 严格正方形（宽=高）比值为 1 → 行为不变；近方形按实际比值微调
+            # （如 84/86 = 0.977）；计算笔刷为 1。补白本身不动（铁律 17）。
+            spacing_basis = min(tip.width, tip.height) / max(1, tip.width, tip.height)
 
         # 各动态的 bVTy / 数值
         sz = _dyn(D.get_obj(p, "szVr"))
@@ -318,6 +330,7 @@ def map_presets(abr: AbrFile) -> list[BrushPreset]:
             diameter=diameter,
             hardness=hardness,
             scale=scale,
+            spacing_basis=spacing_basis,
             tip_gray=tip.gray if tip is not None else None,
             uuid=uuid_raw,
             is_computed=(tip is None),
