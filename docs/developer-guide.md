@@ -440,6 +440,20 @@ paintoppresets/*.kpp          自包含笔刷预设
     修复：退出 Krita → 备份并删除 `resourcecache.sqlite` 让其重建 → 重启 Krita → 重新导入 bundle；
     覆盖产物时务必「先退出 Krita，复制完成后再启动」。一条命令体检：`python tools/diagnose_profile.py --krita-dir "%APPDATA%/krita" --bundle <你的.bundle> --predict`。
 
+26. **Krita 5.3 会把 `.abr` 当「Adobe Brush Library」直读，生成一套没有经过本工具转换的同款笔刷**。
+    原始 `.abr` 被放进 `%APPDATA%\krita`（或在资源管理器里导入 ABR）时，Krita 不走转换链，而是自己解析 ABR
+    生成资源：`storages` 里多出一行 `storage_type_id=4`（`Adobe Brush Library`），其下资源是**画笔笔尖
+    （brush tips，`resource_type_id=1`）**，不带本工具写入的内嵌纹理与参数映射。它和 `.bundle` 里的转换产物
+    混在同一笔刷列表里，看起来就是「纹理全丢 / 笔刷不可见」——本次缺陷的实测真因就在这儿，**不是转换格式问题**。
+    **实测：使用者删掉 `%APPDATA%\krita` 下的 `.abr`（或移除该库）并重启 Krita 后，转换产物的纹理即恢复。**
+    排查：`tools/diagnose_profile.py` 的 `[3/8]` 节会醒目列出 `storage_type=4` 的库及「该库资源：预设=0 /
+    图案=0 / 全部=N」（v1.3.1 起支持检测，之前只能人工看 `storages` 概览）；`[4/8]` 节列出跨 storage 同名
+    预设（同名会互相遮蔽/混淆）。两者都算「发现问题」，退出码 1。
+    **结论门槛**：遇到「纹理没了」先确认 Krita 里没有 ABR 直读库，再谈产物与缓存——
+    相对地，`resourcecache.sqlite` 的 `integrity_check` 轻微异常（`Page N is never used` + 索引条目数不符）
+    **不是**本缺陷的必要条件，重建缓存只是可选兜底（代价：自定义预设标签与分组丢失，资源文件不丢）。
+    证据：`docs/验收报告/缺陷-纹理丢失-v1.3.1-文档加固.md`。
+
 ## 8. 参考实现与样本
 
 - **GIMP**（GPL）：`app/core/gimpbrush-load.c` + `gimp-utils.c`——ABR v6 笔尖解析与 RLE 解码的权威来源。

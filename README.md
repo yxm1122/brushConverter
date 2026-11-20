@@ -1,6 +1,6 @@
 # brushConverter
 
-Convert Photoshop brush sets (`.abr`) into Krita brushes (`.kpp` presets / `.bundle` resource packs), with automatic brush-parameter mapping. Ships as both a command-line tool and a PySide6 GUI. **v1.3.0**
+Convert Photoshop brush sets (`.abr`) into Krita brushes (`.kpp` presets / `.bundle` resource packs), with automatic brush-parameter mapping. Ships as both a command-line tool and a PySide6 GUI. **v1.3.1**
 
 Photoshop 笔刷（`.abr`）转 Krita 笔刷（`.kpp` / `.bundle`）工具，支持参数自动映射，提供命令行与图形界面两种方式。
 
@@ -72,6 +72,89 @@ pyinstaller brushconverter-gui.spec    # → dist/brushConverter/brushConverter.
   亮度/对比度默认使用 calibrated 公式（v1.2.0 起，同引擎掩码空间差异 0.00%，见 `docs/parameter-mapping.md` §7.1）；需要 v1.1.2 旧行为时，转换前设置环境变量 `BRUSHCONVERTER_TEXTURE_FORMULA=legacy` 即可回退。
 - 双笔刷、颜色动态、湿边等暂不映射（引擎差异大）。
 - 想了解实现原理与开发中踩过的坑，见 `docs/developer-guide.md`。
+
+## 常见问题（FAQ）
+
+### Krita 里笔刷不可见 / 纹理消失怎么办
+
+按下面的顺序排查，**从代价最小的开始做**。前两步能覆盖绝大多数情况；第三步是可选项，不是必须。
+
+#### 1）先确认：不要把原始 `.abr` 直接导入 Krita
+
+Krita 5.3 支持直接读 `.abr`，会把它当成一个 **Adobe Brush Library** 解析。这样生成的是一套
+**没有经过本工具转换**的笔刷：没有纹理映射、参数与本工具产物不同，但会和你导入的 `.bundle`
+产物混在同一个笔刷列表里——看起来就像「纹理全丢了 / 笔刷不可见」，资源管理器里则会多出一个
+Adobe Brush Library 库。
+
+做法（任选其一）：
+
+- 在 Krita 里 `设置 → 管理资源` 移除那个 ABR 库；
+- 或**彻底退出 Krita**，把 `%APPDATA%\krita` 下的 `.abr` 文件移到别处备份，再重新启动 Krita。
+
+这是本次「纹理丢失」缺陷里**使用者实测有效**的修复：删掉 `%APPDATA%\krita` 下的 `.abr` 后纹理即恢复。
+原始 `.abr` 只应交给本工具转换；要导入 Krita 的是转换产出的 `.bundle`（`.kpp` 则放进资源目录的
+`paintoppresets/`）。
+
+#### 2）校验转换产物是否完整、是否已注册
+
+```bash
+python tools/diagnose_profile.py --krita-dir "%APPDATA%\krita" --bundle 你的.bundle --predict
+```
+
+重点看这几行：
+
+- `大小` / `ZIP 条目数`（正式产物为 22：mimetype + manifest + meta + 19 个 `.kpp`）；
+- `manifest md5：通过 19 条，失败 0 条`；
+- `DB 注册状态：已注册（storage id=…）`——若显示「未注册」，说明 Krita 没扫描到这个 bundle
+  （通常是没完整重启 Krita，或文件被截断）；
+- 末尾 `结论`：有没有把问题列出来。同时 `[3/8] ABR 直读库检测` 会直接告诉你有没有 ABR 直读库。
+
+另外，**v1.3.1 起转换过程本身在写出后会回读校验**：CLI 最后一行应当是
+`输出校验：OK（N 个预设，sha256=…，大小=…B）`；不是这一行就说明产物没通过校验（见下面第 4 条）。
+
+该工具**只读**：先把 `resourcecache.sqlite` 复制到临时目录再读，不启动 Krita、不写你的 profile。
+退出码：`0` 正常 / `1` 发现问题 / `2` 参数或读取错误。
+
+#### 3）（可选，非必须）重建资源缓存
+
+**重建资源缓存不是修复本缺陷的必要步骤。** 只有上面两步都做过、笔刷/纹理仍异常时，才考虑它。
+
+- 彻底退出 Krita；
+- **把整个 `%APPDATA%\krita` 目录备份一份**（整份备份，不是只挑文件）；
+- 把 `%APPDATA%\krita\resourcecache.sqlite` 改名（如加 `.bak`）或删除；
+- 重启 Krita，等它重建缓存（约 1–3 分钟，期间资源库是空的，属正常）。
+
+**必须先知道的后果**：重建后，你在 Krita 里**自定义的预设标签与分组会丢失**；笔刷、图案等资源
+文件本身不会丢（它们在你的资源目录和 `.bundle` 里，删掉的只是缓存数据库）。所以做之前一定整份备份。
+
+#### 4）更新产物：先彻底退出 Krita，再替换 `.bundle`
+
+Krita 运行中替换 `.bundle` 会出现「文件已经换了、Krita 里还是旧的」甚至静默失败。
+正确顺序：**彻底退出 Krita → 复制/替换 `.bundle` → 再启动 Krita**。
+
+从 **v1.3.1** 起产物命名与覆盖规则改了：
+
+- `.bundle` 文件名是 `<ABR 文件名去扩展名>_v<版本号>_<8 位内容短哈希>.bundle`，
+  例如 `测试用_v1.3.1_656f9dc8.bundle`。短哈希是「bundle 内预设条目」的确定性内容哈希：
+  同一输入重复转换得到同一个文件名、同一份字节，所以不同版本/不同内容不会再同名覆盖。
+- `.kpp`（standalone）文件名不变，仍是「3 位序号 + 清洗后的笔刷名」。
+- **覆盖防呆**：目标同名且内容相同 → 不重复写，直接复用；同名但内容不同 → 自动加 `_2`、`_3` 后缀，
+  原文件一字不动，并给出提示；旧版命名的 `<名字>.bundle` 还在同目录时只提示「v1.3.1 不覆盖旧文件」，
+  既不覆盖也不删除。
+- **写出后回读校验**：转换结束会回读产物（zip 可读、条目数、mimetype、manifest md5、每个 `.kpp`），
+  CLI 打印 `输出校验：OK（N 个预设，sha256=…，大小=…B）`；校验失败则打印原因并以**退出码 3** 结束，
+  GUI 会在完成对话框里提示。
+
+旧版本的产物文件可以手动删掉，避免资源库里同时挂着多份。
+
+#### 5）有些预设本来就没有可见纹理，先别当缺陷
+
+- 10 个预设**纹理是关闭的**：000、003、004、012、013、014、015、016、017、018；
+- 001、002 用的是 **1×1 纹理**（在 Photoshop 里同样没有纹理感）；
+- 只有 **005–011** 这 7 个带真实的 **1920×1920 纹理**。
+
+所以在 001/002 或上面那 10 个预设上看不到纹理，是**预期行为**，不是转换丢了纹理。
+判断「纹理是否恢复」请用 005–011 落笔对照（推荐 006_大怪兽-碳铅）。
 
 ## 已知不可映射模式（v1.3.0）
 

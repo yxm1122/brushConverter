@@ -1,3 +1,79 @@
+# brushConverter v1.3.1（2026-11-20）
+
+「Krita 里笔刷不可见 / 纹理消失」缺陷的**文档与工具加固版**（PATCH）。
+**转换格式与参数映射未变：v1.3.0 的产物可以直接继续用，不需要重新转换。**
+
+## 主要变化
+
+- **产物命名带版本号 + 逻辑内容短哈希（只改 `.bundle`）**：
+  `<ABR 名去扩展名>_v<版本号>_<8 位内容短哈希>.bundle`，例如 `测试用_v1.3.1_656f9dc8.bundle`。
+  短哈希是确定性**逻辑内容**哈希（bundle 内 `paintoppresets/` 条目按名字排序，逐个喂
+  「条目名 + 0x00 字节 + sha256(条目字节)」，整体再取 sha256 前 8 位；**不是** zip 文件字节哈希——
+  zip 头带时间戳会破坏确定性）。同一输入重复转换结果字节相同、文件名相同。
+  `.kpp`（standalone）命名**不变**，仍是 3 位序号 + 清洗后的笔刷名。
+- **写出后回读校验**：`verify_bundle()` 回读产物并逐条校验（zip 可打开 / `testzip()` 无损坏条目 /
+  mimetype 是首个条目且不压缩 / manifest 预设条目数等于 zip 里 `paintoppresets/` 条目数且 md5 一致 /
+  每个 `.kpp` 都是合法 PNG + iTXt 预设 XML 且块 CRC 正确）。通过时 CLI 打印
+  `输出校验：OK（N 个预设，sha256=…，大小=…B）`；失败打印原因并以**退出码 3** 结束（不再静默返回 0），
+  GUI 在完成对话框追加「产物回读校验失败：<原因>」。
+- **覆盖防呆（绝不静默覆盖）**：目标不存在 → 直接写；已存在且逻辑内容哈希相同 → 复用不重写（提示
+  「已存在同内容产物，未重复写入」）；已存在但内容不同 → 自动加 `_2`/`_3` 后缀、原文件一字不动
+  （提示「目标同名文件内容不同，已重命名为 …（原文件未覆盖）」）；旧版命名 `<stem>.bundle` 仍在同目录时
+  只提示不覆盖不删除。
+- **GUI / CLI 显示带真实纹理的预设数**：口径是 `.kpp` 里 `Texture/Pattern/Enabled=true`
+  **且**内嵌 patterns 资源不是 1×1 占位图；CLI 完成行「转换完成：N 个预设（含真实纹理 M 个）」，
+  GUI 摘要「预设 N 个（含真实纹理 M 个）」+「资源包：<文件名>（短哈希 <hash8>）」。
+- **新增只读诊断工具 `tools/diagnose_profile.py`**：一条命令体检 `resourcecache.sqlite` 完整性、storages、
+  **ABR 直读库（Adobe Brush Library）**、跨 storage 同名预设、悬空 storage、bundle 完整性与注册状态、
+  逐预设纹理解析预测。只读：先把 cache 复制到临时目录再读，不启动 Krita、不写用户 profile。
+- **README 新增 FAQ「Krita 里笔刷不可见 / 纹理消失怎么办」**：按「代价从小到大」给出排查顺序，
+  第一条就是「不要把原始 `.abr` 直接导入 Krita」。
+
+## 根因说明（重要）
+
+本轮缺陷的实测真因**不是转换格式**：使用者把 **42 MB 的原始 `.abr` 直接导入了 Krita**。
+Krita 5.3 会把 ABR 当 **Adobe Brush Library** 直读（资源管理器里显示为 Adobe Brush Library，
+资源缓存里是 `storage_type_id=4` 的一行），生成一套**没有经过本工具转换**的同款笔刷
+（无纹理映射、参数与本工具产物不同）。它和转换产物的 `.bundle` 混在同一笔刷列表里，
+看起来就像「纹理全丢 / 笔刷不可见」。**实测：删掉 `%APPDATA%\krita` 下的 `.abr` 后即恢复。**
+
+`resourcecache.sqlite` 的 `integrity_check` 确有轻微异常（`Page 30779 is never used` + 两处索引条目数不符），
+但**重建资源缓存不是修复本缺陷的必要步骤**，只是两步排查都无效后的可选兜底；
+重建会丢失**自定义预设标签与分组**（笔刷/图案等资源文件本身不丢）。
+
+## 已知限制（与 v1.3.0 相同）
+
+1. **24 个纹理混合模式不可映射**（16 个 Krita 无对应算子 / 8 个 PS 侧产不出可比真值），未登记模式回退 Multiply 并保留警告。
+2. **0.00% 不等于语义等价**：39 个有 PS 真值的模式在 6 组参数下只出 12 类像素，31 个模式与其他模式像素完全不可区分。
+3. 亮度/对比度是按实测校准的公式（不是源码复刻）；`height`/`linearHeight` 两侧逐像素不可区分。
+4. 双笔刷、颜色动态、湿边仍未映射。
+
+## 回退方式
+
+把工作区 `git revert` 回 **v1.3.0**（tag `v1.3.0`，commit `bf52dab`），或直接 `git checkout bf52dab`。
+本版本不改转换格式、映射表与纹理公式，回退后转换结果与 v1.3.0 一致。
+
+## 验证
+
+- **转换格式与映射未变**：v1.3.1 未改 `src/brush_converter/mapping.py` 的 `_TEXTURING_MODE` 表与纹理
+  brightness/contrast 公式；v1.3.0 产物无需重转（对照见 `docs/验收报告/缺陷-纹理丢失-v1.3.1-代码加固.md`）。
+- **命名确定性与覆盖防呆（本地实测）**：`tests/测试用.abr`（6 预设）→
+  `测试用_v1.3.1_656f9dc8.bundle`，sha256 `cffcf027cbf52377862a0df3c06abd6f73ef70c21b5f4674bc04aca055054e6f`
+  / 651,812 B；同目录再转一次 → 同一文件名、同 sha256，提示「已存在同内容产物，未重复写入」；
+  把该文件截断成 1,000 B 后再转 → 生成 `..._656f9dc8_2.bundle`（sha256 `8d48cd17…` / 651,814 B，
+  差别来自 meta.xml 的 `dc:title` 跟随文件名），截断的旧文件原样保留（1,000 B）。
+- **全量回归**（本机 conda 环境实跑，2026-11-20 12:27）：`python -m pytest -q` → **265 passed / 1 failed**（65.81 s）。
+  失败项 `tests/test_verify_entry.py::test_skip_is_counted_separately_from_pass` **单独跑通过**，属顺序/环境相关的
+  测试隔离问题（该用例用子进程调 `tools/verify_entry.py`），与本版本改动无因果关系；**发布前由代码加固方复跑确认**。
+- **诊断工具自检**：`python tools/diagnose_profile.py --help` 全中文；`--krita-dir` 支持 `%VAR%`/`~`；
+  代码内零本机绝对路径（`grep -nE "C:[\\/]Users|D:[\\/]program" tools/diagnose_profile.py` 0 命中）。
+- **真机现场复跑**（只读副本）：缺陷现场快照 → `[3/8]` 报告 1 个 ABR 直读库并给出处理建议，退出码 1；
+  使用者移除 `.abr` 后的当前 profile → `[3/8]` 报告 0 个 ABR 直读库，`[6/8]` 产物 manifest md5 19/19
+  且「DB 注册状态：已注册（storage id=275，19 预设 active）」。逐条输出见
+  `docs/验收报告/缺陷-纹理丢失-v1.3.1-文档加固.md` §三。
+
+---
+
 # brushConverter v1.3.0（2026-11-20）
 
 纹理混合模式逐模式定论与转正：**47 个 Photoshop 纹理混合模式全部有结论**
