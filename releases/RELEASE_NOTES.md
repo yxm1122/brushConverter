@@ -62,9 +62,10 @@ Krita 5.3 会把 ABR 当 **Adobe Brush Library** 直读（资源管理器里显�
   / 651,812 B；同目录再转一次 → 同一文件名、同 sha256，提示「已存在同内容产物，未重复写入」；
   把该文件截断成 1,000 B 后再转 → 生成 `..._656f9dc8_2.bundle`（sha256 `8d48cd17…` / 651,814 B，
   差别来自 meta.xml 的 `dc:title` 跟随文件名），截断的旧文件原样保留（1,000 B）。
-- **全量回归**（本机 conda 环境实跑，2026-11-20 12:27）：`python -m pytest -q` → **265 passed / 1 failed**（65.81 s）。
-  失败项 `tests/test_verify_entry.py::test_skip_is_counted_separately_from_pass` **单独跑通过**，属顺序/环境相关的
-  测试隔离问题（该用例用子进程调 `tools/verify_entry.py`），与本版本改动无因果关系；**发布前由代码加固方复跑确认**。
+- **全量回归**（本机 conda 环境、单进程串行实跑，2026-11-20 12:43）：`python -m pytest -q` →
+  **266 passed / 0 failed / 0 skipped**（66.42 s；251 项基线 + 15 项新增 `tests/test_bundle_hardening_v131.py`）。
+  **发布前回归请串行跑**：并发跑两套全量会挂 2 个 Krita 渲染用例（`tests/test_krita_render.py`，Krita 渲染属共享
+  单实例资源，团队规则要求先抢锁），不是产品回归。
 - **诊断工具自检**：`python tools/diagnose_profile.py --help` 全中文；`--krita-dir` 支持 `%VAR%`/`~`；
   代码内零本机绝对路径（`grep -nE "C:[\\/]Users|D:[\\/]program" tools/diagnose_profile.py` 0 命中）。
 - **真机现场复跑**（只读副本）：缺陷现场快照 → `[3/8]` 报告 1 个 ABR 直读库并给出处理建议，退出码 1；
