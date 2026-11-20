@@ -1,0 +1,23 @@
+# 任务 111 转换回归（CLI: python cli.py convert <abr> -o <%TEMP%>/<stem> --no-bundle）
+# 输出目录用系统临时目录：converted/ 按铁律 5 只读，不写入；日志只记文件名与退出码
+文件                 退出码 kpp数 产物
+angle-000              0      1     000_BC-v140-angle-000.kpp
+angle-045              0      1     000_BC-v140-angle-045.kpp
+angle-090              0      1     000_BC-v140-angle-090.kpp
+control-default        0      1     000_BC-v140-control-default.kpp
+hardness-000           0      1     000_BC-v140-hardness-000.kpp
+hardness-050           0      1     000_BC-v140-hardness-050.kpp
+hardness-100           0      1     000_BC-v140-hardness-100.kpp
+one-test               0      1     000_BC测试笔刷110.kpp
+scale-050              0      1     000_BC-v140-scale-050.kpp
+scale-100              0      1     000_BC-v140-scale-100.kpp
+scale-200              0      1     000_BC-v140-scale-200.kpp
+scatter-000            0      1     000_BC-v140-scatter-000.kpp
+scatter-100            0      1     000_BC-v140-scatter-100.kpp
+scatter-300            0      1     000_BC-v140-scatter-300.kpp
+size-020               0      1     000_BC-v140-size-020.kpp
+size-100               0      1     000_BC-v140-size-100.kpp
+size-300               0      1     000_BC-v140-size-300.kpp
+spacing-010            0      1     000_BC-v140-spacing-010.kpp
+spacing-050            0      1     000_BC-v140-spacing-050.kpp
+spacing-100            0      1     000_BC-v140-spacing-100.kpp

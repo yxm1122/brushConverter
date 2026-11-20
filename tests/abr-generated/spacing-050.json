@@ -1,0 +1,25 @@
+{
+  "mode": "zero",
+  "kind": "sampled",
+  "name": "BC-v140-spacing-050",
+  "diameter": 112.0,
+  "hardness": 80.0,
+  "spacing": 50.0,
+  "angle": 0.0,
+  "roundness": 100.0,
+  "uuid": "b5c0de22-1400-4a5b-8c6d-000000000060",
+  "tip_size": [
+    128,
+    100
+  ],
+  "sections": [
+    "samp",
+    "desc",
+    "phry"
+  ],
+  "diagnostics": [],
+  "scatter": null,
+  "texture": null,
+  "check_tip_center": true,
+  "out": "spacing-050.abr"
+}

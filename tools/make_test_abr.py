@@ -60,11 +60,32 @@
     # 3) 只做自检（读回并逐键比对清单里记录的期望值）
     python tools/make_test_abr.py --check tests/abr-generated/one-test.abr
 
+    # 4) 任务 111：一次生成整套 19 支测试笔刷（六参数覆盖矩阵 + 1 支对照笔）
+    python tools/make_test_abr.py --suite
+
+    # 5) 整套重新自检（不写文件，只读回逐键比对）
+    python tools/make_test_abr.py --check-suite
+
 只写 --out 指定的 .abr 与同名 .json 自检清单；不改 src/、tests/ 既有文件。
+
+任务 111 的扩展（本文件在 110 基础上只做了「补齐参数键」这一层）
+------------------------------------------------------------------
+110 只能写 5 个参数（直径/硬度/间距/角度 + 采样笔尖形状）。111 的六参数
+覆盖矩阵还需要：圆度 Rndn、散布 useScatter/scatterDynamics.jitter、
+纹理（patt 区 + Txtr/textureScale），以及「计算笔刷」（无 samp 笔尖、
+Brsh 类为 computedBrush）。这些键的写法全部照抄三个现有样本实测结构
+（不复制样本像素：笔尖与纹理都由本脚本合成）。新增写入能力清单：
+  - 采样笔尖支持非正方形（宽×高任意，椭圆蒙版）→ 暴露任务 107 的
+    「间距基准 = 短边/长边」补偿；
+  - 计算笔刷（computedBrush）+ 圆度 Rndn；
+  - 散布：useScatter + Cnt + bothAxes + scatterDynamics.jitter；
+  - 纹理：patt 区（灰度、RAW、64×64 确定性噪点，自造不入商用素材）
+    + useTexture/Txtr/textureScale/textureDepth/textureBlendMode。
 """
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 import struct
@@ -83,6 +104,8 @@ from brush_converter.mapping import map_presets           # noqa: E402
 
 DEFAULT_OUT = _REPO_ROOT / "tests" / "abr-generated" / "one-test.abr"
 DEFAULT_TEMPLATE = _REPO_ROOT / "tests" / "测试用.abr"
+#: 任务 111 整套测试笔刷的输出目录（与 110 的 one-test.abr 同目录，总数 ≤20 支）
+SUITE_OUT_DIR = _REPO_ROOT / "tests" / "abr-generated"
 
 # 从零构造时的默认笔刷参数（写入 desc 的键值就是这五项，自检逐项核对）
 DEFAULT_NAME = "BC测试笔刷110"
@@ -91,6 +114,14 @@ DEFAULT_HARDNESS = 80.0     # 百分比（写入 Hrdn；采样笔尖的硬度同
 DEFAULT_SPACING = 25.0      # 百分比
 DEFAULT_ANGLE = 0.0         # 角度
 DEFAULT_TIP_SIZE = 64       # 笔尖位图边长（像素）
+
+# 任务 111：整套笔刷共用的固定值（改这里等于改整套测试集，清单要同步改）
+SUITE_PATTERN_NAME = "BC-noise64-v140"          # 自造纹理图案名（PS 图案面板可见）
+SUITE_PATTERN_UUID = "b5c0de11-1400-4a5b-8c6d-000000000111"
+SUITE_PATTERN_SIZE = 64                          # 纹理边长（灰度噪点）
+SUITE_PATTERN_SEED = "brushConverter-v140"       # 确定性噪点种子（可复现）
+SUITE_GROUP_NAME = "BC-v140 测试笔刷组"
+SUITE_GROUP_UUID = "b5c0de11-1400-4a5b-8c6d-0000000001a0"
 
 # 从零构造用的固定 UUID（可复现；PS 的 UUID 是 8-4-4-4-12 十六进制串）
 DEFAULT_UUID = "a1b2c3d4-1100-4a5b-8c6d-000000000110"
@@ -256,6 +287,38 @@ def encode_section(key: str, data: bytes) -> bytes:
 
 # ---------------------------------------------------------------- 采样笔尖
 
+def make_ellipse_tip(width: int = DEFAULT_TIP_SIZE, height: int | None = None,
+                     hardness: float = DEFAULT_HARDNESS) -> bytes:
+    """生成一个椭圆（非正方形）软边笔尖的原始像素（每像素 1 字节）。
+
+    任务 111 追加：间距组需要一个**非方形**采样笔尖，才能暴露任务 107 的
+    「间距基准 = 短边/长边」补偿（106 §4：PS 用渲染后短边作间距基准，
+    Krita 补白后用的是长边）。这里用椭圆而不是矩形，是为了在 PS/Krita
+    两侧都能一眼看出笔迹方向，且不依赖任何商用样本像素。
+    宽高相等时与 110 的 make_round_tip 数学公式相同（保持 one-test.abr 可复现）。
+    """
+    if height is None:
+        height = width
+    rx = width / 2.0
+    ry = height / 2.0
+    # 硬度 100% 时仍保留 1 像素过渡，避免出现锯齿硬边
+    feather = max(1.0, (1.0 - max(0.0, min(100.0, hardness)) / 100.0) * min(rx, ry))
+    pixels = bytearray(width * height)
+    for y in range(height):
+        dy = (y + 0.5 - ry) / ry
+        for x in range(width):
+            dx = (x + 0.5 - rx) / rx
+            # 归一化椭圆距离（中心 0、边界 1），再用「到边界的真实像素距离」算 alpha
+            norm = math.hypot(dx, dy)
+            inside = (1.0 - norm) * min(rx, ry)
+            if inside <= 0:
+                alpha = 0.0
+            else:
+                alpha = min(1.0, inside / feather)
+            pixels[y * width + x] = 255 - int(round(alpha * 255.0))
+    return bytes(pixels)
+
+
 def make_round_tip(size: int = DEFAULT_TIP_SIZE, hardness: float = DEFAULT_HARDNESS) -> bytes:
     """生成一个圆形软边笔尖的原始像素（每像素 1 字节）。
 
@@ -263,6 +326,7 @@ def make_round_tip(size: int = DEFAULT_TIP_SIZE, hardness: float = DEFAULT_HARDN
     所以这里先算不透明度 alpha（255=墨），再存 255-alpha。
     硬度控制边缘过渡宽度：100% ≈ 硬边，0% ≈ 从中心开始的渐变。
     """
+    # 110 的原始实现（等宽高）保留成独立路径，保证 one-test.abr 逐字节可复现
     radius = size / 2.0
     # 硬度 100% 时仍保留 1 像素过渡，避免出现锯齿硬边
     feather = max(1.0, (1.0 - max(0.0, min(100.0, hardness)) / 100.0) * radius)
@@ -323,6 +387,63 @@ def encode_samp_item(uuid: str, width: int, height: int, pixels: bytes,
     return struct.pack(">I", len(body)) + bytes(body) + b"\x00" * pad
 
 
+# ---------------------------------------------------------------- 纹理图案（patt）
+
+def make_noise_pattern(size: int = SUITE_PATTERN_SIZE,
+                       seed: str = SUITE_PATTERN_SEED) -> bytes:
+    """生成确定性的灰度噪点纹理（size×size，每像素 1 字节）。
+
+    不依赖 numpy、不读取任何外部图片：用 sha256 链式哈希展开成字节流，
+    同一 seed/size 永远得到同一份像素（可复现），也避免把商用纹理带进仓库。
+    纯高频噪点用来暴露「纹理缩放」的重采样差异（与任务 106 的 exp 纹理同类）。
+    """
+    out = bytearray()
+    block = hashlib.sha256(f"{seed}:{size}".encode("utf-8")).digest()
+    counter = 0
+    while len(out) < size * size:
+        block = hashlib.sha256(block + counter.to_bytes(4, "big")).digest()
+        out += block
+        counter += 1
+    return bytes(out[: size * size])
+
+
+def encode_pattern_record(name: str, uuid: str, width: int, height: int,
+                          pixels: bytes) -> bytes:
+    """编码一条灰度（颜色模式 1）纹理图案记录（含 u32 记录长与 4 字节对齐）。
+
+    结构照抄 patterns.py 的实测注释与样本（测试用.abr 的 "Stone" 80×80 灰度图案）：
+        u32 len | u32 version(1) | u32 颜色模式(1=灰度) | 2×i16 (宽,高 提示)
+        | u32 名字符数(含 NUL) | 名字 UTF-16BE | u8 名字节数 + UUID ASCII
+        | u32 VMA 版本(3) | u32 body 长 | body
+    body = 4×u32 矩形(0,0,高,宽) + u32 通道数(样本恒 24)
+           + (24+2) 个通道块；灰度只写第 1 个通道块，其余 is_written=0。
+    通道块 = u32 is_written(1) | u32 块长(23+像素) | u32 depth(8)
+             | 4×u32 矩形 | u16 像素位深(8) | u8 压缩(0=RAW) | 像素。
+    """
+    if len(pixels) != width * height:
+        raise ValueError("图案像素数与宽高不符")
+    ch = bytearray()
+    ch += struct.pack(">I", 1)                       # is_written = 1
+    ch += struct.pack(">I", 23 + len(pixels))        # 通道块长度
+    ch += struct.pack(">I", 8)                       # depth
+    ch += struct.pack(">4I", 0, 0, height, width)    # 通道矩形
+    ch += struct.pack(">HB", 8, 0)                   # 像素位深, 压缩=RAW
+    ch += pixels
+    ch += struct.pack(">I", 0) * 25                  # 其余 25 个空通道块
+    body = (struct.pack(">4I", 0, 0, height, width)
+            + struct.pack(">I", 24) + bytes(ch))
+
+    name_b = (name + "\x00").encode("utf-16-be")
+    uuid_b = uuid.encode("ascii")
+    rec = (struct.pack(">II", 1, 1)                   # version=1, 颜色模式=灰度
+           + struct.pack(">hh", width, height)        # 宽高提示
+           + struct.pack(">I", len(name) + 1) + name_b
+           + bytes([len(uuid_b)]) + uuid_b
+           + struct.pack(">II", 3, len(body)) + body)
+    pad = (-len(rec)) % 4
+    return struct.pack(">I", len(rec)) + rec + b"\x00" * pad
+
+
 # ---------------------------------------------------------------- 预设描述符
 
 def _dyn(bvty: int = 0, jitter: float = 0.0, minimum: float = 0.0) -> DescValue:
@@ -336,7 +457,11 @@ def _dyn(bvty: int = 0, jitter: float = 0.0, minimum: float = 0.0) -> DescValue:
 
 
 def build_preset(name: str, diameter: float, hardness: float, spacing: float,
-                 angle: float, tip_uuid: str, tip_name: str) -> DescValue:
+                 angle: float, tip_uuid: str, tip_name: str,
+                 roundness: float = 100.0,
+                 scatter_jitter: float | None = None,
+                 scatter_both_axes: bool = False,
+                 texture: dict | None = None) -> DescValue:
     """造一个「采样笔刷」预设（键集与样本 海怪笔刷#0 一致，另加 Hrdn）。
 
     键集说明：海怪样本的第一个预设只有 14 个顶层键（PS 自己写的、PS 能打开），
@@ -344,12 +469,17 @@ def build_preset(name: str, diameter: float, hardness: float, spacing: float,
     Hrdn 不是 PS 给采样笔刷写的键（采样笔刷的硬度烘在像素里），这里补上
     是为了让本项目解析器能读回「硬度」并与写入值比对；多一个键 PS 会忽略
     （模板路线生成的文件同样带 Hrdn，PS 实测能打开）。
+
+    任务 111 追加三个可选参数（默认值 = 110 的原行为，写成字节逐字节不变）：
+      roundness       圆度（Rndn，%，100=圆；角度组用 30 让椭圆可测）；
+      scatter_jitter  散布量（%，None=不启用；写了才加 useScatter 一族键）；
+      texture         纹理设置 dict（None=不启用；写了才加 useTexture 一族键）。
     """
     brsh = objc("sampledBrush", [
         ("Dmtr", untf(diameter, "#Pxl")),
         ("Hrdn", untf(hardness, "#Prc")),
         ("Angl", untf(angle, "#Ang")),
-        ("Rndn", untf(100.0, "#Prc")),
+        ("Rndn", untf(roundness, "#Prc")),
         ("Nm  ", text(tip_name)),
         ("Spcn", untf(spacing, "#Prc")),
         ("Intr", boolean(True)),
@@ -357,14 +487,14 @@ def build_preset(name: str, diameter: float, hardness: float, spacing: float,
         ("flipY", boolean(False)),
         ("sampledData", text(tip_uuid)),
     ])
-    return objc("brushPreset", [
+    items: list[tuple[str, DescValue]] = [
         ("Nm  ", text(name)),
         ("Brsh", brsh),
         ("useTipDynamics", boolean(False)),
-        ("useScatter", boolean(False)),
+        ("useScatter", boolean(scatter_jitter is not None)),
         ("dualBrush", objc("dualBrush", [("useDualBrush", boolean(False))])),
         ("brushGroup", objc("brushGroup", [("useBrushGroup", boolean(False))])),
-        ("useTexture", boolean(False)),
+        ("useTexture", boolean(texture is not None)),
         ("usePaintDynamics", boolean(False)),
         ("useColorDynamics", boolean(False)),
         ("Wtdg", boolean(False)),
@@ -372,7 +502,96 @@ def build_preset(name: str, diameter: float, hardness: float, spacing: float,
         ("Rpt ", boolean(False)),
         ("useBrushSize", boolean(False)),
         ("useBrushPose", boolean(False)),
+    ]
+    # 散布键只在启用时追加（保持 110 默认键序不变）
+    if scatter_jitter is not None:
+        items.extend(_scatter_items(scatter_jitter, scatter_both_axes))
+    # 纹理键只在启用时追加
+    if texture is not None:
+        items.extend(_texture_items(texture))
+    return objc("brushPreset", items)
+
+
+def _scatter_items(jitter: float, both_axes: bool) -> list[tuple[str, DescValue]]:
+    """散布一族键：useScatter 已在外层写，这里补计数/双轴/散布动态。
+
+    样本写法（测试用.abr preset 3）：useScatter + Cnt(doub) + bothAxes(bool)
+    + countDynamics(brVr) + scatterDynamics(brVr)。
+    散布量真正来源是 scatterDynamics.jitter（映射层注释与矩阵同口径）。
+    """
+    return [
+        ("Cnt ", double(1.0)),
+        ("bothAxes", boolean(both_axes)),
+        ("countDynamics", _dyn()),
+        ("scatterDynamics", _dyn(jitter=jitter)),
+    ]
+
+
+def _texture_items(texture: dict) -> list[tuple[str, DescValue]]:
+    """纹理一族键（键名与样本一致；缺省键由 PS 取默认值）。"""
+    return [
+        ("brushProjection", boolean(False)),
+        ("TxtC", boolean(True)),
+        ("interpretation", boolean(True)),
+        ("textureBlendMode", enum("BlnM", str(texture["blend"]))),
+        ("textureDepth", untf(float(texture["depth"]), "#Prc")),
+        ("minimumDepth", untf(0.0, "#Prc")),
+        ("textureDepthDynamics", _dyn()),
+        ("Txtr", objc("Ptrn", [
+            ("Nm  ", text(str(texture["name"]))),
+            ("Idnt", text(str(texture["uuid"]))),
+        ])),
+        ("textureScale", untf(float(texture["scale"]), "#Prc")),
+        ("InvT", boolean(bool(texture.get("invert", False)))),
+        ("protectTexture", boolean(False)),
+        ("textureBrightness", integer(0)),
+        ("textureContrast", integer(0)),
+    ]
+
+
+def build_computed_preset(name: str, diameter: float, hardness: float, spacing: float,
+                          angle: float, roundness: float = 100.0,
+                          scatter_jitter: float | None = None,
+                          scatter_both_axes: bool = False,
+                          texture: dict | None = None) -> DescValue:
+    """造一个「计算笔刷」预设（Brsh 类 = computedBrush，无采样笔尖）。
+
+    键集照抄 tests/定量测试专用.abr 的 computedBrush：
+    Dmtr/Hrdn/Angl/Rndn/Spcn/Intr/flipX/flipY（无 sampledData、无 Brsh.Nm）。
+    计算笔刷的尺寸/硬度/圆度是**真参数**（不是烘在像素里），所以尺寸组、
+    硬度组、角度组、散布组、缩放组都用它做载体。
+    """
+    brsh = objc("computedBrush", [
+        ("Dmtr", untf(diameter, "#Pxl")),
+        ("Hrdn", untf(hardness, "#Prc")),
+        ("Angl", untf(angle, "#Ang")),
+        ("Rndn", untf(roundness, "#Prc")),
+        ("Spcn", untf(spacing, "#Prc")),
+        ("Intr", boolean(True)),
+        ("flipX", boolean(False)),
+        ("flipY", boolean(False)),
     ])
+    items: list[tuple[str, DescValue]] = [
+        ("Nm  ", text(name)),
+        ("Brsh", brsh),
+        ("useTipDynamics", boolean(False)),
+        ("useScatter", boolean(scatter_jitter is not None)),
+        ("dualBrush", objc("dualBrush", [("useDualBrush", boolean(False))])),
+        ("brushGroup", objc("brushGroup", [("useBrushGroup", boolean(False))])),
+        ("useTexture", boolean(texture is not None)),
+        ("usePaintDynamics", boolean(False)),
+        ("useColorDynamics", boolean(False)),
+        ("Wtdg", boolean(False)),
+        ("Nose", boolean(False)),
+        ("Rpt ", boolean(False)),
+        ("useBrushSize", boolean(False)),
+        ("useBrushPose", boolean(False)),
+    ]
+    if scatter_jitter is not None:
+        items.extend(_scatter_items(scatter_jitter, scatter_both_axes))
+    if texture is not None:
+        items.extend(_texture_items(texture))
+    return objc("brushPreset", items)
 
 
 def build_phry(group_name: str, group_uuid: str, preset_count: int) -> bytes:
@@ -389,17 +608,56 @@ def build_phry(group_name: str, group_uuid: str, preset_count: int) -> bytes:
 # ---------------------------------------------------------------- 从零构造
 
 def build_abr_zero(name: str, diameter: float, hardness: float, spacing: float,
-                   angle: float, tip_size: int, uuid: str) -> bytes:
-    """从零拼一个 v6.2 ABR：samp(1 个笔尖) + desc(1 个预设) + phry(1 个组)。"""
-    pixels = make_round_tip(tip_size, hardness)
-    samp = encode_samp_item(uuid, tip_size, tip_size, pixels, compression=0)
-    preset = build_preset(name, diameter, hardness, spacing, angle, uuid, name + " 形状")
+                   angle: float, tip_size: int, uuid: str,
+                   kind: str = "sampled",
+                   tip_width: int | None = None, tip_height: int | None = None,
+                   tip_hardness: float | None = None,
+                   roundness: float = 100.0,
+                   scatter_jitter: float | None = None,
+                   scatter_both_axes: bool = False,
+                   texture: dict | None = None) -> bytes:
+    """从零拼一个 v6.2 ABR：samp + [patt] + desc(1 个预设) + phry(1 个组)。
+
+    默认参数（kind=sampled、方形笔尖、无散布/纹理）与 110 的产物逐字节一致，
+    保证 one-test.abr 可复现；任务 111 只通过新参数追加能力。
+    区段顺序照抄三个样本：samp → patt → desc → phry。
+    """
+    if kind == "computed":
+        # 计算笔刷：samp 区长度为 0（样本 定量测试专用.abr 实测 PS 能打开）
+        preset = build_computed_preset(name, diameter, hardness, spacing, angle,
+                                       roundness=roundness,
+                                       scatter_jitter=scatter_jitter,
+                                       scatter_both_axes=scatter_both_axes,
+                                       texture=texture)
+        sections = [encode_section("samp", b"")]
+    else:
+        w = tip_width if tip_width is not None else tip_size
+        h = tip_height if tip_height is not None else tip_size
+        hard = hardness if tip_hardness is None else tip_hardness
+        if (w, h) == (tip_size, tip_size) and tip_hardness is None:
+            pixels = make_round_tip(tip_size, hardness)   # 110 原路径
+        else:
+            pixels = make_ellipse_tip(w, h, hard)
+        samp = encode_samp_item(uuid, w, h, pixels, compression=0)
+        preset = build_preset(name, diameter, hardness, spacing, angle, uuid,
+                              name + " 形状", roundness=roundness,
+                              scatter_jitter=scatter_jitter,
+                              scatter_both_axes=scatter_both_axes,
+                              texture=texture)
+        sections = [encode_section("samp", samp)]
+
+    if texture is not None:
+        pattern = make_noise_pattern(int(texture.get("size", SUITE_PATTERN_SIZE)),
+                                     str(texture.get("seed", SUITE_PATTERN_SEED)))
+        psize = int(texture.get("size", SUITE_PATTERN_SIZE))
+        record = encode_pattern_record(str(texture["name"]), str(texture["uuid"]),
+                                       psize, psize, pattern)
+        sections.append(encode_section("patt", record))
+
     desc = encode_desc_section([("Brsh", vlls([preset]))])
     phry = build_phry(DEFAULT_GROUP_NAME, DEFAULT_GROUP_UUID, 1)
-    return (struct.pack(">HH", 6, 2)
-            + encode_section("samp", samp)
-            + encode_section("desc", desc)
-            + encode_section("phry", phry))
+    sections.extend([encode_section("desc", desc), encode_section("phry", phry)])
+    return struct.pack(">HH", 6, 2) + b"".join(sections)
 
 
 # ---------------------------------------------------------------- 模板改写
@@ -515,8 +773,10 @@ def verify(path: Path, expect: dict) -> tuple[bool, list[tuple[str, object, obje
     ck("主版本", abr.version, 6)
     ck("子版本", abr.subversion, 2)
     ck("区段", list(abr.sections), expect["sections"])
-    ck("诊断信息", abr.diagnostics, [])
-    ck("采样笔尖数", len(abr.tips), 1)
+    want_diag = expect.get("diagnostics", [])
+    ck("诊断信息", abr.diagnostics, want_diag)
+    kind = expect.get("kind", "sampled")
+    ck("采样笔尖数", len(abr.tips), 0 if kind == "computed" else 1)
     if len(abr.tips) == 1:
         tip = abr.tips[0]
         ck("笔尖尺寸(WxH)", (tip.width, tip.height), tuple(expect["tip_size"]))
@@ -532,20 +792,42 @@ def verify(path: Path, expect: dict) -> tuple[bool, list[tuple[str, object, obje
         ck("硬度", p.hardness, expect["hardness"])
         ck("间距(%)", p.spacing * 100.0, expect["spacing"])
         ck("角度", p.angle, expect["angle"])
-        ck("笔尖已关联", p.is_computed, False)
-        # 蒙版数组形状是 (高, 宽)，期望值里存的是 [宽, 高]，这里要反过来
-        w, h = expect["tip_size"][0], expect["tip_size"][1]
-        ck("蒙版尺寸", None if p.tip_gray is None else tuple(p.tip_gray.shape), (h, w))
-        if p.tip_gray is not None:
-            if expect.get("check_tip_center"):
-                # 从零构造的圆笔尖：中心必须是墨（255）、角落必须是透明（0）
-                ck("蒙版中心值", int(p.tip_gray[p.tip_gray.shape[0] // 2,
-                                               p.tip_gray.shape[1] // 2]), 255)
-                ck("蒙版角落值", int(p.tip_gray[0, 0]), 0)
-            else:
-                # 模板笔尖形状任意：只要求「有墨也有透明」，否则 PS/Krita 里看不见
-                ck("蒙版含墨(最大值)", int(p.tip_gray.max()), 255)
-                ck("蒙版含透明(最小值)", int(p.tip_gray.min()), 0)
+        ck("圆度", p.roundness, expect.get("roundness", 100.0))
+        ck("笔尖已关联", p.is_computed, kind == "computed")
+        if kind == "sampled":
+            # 蒙版数组形状是 (高, 宽)，期望值里存的是 [宽, 高]，这里要反过来
+            w, h = expect["tip_size"][0], expect["tip_size"][1]
+            ck("蒙版尺寸", None if p.tip_gray is None else tuple(p.tip_gray.shape), (h, w))
+            if p.tip_gray is not None:
+                if expect.get("check_tip_center"):
+                    # 从零构造的椭圆笔尖：中心必须是墨（255）、角落必须是透明（0）
+                    ck("蒙版中心值", int(p.tip_gray[p.tip_gray.shape[0] // 2,
+                                                   p.tip_gray.shape[1] // 2]), 255)
+                    ck("蒙版角落值", int(p.tip_gray[0, 0]), 0)
+                else:
+                    # 模板笔尖形状任意：只要求「有墨也有透明」，否则 PS/Krita 里看不见
+                    ck("蒙版含墨(最大值)", int(p.tip_gray.max()), 255)
+                    ck("蒙版含透明(最小值)", int(p.tip_gray.min()), 0)
+
+        # 散布（任务 111）：期望里 scatter 为 None 表示未启用
+        want_scatter = expect.get("scatter")
+        ck("散布启用", p.scatter, want_scatter is not None)
+        if want_scatter is not None:
+            ck("散布量(%)", p.scatter_amount, want_scatter["jitter"])
+            ck("散布双轴", p.scatter_both_axes, want_scatter["both_axes"])
+
+        # 纹理（任务 111）：期望里 texture 为 None 表示未启用
+        want_tex = expect.get("texture")
+        ck("纹理启用", p.texture is not None, want_tex is not None)
+        if want_tex is not None and p.texture is not None:
+            ck("纹理缩放(%)", p.texture.scale, want_tex["scale"])
+            ck("纹理图案名", p.texture.name, want_tex["name"])
+            ck("纹理混合模式", p.texture.blend_mode, want_tex["blend"])
+            ck("纹理深度(%)", p.texture.depth, want_tex["depth"])
+            ck("纹理位图", None if p.texture.image is None else tuple(p.texture.image.shape[:2]),
+               (want_tex["size"], want_tex["size"]))
+            ck("图案数(patt)", len(abr.patterns), 1)
+
 
     ok = all(r[3] for r in rows)
     return ok, rows
@@ -557,6 +839,217 @@ def print_table(rows: list[tuple[str, object, object, bool]]) -> None:
     for label, got, want, ok in rows:
         print(f"  {label:<12} {str(got):<28} {str(want):<28} {'通过' if ok else '失败'}")
     print(f"  合计 {sum(1 for r in rows if r[3])}/{len(rows)} 项通过")
+
+
+# ---------------------------------------------------------------- 任务 111：整套测试笔刷
+
+def _texture_spec(scale: float, depth: float = 100.0, blend: str = "Mltp") -> dict:
+    """任务 111 的纹理规格（固定用自造噪点图案，只让 scale 变化）。"""
+    return {
+        "name": SUITE_PATTERN_NAME,
+        "uuid": SUITE_PATTERN_UUID,
+        "scale": float(scale),
+        "depth": float(depth),
+        "blend": blend,
+        "size": SUITE_PATTERN_SIZE,
+        "seed": SUITE_PATTERN_SEED,
+    }
+
+
+def _tip_uuid(index: int) -> str:
+    """整套笔刷里每个采样笔尖的固定 UUID（同索引每次生成不变，便于复现）。"""
+    return f"b5c0de22-1400-4a5b-8c6d-{index:012d}"
+
+
+def test_suite() -> list[dict]:
+    """任务 111 的 19 支测试笔刷规格（中文注释即清单依据）。
+
+    约定：**组内只有一个参数不同**；组间基础可以不同（参数载体不同），
+    control-default 是无动态/无纹理的全局对照。参数组与清单
+    `docs/测试笔刷验证清单.md` 一一对应，改这里必须同步改清单。
+    """
+    items: list[dict] = []
+
+    # 0) 全默认对照笔（与 110 的 one-test.abr 同参数，只换名字与 UUID）
+    items.append(dict(
+        file="control-default.abr", name="BC-v140-control-default",
+        group="control", param="无（对照）", value=None,
+        diameter=64.0, hardness=80.0, spacing=25.0, angle=0.0,
+        kind="sampled", tip_size=64, tip_hardness=80.0, uuid=_tip_uuid(1),
+        note="不改任何参数：圆形 64px 软边采样笔尖，硬度 80、间距 25%、角度 0、无散布/纹理",
+    ))
+
+    # 1) 间距组：非方形采样笔尖（128×100，短/长 = 0.78125 ≈ 106 的 143/183），
+    #    只改 Spcn 10/50/100 → 暴露任务 107 的「间距基准 = 短边/长边」补偿。
+    for v in (10.0, 50.0, 100.0):
+        items.append(dict(
+            file=f"spacing-{int(v):03d}.abr", name=f"BC-v140-spacing-{int(v):03d}",
+            group="spacing", param="间距 Spcn", value=v,
+            diameter=112.0, hardness=80.0, spacing=v, angle=0.0,
+            kind="sampled", tip_width=128, tip_height=100, tip_hardness=100.0,
+            uuid=_tip_uuid(10 + int(v)), note="非方形采样笔尖 128×100（短/长 0.78125），硬边；只改间距",
+        ))
+
+    # 2) 尺寸组：计算笔刷，直径 20/100/300，其余固定（硬度 100、间距 100）
+    for v in (20.0, 100.0, 300.0):
+        items.append(dict(
+            file=f"size-{int(v):03d}.abr", name=f"BC-v140-size-{int(v):03d}",
+            group="size", param="尺寸 Dmtr", value=v,
+            diameter=v, hardness=100.0, spacing=100.0, angle=0.0,
+            kind="computed", note="计算笔刷（圆度 100、硬度 100、间距 100）；只改直径",
+        ))
+
+    # 3) 硬度组：计算笔刷 D=200，硬度 0/50/100，其余固定
+    for v in (0.0, 50.0, 100.0):
+        items.append(dict(
+            file=f"hardness-{int(v):03d}.abr", name=f"BC-v140-hardness-{int(v):03d}",
+            group="hardness", param="硬度 Hrdn", value=v,
+            diameter=200.0, hardness=v, spacing=100.0, angle=0.0,
+            kind="computed", note="计算笔刷 D=200、间距 100；只改硬度",
+        ))
+
+    # 4) 散布组：计算笔刷 D=100、间距 50，散布 0/100/300（单轴，笔迹横向为 x）
+    for v in (0.0, 100.0, 300.0):
+        items.append(dict(
+            file=f"scatter-{int(v):03d}.abr", name=f"BC-v140-scatter-{int(v):03d}",
+            group="scatter", param="散布 scatterDynamics.jitter", value=v,
+            diameter=100.0, hardness=100.0, spacing=50.0, angle=0.0,
+            kind="computed", scatter=v, scatter_both_axes=False,
+            note="计算笔刷 D=100、间距 50、单轴散布；只改散布量",
+        ))
+
+    # 5) 角度组：计算笔刷 D=200、圆度 30（椭圆可测主轴），角度 0/45/90
+    for v in (0.0, 45.0, 90.0):
+        items.append(dict(
+            file=f"angle-{int(v):03d}.abr", name=f"BC-v140-angle-{int(v):03d}",
+            group="angle", param="角度 Angl", value=v,
+            diameter=200.0, hardness=100.0, spacing=100.0, angle=v,
+            kind="computed", roundness=30.0,
+            note="计算笔刷 D=200、圆度 30%（椭圆）；只改角度",
+        ))
+
+    # 6) 缩放组：计算笔刷 D=200、间距 1000（单笔尖），纹理 50/100/200
+    for v in (50.0, 100.0, 200.0):
+        items.append(dict(
+            file=f"scale-{int(v):03d}.abr", name=f"BC-v140-scale-{int(v):03d}",
+            group="scale", param="纹理缩放 textureScale", value=v,
+            diameter=200.0, hardness=100.0, spacing=1000.0, angle=0.0,
+            kind="computed", texture=_texture_spec(v),
+            note="计算笔刷 D=200、间距 1000（单笔尖）、纹理深度 100/正片叠底；只改纹理缩放",
+        ))
+
+    return items
+
+
+def _spec_to_expect(spec: dict, out_name: str) -> dict:
+    """把规格转成 --check 用的期望值清单。"""
+    texture = spec.get("texture")
+    kind = spec.get("kind", "sampled")
+    if kind == "computed":
+        tip_size = [0, 0]
+        diagnostics = ["samp 区为空，未包含任何采样笔尖"]
+    else:
+        w = spec.get("tip_width") or spec.get("tip_size", DEFAULT_TIP_SIZE)
+        h = spec.get("tip_height") or spec.get("tip_size", DEFAULT_TIP_SIZE)
+        tip_size = [w, h]
+        diagnostics = []
+    sections = ["samp"] + (["patt"] if texture else []) + ["desc", "phry"]
+    return {
+        "mode": "zero",
+        "kind": kind,
+        "name": spec["name"],
+        "diameter": float(spec["diameter"]),
+        "hardness": float(spec["hardness"]),
+        "spacing": float(spec["spacing"]),
+        "angle": float(spec["angle"]),
+        "roundness": float(spec.get("roundness", 100.0)),
+        "uuid": spec.get("uuid", ""),
+        "tip_size": tip_size,
+        "sections": sections,
+        "diagnostics": diagnostics,
+        "scatter": (None if spec.get("scatter") is None else
+                    {"jitter": float(spec["scatter"]),
+                     "both_axes": bool(spec.get("scatter_both_axes", False))}),
+        "texture": (None if texture is None else
+                    {"scale": float(texture["scale"]),
+                     "name": texture["name"],
+                     "blend": texture["blend"],
+                     "depth": float(texture["depth"]),
+                     "size": int(texture["size"])}),
+        "check_tip_center": kind == "sampled",
+        "out": out_name,
+    }
+
+
+def generate_spec(spec: dict) -> tuple[bytes, dict]:
+    """按规格生成 .abr 字节与期望值清单（suite 与单支 CLI 共用）。"""
+    kind = spec.get("kind", "sampled")
+    texture = spec.get("texture")
+    data = build_abr_zero(
+        spec["name"], float(spec["diameter"]), float(spec["hardness"]),
+        float(spec["spacing"]), float(spec["angle"]),
+        int(spec.get("tip_size", DEFAULT_TIP_SIZE)), spec.get("uuid", DEFAULT_UUID),
+        kind=kind,
+        tip_width=spec.get("tip_width"), tip_height=spec.get("tip_height"),
+        tip_hardness=spec.get("tip_hardness"),
+        roundness=float(spec.get("roundness", 100.0)),
+        scatter_jitter=(None if spec.get("scatter") is None else float(spec["scatter"])),
+        scatter_both_axes=bool(spec.get("scatter_both_axes", False)),
+        texture=texture,
+    )
+    return data, _spec_to_expect(spec, Path(spec["file"]).name)
+
+
+def run_suite(out_dir: Path) -> int:
+    """生成整套 19 支测试笔刷并逐支自检；任一支失败返回 1。"""
+    out_dir.mkdir(parents=True, exist_ok=True)
+    print("整套测试笔刷（任务 111，共 %d 支；含 110 的 one-test.abr 后 ≤20 支）" % len(test_suite()))
+    print(f"  {'文件':<22} {'笔名':<26} {'组':<9} {'取值':<8} 结果")
+    failed = 0
+    for spec in test_suite():
+        data, expect = generate_spec(spec)
+        out_path = out_dir / spec["file"]
+        out_path.write_bytes(data)
+        expect_path = out_path.with_suffix(".json")
+        expect_path.write_text(json.dumps(expect, ensure_ascii=False, indent=2) + "\n",
+                               encoding="utf-8")
+        ok, rows = verify(out_path, expect)
+        passed = sum(1 for r in rows if r[3])
+        value = "" if spec.get("value") is None else f"{spec['value']:g}"
+        result = f"{'通过' if ok else '失败'} {passed}/{len(rows)}"
+        print(f"  {spec['file']:<22} {spec['name']:<26} {spec['group']:<9} {value:<8} {result}")
+        if not ok:
+            failed += 1
+            for label, got, want, good in rows:
+                if not good:
+                    print(f"      ! {label}: 回读={got!r} 期望={want!r}")
+    print(f"整套自检：{len(test_suite()) - failed}/{len(test_suite())} 支通过")
+    return 0 if failed == 0 else 1
+
+
+def check_suite(out_dir: Path) -> int:
+    """对整套已生成文件重跑自检（不写文件）。"""
+    failed = 0
+    items = test_suite()
+    for spec in items:
+        out_path = out_dir / spec["file"]
+        meta_path = out_path.with_suffix(".json")
+        if not out_path.exists() or not meta_path.exists():
+            print(f"  {spec['file']}: 缺文件或缺自检清单")
+            failed += 1
+            continue
+        expect = json.loads(meta_path.read_text(encoding="utf-8"))
+        expect["tip_size"] = tuple(expect["tip_size"])
+        ok, rows = verify(out_path, expect)
+        passed = sum(1 for r in rows if r[3])
+        print(f"  {spec['file']:<22} {'通过' if ok else '失败'} {passed}/{len(rows)}")
+        if not ok:
+            failed += 1
+            for label, got, want, good in rows:
+                if not good:
+                    print(f"      ! {label}: 回读={got!r} 期望={want!r}")
+    print(f"整套重新自检：{len(items) - failed}/{len(items)} 支通过")
+    return 0 if failed == 0 else 1
 
 
 # ---------------------------------------------------------------- 入口
@@ -578,10 +1071,37 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--tip-size", type=int, default=DEFAULT_TIP_SIZE,
                     help="从零构造时笔尖位图边长（像素）")
     ap.add_argument("--uuid", default=DEFAULT_UUID, help="从零构造时笔尖 UUID")
+    ap.add_argument("--kind", choices=("sampled", "computed"), default="sampled",
+                    help="从零构造的笔刷类型（computed=计算笔刷，无采样笔尖）")
+    ap.add_argument("--tip-width", type=int, default=None,
+                    help="从零构造时笔尖位图宽（像素；与 --tip-height 不同即非方形）")
+    ap.add_argument("--tip-height", type=int, default=None, help="从零构造时笔尖位图高（像素）")
+    ap.add_argument("--tip-hardness", type=float, default=None,
+                    help="烘进笔尖像素的硬度（默认跟 --hardness；采样笔刷专用）")
+    ap.add_argument("--roundness", type=float, default=100.0, help="圆度（%，100=圆）")
+    ap.add_argument("--scatter", type=float, default=None,
+                    help="散布量（%%）；给了才启用 useScatter 一族键")
+    ap.add_argument("--scatter-both-axes", action="store_true", help="散布沿两轴")
+    ap.add_argument("--texture-scale", type=float, default=None,
+                    help="纹理缩放（%%）；给了才启用纹理并写 patt 区（自造噪点图案）")
+    ap.add_argument("--texture-depth", type=float, default=100.0, help="纹理深度（百分比）")
+    ap.add_argument("--texture-blend", default="Mltp",
+                    help="纹理混合模式（PS 成员 id，如 Mltp/Hght/linearHeight）")
+    ap.add_argument("--suite", action="store_true",
+                    help="任务 111：生成整套 19 支测试笔刷到 tests/abr-generated/")
+    ap.add_argument("--suite-out", default=str(SUITE_OUT_DIR),
+                    help="整套输出目录（默认 tests/abr-generated/）")
+    ap.add_argument("--check-suite", action="store_true",
+                    help="任务 111：重新自检整套笔刷（不写文件）")
     ap.add_argument("--check", default=None,
                     help="只自检：读回指定 .abr（同目录同名 .json 提供期望值）")
     ap.add_argument("--no-check", action="store_true", help="写完不做自检")
     args = ap.parse_args(argv)
+
+    if args.suite:
+        return run_suite(Path(args.suite_out).resolve())
+    if args.check_suite:
+        return check_suite(Path(args.suite_out).resolve())
 
     if args.check:
         check_path = Path(args.check).resolve()
@@ -600,19 +1120,40 @@ def main(argv: list[str] | None = None) -> int:
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
     if args.mode == "zero":
+        tip_w = args.tip_width if args.tip_width is not None else args.tip_size
+        tip_h = args.tip_height if args.tip_height is not None else args.tip_size
+        texture = (None if args.texture_scale is None else
+                   _texture_spec(args.texture_scale, args.texture_depth, args.texture_blend))
         data = build_abr_zero(args.name, args.diameter, args.hardness, args.spacing,
-                              args.angle, args.tip_size, args.uuid)
+                              args.angle, args.tip_size, args.uuid,
+                              kind=args.kind,
+                              tip_width=args.tip_width, tip_height=args.tip_height,
+                              tip_hardness=args.tip_hardness,
+                              roundness=args.roundness,
+                              scatter_jitter=args.scatter,
+                              scatter_both_axes=args.scatter_both_axes,
+                              texture=texture)
         expect = {
             "mode": "zero",
+            "kind": args.kind,
             "name": args.name,
             "diameter": args.diameter,
             "hardness": args.hardness,
             "spacing": args.spacing,
             "angle": args.angle,
+            "roundness": args.roundness,
             "uuid": args.uuid,
-            "tip_size": [args.tip_size, args.tip_size],
-            "sections": ["samp", "desc", "phry"],
-            "check_tip_center": True,
+            "tip_size": [tip_w, tip_h],
+            "sections": (["samp"] + (["patt"] if texture else []) + ["desc", "phry"]),
+            "diagnostics": (["samp 区为空，未包含任何采样笔尖"]
+                            if args.kind == "computed" else []),
+            "scatter": (None if args.scatter is None else
+                        {"jitter": args.scatter, "both_axes": args.scatter_both_axes}),
+            "texture": (None if texture is None else
+                        {"scale": texture["scale"], "name": texture["name"],
+                         "blend": texture["blend"], "depth": texture["depth"],
+                         "size": texture["size"]}),
+            "check_tip_center": args.kind == "sampled",
         }
     else:
         data, meta = build_abr_from_template(Path(args.template).resolve(),
@@ -648,7 +1189,7 @@ def main(argv: list[str] | None = None) -> int:
     if not ok:
         print("自检失败：回读值与写入值不一致（详见上表）", file=sys.stderr)
         return 1
-    print("自检通过：1 支笔刷、1 个笔尖，键值逐项一致。")
+    print("自检通过：1 支笔刷，键值逐项一致。")
     return 0
 
 

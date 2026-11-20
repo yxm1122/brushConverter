@@ -1,0 +1,27 @@
+{
+  "mode": "zero",
+  "kind": "computed",
+  "name": "BC-v140-size-100",
+  "diameter": 100.0,
+  "hardness": 100.0,
+  "spacing": 100.0,
+  "angle": 0.0,
+  "roundness": 100.0,
+  "uuid": "",
+  "tip_size": [
+    0,
+    0
+  ],
+  "sections": [
+    "samp",
+    "desc",
+    "phry"
+  ],
+  "diagnostics": [
+    "samp 区为空，未包含任何采样笔尖"
+  ],
+  "scatter": null,
+  "texture": null,
+  "check_tip_center": false,
+  "out": "size-100.abr"
+}
