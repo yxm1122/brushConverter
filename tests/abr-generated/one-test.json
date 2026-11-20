@@ -1,0 +1,20 @@
+{
+  "mode": "zero",
+  "name": "BC测试笔刷110",
+  "diameter": 64.0,
+  "hardness": 80.0,
+  "spacing": 25.0,
+  "angle": 0.0,
+  "uuid": "a1b2c3d4-1100-4a5b-8c6d-000000000110",
+  "tip_size": [
+    64,
+    64
+  ],
+  "sections": [
+    "samp",
+    "desc",
+    "phry"
+  ],
+  "check_tip_center": true,
+  "out": "one-test.abr"
+}
