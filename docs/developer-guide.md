@@ -421,6 +421,25 @@ paintoppresets/*.kpp          自包含笔刷预设
     `HEIGHT_STRENGTH_GAIN`、`_HEIGHT_BLEND_MODES`、`_texture_strength()`。
     证据：`docs/验收报告/实验-归因-报告.md` §4.2/§4.3、`docs/验收报告/实验-Krita侧-报告.md` §17。
 
+### 7.7 资源注册与 md5 语义层面（2026-11 缺陷复盘新增）
+
+24. **`.kpp` 内嵌纹理的 `Texture/Pattern/PatternMD5` 必须留空**。Krita 自己保存预设时会写入 16 字节二进制
+    （可能在 XML 里产生非法字符），加载时第一步就把它删掉（`kis_paintop_preset.cpp:189-193`）；
+    真正参与校验的是内嵌 resource 的 `md5sum` 属性与 `Texture/Pattern/PatternMD5Sum` 参数，
+    **两者都必须等于内嵌 PNG 文件字节的 md5**——Krita 从不哈希解码后的像素（`KoMD5Generator` 直接对字节做 `QCryptographicHash::Md5`）。
+    填了 `PatternMD5` 会改变「按 md5 去重」的取用语义，且没有收益。v1.2.1 给内嵌 PNG 追加 tEXt 让字节 md5 必然不同，
+    只是规避「同 md5 被库内图案去重」的坑，解码像素逐字节不变；它不改变 md5 的计算对象。
+    回归检查：转换产物里 `resource@md5sum == PatternMD5Sum == md5(内嵌PNG)`（可用 `tools/diagnose_profile.py --bundle ... --predict` 一次看出）。
+
+25. **bundle 文件在磁盘上 ≠ 已被 Krita 注册**。Krita 的注册结果只在 `resourcecache.sqlite` 的 `storages`/`resources` 行里；
+    覆盖 bundle 后若没有完整重启 Krita，或 cache 已损坏，就会出现「资源库看着正常，但笔刷不可见 / 纹理静默丢失」且**零报错**：
+    - 删掉/移走 bundle 文件 → 下次启动 Krita 会**静默删除**该 storage 与整包预设（对应「导入的笔刷彻底不可见」）；
+    - bundle 被截断/不完整（复制或覆盖中断、磁盘满、杀软锁文件）→ 预设仍可见可画，但内嵌纹理侧载**静默失败**
+      （实测 006 的 Alpha 非零数 8844→4672，纹理列表为空）。
+    排查：看 `storages.location` 有没有对应行、`resources.status` 是否 active、`PRAGMA integrity_check` 是否 ok；
+    修复：退出 Krita → 备份并删除 `resourcecache.sqlite` 让其重建 → 重启 Krita → 重新导入 bundle；
+    覆盖产物时务必「先退出 Krita，复制完成后再启动」。一条命令体检：`python tools/diagnose_profile.py --krita-dir "%APPDATA%/krita" --bundle <你的.bundle> --predict`。
+
 ## 8. 参考实现与样本
 
 - **GIMP**（GPL）：`app/core/gimpbrush-load.c` + `gimp-utils.c`——ABR v6 笔尖解析与 RLE 解码的权威来源。
