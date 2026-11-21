@@ -11,7 +11,7 @@
   - legacy     （历史方案，v1.1.2 及更早）经验公式，可用环境变量一键回退：
         BRUSHCONVERTER_TEXTURE_FORMULA=legacy python cli.py convert ...
 回退理由：新公式是研究产物，一旦退化必须能立刻回到旧行为。
-转正依据（A/B 掩码空间 70.75% → 0.00%）与限制见 docs/验收报告/13-报告.md。
+转正依据（A/B 掩码空间 70.75% → 0.00%）与限制见 docs/parameter-mapping.md §7.1。
 """
 
 from __future__ import annotations
@@ -228,7 +228,7 @@ def _resources_xml(resources: list[tuple[str, str, str, bytes]]) -> str:
 # ---------------------------------------------------------------------------
 # 纹理亮度/对比度：公式开关与两条实现（任务 13）
 #
-# PS 侧真值来自任务 12（docs/研究报告/lut-拟合.md）：
+# PS 侧真值来自任务 12 拟合（见 docs/parameter-mapping.md §7.1）：
 #   对比度中心 p = 127（0..255 尺度），因子 k = 1+C/100（C<0）或 1/(1-C/100)（C>=0）；
 #   顺序随对比度符号翻转：C>=0 先亮度后对比度，C<0 先对比度后亮度。
 # Krita 侧真值来自 KisTextureMaskInfo::recalculateMask()（tools/texture_mask.py 精确复刻）：
@@ -273,7 +273,7 @@ def _texture_contrast_factor(ps_contrast: float) -> float:
     """Photoshop 纹理对比度 → 中心乘法因子 k（两条路径共用，未舍入）。
 
     C < 0：k = 1 + C/100；C >= 0：k = 1/(1-C/100)；C >= 100 用 1e6 逼近完全二值化。
-    依据任务 12 拟合（docs/研究报告/lut-拟合.md 第 4.1 节：实测 k 与经验公式一致）。
+    依据任务 12 拟合（见 docs/parameter-mapping.md §7.1：实测 k 与经验公式一致）。
     """
     c = max(-50.0, min(100.0, ps_contrast))
     if c < 0.0:
@@ -304,28 +304,13 @@ def _texture_contrast_legacy(ps_contrast: float) -> float:
 def _texture_brightness_contrast_calibrated(
     ps_brightness: float, ps_contrast: float
 ) -> tuple[float, float]:
-    """现行方案（v1.2.0 起默认）：任务 12 拟合公式的精确逆，闭式推导见下。
+    """现行方案（v1.2.0 起默认）：任务 12 拟合公式的精确逆。
 
-    记 PS 亮度值 b（-150..150，0..255 尺度）、对比度因子 k（0..2 可表达），
-    Krita 前置掩码（0..255 尺度）为
-        U_k = k*t - 255*k*b_k + 127.5*(1-k)          （唯一一次 clamp 在出口）
-    PS 前置掩码（0..255 尺度）按任务 12 的符号规则：
-        C >= 0（先亮度后对比度） U = k*clip(t+b) + 127*(1-k)
-        C <  0（先对比度后亮度） U = clip(k*t + 127*(1-k) + b)
-    在未截断区把两式逐项对齐，解出唯一一组 Krita 参数：
-        c_k = k
-        b_k = (1-k)/(510k) - b/(255k)   （C < 0，亮度在对比度之后 → 反解时要除以 k）
-        b_k = (1-k)/(510k) - b/255      （C >= 0，亮度在对比度之前）
-    截断区可证明两侧等价（k>=1 时 PS 的「先截断亮度」与 Krita 的「最后统一截断」
-    在饱和区给出相同的 0/255），因此该闭式在整个定义域内逐点等价，不需要数值搜索。
-
-    表达不了的两类参数（如实保留并写进文档，不做假补）：
-      1) C > 50 时 k > 2，超出 Krita Contrast 上限 2 → 按 2 截断，属结构性失真；
-      2) 反解出的 b_k 超出 Krita 亮度滑杆范围 [-1,1] 时按边界截断
-         （仅 C<0 且 |PS 亮度| 很大时出现，例如 C=-50 与 b=±150）。
-    精度：Krita 用 double 读取预设值（KisTextureOptionData::read 的 getDouble），
-    这里保留 3 位小数（Krita UI 显示两位，多留一位是为了让 k=2 时
-    亮度舍入误差不超过 1/255，保证掩码等价误差 <= 1 级）。
+    闭式解（C>=0 与 C<0 两分支）、逐项对齐推导与截断区等价证明见
+    docs/parameter-mapping.md §7.1。这里保留 3 位小数：Krita 用 getDouble 原样读取
+    预设值，2 位在 k=2 时舍入误差达 2.55 灰度级，不满足 ≤2% 判据。
+    表达不了的两类参数按边界截断、如实保留不做假补：C>50 时 k>2 超 Krita Contrast
+    上限 2；C<0 且 |PS 亮度| 很大时反解出的 b_k 超 [-1,1]（均属结构性失真）。
     """
     k = _texture_contrast_factor(ps_contrast)
     c = max(-50.0, min(100.0, ps_contrast))
@@ -503,7 +488,7 @@ def build_preset_xml(
         # 散布量换算：PS jitter(0..1000%) → Krita ScatterValue(0..5.0)
         # 任务 107 实测结论：线性系数无法同时对上 100%/300%（PS 响应超线性、Krita 线性），
         # 且 300% 点的带高统计复现性 ±13%，无法证明 ≤2% → 保留 106 时的系数并标「需校准」。
-        # 依据与残差见 docs/研究报告/参数偏差-2026-11-20.md §3.5 与 docs/验收报告/107-报告.md。
+        # 依据与残差见 docs/parameter-mapping.md §10.3。
         if scatter_amount is not None:
             set_internal("ScatterValue", f"{scatter_amount / 400.0:g}")
         # PS bothAxes → Krita 两个轴都开；否则只在 Y 轴（垂直笔迹方向）

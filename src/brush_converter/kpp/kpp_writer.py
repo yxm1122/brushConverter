@@ -62,7 +62,7 @@ def render_tip_preview(gray: np.ndarray, size: int = 200) -> np.ndarray:
     h, w = gray.shape
     scale = min(size / h, size / w)
     nw, nh = max(1, int(w * scale)), max(1, int(h * scale))
-    img = Image.fromarray(gray, mode="L").resize((nw, nh), Image.LANCZOS)
+    img = Image.fromarray(gray, mode="L").resize((nw, nh), Image.Resampling.LANCZOS)
     canvas = Image.new("RGBA", (size, size), (0, 0, 0, 0))
     canvas.paste(Image.merge("RGBA", (img, img, img, img)),
                  ((size - nw) // 2, (size - nh) // 2))

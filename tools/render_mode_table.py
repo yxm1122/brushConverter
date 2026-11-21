@@ -492,6 +492,18 @@ def render_section(data):
     col = data["collapse"]
     bb = c["by_batch"]
     out = [SECTION_HEAD, ""]
+    ui = [m for m in data["modes"] if m.get("evidence_grade") != "C"]
+    ui_mapped = sum(1 for m in ui if m["verdict"] == "可映射")
+    ui_cal = sum(1 for m in ui if m["verdict"] == "需校准")
+    ui_unmap = sum(1 for m in ui if m["verdict"] == "不可映射")
+    non_ui = len(data["modes"]) - len(ui)
+    out.append("> **用户视角（重要）**：Photoshop「纹理 > 模式」下拉只有 **%d 项可选**——"
+               "%d 项可映射、%d 项需校准（hardMix）、%d 项不可映射（Drkn 变暗，PS 随深度换算子）。"
+               % (len(ui), ui_mapped, ui_cal, ui_unmap))
+    out.append("> 下表其余 **%d 项是 PS 内部枚举值**（" % non_ui + _code("evidence_grade=C")
+               + "），UI 里选不到、与用户无关，**不计为转换限制**；完整 %d 行只是枚举研究归档。"
+               % len(data["modes"]))
+    out.append("")
     out.append("> 本节的**数据真身是 " + _code("docs/数据/mode-table.json") + "**：由 "
                + _code("python tools/render_mode_table.py --build") + " 重算，由 "
                + _code("python tools/render_matrix_md.py") + " 写入。**禁止手改本节**。")

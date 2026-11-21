@@ -28,6 +28,7 @@ from __future__ import annotations
 
 import struct
 from dataclasses import dataclass
+from typing import cast
 
 
 class DescParseError(ValueError):
@@ -52,7 +53,7 @@ class Value:
         if self.type == "Objc":
             return f"<Objc {self.class_id} keys={list(self.value.keys()) if isinstance(self.value, dict) else '?'}>"
         if self.type == "VlLs":
-            return f"<VlLs {len(self.value)} items>"
+            return f"<VlLs {len(self.value) if isinstance(self.value, list) else '?'} items>"
         if self.type == "UntF":
             return f"<UntF {self.value} {self.unit}>"
         if self.type == "enum":
@@ -244,7 +245,7 @@ def _skip_global_object(r: Reader) -> None:
 def parse_descriptor_block(data: bytes) -> dict[str, Value]:
     """解析完整 desc 区段（含 4 字节 version 前缀），返回顶层描述符。"""
     r = Reader(data)
-    version = r.u32()  # 值被忽略
+    r.u32()  # version 前缀，值被忽略
     desc, _class_id = r.read_descriptor()
     return desc
 
@@ -252,7 +253,7 @@ def parse_descriptor_block(data: bytes) -> dict[str, Value]:
 def iter_brush_presets(desc: dict[str, Value]) -> list[dict[str, Value]]:
     """从顶层描述符提取笔刷预设列表（'Brsh' → VlLs → Objc）。"""
     brsh = desc.get("Brsh")
-    if brsh is None or brsh.type != "VlLs":
+    if brsh is None or brsh.type != "VlLs" or not isinstance(brsh.value, list):
         return []
     out = []
     for item in brsh.value:
@@ -273,7 +274,7 @@ def get_number(d: dict[str, Value], key: str) -> float | None:
     if v is None:
         return None
     if v.type in ("long", "doub", "UntF"):
-        return float(v.value)
+        return float(cast("float | int | str", v.value))
     return None
 
 

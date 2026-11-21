@@ -7,8 +7,8 @@ import traceback
 from PySide6.QtCore import QThread, Signal
 
 from brush_converter.abr import AbrFile
-from brush_converter.mapping import BrushPreset, map_presets
 from brush_converter.convert import convert_presets
+from brush_converter.mapping import BrushPreset, map_presets
 
 
 class ParseWorker(QThread):

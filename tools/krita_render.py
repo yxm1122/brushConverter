@@ -16,7 +16,7 @@
      外壳据「结果标记 + PNG 是否存在」判成败，不看退出码。
 3) 任务 04 门结论：kritarunner 里 `windows=0 / activeWindow=None`，建立视图（`addView`）必崩 0xC0000005，
    而 `Node.paintLine()` 在源码里硬依赖「当前主窗口→当前视图」。
-   → 在无视图环境里本脚本**如实返回 ok=false**（不主动触发崩溃，崩溃复现见 tools/krita_probe/probe7、probe11）；
+   → 在无视图环境里本脚本**如实返回 ok=false**（不主动触发崩溃，崩溃复现见 tools/_archive/krita_probe/probe7、probe11）；
      将来在 Krita GUI 的 Scripter 里执行（有视图）时，脚本会走真正的落笔+导出路径。
 """
 

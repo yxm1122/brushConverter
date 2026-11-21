@@ -2,7 +2,7 @@
 
 > 引擎：现阶段仅像素引擎（paintbrush）。源数据来自 `海怪笔刷…18支.abr`（v6.2，20 预设）。
 > ✅ = 已实现，⛔ = 不映射（原因见右侧），⚠️ = 已尽量映射但仍保留提示（如 `TxtC` / `protectTexture` 在 Krita 无对应）；
-> ❓ = 待确认（**历史记号**，本表现已无待确认项：早期两处已全部落地，见任务 16 的 `docs/文档对齐报告.md`）。
+> ❓ = 待确认（**历史记号**，本表现已无待确认项：早期两处已全部落地，见任务 16 的 `docs/归档/文档对齐报告.md`）。
 
 ## 1. 笔尖与基础属性
 
@@ -87,12 +87,11 @@
 | `bothAxes` | 两轴 | `AxisX`/`AxisY` | True→AxisX=Y=True；False→AxisX=False,Y=True | ✅ |
 | `Spcn`（顶层） | 散布间距 | — | 不映射到散布量（见注②） | ⛔ |
 | `Cnt`（数量） | — | — | Krita 像素引擎无「数量」 | ⛔ |
+| `countDynamics` | — | — | 同上 | ⛔ |
 
 > 注②：Krita 里 `PressureScatter` 是「散布选项是否启用」的开关（`isChecked` 序列化名），并非"压感控制"；压感控制由 `ScatterSensor` 决定。散布量真正来源是 `scatterDynamics.jitter`（顶层 `Spcn` 实为间距，非散布量）。
 >
 > 散布量换算 `÷400`：**v1.4.0（任务 107）实测后确认无法用确定性换算修到 ≤2%，保留原系数并判「需校准」**（残差、拟合式与回退理由见 §10.3）。旧说明（PS 高斯分布 vs Krita 均匀分布、锚点 PS 145% ≈ Krita 35%）仍成立，但只解释了「为什么需要系数」，解释不了「为什么 100%/300% 同时偏小近一半」。
-
-| `countDynamics` | — | — | 同上 | ⛔ |
 
 ## 6. 不映射（引擎差异大，已列为后续增强）
 
@@ -108,7 +107,7 @@
 
 > 纹理数据源：ABR `patt` 区段（按 UUID 匹配 `Txtr.Idnt`），资源以 PNG 内嵌
 > （`type="patterns"`，与 Krita 5.x 官方样本一致）。格式细节见
-> `docs/developer-guide.md` 与 `docs/texture-mapping-proposal.md`。
+> `docs/developer-guide.md` 与 `docs/归档/texture-mapping-proposal.md`。
 
 | ABR 键 | → Krita 参数 | 映射公式 | 状态 |
 |--------|--------------|----------|------|
@@ -122,7 +121,7 @@
 | `textureDepthDynamics.bVTy==0` | `PressureTexture/Strength/` + `Texture/Strength/UseCurve` | `true` + `false`（效果强度开启、无传感器，恒定用 Value） | ✅ |
 | `textureDepthDynamics.Mnm` | `Texture/Strength/commonCurve` | 高度系 `0,min(1,1.2×Mnm/100);1,1;`；非高度系 `0,Mnm/100;1,1;`（仅 bVTy==2，v1.2.1） | ✅ |
 | `InvT` | `Texture/Pattern/Invert` | 直接 | ✅ |
-| `textureBlendMode` | `Texture/Pattern/TexturingMode` | 按 `mapping._TEXTURING_MODE`（v1.3.0 起 **34 个键**）取 Krita 枚举值：`linearHeight`→15、`height`→14、`hardMix`→10、`Mltp`→0、`Sbtr`→1、`Dfrn`→1、`blendSubtraction`→1、`Ovrl`→5、`CDdg`→6、`CBrn`→7、`linearDodge`→8、`linearBurn`→9 等；未登记的模式回退 Multiply(0) 并保留一条警告 | ✅ 22 / 🧪 1 / ⛔ 24（逐模式见 §7.2） |
+| `textureBlendMode` | `Texture/Pattern/TexturingMode` | 按 `mapping._TEXTURING_MODE`（v1.3.0 起 **34 个键**）取 Krita 枚举值：`linearHeight`→15、`height`→14、`hardMix`→10、`Mltp`→0、`Sbtr`→1、`Dfrn`→1、`blendSubtraction`→1、`Ovrl`→5、`CDdg`→6、`CBrn`→7、`linearDodge`→8、`linearBurn`→9 等；未登记的模式回退 Multiply(0) 并保留一条警告 | UI 10 项：✅ 8 / 🧪 1 / ⛔ 1（另 37 内部值不计限制，见 §7.2） |
 | `textureBrightness`（PS -150..150） | `Texture/Pattern/Brightness` | **默认（calibrated，v1.2.0 起）**：`b_k = (1-k)/(510k) - v/255`（C≥0）或 `(1-k)/(510k) - v/(255k)`（C<0），保留 3 位小数，clamp [-1,1]；**历史方案（legacy，v1.1.2，可回退）**：`round(0.10-v/250,2)`，clamp [-1,1] | ✅ / 🧪 |
 | `textureContrast`（PS -50..100） | `Texture/Pattern/Contrast` | 两条路径共用 PS 中心因子 `k`（C<0：1+C/100；C≥0：1/(1-C/100)），clamp [0,2]；calibrated（默认）保留 3 位小数，legacy 保留 2 位 | ✅ / 🧪 |
 | `TxtC` / `interpretation` | — | Krita 无对应，静默忽略（源文件默认值） | ⚠️ |
@@ -249,7 +248,15 @@ b_k = (1-k)/(510k) - b/(255k)     （C <  0，亮度在对比度之后 → 反�
 差异比例 ≤2% 且 max_delta ≤2 才算达标，分母 W×H。判据材料是**单笔尖满覆盖（base=1）+ 单纹理**，
 所以下面所有结论只在这个口径成立。
 
-**47 个模式：可映射 22 / 需校准 1 / 不可映射 24 / 不可判定 0（无结论 0）。**
+**用户视角：PS「纹理 > 模式」UI 只有 10 项可选——可映射 8 / 需校准 1（hardMix）/ 不可映射 1（Drkn 变暗）。** 其余 37 项是 PS 内部枚举值（`evidence_grade=C`），UI 选不到、与用户无关，**不计为转换限制**。
+
+**完整枚举研究归档（47 行）：可映射 22 / 需校准 1 / 不可映射 24 / 不可判定 0（无结论 0）。** 下表是这个完整口径的技术细节，不是用户可见的限制清单。
+
+> **「不可映射」≠「UI 不可见」**：PS「纹理 > 模式」下拉实际只有 10 项——正片叠底(`Mltp`)、
+> 减去(`Sbtr`)、变暗(`Drkn`)、叠加(`Ovrl`)、颜色减淡(`CDdg`)、颜色加深(`CBrn`)、线性加深(`linearBurn`)、
+> 实色混合(`hardMix`)、线性高度(`linearHeight`)、高度(`height`)。这 10 项里 9 项有可用映射
+> （`hardMix` 需校准），`Drkn` 实测不可映射（PS 在纹理上随深度换算子）。其余 37 个模式不在 PS 下拉里，
+> 证据等级一律 C（本轮无法投入验证），**不一定**不可映射；真正判「不可映射」的是下面 24 个（有结构/真值证据）。
 
 | 结论 | 条数 | 模式（order） |
 |---|---:|---|
@@ -265,6 +272,8 @@ b_k = (1-k)/(510k) - b/(255k)     （C <  0，亮度在对比度之后 → 反�
 ⚠ **0.00% 不等于语义等价。** 39 个有 PS 真值的模式在 6 组参数下只出 **12 类**像素，
 **31 个模式与别的模式像素完全不可区分**；本表凡写 0.00% 的地方，含义一律是「当前口径下像素不可区分」。
 `height` 与 `linearHeight` 两侧都逐像素不可区分（Krita 14/15 渲染 max Δ=0），**不能**写成「linearHeight 已精确复现」。
+
+> 下面 24 条「不可映射」中，**只有 `Drkn`（变暗）是 PS UI 可选模式**；其余 23 条都是 UI 选不到的内部枚举值，对用户不构成限制，仅作完整枚举研究归档。
 
 **① Krita 侧没有对应能力（结构性不可映射，16 条）**
 

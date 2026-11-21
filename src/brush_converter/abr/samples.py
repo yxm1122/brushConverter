@@ -89,7 +89,7 @@ def _parse_v12(data: memoryview | bytes, count: int, version: int,
         if version == 2:
             (char_count,) = struct.unpack_from(">I", data, pos)
             pos += 4
-            name = data[pos : pos + char_count * 2].decode("utf-16-be", "replace")
+            name = bytes(data[pos : pos + char_count * 2]).decode("utf-16-be", "replace")
             pos += char_count * 2
         pos += 1  # antialiasing
         pos += 8  # short bounds ×4

@@ -20,12 +20,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from typing import cast
 
 import numpy as np
 
-from .abr import AbrFile
+from .abr import AbrFile, BrushTip
 from .abr import descriptors as D
-
 
 # Photoshop 纹理混合模式（enum BlnM 成员）→ Krita TexturingMode 数值。
 # 未列出的模式回退 Multiply(0)，并在警告里注明（见 _collect_warnings）。
@@ -56,7 +56,7 @@ _TEXTURING_MODE = {
     # Multiply(0)。任务 35（B 批）实测转正：PS 真值 ↔ Krita 对应模式渲染 6/6 组 0.00%/max≤1。
     "linearDodge": 8,    # LINEAR_DODGE（等价 4CC 键 LDdg）
     "linearBurn": 9,     # LINEAR_BURN（等价 4CC 键 LBur）
-    # --- v0.4 任务 34（A 批实测转正，证据 docs/研究报告/模式-A.md）---
+    # --- v0.4 任务 34（A 批实测转正，证据见 docs/parameter-mapping.md §7.2）---
     # 依据：PS 真值 Alpha 与 Mltp 真值同哈希（6/6 组）、与 Krita 对应模式真机渲染
     # 掩码空间 0.00%、max_delta ≤1。显式登记后不再打印「回退Multiply」警告。
     # 注意：base=1（不透明笔尖章）时 MULTIPLY/DARKEN/LINEAR_BURN 三算子像素相同，
@@ -73,7 +73,7 @@ _TEXTURING_MODE = {
     # d=100 同为 255−u）。映射到 Krita SUBTRACT(1) 后 6/6 组 0.00%/max≤1；
     # 旧行为是静默回退 Multiply，实测差异 69.04%~99.29%。按像素校准，不是按名字对应。
     "Dfrn": 1,           # SUBTRACT
-    # --- v0.4 任务 36（C 批实测转正，证据 docs/研究报告/模式-C.md）---
+    # --- v0.4 任务 36（C 批实测转正，证据见 docs/parameter-mapping.md §7.2）---
     # 口径：PS 真值 vs「任务 33 已渲染的 Krita 同组图」逐像素比（tol=2，门槛 2%/max2）。
     # 前三条：PS 侧真值与 Mltp 真值逐字节相同，且 vs Krita Multiply 渲染 6/6 组
     # 0.00%、max_delta<=1。PS 把这几个「层域」模式名在纹理笔迹上按默认算子处理，
@@ -152,7 +152,7 @@ def _dyn(obj: dict[str, D.Value] | None) -> dict[str, float]:
     if obj is None:
         return {}
     return {
-        k: float(v.value)
+        k: float(cast("float | int | str", v.value))
         for k, v in obj.items()
         if v.type in ("long", "doub", "UntF")
     }
@@ -239,7 +239,7 @@ def map_presets(abr: AbrFile) -> list[BrushPreset]:
     patterns = {_norm_uuid(k): v
                 for k, v in (getattr(abr, "patterns", None) or {}).items()}
 
-    tip_by_uuid: dict[str, object] = {}
+    tip_by_uuid: dict[str, BrushTip] = {}
     for t in abr.tips:
         if t.uuid:
             tip_by_uuid[_norm_uuid(t.uuid)] = t

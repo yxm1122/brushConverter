@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "brushconverter"
+description = "Photoshop (.abr) → Krita (.kpp/.bundle) 笔刷转换工具"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+dynamic = ["version"]
+dependencies = [
+    "numpy>=2.0",
+    "Pillow>=10.0",
+    "PySide6>=6.5",
+]
+
+[project.optional-dependencies]
+dev = ["pyinstaller>=6.0", "ruff>=0.6", "mypy>=1.10"]
+
+[tool.setuptools]
+packages = ["brush_converter", "brush_converter.abr", "brush_converter.kpp", "gui"]
+
+[tool.setuptools.package-dir]
+brush_converter = "src/brush_converter"
+gui = "gui"
+
+[tool.setuptools.dynamic]
+version = { attr = "brush_converter.__version__" }
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+# 长行多为中文 docstring 与 i18n 单行译文（后者不可换行），不做强制行宽。
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.12"
+ignore_missing_imports = true

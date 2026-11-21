@@ -13,7 +13,7 @@
 | 我想… | 看这份 |
 |---|---|
 | 知道逐字段怎么映射（尺寸/间距/角度/散布/纹理…） | [`parameter-mapping.md`](parameter-mapping.md)（**映射唯一权威**，含纹理 §7/§7.1，纹理模式逐模式结论见 §7.2） |
-| 查 47 个纹理混合模式的结论（可映射/需校准/不可映射） | [`数据/mode-table.json`](数据/mode-table.json)（**模式结论唯一真相**，47 行，含证据强度/可区分/塌缩类/前提） |
+| 查纹理混合模式结论（PS UI 仅 10 项可选；另 37 内部值不计限制） | [`数据/mode-table.json`](数据/mode-table.json)（**模式结论唯一真相**，47 行完整枚举归档，含 evidence_grade/证据强度/可区分/塌缩类） |
 | 查某个参数键的结论、来源与承载字段 | [`参数矩阵.json`](参数矩阵.json)（**参数结论唯一真相**，137 行 × 8 栏，含 `ui_visibility` / `ui_control`；渲染版 [`参数矩阵.md`](参数矩阵.md)，由脚本生成，禁止手改） |
 | 判断某个映射为什么这么定、有没有实测依据 | [`parameter-mapping.md`](parameter-mapping.md) + 下方「研究结论」 |
 | 跑验证、看懂「通过/失败/跳过」口径 | [`验证体系使用说明.md`](验证体系使用说明.md) |
@@ -26,7 +26,7 @@
 | 批量渲染并把产物登记进基准库 | [`批量渲染操作说明.md`](批量渲染操作说明.md) |
 | 让 Photoshop 自动产出真值图（JSX/COM） | [`PS真值自动化说明.md`](PS真值自动化说明.md) |
 | 发布前打包、看体积与已知限制 | [`../releases/RELEASE_NOTES.md`](../releases/RELEASE_NOTES.md) + 本文 §7.4 |
-| 了解 v1.2.x 文案/文档对齐的处置 | [`文档对齐报告.md`](文档对齐报告.md) |
+| 了解 v1.2.x 文案/文档对齐的处置 | [`文档对齐报告.md`](归档/文档对齐报告.md) |
 
 ### 0.2 研究结论（为什么这么映射，按主题）
 
@@ -37,13 +37,15 @@
 | 纹理公式·逆向（静态/动态/参考实现） | [`研究报告/ps-逆向-静态.md`](研究报告/ps-逆向-静态.md)、[`ps-逆向-动态.md`](研究报告/ps-逆向-动态.md)、[`ps-纹理公式-参考实现.md`](研究报告/ps-纹理公式-参考实现.md) | 参数语义被动态证实（int32、无 clamp、depth clamp 100）；像素公式来自数据拟合 |
 | Krita 无头渲染可行性 | [`研究报告/krita-runner-可行性.md`](研究报告/krita-runner-可行性.md) | kritarunner 无头落笔不可用；改真实 GUI + 启动插件（路线 A） |
 | **缩放/深度是否准（v1.2.1 依据）** | [`研究报告/缩放深度-归因实验.md`](研究报告/缩放深度-归因实验.md) | multiply 深度 0.00% 准；高度系差 2q（已修）；缩放 50% 准、150/200% 属重采样差异 |
-| 历史方案（已被取代，勿照抄） | [`mapping-proposal.md`](mapping-proposal.md)、[`texture-mapping-proposal.md`](texture-mapping-proposal.md)、[`feasibility.md`](feasibility.md) | 仅作演进记录 |
+| 历史方案（已被取代，勿照抄，存于 `归档/`） | [`mapping-proposal.md`](归档/mapping-proposal.md)、[`texture-mapping-proposal.md`](归档/texture-mapping-proposal.md)、[`feasibility.md`](归档/feasibility.md) | 仅作演进记录 |
 
-### 0.3 验收证据（每个任务一份，编号对应内部任务书）
+### 0.3 验收证据（证据归档，非上手必读；编号对应内部任务书）
 
-- [`验收报告/`](验收报告/)：`01`–`18A` 为各任务的自检报告（`NN-报告.md`），`90-报告.md` 为发布验收。
+- [`验收报告/`](验收报告/)：逐份清单见 [`验收报告/INDEX.md`](验收报告/INDEX.md)（脚本生成，禁止手改）；`01`–`116` 为各任务自检报告（含 `06A/07A/11A/11B/18A/30A` 等拆分），`90`–`92` 为发布验收。
+- [`研究报告/`](研究报告/)：逐份清单见 [`研究报告/INDEX.md`](研究报告/INDEX.md)（脚本生成）；按主题导航见上方 §0.2。
 - `实验-PS侧-报告.md` / `实验-Krita侧-报告.md` / `实验-归因-报告.md`：v1.2.0 之后追加的「缩放/深度 2×2 归因实验」与 v1.2.1 渲染回归。
 - 全量验收归档在 `验收报告/归档/verify-<时间戳>.md`（`tools/verify_all.py --archive` 生成）。
+- 索引再生成：`python tools/render_archive_index.py`（验收）/ `--dir docs/研究报告 --md docs/研究报告/INDEX.md`（研究）；`--check` 校验同步。
 
 ### 0.4 常见接手路径
 
@@ -64,7 +66,7 @@
 | [`数据/ps_keys.json`](数据/ps_keys.json) | 逆向得到的 PS 参数键全集（125 条） | 任务 21 产出；check_matrix 的 C6a 依赖 |
 | [`数据/abr_keys.json`](数据/abr_keys.json) | 真实 .abr 样本里实测出现的键（91 条） | 任务 22 产出；check_matrix 的 C6b 依赖 |
 | [`数据/candidates.json`](数据/candidates.json) | 候选映射清单（跨模式候选、判据与置信度） | 任务 29 产出；模式判定时查 |
-| [`数据/mode-table.json`](数据/mode-table.json) | **47 个纹理混合模式的逐模式结论**（唯一真相） | `python tools/render_mode_table.py --build`；`--check` 校验与 `参数矩阵.md` 同步 |
+| [`数据/mode-table.json`](数据/mode-table.json) | **纹理混合模式逐模式结论**（唯一真相；PS UI 仅 10 项可选，47 行为完整枚举归档） | `python tools/render_mode_table.py --build`；`--check` 校验与 `参数矩阵.md` 同步 |
 | [`数据/mode-batch.json`](数据/mode-batch.json) | 三批（A/B/C）模式的批次成员、PS 真值状态、Krita 渲染登记 | `python tools/mode_batch.py --plan/--manifest`；重跑 `--manifest` 后须再跑 `render_mode_table.py --amend-data` |
 | [`数据/mode-align.json`](数据/mode-align.json) | PS 模式号 ↔ Krita TexturingMode 的对齐表（含 runtime_id） | 任务 33/37 数据；Krita 基线生成时断言用 |
 
@@ -230,7 +232,7 @@ Record = u32 len | 记录体（len 字节） | pad 到 4
 | 类别 | ABR 源 | Krita 目标 |
 |------|--------|-----------|
 | 尺寸 | `Dmtr` | `scale = Dmtr / max(笔尖宽, 笔尖高)`；采样笔尖内嵌 PNG 补零为正方形 |
-| 间距 | `Spcn`（#Prc） | `spacing = Spcn/100` |
+| 间距 | `Spcn`（#Prc） | 计算笔刷 `spacing = Spcn/100`；采样笔刷再乘短边/长边（见 `parameter-mapping.md` §1） |
 | 角度 | `Angl`（度） | `angle = math.radians(Angl % 360)` |
 | 硬度（计算笔刷） | `Hrdn` | `hfade/vfade = Hrdn/100` |
 | 压感→大小 | `szVr.bVTy==2` + `minimumDiameter` | `SizecommonCurve` |
@@ -241,7 +243,7 @@ Record = u32 len | 记录体（len 字节） | pad 到 4
 | 散布 | `useScatter` + `scatterDynamics.jitter` | `PressureScatter` + `ScatterValue` |
 | 纹理 | `useTexture` + `Txtr.Idnt` + `textureScale/Depth/BlendMode/InvT/Brightness/Contrast` | `Texture/Pattern/*` + `Texture/Strength/*`（逐项见 `parameter-mapping.md` §7） |
 
-**控制源编码（bVTy）**：0=关、1=渐隐、2=压力、3=倾斜、4=转轮、5=旋转、6/7=初始方向/方向。当前映射到 Krita 传感器：pressure（bVTy=2）、drawingangle（bVTy=6/7，随笔迹方向）；bVTy=1/3/4/5 未映射（若 jitter>0 会在 GUI 提示「旋转控制源未映射」）。对于方向旋转，Photoshop `angleDynamics.jitter` 映射到 Krita `RotationValue`（效果强度，jitter/100），`fuzzy` 与 `fuzzystroke` 随机度曲线在 UI 中对应 -180°..+180°，但 XML 使用归一化坐标，完整范围写为 `0,0;1,1;`。bVTy=0（控制=关）但 jitter>0 时是纯随机角度抖动：旋转选项仍需开启（`PressureRotation=true`），使用只有 fuzzy/fuzzystroke 的传感器（不含 drawingangle），`RotationValue=jitter/100`。
+**控制源编码（bVTy）**：0=关、1=渐隐、2=压力、3=倾斜、4=转轮、5=旋转随机、6/7=初始方向/方向。映射到 Krita 传感器：pressure（bVTy=2）、drawingangle（bVTy=6/7，随笔迹方向）；bVTy=1/3/4/5 未映射（若 jitter>0 会在 GUI 提示「旋转控制源未映射」）。旋转/散布的逐项换算（含 bVTy=0 纯随机抖动的 fuzzy 传感器、`RotationValue=jitter/100`、随机度曲线归一化 `0,0;1,1;`）见 [`parameter-mapping.md`](parameter-mapping.md) §3、§8。
 
 **计算笔刷**（无 `sampledData` UUID，只有参数）：映射为 Krita 的 `auto_brush`（程序化圆形笔尖），`diameter`/`ratio`（圆度）/`hfade`/`vfade`（硬度）放进 `MaskGenerator`。
 
@@ -320,7 +322,7 @@ PS 纹理深度无论是否接传感器都要设为 `true`；深度随压感（`
 注意：
 - **`PatternMD5Sum` 存 hex md5**；`PatternMD5` 留空——Krita 5.0 曾在该字段写原始
   二进制导致非法 XML（Krita 官方 MR 修复），新版本以 `PatternMD5Sum` 为准。
-- `TexturingMode` 数值来自 Krita `KisTextureOptionData::TexturingMode`：Multiply=0、Subtract=1、Lightness=2、Gradient=3、Darken=4、Overlay=5、Color Dodge=6、Color Burn=7、Linear Dodge=8、Linear Burn=9、Hard Mix (Photoshop)=10、Hard Mix Softer (Photoshop)=11、Height=12、Linear Height=13、Height (Photoshop)=14、Linear Height (Photoshop)=15。ABR 的 `linearHeight` 优先映射到 15，避免误落到 Darken=4。v1.3.0 把 `_TEXTURING_MODE` 由 19 键扩到 **34 键**并逐模式定论：47 个 PS 模式中 **22 可映射 / 1 需校准 / 24 不可映射 / 0 不可判定**，未登记的模式回退 0 并警告；逐模式结论、证据强度与「0.00% ≠ 语义等价」的口径见 [`数据/mode-table.json`](数据/mode-table.json) 与 [`parameter-mapping.md`](parameter-mapping.md) §7.2。
+- `TexturingMode` 数值来自 Krita `KisTextureOptionData::TexturingMode`：Multiply=0、Subtract=1、Lightness=2、Gradient=3、Darken=4、Overlay=5、Color Dodge=6、Color Burn=7、Linear Dodge=8、Linear Burn=9、Hard Mix (Photoshop)=10、Hard Mix Softer (Photoshop)=11、Height=12、Linear Height=13、Height (Photoshop)=14、Linear Height (Photoshop)=15。ABR 的 `linearHeight` 优先映射到 15，避免误落到 Darken=4。v1.3.0 把 `_TEXTURING_MODE` 由 19 键扩到 **34 键**并逐模式定论：**PS UI 仅 10 项可选模式全部支持（8 可映射 / 1 需校准 hardMix / 1 不可映射 Drkn）**；完整 47 模式枚举归档为 22 可映射 / 1 需校准 / 24 不可映射（其中 23 个不可映射是 UI 选不到的内部值，不计为用户限制），未登记的模式回退 0 并警告；逐模式结论、证据强度与「0.00% ≠ 语义等价」的口径见 [`数据/mode-table.json`](数据/mode-table.json) 与 [`parameter-mapping.md`](parameter-mapping.md) §7.2。
 - 亮/对比度换算依据 Krita `KisTextureMaskInfo::recalculateMask()` 与 Photoshop/Krita 对照。**默认公式为 `calibrated`（v1.2.0 起，任务 12 拟合 + 任务 13 转正）**：对比度 `c_k = k`（PS 中心因子，`C<0→1+C/100`、`C>=0→1/(1-C/100)`）；亮度 `b_k = (1-k)/(510k) - v/255`（C>=0）或 `(1-k)/(510k) - v/(255k)`（C<0）；保留 3 位小数，最终 clamp 到 Krita UI 范围（亮度 [-1,1]、对比度 [0,2]）。掩码空间 A/B：`calibrated` 0.00% vs 旧公式 70.75%。
   历史方案（`legacy`，v1.1.2 行为，可用环境变量回退）：所有模式统一亮度 `round(0.10-v/250,2)`，对比度用同一 PS 中心因子并 round 两位。开关与回退命令见 `parameter-mapping.md` §7.1。
   Linear Height (Photoshop) 曾使用 0.30 基线与对比度倒数的特殊映射，实测效果不好，2026-08-27 确认取消。源码快照与来源链接见 `research/krita_texture/` 和 `research/README.md`。
@@ -335,6 +337,13 @@ META-INF/manifest.xml         OpenDocument manifest 命名空间（易错，见 
 meta.xml                      OpenDocument meta
 paintoppresets/*.kpp          自包含笔刷预设
 ```
+
+**v1.3.1 产物加固**（内容短哈希命名 / 覆盖防呆 / 回读校验 / 纹理计数，使用者批准的 4 条）：
+
+- **命名**：`<ABR名>_v<版本>_<8位逻辑内容哈希>.bundle`，让「同名 ⇒ 同内容」成立（`bundle_content_hash8`）；版本号隔离不同版本产物。
+- **覆盖防呆**：目标同内容 → 复用不重写；同名不同内容 → 自动 `_2/_3` 后缀、原文件不覆盖；旧版 `stem.bundle` 只提示不覆盖不删（`_resolve_bundle_path`）。
+- **回读校验**：写出后校验 zip 可读 / 条目数 / mimetype / manifest md5 / 每个 `.kpp`，失败结论进 `ConvertResult.verify`，CLI 退出码 3（`verify_bundle`）。
+- **纹理计数**：「含真实纹理」口径 = `Texture/Pattern/Enabled=true` 且内嵌图案非 1×1（`count_real_textures`，GUI 摘要与回归共用）。
 
 ## 6. CLI 与 GUI
 

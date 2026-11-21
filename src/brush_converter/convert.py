@@ -16,16 +16,16 @@ from PIL import Image, PngImagePlugin
 
 from . import __version__
 from .abr import AbrFile
-from .mapping import BrushPreset, TextureSettings, map_presets, _TEXTURING_MODE
-from .kpp import TextureXml, build_preset_xml, write_kpp, write_bundle
+from .kpp import TextureXml, build_preset_xml, write_bundle, write_kpp
 from .kpp.bundle import (
     BundleVerifyResult,
     bundle_content_hash8,
     bundle_content_hash8_of_file,
     verify_bundle,
 )
-from .kpp.preset_xml import texture_brightness_contrast
 from .kpp.kpp_writer import read_preset_xml, render_tip_preview
+from .kpp.preset_xml import texture_brightness_contrast
+from .mapping import _TEXTURING_MODE, BrushPreset, TextureSettings, map_presets
 
 
 def _png_bytes(gray: np.ndarray) -> bytes:
@@ -55,25 +55,16 @@ def _square_tip(gray: np.ndarray) -> np.ndarray:
 
 
 # ---------------------------------------------------------------------------
-# 高度系纹理强度增益（v1.2.1）
-#
-# 依据 docs/验收报告/实验-归因-报告.md §4.2/§4.3 与
-# docs/验收报告/实验-Krita侧-报告.md §17（fixA 实测，2026-11-19）：
-# PS 的「高度 / 线性高度」系纹理掩码按 12*q 加权（q = round(2.55*depth)），
-# Krita 对应的 Photoshop 算子写 10*s（s = Texture/Strength/Value），
-# 归一化后两侧固定相差 2q：d10 实测 PS vs Krita mean|Δ|=43.31 / max=52 /
-# 95.36% 像素超阈。把高度系强度乘 W 比 12/10 = 1.2 后实测（scale=100%）：
-# mean|Δ| 43.31 → 1.39、max 52 → 2、超阈 95.36% → 0.00%。
-# 非高度系（multiply/subtract/hardMix）实测已 0.00%，一律不加增益：
-# 动了会反过来引入 2q 的正偏差，属于「修好一个、弄坏一个」。
-# 封顶 1.0：PS depth > 83% 时 Krita 强度上限 1.0 会提前饱和，这是既有的
-# 结构性限制（docs/parameter-mapping.md §7.1 局限 3），本修复不改变它。
+# 高度系纹理强度增益（v1.2.1）：PS 权重 12 vs Krita 权重 10，归一化后固定相差 2q。
+# 高度系强度乘 12/10=1.2 再封顶 1.0（d10 实测 mean|Δ| 43.31→1.39、超阈 95.36%→0.00%）；
+# 非高度系（multiply/subtract/hardMix）已 0.00%，一律不加增益（动了会引入 2q 正偏差）。
+# 推导、实测与封顶 1.0 的结构性限制见 docs/parameter-mapping.md §7.1（第 8 条）。
 _HEIGHT_BLEND_MODES = frozenset({
     "Hght", "height", "HghtPS",
     "linearHeight", "linearHeightPhotoshop", "linearHeightPS",
 })
 
-#: 高度系强度增益 = PS 权重 12 / Krita 权重 10；出处见上方注释与 §7.1。
+#: 高度系强度增益 = PS 权重 12 / Krita 权重 10；推导见 parameter-mapping §7.1。
 HEIGHT_STRENGTH_GAIN = 1.2
 
 #: 内嵌纹理 PNG 的 tEXt 元数据关键字（Krita 5.3.3 md5 去重坑的规避标记）。
@@ -141,7 +132,7 @@ def _texture_xml(bp: BrushPreset) -> TextureXml | None:
     映射目标是 Krita 模式合成后的最终效果；校准常数来自
     research/测试结果2 与 research/krita结果，而不是 Photoshop 中间纹理值。
 
-    v1.2.1 两处修复（依据 docs/验收报告/实验-Krita侧-报告.md §8/§17）：
+    v1.2.1 两处修复（依据见 docs/parameter-mapping.md §7.1）：
     - 高度系强度 ×1.2（抵消 PS W=12 vs Krita W=10，见 _texture_strength()）；
     - 图案资源名由内嵌字节的 sha256 派生 + 内嵌 PNG 追加 tEXt 标记
       （Krita 5.3.3 的「同名串用」与「同 md5 静默禁用」两个静默坑）。
@@ -240,7 +231,7 @@ class ConvertResult:
 
 # ---------------------------------------------------------------------------
 # v1.3.1 产物加固：内容短哈希命名 / 覆盖防呆 / 回读校验 / 纹理计数
-# 依据 docs/验收报告/缺陷-纹理丢失-v1.3.1-代码加固.md（使用者批准的 4 条）。
+# 依据见 docs/developer-guide.md §5.4（v1.3.1 产物加固，使用者批准的 4 条）。
 # ---------------------------------------------------------------------------
 
 
@@ -336,6 +327,7 @@ def _render_preset(bp: BrushPreset, index: int) -> tuple[str, str, np.ndarray]:
             _circle_mask(bp.hardness if bp.hardness is not None else 100.0,
                          bp.roundness))
     else:
+        assert bp.tip_gray is not None  # 非计算笔刷必有笔尖（函数开头已校验）
         # Krita 对非正方形 png_brush 的编辑器尺寸显示存在偏差；
         # 与映射时的 max(width,height) 基准保持一致，内嵌正方形笔尖。
         # 间距基准补偿在 _sampled_brush_def 里做（spacing × 短边/长边）。
