@@ -835,6 +835,13 @@ INTERNAL_ARTIFACT_RULES = [
     (".env 文件", re.compile(r"(?:^|/)\.env(?:\.[^/]*)?$")),
 ]
 
+# 110/111 自产测试笔刷：tests/abr-generated/*.abr 是有意入库的可复现测试资产
+# （.gitignore 显式放行，约 5KB/支，无敏感内容）。2026-11-21 使用者批准白名单：
+# 仍登记为 warn 以便审计，但不阻断发布。
+ALLOWED_INTERNAL_ARTIFACTS = {
+    "tests/**/*.abr 样本": re.compile(r"^tests/abr-generated/[^/]+\.abr$"),
+}
+
 
 def check_internal_artifacts(paths: list[str]) -> list[Hit]:
     hits: list[Hit] = []
@@ -843,6 +850,21 @@ def check_internal_artifacts(paths: list[str]) -> list[Hit]:
             if not pat.search(rel):
                 continue
             if label == ".env 文件" and rel.endswith(".example"):
+                continue
+            allow = ALLOWED_INTERNAL_ARTIFACTS.get(label)
+            if allow is not None and allow.search(rel):
+                hits.append(
+                    Hit(
+                        category="artifact",
+                        rule="internal_artifact:%s" % label,
+                        severity="warn",
+                        scope="worktree",
+                        location=rel,
+                        matched=label,
+                        evidence="使用者 2026-11-21 批准：自产测试笔刷，自包含、无敏感内容",
+                        note="；白名单保留（不删文件、不误报 block）",
+                    )
+                )
                 continue
             cat = "credential" if label == ".env 文件" else "artifact"
             hits.append(
