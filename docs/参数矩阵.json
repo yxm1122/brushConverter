@@ -314,8 +314,8 @@
    "krita",
    "parser"
   ],
-  "krita_target": "brush_definition 的 spacing 属性 = Spcn/100",
-  "verdict": "可映射",
+  "krita_target": "spacing 属性 = Spcn/100 × 原始笔尖短边/长边（仅采样笔刷；严格正方形比值 1，近方形按实际，计算笔刷不补偿）；非方形 100% 点残差 3.53%（PS 自身 −3.4%，少周期量测），10%/50% 0.11%/0.18%，不再调系数",
+  "verdict": "需校准",
   "ui_visibility": "有",
   "ui_control": "画笔笔尖形状/间距"
  },
