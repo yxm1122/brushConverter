@@ -14,7 +14,7 @@
 |---|---|
 | 知道逐字段怎么映射（尺寸/间距/角度/散布/纹理…） | [`parameter-mapping.md`](parameter-mapping.md)（**映射唯一权威**，含纹理 §7/§7.1，纹理模式逐模式结论见 §7.2） |
 | 查 47 个纹理混合模式的结论（可映射/需校准/不可映射） | [`数据/mode-table.json`](数据/mode-table.json)（**模式结论唯一真相**，47 行，含证据强度/可区分/塌缩类/前提） |
-| 查某个参数键的结论、来源与承载字段 | [`参数矩阵.json`](参数矩阵.json)（**参数结论唯一真相**，130 行；渲染版 [`参数矩阵.md`](参数矩阵.md)，由脚本生成，禁止手改） |
+| 查某个参数键的结论、来源与承载字段 | [`参数矩阵.json`](参数矩阵.json)（**参数结论唯一真相**，137 行 × 8 栏，含 `ui_visibility` / `ui_control`；渲染版 [`参数矩阵.md`](参数矩阵.md)，由脚本生成，禁止手改） |
 | 判断某个映射为什么这么定、有没有实测依据 | [`parameter-mapping.md`](parameter-mapping.md) + 下方「研究结论」 |
 | 跑验证、看懂「通过/失败/跳过」口径 | [`验证体系使用说明.md`](验证体系使用说明.md) |
 | 加一张基准图 / 搞清楚命名与登记规则 | [`基准库命名规范.md`](基准库命名规范.md) |
@@ -59,7 +59,7 @@
 
 | 文件 | 用途 | 生成/校验 |
 |---|---|---|
-| [`参数矩阵.json`](参数矩阵.json) | 130 个 ABR/PS 参数键的结论（semantics / range / sources / krita_target / verdict） | 手改 JSON 后跑 `python tools/render_matrix_md.py`，再跑 `python tools/check_matrix.py`（退出码 0 才算过） |
+| [`参数矩阵.json`](参数矩阵.json) | 137 行参数键结论（8 栏：semantics / range / sources / krita_target / verdict / ui_visibility / ui_control） | 手改 JSON 后跑 `python tools/render_matrix_md.py`，再跑 `python tools/check_matrix.py`（退出码 0 才算过） |
 | [`参数矩阵.md`](参数矩阵.md) | 矩阵的渲染版 + 模式总表节 | 只由 `tools/render_matrix_md.py` 生成，**不许手改**（check_matrix 的 C9 会红） |
 | [`数据/ps_keys.json`](数据/ps_keys.json) | 逆向得到的 PS 参数键全集（125 条） | 任务 21 产出；check_matrix 的 C6a 依赖 |
 | [`数据/abr_keys.json`](数据/abr_keys.json) | 真实 .abr 样本里实测出现的键（91 条） | 任务 22 产出；check_matrix 的 C6b 依赖 |
@@ -379,7 +379,7 @@ paintoppresets/*.kpp          自包含笔刷预设
 ### 7.5 渲染验证与公式开关层面（v1.2.0 新增）
 
 20. **Krita 5.3.3 的 `kritarunner` 无头路线不能落笔，真实渲染必须走「GUI 路线 A」，且必须串行**。
-    `kritarunner` 能建文档、能读资源库（137 个预设），但 `Window.addView()` 必崩（退出码 `-1073741819` = `0xC0000005`，probe 3/3 复现）；
+    `kritarunner` 能建文档、能读资源库（137 个预设），但 `Window.addView()` 必崩（退出码 `-1073741819`，即 Windows 访问违例，probe 3/3 复现）；
     `Node.paintLine()` 依赖「当前主窗口 → 当前视图」，无视图即访问违例；且它的 Python API 只能按资源库选预设，
     **没有「按 `.kpp` 路径加载预设」的接口**。所以真实渲染走路线 A：临时装 PyKrita 启动插件 + 临时改 `kritarc` +
     把 `.kpp` 临时复制进 `paintoppresets/` → 启动 `krita.com --nosplash` → 插件 `addView`/`paintLine` 落笔 → 导出 PNG →
@@ -453,6 +453,36 @@ paintoppresets/*.kpp          自包含笔刷预设
     相对地，`resourcecache.sqlite` 的 `integrity_check` 轻微异常（`Page N is never used` + 索引条目数不符）
     **不是**本缺陷的必要条件，重建缓存只是可选兜底（代价：自定义预设标签与分组丢失，资源文件不丢）。
     证据：`docs/验收报告/缺陷-纹理丢失-v1.3.1-文档加固.md`。
+
+### 7.8 v1.4.0 新增的坑（参数修正、测试 .abr、传感器默认）
+
+27. **从零构造 `.abr` 时，采样笔尖像素数据后必须跟 8 个 0 字节尾块**。三个样本共 21 个采样笔尖项，
+    无论 RAW 还是 RLE，像素之后都固定跟 `0000000000000000`；漏掉时 Photoshop 直接判整份文件
+    「与这个版本的 Photoshop 不兼容」。坑在于**本项目自己的解析器照样能读**（`_decode_pixels` 只取
+    `width*height` 字节），所以自检全绿、PS 打不开，极易漏。测试笔刷生成器
+    `tools/make_test_abr.py` 已固定写入该尾块（证据：`docs/验收报告/110-报告.md` §三）。
+28. **`*Sensor` 必须写合法 XML，禁止空 `<params/>`**。`.kpp` 模板的 17 组 `*Sensor` 默认写
+    合法的 `pressure` 占位，未映射动态用 `Pressure*=false` + `*UseCurve=false` 关闭；只有 ABR
+    明确映射到压感/方向等控制源时才开启（`build_preset_xml` 里按需覆盖）。**空 `<params/>` 会
+    让 Krita 的 `KisKritaSensorPack::read()` 在 sensorId 为空时早退**，后面的 `UseCurve` /
+    `Value` / `commonCurve` 都不读，界面出现异常曲线或旧值（5.3.3 日志实测
+    `!sensorId.isEmpty()` 断言 19,850 次）。`d448d24` 只修了“默认压感”，空 XML 写法本身是错的；
+    2026-11-21 已改为合法 `pressure` 占位（回归 `tests/test_sensor_defaults_v140.py`）。
+    **旧版产物必须重转。**
+29. **间距短边补偿只改 spacing，不改补白**。采样笔刷 `spacing = Spcn/100 × 短边/长边`
+    （`BrushPreset.spacing_basis`，在 `convert._sampled_brush_def()` 乘上）；严格正方形=1、
+    近方形按实际比值、计算笔刷不补偿。补白成正方形、255 边框是绕 Krita bug 的刻意做法（铁律 17），
+    不要为了修间距去动它——那会同时改笔迹本体（非方形笔迹仍比 PS 高约 1.3–1.5×，属已知）。
+30. **Krita 界面参数错乱先查 sensor id，不要先归因 UI bug**。5.3.3 里点「新建画笔（像素引擎）」
+    再切回测试笔刷，确实可能让编辑器显示状态混乱；但 2026-11-21 复核发现，之前记录的
+    “所有测试笔刷曲线异常、散布 500%/强度 9%”是本项目 `.kpp` 写了空 `<params/>` 导致
+    `KisKritaSensorPack::read()` 早退，不是 Krita 的锅。判定前先**彻底退出 Krita、重新导入
+    新产物、重启后再看**；同时用 `kpp_params` 检查所有 `*Sensor` 都有非空 `id`，并查
+    `%LOCALAPPDATA%\krita.log` 是否还有 `!sensorId.isEmpty()`（证据：`docs/验收报告/112-报告.md`
+    §5.5 的 2026-11-21 更正）。
+31. **公开 / 本地地址分隔**。函数地址、偏移、模块基址这类整数地址只留在本地逆向记录
+    （`docs/优化提示词/`，不入公开仓库）；公开文档与矩阵一律用占位或只写结论，
+    也不写本机绝对路径（通用规范第 11 条、任务 113）。
 
 ## 8. 参考实现与样本
 

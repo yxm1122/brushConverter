@@ -23,8 +23,8 @@
 > 1.253 / 1.281 / 1.325（长宽比 1.280），方形组 1.013–1.020，计算笔刷 0.982–1.000。
 > 修法**只动间距换算这一层**：`spacing × 短边/长边`（比值来自 `BrushPreset.spacing_basis`，
 > 由 `mapping.py` 从原始笔尖宽高算出、在 `convert._sampled_brush_def` 里乘上）。
-> **补白代码一行未改**（铁律 17）；严格正方形笔尖（宽=高）比值为 1、输出与改动前逐字节一致；
-> 近方形按实际短/长边微调（如 86×84 → 0.977，方形组实测误差 1.69–2.01% → 0.68–1.18%）；计算笔刷不变。
+> **补白代码一行未改**（铁律 17）；间距基准比为**严格正方形=1；近方形按实际短/长边；计算笔刷不补偿**
+> （如 86×84 → 0.977，方形组实测误差 1.69–2.01% → 0.68–1.18%；计算笔刷 spacing 原样，走 `_computed_brush_def()`）。
 > 非方形三点实测：25.28%→**0.11%**、28.09%→**0.18%**、32.46%→**3.53%**（最后一点超阈，
 > 原因见 §10.1）。
 
@@ -67,6 +67,15 @@
 | `wtVr`（湿度） | — | — | 像素引擎无对应 | ⛔ |
 | `mxVr`（混合） | — | — | 像素引擎无对应 | ⛔ |
 
+> **传感器默认（v1.4.0 起，任务 112 人工复验 + 2026-11-21 修正）**：`.kpp` 基础模板的 17 组
+> `*Sensor` 必须写**合法的传感器 XML**（默认写 `pressure` 占位），未映射动态用
+> `Pressure*=false` + `*UseCurve=false` 关闭。**禁止写空 `<params/>`**：Krita 5.3.3 的
+> `KisKritaSensorPack::read()` 会在 sensorId 为空时触发 `!sensorId.isEmpty()` 断言并早退，
+> 后面的 `UseCurve` / `Value` / `commonCurve` 全部不读，界面就会显示旧曲线或错误数值
+> （实测出现散布 500%、效果强度 9% 等）。`d448d24` 的「空传感器」写法本身不完整，现已改为
+> 合法 `pressure` 占位（回归 `tests/test_sensor_defaults_v140.py`）。**旧版转换出的 `.kpp`
+> 必须重转**；此前把界面异常归因为 Krita UI bug 的结论已撤回。
+
 ## 5. 散布（Scattering）
 
 | ABR 键 | 含义 | → Krita | 映射公式 | 状态 |
@@ -74,7 +83,7 @@
 | `useScatter` | 启用散布 | `PressureScatter=true`（散布开关） | — | ✅ |
 | `scatterDynamics.jitter` | 散布量（0–1000%） | `ScatterValue`（0–5.0） | `ScatterValue = jitter / 400` | ⚠️需校准（残差 39.7% / 51.1%，见 §10.3） |
 | `scatterDynamics.bVTy==2` | 散布量随压感 | `ScatterSensor=pressure` + `ScatterUseCurve=true` | — | ✅ |
-| `scatterDynamics.bVTy==0` | 散布恒定 | `ScatterUseCurve=false`（关闭曲线） | — | ✅ |
+| `scatterDynamics.bVTy==0` | 散布恒定 | `ScatterSensor=pressure`（合法占位）+ `ScatterUseCurve=false`（关闭曲线） | — | ✅ |
 | `bothAxes` | 两轴 | `AxisX`/`AxisY` | True→AxisX=Y=True；False→AxisX=False,Y=True | ✅ |
 | `Spcn`（顶层） | 散布间距 | — | 不映射到散布量（见注②） | ⛔ |
 | `Cnt`（数量） | — | — | Krita 像素引擎无「数量」 | ⛔ |
@@ -107,7 +116,7 @@
 | `Txtr.Idnt` | 资源查找 | patt 记录按 UUID 匹配，PNG 内嵌 | ✅ |
 | `Txtr.Nm` | `Name` / `PatternFileName` | 资源名由内嵌字节派生：`tex_<sha256(内嵌PNG)前12>.png`（v1.2.1；旧版 `tex_<uuid前8>.png` 与内容无关，会与用户图案库撞名） | ✅ |
 | PNG 字节 | `PatternMD5Sum` | md5 hex（`PatternMD5` 留空，绕开 Krita 5.0 写二进制 bug） | ✅ |
-| `textureScale`（%） | `Texture/Pattern/Scale` | `textureScale/100`，clamp [0.01, 10] | ✅（用户已确认一致） |
+| `textureScale`（%） | `Texture/Pattern/Scale` | `textureScale/100`，clamp [0.01, 10] | ⚠️需校准（200% 残差 32.4%，见 §10.4；50%/100% 已达标：0.00%/max 1、0.00%/max 0） |
 | `textureDepth`（%） | `Texture/Strength/Value` | 高度系 `min(1, 1.2×textureDepth/100)`；非高度系 `textureDepth/100`（0..1，v1.2.1） | ✅ |
 | `textureDepthDynamics.bVTy==2` | `PressureTexture/Strength/` + `Texture/Strength/UseCurve` | `true` + `true`（压感曲线，最小值见下） | ✅ |
 | `textureDepthDynamics.bVTy==0` | `PressureTexture/Strength/` + `Texture/Strength/UseCurve` | `true` + `false`（效果强度开启、无传感器，恒定用 Value） | ✅ |

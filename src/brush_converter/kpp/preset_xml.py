@@ -33,10 +33,11 @@ _SENSORS = [
 ]
 
 _SENSOR_XML = '<!DOCTYPE params> <params id="pressure"/> '
-# 空传感器列表：Krita 会显示「未勾选传感器」；不能沿用 pressure 模板默认，
-# 否则 PS 侧没开的动态（不透明度/流量/尺寸/圆度/旋转/散布/间距等）在 Krita 里
-# 仍会按压感变化。任务 112 人工复验发现（2026-11-20）。
-_EMPTY_SENSOR_XML = '<!DOCTYPE params> <params/> '
+# 关闭动态靠 Pressure<名称>=false，不能写空传感器 XML：
+# KisKritaSensorPack::read() 对 "*Sensor" 先判空；空字符串才会走 noop，
+# 而 `<params/>` 会被当成有定义、随后因 sensorId 为空而早退，导致该动态的
+# 曲线、Value（如 ScatterValue）全部没读。原生 Krita 预设始终写合法 sensor
+# id（通常是 pressure），再用 Pressure* 开关关闭。
 _CURVE_ID = "0,0;1,1;"
 
 
@@ -55,10 +56,10 @@ def _build_default_params() -> dict[str, tuple[str, str]]:
     p: dict[str, tuple[str, str]] = {}
 
     for s in _SENSORS:
-        # 默认「无传感器 + 关曲线」；只有 build_preset_xml 里明确映射到压感/方向
-        # 等传感器时才覆盖。之前默认 pressure 会让所有未映射动态在 Krita 里
-        # 悄悄按压感变化（任务 112 人工复验发现的真实缺陷）。
-        p[_sensor_param_name(s, "Sensor")] = ("string", _EMPTY_SENSOR_XML)
+        # 默认写合法的 pressure 传感器，但用 Pressure<名称>=false 关闭动态。
+        # 不能写空 XML：Krita 的 read() 会在 sensorId 为空时早退，后面的
+        # UseCurve/Value/commonCurve 都不再读取（见 _SENSOR_XML 注释）。
+        p[_sensor_param_name(s, "Sensor")] = ("string", _SENSOR_XML)
         p[_sensor_param_name(s, "UseCurve")] = ("internal", "false")
         p[_sensor_param_name(s, "UseSameCurve")] = ("internal", "true")
         p[_sensor_param_name(s, "Value")] = ("internal", "1")
@@ -93,7 +94,7 @@ def _build_default_params() -> dict[str, tuple[str, str]]:
         "Texture/Pattern/UseSoftTexturing": ("internal", "false"),
         "Texture/Pattern/isRandomOffsetX": ("internal", "false"),
         "Texture/Pattern/isRandomOffsetY": ("internal", "false"),
-        "Texture/Strength/Sensor": ("string", _EMPTY_SENSOR_XML),
+        "Texture/Strength/Sensor": ("string", _SENSOR_XML),
         "Texture/Strength/UseCurve": ("internal", "false"),
         "Texture/Strength/UseSameCurve": ("internal", "true"),
         "Texture/Strength/Value": ("internal", "1"),
@@ -411,8 +412,9 @@ def _apply_texture(params: dict[str, tuple[str, str]], tex: TextureXml) -> None:
         if tex.strength_curve:
             set_string("Texture/Strength/commonCurve", tex.strength_curve)
     else:
-        # PS bVTy==0：恒定强度，只写 Value（textureDepth/100），不接传感器
-        set_string("Texture/Strength/Sensor", _EMPTY_SENSOR_XML)
+        # PS bVTy==0：恒定强度，只写 Value（textureDepth/100）。
+        # 传感器串仍必须是合法 XML（用 pressure 占位），否则 Krita 会早退。
+        set_string("Texture/Strength/Sensor", _pressure_sensor())
         set_internal("Texture/Strength/UseCurve", "false")
 
 
@@ -495,7 +497,8 @@ def build_preset_xml(
             set_string("ScatterSensor", _pressure_sensor())
             set_internal("ScatterUseCurve", "true")
         else:
-            set_string("ScatterSensor", _EMPTY_SENSOR_XML)
+            # 恒定散布：传感器串必须是合法 XML（pressure 占位），曲线关闭。
+            set_string("ScatterSensor", _pressure_sensor())
             set_internal("ScatterUseCurve", "false")
         # 散布量换算：PS jitter(0..1000%) → Krita ScatterValue(0..5.0)
         # 任务 107 实测结论：线性系数无法同时对上 100%/300%（PS 响应超线性、Krita 线性），
