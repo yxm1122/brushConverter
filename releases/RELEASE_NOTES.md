@@ -1,4 +1,4 @@
-# brushConverter v1.4.0（2026-11-20）
+# brushConverter v1.4.0（2026-11-21）
 
 参数修正与验证基建版：界面可见性门、证据分级、参数实测修正、测试 `.abr` 生成。
 **升级必读：非方形采样笔刷的间距与所有笔刷的传感器 XML 写法会变，旧产物必须重新转换**（见下文「升级注意」）。
@@ -10,14 +10,14 @@
 - **证据分级 A/B/C**：47 个纹理混合模式与参数证据统一分级（A=可重跑实测或源码/逆向原文；B=单点/单类证据且写明依赖假设；C=语义推断或该模式在 PS 界面「模式」下拉里不存在）。模式 verdict 不变：可映射 22 / 需校准 1 / 不可映射 24 / 不可判定 0。
 - **间距短边补偿（参数修正）**：采样笔刷 `spacing = Spcn/100 × 原始笔尖短边/长边`（`BrushPreset.spacing_basis`）。非方形三点实测 25.28%→**0.11%**、28.09%→**0.18%**、32.46%→**3.53%**；严格正方形=1、近方形按实际短/长边、计算笔刷不补偿；补白代码一行未改（铁律 17）。
 - **三参数判「需校准」（不再硬调系数）**：散布 100%/300% 增量差 **39.7% / 51.1%**（带高统计复现性 ±7–13%）；硬度 h0 **+15.6px/19.8%**（结构性不可达）、h50 **−7.3px/22.6%**、h100 一致；纹理缩放 200% 差异比例 **93.72%**、max_delta **93**、相对残差 **32.4%**（Krita Qt 重采样）。尺寸 / 角度不偏、零改动。
-- **传感器 XML 缺陷修复（`d448d24` + 2026-11-21 修正）**：基础模板 17 组 `*Sensor` 写合法 `pressure` 占位（`<!DOCTYPE params> <params id="pressure"/>`），未映射动态用 `Pressure*=false` + `*UseCurve=false` 关闭；**禁止空 `<params/>`**——空 XML 会被 Krita 当成有定义、又因 `sensorId` 为空触发 `!sensorId.isEmpty()` 断言并早退，曲线/散布等都不读。`d448d24` 只修了「无动态默认接压感」，空 XML 写法本身仍错误；最终修复见 `tests/test_sensor_defaults_v140.py`。
+- **传感器 XML 缺陷修复（`7073abb` 默认压感修复 + `5e4ad39` 格式修正）**：基础模板 17 组 `*Sensor` 写合法 `pressure` 占位（`<!DOCTYPE params> <params id="pressure"/>`），未映射动态用 `Pressure*=false` + `*UseCurve=false` 关闭；**禁止空 `<params/>`**——空 XML 会被 Krita 当成有定义、又因 `sensorId` 为空触发 `!sensorId.isEmpty()` 断言并早退，曲线/散布等都不读。`7073abb` 只修了「无动态默认接压感」，空 XML 写法本身仍错误；最终修复见 `tests/test_sensor_defaults_v140.py`。
 - **测试笔刷集（20 支）**：`tests/abr-generated/` 六参数 × 3 取值 + 全默认对照 + 旧样本；逐支预期与不合格判据在 `docs/测试笔刷验证清单.md`；解析回读 `python tools/make_test_abr.py --check-suite`。
 - **文档与 GUI 对齐**：README 新增「已知需校准参数」与「已知不可映射模式（v1.4.0 定稿）」；`docs/parameter-mapping.md` 修正 textureScale 状态、补传感器默认说明；`docs/developer-guide.md` 新增 §7.8（8 字节尾块 / 传感器合法占位 / 间距补偿 / 界面异常先查 sensor id / 公开与本地地址分隔）；GUI 中英文提示同步为 v1.4.0 事实（含已知残差与传感器格式修复）。
 
 ## 升级注意
 
 1. **非方形采样笔刷的间距会变**：重新转换后中心距会变小、更接近 PS；这是修正，不是回归（已知残差见 README「已知需校准参数」）。
-2. **旧 `.kpp` 必须重新转换**：旧产物把未映射 `*Sensor` 写成空 `<params/>`，Krita 会因 `sensorId` 为空早退，曲线/散布显示可能异常；v1.4.0 改为合法 `pressure` 占位 + `Pressure*=false` / `UseCurve=false`（`d448d24` 只先修了默认压感）。
+2. **旧 `.kpp` 必须重新转换**：旧产物把未映射 `*Sensor` 写成空 `<params/>`，Krita 会因 `sensorId` 为空早退，曲线/散布显示可能异常；v1.4.0 改为合法 `pressure` 占位 + `Pressure*=false` / `UseCurve=false`（`7073abb` 只先修了默认压感，`5e4ad39` 修最终格式）。
 3. 产物格式、纹理亮度/对比度公式与模式映射表未变，但上述两点会改变产物内容与字节。
 
 ## 已知限制
@@ -27,9 +27,11 @@
 ## 验证
 
 - `python tools/check_matrix.py` 退出码 **0**（137 行 × 8 栏，逆向独有 39 行）；`python tools/render_matrix_md.py --check` 输出「同步」。
-- `python -m pytest -q`：**274 passed / 0 failed / 0 skipped**（107 参数修正后的基线，**待 114 更新最终数**；**113 已定稿，114 端到端门待执行**）。
-- 人工三层（优先 7 支）：2026-11-21 全部完成并**全部合格**（scatter-300 按已知残差，只判方向与量级）；传感器格式修复已实机验证（压力传感器全部关闭、曲线为默认 45°）。其余 13 支为可选、非阻塞待回填。
+- `python tools/verify_all.py`：**58 / 0 / 0**；`python -m pytest -q`：**278 passed / 0 failed / 0 skipped**。
+- 人工三层：优先 7 支全部完成并合格（scatter-300 按已知残差，只判方向与量级）；114 端到端按使用者 2026-11-21 决定放行——12 支明确合格 + §5.1 四支 + GUI 口头确认，其余 8 项以现有证据记录为边界，不写成人工合格。
+- **隐私门**：全历史 `block=0`（warn 882，凭据 0；20 个自产测试 `.abr` 按使用者批准白名单记 warn）；发布前未推送/历史路径重写已完成，备份 bundle 留在校验目录外。
 - 矩阵 verdict 本轮只改 1 行（`Spcn`：可映射 → 需校准），其余 6 行按 108 清单维持；逐条证据见 `docs/验收报告/113-报告.md`（该报告已按 2026-11-21「恢复与定稿说明」定稿；三项校验 2026-11-21 重跑仍为 0 / 0 / 0）。
+- 发行包：GUI `brushConverter-v1.4.0-win64.zip`（65,269,647 B，sha256 `4d7c0b64…7af5b7a`）；CLI `brushconverter-cli-v1.4.0-win64.zip`（27,247,237 B，sha256 `91e859a2…683b213`）。
 
 ## 回退方式
 
