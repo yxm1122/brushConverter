@@ -14,7 +14,8 @@
     bVTy==2 → 压感控制，bVTy==0 → 恒定；bothAxes → 两轴
   - 纹理：按 Krita 模式合成校准亮度/对比度；Linear Height (Photoshop) 使用独立基线
     与反向对比度映射，Krita UI 数值按两位小数输出
-  - 计算笔刷 → Krita auto_brush
+  - 计算笔刷 → 按 PS 硬度剖面生成采样笔尖（png_brush，v1.5.0 任务 133；130 实验定论：
+    计算→采样等价路线可行，硬前置是 Krita 尺寸字段取 PS 实际足印）
 """
 
 from __future__ import annotations
@@ -126,6 +127,8 @@ class BrushPreset:
     spacing_basis: float = 1.0
     tip_gray: np.ndarray | None = None   # 采样笔尖蒙版（255=墨）
     uuid: str | None = None
+    #: ABR 里没有自带位图（计算笔尖）。v1.5.0 起仍由本字段区分来源，但渲染改为
+    #: 「按 Hrdn 剖面生成采样笔尖」（convert._render_preset + hardness_tip.build_tip）。
     is_computed: bool = False
     size_curve: str | None = None       # "x,y;x,y;"
     opacity_curve: str | None = None

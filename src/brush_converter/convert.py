@@ -25,6 +25,7 @@ from .kpp.bundle import (
 )
 from .kpp.kpp_writer import read_preset_xml, render_tip_preview
 from .kpp.preset_xml import texture_brightness_contrast
+from .hardness_tip import build_tip, verify_generated_tip
 from .mapping import _TEXTURING_MODE, BrushPreset, TextureSettings, map_presets
 
 
@@ -190,7 +191,10 @@ def _safe_filename(name: str, index: int) -> str:
 
 def _circle_mask(hardness: float, roundness: float,
                  size: int = 256) -> np.ndarray:
-    """按硬度/圆度生成一个圆形灰度蒙版（用于计算笔刷预览）。
+    """按硬度/圆度生成一个圆形灰度蒙版（预览/实验夹具用）。
+
+    v1.5.0 起计算笔刷的预设与预览都改用 `hardness_tip.build_tip` 生成的 PS 剖面位图，
+    本函数保留给 130 实验的路径 A 对照与既有回归用例（不是生产路径、也不是开关）。
 
     预览始终把笔尖铺满画布的 90%，与 PS 主直径无关：真实尺寸由预设里
     auto_brush 的 diameter 决定，缩略图只反映形状与边缘软硬。
@@ -321,11 +325,25 @@ def _render_preset(bp: BrushPreset, index: int) -> tuple[str, str, np.ndarray]:
         raise ValueError(f"{bp.name}: 无笔尖位图")
 
     if bp.is_computed:
-        tip_png = None
-        brush_def = _computed_brush_def(bp)
-        preview = render_tip_preview(
-            _circle_mask(bp.hardness if bp.hardness is not None else 100.0,
-                         bp.roundness))
+        # v1.5.0（任务 133，132 落地清单 133-1/133-2/133-3）：计算笔刷由 auto_brush
+        # 改成「按 PS 硬度剖面生成的采样笔尖」。依据 130 实验：Krita 的 hfade/vfade 只
+        # 作用在 1.00R 以内，复刻不了 PS「软边伸出标称半径」的 h0/h50（−15.60px/−19.81%、
+        # +7.33px/+22.63%）；把剖面烘成位图、并让 Krita 尺寸字段 = PS 实际足印
+        # （h0/50/100 → 1.45/1.25/1.02 × 标称直径）后，过渡带变成 −0.90px/−1.14%、
+        # +0.04px/+0.12%。代价（发布说明必写）：fade/硬度在 Krita 里不可再调、
+        # 尺寸显示值 = PS 足印（200 → 290/250/204）、每支笔多 3–12 KB 位图。
+        generated = build_tip(bp.hardness, bp.diameter or 30.0, bp.roundness)
+        # 自检（130 verify_tip 口径）：正方形 + 外圈整圈 255，失败即报错，
+        # 绝不静默产出「极性写反/带透明边框」的位图（130 首轮 5 组作废的教训）。
+        verify_generated_tip(generated)
+        tip_png = _png_bytes(generated.stored)
+        res_name = _safe_filename(bp.name, index).rsplit(".", 1)[0]
+        # scale=1.0 → 预设尺寸字段 = 位图边长 = PS 足印；间距按「标称基准 / 位图边长」
+        # 乘回（否则 h0 的步长会被放大到 1.45 倍，见 hardness_tip.spacing_basis）。
+        brush_def = _sampled_brush_def(res_name, tip_png, bp,
+                                       spacing_basis=generated.spacing_basis,
+                                       scale=1.0)
+        preview = render_tip_preview(generated.mask)
     else:
         assert bp.tip_gray is not None  # 非计算笔刷必有笔尖（函数开头已校验）
         # Krita 对非正方形 png_brush 的编辑器尺寸显示存在偏差；
@@ -417,26 +435,41 @@ def convert_presets(abr: AbrFile, presets: list[BrushPreset], out_dir: str,
     return result
 
 
-def _sampled_brush_def(res_name: str, tip_png: bytes, bp: BrushPreset) -> str:
+def _sampled_brush_def(res_name: str, tip_png: bytes, bp: BrushPreset,
+                        spacing_basis: float | None = None,
+                        scale: float | None = None) -> str:
     """生成采样笔尖的 png_brush <Brush> 定义（filename + md5sum 引用内嵌 PNG）。
 
-    spacing 在这里乘 `bp.spacing_basis`（= 原始笔尖短边/长边，任务 107）：
-    Krita 的 png_brush 尺寸/间距基准是补白后的正方形画布边长（=长边），而 PS 对
-    非方形笔尖的间距基准是「渲染后短边」。任务 106 §4 实测 Krita/PS 步长比
-    ≈ 笔尖长宽比（非方形 1.253/1.281/1.325，长宽比 1.280；方形 1.013–1.020）。
-    补白是绕 Krita 尺寸显示的刻意做法（铁律 17，不动），只在间距换算这一层
-    把基准补回短边。严格正方形笔尖（宽=高）比值 = 1 → 输出与改动前逐字节一致；
-    近方形按实际短/长边微调（如 84/86 = 0.977），计算笔刷不变。
+    spacing 在这里乘「间距基准补偿」：Krita 的 png_brush 尺寸/间距基准是内嵌位图的
+    边长，而 PS 的基准是笔尖蒙版的**短边**。两类笔刷的补偿系数不同：
+
+    - 采样笔尖（ABR 自带位图）：用 `bp.spacing_basis` = 原始笔尖短边/长边（任务 107）。
+      补白把 Krita 的基准由短边换成长边，任务 106 §4 实测 Krita/PS 步长比 ≈ 长宽比
+      （非方形 1.253/1.281/1.325，长宽比 1.280；方形 1.013–1.020）。严格正方形比值为 1
+      → 输出与改动前逐字节一致；近方形按实际短/长边微调（如 84/86 = 0.977）。
+    - 计算笔刷（v1.5.0 任务 133）：由调用方传 `spacing_basis` = Dmtr×短/长 ÷ 位图边长
+      （`hardness_tip.spacing_basis`）。PS 对计算笔刷的 100% 间距基准是标称直径
+      （131 表 3：b_PS=200.00=Dmtr），改采样后 Krita 基准变成 PS 足印（h0 是 1.45×Dmtr）。
+
+    scale=1.0 时预设尺寸字段 = 位图边长（计算笔刷路径显式传 1.0，让尺寸恰好等于足印）。
     """
     from .kpp.preset_xml import sampled_brush_definition
     md5 = hashlib.md5(tip_png).hexdigest()
-    basis = bp.spacing_basis if bp.spacing_basis else 1.0
+    basis = bp.spacing_basis if spacing_basis is None else spacing_basis
+    basis = basis if basis else 1.0
+    scale = bp.scale if scale is None else scale
     return sampled_brush_definition(res_name + ".png", md5, bp.spacing * basis,
-                                    bp.angle, bp.scale)
+                                    bp.angle, scale)
 
 
 def _computed_brush_def(bp: BrushPreset) -> str:
-    """生成计算笔刷的 auto_brush <Brush> 定义（程序化圆形笔尖）。"""
+    """生成计算笔刷的 auto_brush <Brush> 定义（程序化圆形笔尖）。
+
+    **v1.5.0 起生产路径不再使用**：计算笔刷改由 `hardness_tip.build_tip` 生成采样笔尖
+    （任务 133，130 实验判「采样等价路线可行」）。本函数保留给两处不改的调用方——
+    130 实验复跑（`tools/exp_hardness_profile.py` 的路径 A 对照）与 107 的回归用例
+    （`tests/test_param_calibration_v140.py`）——不是功能开关，也不能被重新接回生产。
+    """
     from .kpp.preset_xml import auto_brush_definition
     return auto_brush_definition(bp.diameter or 30.0, bp.spacing, bp.angle,
                                  bp.roundness, bp.hardness)
