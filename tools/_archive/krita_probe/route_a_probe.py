@@ -22,7 +22,7 @@ import time
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO_ROOT = os.path.dirname(os.path.dirname(HERE))
 # 环境变量优先（BRUSHCONVERTER_KRITA），本机默认值兜底（不含身份信息）
-KRITA_BIN = os.environ.get("BRUSHCONVERTER_KRITA", r"D:\program\Krita (x64)\bin\krita.com")
+KRITA_BIN = os.environ.get("BRUSHCONVERTER_KRITA", r"<LOCAL_APP_DIR>/Krita (x64)/bin/krita.com")
 PLUGIN_SRC = os.path.join(HERE, "krita_auto_plugin", "__init__.py")
 PLUGIN_NAME = "bc_auto_render"
 LOG_PATH = os.path.join(REPO_ROOT, "tools", "krita_probe", "route_a_log.txt")

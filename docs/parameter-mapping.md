@@ -8,9 +8,9 @@
 
 | ABR 键 | 含义 | → Krita | 映射公式 | 状态 |
 |--------|------|---------|----------|------|
-| `samp` 位图 + `sampledData` UUID | 采样笔尖 | png_brush 内嵌笔尖 | 灰度 PNG，白=墨（base64 内嵌） | ✅ |
+| `samp` 位图 + `sampledData` UUID | 采样笔尖 | png_brush 内嵌笔尖 | 灰度 PNG，**深=墨 / 255=白=透明**（ABR 原始字节 255=墨，`samples._decode_pixels` 做一次 `255−raw`；与 Krita 极性一致，见 developer-guide §7.1 第 2/3 条） | ✅ |
 | `Brsh.Dmtr` | 主直径 px | `scale` | `scale = Dmtr / max(笔尖宽, 笔尖高)`；采样笔尖内嵌 PNG 补零为正方形 | ✅（Krita 显示尺寸修正） |
-| `Brsh.Spcn` | 间距 % | `spacing` | 计算笔刷：`spacing = Spcn / 100`；采样笔刷：`spacing = Spcn/100 × 原始笔尖短边/长边`（v1.4.0 任务 107 基准补偿） | ✅ / ⚠️需校准（仅非方形 100% 点，见 §10.1） |
+| `Brsh.Spcn` | 间距 % | `spacing` | 计算笔刷：`spacing = Spcn/100 × 标称直径/位图足印边长`（v1.5.0 起计算笔刷也是 png_brush，按足印反算基准）；采样笔刷：`spacing = Spcn/100 × 原始笔尖短边/长边`（v1.4.0 任务 107 基准补偿） | ✅ / ⚠️需校准（131 复测 9/9 ≤2%，见 §10.1） |
 | `Brsh.Angl` | 角度（度） | `angle` | `math.radians(Angl % 360)`（度→弧度，负角先 normalize 到 [0,360)） | ✅ |
 | `Brsh.Rndn` | 圆度 % | （采样笔刷不映射，见注①） | — | ⛔ |
 | `Brsh.Hrdn` | 硬度 % | （采样笔刷不映射，见注①） | — | ⛔ |
@@ -25,23 +25,33 @@
 > 由 `mapping.py` 从原始笔尖宽高算出、在 `convert._sampled_brush_def` 里乘上）。
 > **补白代码一行未改**（铁律 17）；间距基准比为**严格正方形=1；近方形按实际短/长边；计算笔刷不补偿**
 > （如 86×84 → 0.977，方形组实测误差 1.69–2.01% → 0.68–1.18%；计算笔刷 spacing 原样，走 `_computed_brush_def()`）。
-> 非方形三点实测：25.28%→**0.11%**、28.09%→**0.18%**、32.46%→**3.53%**（最后一点超阈，
-> 原因见 §10.1）。
+> 106 单周期实测：25.28%→**0.11%**、28.09%→**0.18%**、32.46%→**3.53%**；
+> **131 用 2 次重复、9/9 组复测 ≤2%（最大 0.73%），3.53% 是 106 少周期量测伪差**（100% 点仅约 3.6 个周期，见 §10.1）。
 
 > 注①：圆度/硬度只对「计算笔刷」有意义（采样笔刷的圆度已固化在笔尖位图里）。
 
-## 2. 计算笔刷（无位图 → auto_brush）
+## 2. 计算笔刷（无位图 → png_brush，v1.5.0 起）
+
+> **v1.5.0（任务 133）把计算笔刷的承载从 `auto_brush` 换成按 PS 硬度剖面生成的采样位图 `png_brush`**：
+> Krita `auto_brush` 的 `hfade/vfade` 是 [0,1] 线性剖面，PS 硬度剖面在低硬度端更宽，
+> h0 过渡带实测 +15.60px（19.8%）属结构性不可达；改位图后 h0/h50/h100 过渡带
+> **Δ0.858 / 0.058 / 0.485 px**（D=200，136 抽检几何级 3/3 过），h50 由 +7.33px 降到 +0.04px。
+> 生成器 `src/brush_converter/hardness_tip.py`，剖面表 `HARDNESS_PROFILES`。
 
 | ABR 键 | → Krita | 映射公式 | 状态 |
 |--------|---------|----------|------|
-| `Dmtr` | `MaskGenerator.diameter` | 直接 | ✅ |
-| `Hrdn` | `hfade`/`vfade` | `Hrdn / 100`（fade=实心区占比，与硬度同向） | ⚠️需校准（h=0 结构性不可达，见 §10.2） |
-| `Rndn` | `ratio` | `Rndn / 100` | ✅ |
+| `Dmtr` | `BrushDef/size`（=位图边长） | 不直接写：位图边长 = `2·ceil(r_vis)+2`（h0/h50/h100 @ D=200 → **290/250/204**），`size` = 位图边长 = **PS 实际足印** | ✅（v1.5.0） |
+| `Hrdn` | 位图（`png_brush`） | 按剖面表生成位图，**不再写 `hfade/vfade`** | ✅（v1.5.0；Krita 里硬度/fade 不可再调） |
+| `Rndn` | 位图（`png_brush`） | 圆度 <100 时把剖面沿短轴压缩成椭圆再栅格化（轴序与旧 `ratio` 相同） | ✅ |
 | `Angl` | `angle` | `math.radians(Angl % 360)`（度→弧度，负角 normalize） | ✅ |
-| `Spcn` | `spacing` | `Spcn / 100` | ✅ |
+| `Spcn` | `spacing` | `Spcn/100 × 标称直径/位图边长`（硬度越高位图越大，步长按标称直径反算，否则 h0 步长会被放大 1.45 倍） | ✅ |
 
-> 注①：圆度/硬度只对「计算笔刷」有意义。硬度映射 `fade = Hrdn/100`（Krita 的 `hfade/vfade` 是「实心区占半径比例」，硬度 100%→1.0 硬边、0%→0.0 全软，与 Photoshop 硬度同向，不是 `(100-Hrdn)/100`）。角度 `angle` 在 Krita XML 里存**弧度**、UI 范围 **[0,360) 度**，负角度需先 `% 360` normalize，否则被角度控件 clamp 到 0。
-> **v1.4.0（任务 107）实测：硬度判「需校准」**，代码未改（证据见 §10.2）。
+> **代价（发布说明必写）**：① Krita 里 `fade`/硬度不可再调（已烘焙进位图）；② 尺寸显示值 = PS 实际足印
+> （PS 标称 200 → Krita 290/250/204）；③ 每支笔多 3–12 KB（h100 @D=200 的 .kpp 5,588→9,143 B）。
+> 生成位图必须**保持正方形 + 边框 255**（铁律 17；`build_tip` 不经 `_square_tip`，正方形与边框是
+> 「径向剖面 + 外环强制归零」的结构性质，勿改回补白）。
+> `auto_brush` 承载链路在 v1.5.0 起已不在生产路径（`convert._computed_brush_def` 保留但不再调用）。
+> 证据：`docs/验收报告/133-报告.md` §二/§四、`docs/验收报告/136-报告.md` §2.1。
 
 ## 3. 形状动态（Shape Dynamics）
 
@@ -50,9 +60,9 @@
 | `szVr.bVTy==2` | 压力 | `PressureSize=true` | — | ✅ |
 | `minimumDiameter` | — | `SizecommonCurve` | `0,{minD/100};1,1;` | ✅ |
 | `angleDynamics.bVTy==6` | 方向 | `RotationSensor=drawingangle` | sensorslist + fuzzy | ✅ |
-| `angleDynamics.jitter` | `RotationValue`（旋转-效果强度） | fuzzy/fuzzystroke 曲线 | `RotationValue=jitter/100`；两条随机度曲线固定 `0,0;1,1;`（Krita UI 对应 -180°..+180°，XML 坐标归一化为 0..1） | ✅（按手调 KPP 校准） |
+| `angleDynamics.jitter` | `RotationValue`（旋转-效果强度） | fuzzy/fuzzystroke 曲线 | `RotationValue=min(1, jitter/50)`（v1.5.0 任务 134-2）；两条随机度曲线固定 `0,0;1,1;`（Krita UI 对应 -180°..+180°，XML 坐标归一化为 0..1） | ✅（j>50 饱和属 B 级未量测，见 §10.3） |
 | `angleDynamics.bVTy==2` | 压力 | `RotationSensor=pressure` | — | ✅ |
-| `angleDynamics.bVTy==0` 且 jitter>0 | 无控制源（纯随机抖动） | `PressureRotation=true` + fuzzy-only 传感器 | `RotationValue=jitter/100`；fuzzy/fuzzystroke 曲线 `0,0;1,1;`，**不含** drawingangle（不随笔迹方向） | ✅（待 Krita 实测复核） |
+| `angleDynamics.bVTy==0` 且 jitter>0 | 无控制源（纯随机抖动） | `PressureRotation=true` + fuzzy-only 传感器 | `RotationValue=min(1, jitter/50)`（v1.5.0 任务 134-2）；fuzzy/fuzzystroke 曲线 `0,0;1,1;`，**不含** drawingangle（不随笔迹方向） | ✅（j=50 跨度 309.90°、复渲 1.51%，见 §10.3） |
 | `roundnessDynamics.bVTy==2` | 压力 | `PressureRatio=true` | — | ✅ |
 | `minimumRoundness` | — | `RatiocommonCurve` | `0,{minR/100};1,1;` | ✅ |
 
@@ -72,7 +82,7 @@
 > `Pressure*=false` + `*UseCurve=false` 关闭。**禁止写空 `<params/>`**：Krita 5.3.3 的
 > `KisKritaSensorPack::read()` 会在 sensorId 为空时触发 `!sensorId.isEmpty()` 断言并早退，
 > 后面的 `UseCurve` / `Value` / `commonCurve` 全部不读，界面就会显示旧曲线或错误数值
-> （实测出现散布 500%、效果强度 9% 等）。`d448d24` 的「空传感器」写法本身不完整，现已改为
+> （实测出现散布 500%、效果强度 9% 等）。`d448d24`（2026-11-21 历史重写前的短哈希，现已失效）的「空传感器」写法本身不完整，现已改为
 > 合法 `pressure` 占位（回归 `tests/test_sensor_defaults_v140.py`）。**旧版转换出的 `.kpp`
 > 必须重转**；此前把界面异常归因为 Krita UI bug 的结论已撤回。
 
@@ -81,7 +91,7 @@
 | ABR 键 | 含义 | → Krita | 映射公式 | 状态 |
 |--------|------|---------|----------|------|
 | `useScatter` | 启用散布 | `PressureScatter=true`（散布开关） | — | ✅ |
-| `scatterDynamics.jitter` | 散布量（0–1000%） | `ScatterValue`（0–5.0） | `ScatterValue = jitter / 400` | ⚠️需校准（残差 39.7% / 51.1%，见 §10.3） |
+| `scatterDynamics.jitter` | 散布量（0–1000%） | `ScatterValue`（0–5.0） | `ScatterValue = jitter / 200`（v1.5.0 任务 134-1；端点 1000%→5.0，不加 clamp） | ✅ / ⚠️需校准（a/D 0.65%/1.69%；1000% 端点未量测，见 §10.3） |
 | `scatterDynamics.bVTy==2` | 散布量随压感 | `ScatterSensor=pressure` + `ScatterUseCurve=true` | — | ✅ |
 | `scatterDynamics.bVTy==0` | 散布恒定 | `ScatterSensor=pressure`（合法占位）+ `ScatterUseCurve=false`（关闭曲线） | — | ✅ |
 | `bothAxes` | 两轴 | `AxisX`/`AxisY` | True→AxisX=Y=True；False→AxisX=False,Y=True | ✅ |
@@ -91,7 +101,11 @@
 
 > 注②：Krita 里 `PressureScatter` 是「散布选项是否启用」的开关（`isChecked` 序列化名），并非"压感控制"；压感控制由 `ScatterSensor` 决定。散布量真正来源是 `scatterDynamics.jitter`（顶层 `Spcn` 实为间距，非散布量）。
 >
-> 散布量换算 `÷400`：**v1.4.0（任务 107）实测后确认无法用确定性换算修到 ≤2%，保留原系数并判「需校准」**（残差、拟合式与回退理由见 §10.3）。旧说明（PS 高斯分布 vs Krita 均匀分布、锚点 PS 145% ≈ Krita 35%）仍成立，但只解释了「为什么需要系数」，解释不了「为什么 100%/300% 同时偏小近一半」。
+> 散布量换算 `÷200`（v1.5.0 任务 134-1 落地）：旧 `÷400` 来自 107 的单点锚定（PS 145% ≈ Krita 35%），
+> 129 用 60 样本、分布型统计量（a/D）实测判定 `÷400` 在 5/5 配置超 10%（最大 50.01%）、`÷200` 最大相对差 0.21%；
+> 134 端到端抽检 a/D 相对差 **0.65%（j=100）/ 1.69%（j=300）**，两次渲染复现 0.08%/0.24%。
+> 散布档与旋转档是**两把尺子**（散布 `j/200`、旋转 `min(1, j/50)`），禁止共用系数。
+> 残差：1000% 端点只做参数/单测、端到端只到 300%（见 §10.3 的 B7）。
 
 ## 6. 不映射（引擎差异大，已列为后续增强）
 
@@ -115,15 +129,15 @@
 | `Txtr.Idnt` | 资源查找 | patt 记录按 UUID 匹配，PNG 内嵌 | ✅ |
 | `Txtr.Nm` | `Name` / `PatternFileName` | 资源名由内嵌字节派生：`tex_<sha256(内嵌PNG)前12>.png`（v1.2.1；旧版 `tex_<uuid前8>.png` 与内容无关，会与用户图案库撞名） | ✅ |
 | PNG 字节 | `PatternMD5Sum` | md5 hex（`PatternMD5` 留空，绕开 Krita 5.0 写二进制 bug） | ✅ |
-| `textureScale`（%） | `Texture/Pattern/Scale` | `textureScale/100`，clamp [0.01, 10] | ⚠️需校准（200% 残差 32.4%，见 §10.4；50%/100% 已达标：0.00%/max 1、0.00%/max 0） |
-| `textureDepth`（%） | `Texture/Strength/Value` | 高度系 `min(1, 1.2×textureDepth/100)`；非高度系 `textureDepth/100`（0..1，v1.2.1） | ✅ |
+| `textureScale`（%） | `Texture/Pattern/Scale` | **v1.5.0 起**：s>100 先用 PS 同核预缩放把纹理重采样后内嵌、`Scale` 写 1.0；s≤100 仍 `textureScale/100`；两处写入 clamp 已解除（Krita 读取无 clamp，UI 滑块 0..2） | ✅（200% 预缩放后 0.00%/max 1，见 §10.4；<100% 核未量测） |
+| `textureDepth`（%） | `Texture/Strength/Value` | 高度系 `min(1, 1.2×textureDepth/100)`；非高度系 `textureDepth/100`（0..1，v1.2.1） | ✅（>83% 是 Krita Strength≤1.0 参数域上限、饱和段无像素后果，见 §7.1 局限 3 与 §10.4） |
 | `textureDepthDynamics.bVTy==2` | `PressureTexture/Strength/` + `Texture/Strength/UseCurve` | `true` + `true`（压感曲线，最小值见下） | ✅ |
 | `textureDepthDynamics.bVTy==0` | `PressureTexture/Strength/` + `Texture/Strength/UseCurve` | `true` + `false`（效果强度开启、无传感器，恒定用 Value） | ✅ |
-| `textureDepthDynamics.Mnm` | `Texture/Strength/commonCurve` | 高度系 `0,min(1,1.2×Mnm/100);1,1;`；非高度系 `0,Mnm/100;1,1;`（仅 bVTy==2，v1.2.1） | ✅ |
+| `textureDepthDynamics.Mnm` | `Texture/Strength/commonCurve` | **v1.5.0（135-5）0 端点写比值** `0,s_m/s_d;1,1;`（`s_m` = 最小深度对应强度、`s_d` = 深度对应强度；各自高度系 ×1.2 后封顶）。Krita 强度是乘性曲线，比值可避免低压力端二次相乘（仅 bVTy==2） | ✅ |
 | `InvT` | `Texture/Pattern/Invert` | 直接 | ✅ |
-| `textureBlendMode` | `Texture/Pattern/TexturingMode` | 按 `mapping._TEXTURING_MODE`（v1.3.0 起 **34 个键**）取 Krita 枚举值：`linearHeight`→15、`height`→14、`hardMix`→10、`Mltp`→0、`Sbtr`→1、`Dfrn`→1、`blendSubtraction`→1、`Ovrl`→5、`CDdg`→6、`CBrn`→7、`linearDodge`→8、`linearBurn`→9 等；未登记的模式回退 Multiply(0) 并保留一条警告 | UI 10 项：✅ 8 / 🧪 1 / ⛔ 1（另 37 内部值不计限制，见 §7.2） |
-| `textureBrightness`（PS -150..150） | `Texture/Pattern/Brightness` | **默认（calibrated，v1.2.0 起）**：`b_k = (1-k)/(510k) - v/255`（C≥0）或 `(1-k)/(510k) - v/(255k)`（C<0），保留 3 位小数，clamp [-1,1]；**历史方案（legacy，v1.1.2，可回退）**：`round(0.10-v/250,2)`，clamp [-1,1] | ✅ / 🧪 |
-| `textureContrast`（PS -50..100） | `Texture/Pattern/Contrast` | 两条路径共用 PS 中心因子 `k`（C<0：1+C/100；C≥0：1/(1-C/100)），clamp [0,2]；calibrated（默认）保留 3 位小数，legacy 保留 2 位 | ✅ / 🧪 |
+| `textureBlendMode` | `Texture/Pattern/TexturingMode` | 按 `mapping._TEXTURING_MODE`（v1.3.0 起 **34 个键**）取 Krita 枚举值：`linearHeight`→15、`height`→14、`hardMix`→10、`Mltp`→0、`Sbtr`→1、`Dfrn`→1、`blendSubtraction`→1、`Ovrl`→5、`CDdg`→6、`CBrn`→7、`linearDodge`→8、`linearBurn`→9 等；未登记的模式回退 Multiply(0) 并保留一条警告；v1.5.0（135-2）另加：hardMix + 满覆盖笔尖 + 恒定深度 → Strength=1.0 + 亮度 ±1/255 偏置 | UI 10 项：✅ 8 / 🧪 1 / ⛔ 1（另 37 内部值不计限制，见 §7.2） |
+| `textureBrightness`（PS -150..150） | `Texture/Pattern/Brightness` | `b_k = (1-k)/(510k) - v/255`（C≥0）或 `(1-k)/(510k) - v/(255k)`（C<0），保留 3 位小数，写入 clamp [-1,1]；满覆盖笔尖 + 恒定深度时另写 ±1/255 偏置（135-2）。越界区（C=−50 且 |v|>127）8/12 组超阈、最大 61.125%，只登记不落地（B10） | ✅ / ⚠️（v1.5.0 起唯一公式，legacy 已删除） |
+| `textureContrast`（PS -50..100） | `Texture/Pattern/Contrast` | 中心因子 `k`（C<0：1+C/100；C≥0：1/(1-C/100)）**原值直写、不再 min(2.0, k) 截断**（135-4）；C>50 用 9 位小数 + `_format_number`；写入域无 clamp（Krita 读取无 clamp，仅 UI 滑块 0..2 显示越界） | ✅（C=84→6.25、C=100→1e6，见 §10.4） |
 | `TxtC` / `interpretation` | — | Krita 无对应，静默忽略（源文件默认值） | ⚠️ |
 | `protectTexture` | — | Krita 无对应，保留轻量警告 | ⚠️ |
 
@@ -132,26 +146,20 @@
 > Krita UI 显示两位小数：legacy 严格按 0.01 舍入（v1.1.2 行为）；
 > calibrated 保留 3 位小数（Krita 用 `getDouble` 原样读取预设值，理由与风险见 §7.1 局限 5）。
 
-### 7.1 纹理亮度/对比度：两条公式与开关（v1.2.0 任务 13）
+### 7.1 纹理亮度/对比度：单条公式（v1.2.0 转正，v1.5.0 起 legacy 开关已删除）
 
-**开关**：环境变量 `BRUSHCONVERTER_TEXTURE_FORMULA`，取值 `calibrated`（默认，v1.2.0 起转正）
-或 `legacy`（v1.1.2 历史方案）。读取集中在 `src/brush_converter/kpp/preset_xml.py::_texture_formula()`；
-非法取值回退**默认公式 calibrated** 并向 stderr 打印一次警告。两条路径的实现都保留在
-`preset_xml.py` 里，旧函数未删除。回退命令：
+**v1.5.0（任务 135）删除了公式开关**：`BRUSHCONVERTER_TEXTURE_FORMULA` 环境变量与 legacy 分支已移除
+（`preset_xml.py` 的引用 13 处 → 0），只剩 calibrated 一条公式；**回退只能 `git revert` + 重转**，
+不提供运行时开关（任务 135 裁决，见 `docs/验收报告/135-报告.md` §四）。
 
-```bash
-BRUSHCONVERTER_TEXTURE_FORMULA=legacy python cli.py convert tests/测试用.abr -o converted
-# GUI 同理：启动 GUI 前设置同一环境变量即可
-```
-
-**历史方案（legacy，v1.1.2 及更早；非默认，可用环境变量回退）**
+**历史方案（legacy，v1.1.2 及更早；v1.5.0 已删除，仅留档）**
 
 - 亮度 `b_k = round(0.10 - PS亮度/250, 2)`，clamp [-1,1]；
 - 对比度 `c_k = k`（PS 中心因子），round 两位，clamp [0,2]。
 - 问题（任务 10/12 实测）：它只是一个「经验标尺」，PS 纹理亮度为 0 时 Krita 仍写入 0.10
   （掩码整体压暗约 26/255）；PS 亮度在整段范围上系统性偏移。掩码空间差异比例 70.75%（61 组可表达参数组）。
 
-**现行方案（calibrated，v1.2.0 起默认；A/B 掩码空间 0.00% vs 旧公式 70.75%）**
+**现行方案（calibrated，v1.2.0 起默认、v1.5.0 起唯一；A/B 掩码空间 0.00% vs 旧公式 70.75%）**
 
 PS 侧前置变换（任务 12 拟合，`docs/研究报告/lut-拟合.md` 第 4 节）：对比度中心 `p=127`（0..255），
 因子 `k`，且**顺序随对比度符号翻转**：
@@ -185,24 +193,24 @@ b_k = (1-k)/(510k) - b/(255k)     （C <  0，亮度在对比度之后 → 反�
 
 **局限（如实记录，不回避）**
 
-1. **Krita 对比度硬上限 2**：PS 对比度 > 50 时 `k > 2`，无法表达（C=75 需 4、C=100 为二值化极限）；
-   本任务按 2 截断，属结构性失真。建议 PS 侧对比度控制在 ≤ 50。
-   实测「KYLE 的橡皮擦 - 自然边缘」C=84 就是这种情况。
+1. **对比度越界（v1.5.0 已解除参数截断，仅剩 UI 显示限制）**：PS 对比度 > 50 时 `k > 2`（C=75 → 4、
+   C=84 → 6.25、C=100 → 1e6）。v1.5.0（135-4）改为 **k 原值直写 + `_format_number` 9 位小数**，
+   Krita 读取层无 clamp，掩码可表达网格 79/81 组差异 0.00%/max≤1；**遗留**是 Krita 笔刷编辑器滑块只显示
+   0..2（值越界属预期，需人工在 Krita 里抽查 1 支确认可编辑性，尚未做）。
 2. **Krita 亮度范围 [-1,1]**：C<0 且反解出的 `b_k` 越界时按边界截断。实测阈值约
    `C=-50 且 PS 亮度 < -127 或 > 127`（参数网格中 b=±150 与 C=-50 的两组），属结构性。
-3. **Krita 纹理强度上限 1.0 与 PS 深度 > 83% 的冲突（任务 12 指出）**：PS 高度/线性高度用
-   `12·q`（`q = round(depth·2.55)`）加权，Krita 同一算子写 `10·s`（`s = Texture/Strength/Value`），
-   换算约 `strength ≈ 1.2·depth/100`；因此 PS 深度 > 约 83% 时 Krita 无法精确表达（会提前饱和）。
-   本任务不改深度映射，只在此记录；要精确表达需另开任务（例如改用非 Photoshop 版 Height 算子或拆分强度）。
+3. **PS 深度 > 83% 与 Krita `Strength≤1.0`（v1.5.0 复核：参数域上限，不是结构性缺陷）**：PS 高度/线性高度用
+   `12·q`（`q = round(depth·2.55)`）加权，Krita 同一算子写 `10·s`，换算 `strength ≈ 1.2·depth/100`。
+   PS 深度 > 约 83% 时映射值被封顶 1.0，但**饱和段与原值同像素（无像素后果）**——PS 高度系本身在该区已饱和，
+   所以这是「参数域上限」而非「失真」；126 C-8 复核结论，136 §五-3 N-10 同步。不改深度映射。
 4. **C=+100 理论二值化边界**：允许 ±128 的单像素翻转（任务 12 第 5.4 节）。
 5. **判据口径**：本节的 A/B 是「掩码空间」同引擎判据——Krita 掩码复刻（`tools/texture_mask.py`，
    对 Krita 真值渲染 23/23 张 ≤2%、最大差 1）vs PS 拟合掩码（任务 12 参数化公式 0.01%）。
    「PS 图 vs Krita 图」整图比对 73.13%~100.00%（任务 09 组装验收；任务 10 的跨引擎基线最小
    22.36%）结构性不可达，不能作为转正判据。
-6. **默认值与回退**：v1.2.0 起默认公式为 `calibrated`。旧公式完整保留，可一键回退：
-   `BRUSHCONVERTER_TEXTURE_FORMULA=legacy python cli.py convert ...`（GUI 同理，启动前设环境变量）。
-   非法取值回退默认 `calibrated` 并警告一次。转正依据与回归数字见
-   `docs/验收报告/13-报告.md` 的「转正执行」一节。
+6. **公式唯一、无运行时开关（v1.5.0）**：v1.2.0 起默认 `calibrated`，v1.5.0（任务 135）删除了
+   `BRUSHCONVERTER_TEXTURE_FORMULA` 开关与 legacy 分支（引用 13 处 → 0），**没有运行时回退**；
+   整体回退 = `git revert` + 重转。转正依据与回归数字见 `docs/验收报告/13-报告.md` 的「转正执行」一节。
 7. **calibrated 的 3 位小数**：依据是 Krita `KisTextureOptionData::read` 用 `getDouble` 原样读取
    （`research/krita_texture/KisTextureOptionData.cpp:17`）；2 位小数在 k=2 时舍入误差达 2.55 灰度级，
    不满足 ≤2% 判据。若用户在 Krita 里打开「笔刷设置」编辑器，控件可能把值舍入到两位
@@ -315,32 +323,45 @@ b_k = (1-k)/(510k) - b/(255k)     （C <  0，亮度在对比度之后 → 反�
 
 | bVTy | Photoshop | Krita 传感器 | 状态 |
 |------|-----------|--------------|------|
-| 0 | 关 | 无 | ✅ |
-| 1 | 渐隐 | 无对应（未映射） | ⛔ |
+| 0 | 关 | 无（未映射动态用 `Pressure*=false` + `UseCurve=false` 关闭） | ✅ |
+| 1 | 渐隐 | 无对应（Krita `fade` 是时间渐隐，语义不等价） | ⛔ |
 | 2 | 压力 | `pressure` | ✅ |
-| 3 | 倾斜 | `tilt`（预留，未启用） | ⛔ |
-| 4 | 转轮 | 无对应 | ⛔ |
-| 5 | 旋转随机 | 无对应（未映射；jitter>0 时在 GUI 提示） | ⛔ |
-| 6 / 7 | 初始方向/方向 | `drawingangle` | ✅ |
+| 3 | 倾斜 | `tilt`（预留，未启用；`ytilt` 语义不等价） | ⛔ |
+| 4 | 转轮 | 无对应（`tangentialpressure` 语义不等价） | ⛔ |
+| 5 | **初始方向** | 无对应（`_BVTY_SENSOR=None`；真实样本新增告警） | ⛔ |
+| 6 | **笔划方向** | `drawingangle` | ✅ |
+| 7 | **速度** | `speed` | ✅（A 级枚举绑定；42MB 样本 0 次出现，未实机验证） |
+| 8 | **旋转** | `rotation` | ✅（同上） |
+
+> **v1.5.0（任务 134-3）按 124 A 级 9 值表修正了枚举错位**：旧文档写的「5 旋转 / 6 方向 / 7 初始方向」是错的，
+> 正确为「5 初始方向 / 6 笔划方向 / 7 速度 / 8 旋转」；1/3/4 仍不映射（Krita 有同名传感器但语义不等价：
+> `fade`=时间渐隐、`ytilt`=倾侧、`tangentialpressure`=转轮）。残留见 §10 的 B5/B6。
 
 ## 9. 去重规则
 
 - 完全重复的预设（同名 + 同 UUID + 同 Dmtr）只保留首个。当前文件因此去掉 1 个重复的「淘宝店」横幅笔刷（20 → 19）。
 
-## 10. 参数偏差实测与残差（v1.4.0 任务 106/107；判据 2% / max_delta 2）
+## 10. 参数偏差实测与残差（v1.5.0 口径；判据四档）
 
-> 证据表：`docs/研究报告/参数偏差-2026-11-20.md`（106）；修正报告：`docs/验收报告/107-报告.md`（107）。
-> 数字全部可用下面命令重算（只读已入库的 PS 真值图与 Krita 图，不重渲）：
-> ```
+> 证据来源：v1.4.0 = 任务 106（`docs/研究报告/参数偏差-2026-11-20.md`）+ 107（`docs/验收报告/107-报告.md`）；
+> v1.5.0 = 129/131/133/134/135 四批实验 + 136 收口（`docs/验收报告/136-报告.md` §四：22 条残差登记 = 结构性 3 / 有条件 3 / 未量测 12 / 待下轮 4）。
+> **判据四档（`docs/优化提示词/01-通用规范.md` 第 22 条，不许放宽）**：
+> 像素级 差异比例 ≤2% 且 max_delta ≤2；几何级 绝对差 ≤2px 或相对差 ≤2%；
+> 随机统计 带高中位数相对差 ≤10% 且两次渲染复现性 ≤5%；结构性 有原文证据 + Krita 无承载/有上限，登记残差不再改。
+> 复算命令（只读入库图，不重渲；**别随手 `--force`**——散布随机种子每次会话不同，会把入库证据覆盖成另一组数）：
+>
+> ```bash
 > python tools/measure_deviation.py --param spacing  --values 10,50,100 --analyze
 > python tools/measure_deviation.py --param hardness --values 0,50,100   --analyze
 > python tools/measure_deviation.py --param scatter  --values 0,100,300  --analyze
 > python tools/measure_deviation.py --param scale    --values 50,100,200 --analyze
+> python -m pytest -q tests/test_hardness_tip_v150.py tests/test_random_dynamics_v150.py tests/test_texture_v150.py
 > ```
-> 要重渲 Krita 侧加 `--force`（`--skip-ps` 保留 PS 真值图）。**散布点别随手 `--force`**：
-> 每次会话随机种子不同，带高会变（±7–13%），会把入库证据覆盖成另一组数。
+>
+> 注意：`measure_deviation` 读的是 106/107 的**旧口径**存储数据（硬度 auto_brush、散布 ÷400、缩放无预缩放），
+> 它复算出来的是「v1.4.0 当时的残差」；v1.5.0 的新口径由上面三条 pytest 断言。
 
-### 10.1 间距（只对采样笔尖补偿短边基准）
+### 10.1 间距（只对采样笔尖补偿短边基准）——已收口 ✅
 
 | 组 | 10% | 50% | 100% | 判定 |
 |---|---|---|---|---|
@@ -348,61 +369,63 @@ b_k = (1-k)/(510k) - b/(255k)     （C <  0，亮度在对比度之后 → 反�
 | square（86×84） | 1.69% → **0.68%** | 2.01% → **0.37%** | 1.30% → **1.18%** | 一致 |
 | nonsquare（183×143） | 25.28% → **0.11%** | 28.09% → **0.18%** | 32.46% → **3.53%** | 1/3 点超阈 |
 
-**残差（3.53%）的来源**：PS 侧 100% 点自身偏离「短边模型」——按短边算应 87.5px，
-实测 84.51px（−3.4%，该点只有约 3.6 个周期，属少周期估计偏差，见 106 §4.2）；
-Krita 侧补偿后恒等于 87.49px（=112×143/183，与标称 1:1）。补偿后的 10%/50% 两点
-（0.11%/0.18%）证明「短边基准」这条换算关系本身是对的，100% 点的 3.53% 是 PS 量测残差，
-不是换算错——**转换侧再调系数只会把 10%/50% 弄坏**，故到此为止。
+**3.53% 已判定为量测伪差，不是映射残差**：131 用 2 次重复、9/9 组（computed/square/nonsquare × 10/50/100）
+复测全部 ≤2%，最大 0.73%（nonsquare 100%：PS 88.17px vs Krita 87.53px，−0.73%/−0.64px）。
+106 的 3.53% 来自「PS 100% 点自身 −3.4%」——该点只有约 3.6 个笔尖周期，属少周期估计偏差；
+补偿后的 10%/50% 两点证明短边基准关系本身正确。**结论：spacing 判据内，不调系数**（再调只会把 10%/50% 弄坏）。
 
-另：非方形笔刷的**笔迹本身**在 Krita 里仍比 PS 高大 ~1.3×（补白给笔尖上下各加了墨色边，
-106 §4.3）。本任务按铁律 17 不改补白，所以「间距已对齐、笔迹仍偏大」这句观感是准确的。
+另：非方形笔刷的**笔迹本身**在 Krita 里仍比 PS 高大 ~1.3×（补白给笔尖上下各加了值 255 的边，106 §4.3）。
+按铁律 17 不改补白，所以「间距已对齐、笔迹仍偏大」这句观感是准确的。
 
-### 10.2 硬度（h=0 结构性不可达 → 整参数需校准，代码未改）
+### 10.2 硬度（v1.5.0 改按 PS 剖面生成 png_brush）——几何级 3/3 通过 ✅
 
-| 硬度 | PS 过渡宽 | Krita 过渡宽 | Δ | 结论 |
-|---|---|---|---|---|
-| 0% | 78.75px | 63.15px | **+15.60px（19.8%）** | 超阈 |
-| 50% | 32.38px | 39.71px | −7.33px（22.6%） | 超阈（可单点修） |
-| 100% | 1.88px | 0.81px | 1.07px | 一致（绝对差 ≤2px） |
+| 硬度 @D=200 | PS 过渡宽 | v1.4.0（auto_brush hfade） | v1.5.0（png_brush） |
+|---|---|---|---|
+| 0% | 78.75px | 63.15px（+15.60px / 19.8%） | **Δ0.858px（1.09%）** |
+| 50% | 32.38px | 39.71px（−7.33px / 22.6%） | **Δ0.058px（0.18%）** |
+| 100% | 1.88px | 0.81px（1.07px，抗锯齿量级） | **Δ0.485px（25.54%，绝对差 ≤2px）** |
 
-- **h=0 不可达**：Krita 的 `hfade` 是 [0,1]，`fade=0` 已是最软档，实测过渡宽上限 63.15px，
-  小于 PS 的 78.75px。要再宽只能改直径或加 `Sharpness/softness`（模糊外扩），
-  而直径属「尺寸」参数（106 判不偏、禁止改），softness 会同时影响所有硬度档 → 不给硬凑。
-- **h=50 可单点修**：107 探针实测 `fade=0.59 → 33.14px`、`fade=0.60 → 32.39px`
-  （PS 32.38px，差 0.03%），即 `fade ≈ 1.2×Hrdn/100` 能对上 50%。但 h=0 仍 19.8%，
-  整参数判据过不了，按 107 任务口径**回退不改**（避免用单点经验系数掩盖 h=0 的结构性差异）。
-  下一轮若要修，必须同时解决「软边尺寸基准」（PS 软边会伸出标称直径之外，Krita 停在半径处）。
-- h=100 的两侧「绝对差 1.07px」属抗锯齿量级，不算偏差。
+133 补测 18 组（3 档硬度 × 3 半径 × 2 类）几何判据 **9/9**、最大 1.603px；136 复跑 D=200 三档复现同一数字。
+**残留（登记，不改）**：B1 大直径——h≥95 过渡带约 `(D/200)×1.9−1.9` px，D≳420 时超 2px 绝对判据
+（D=400 实测 1.603px、余量 0.4px）；B2 中间硬度（0/50/100 之间插值）与椭圆（Rndn<100）组合未量测；
+B3 D<50 量化未量测（D=19 的 h0 理论足印 27.4px、公式给 30px）。
+**代价**：Krita 里 fade/硬度不可再调、尺寸显示=PS 足印（200→290/250/204）、每支 +3–12 KB（详见 §2）。
 
-### 10.3 散布（PS 响应超线性 + 统计复现性差 → 需校准，代码未改）
+### 10.3 散布与抖动（v1.5.0 改用两把尺子）——随机档通过 ✅
 
-| 取值 | PS 带高 | Krita 带高（jitter/400） | 增量 PS/Krita | 残差 |
-|---|---|---|---|---|
-| 0% | 102 | 100 | —（锚点） | — |
-| 100% | 165 | 138 | 63 / 38 | **39.7%** |
-| 300% | 376 | 234 | 274 / 134 | **51.1%** |
+| 参数 | v1.4.0 | v1.5.0 | 真值 / 判据 |
+|---|---|---|---|
+| 散布 `ScatterValue` | jitter/400 | **jitter/200** | a/D：j=100 实测 0.5057 vs PS 0.509（**0.65%**）；j=300 1.5189 vs 1.545（**1.69%**）；≤10% 达标 |
+| 散布复现性 | — | 两次渲染 0.08% / 0.24% | ≤5% 达标 |
+| 旋转 `RotationValue` | jitter/100 | **min(1, jitter/50)** | j=50 跨度 309.90°（旧 200.01°）；PS B 级参考 352°（25 dab，统计量不同，只作方向参考）；复渲 1.51% |
 
-107 实测后回退的过程（全部用 `tools/measure_deviation.py` 同一套渲染/统计）：
+判据来源是 129 的分布型统计量（a/D = alpha 加权行位移 ÷ 直径）：÷400 在 5/5 配置超 10%（最大 50.01%）、÷200 最大 0.21%；
+134 端到端抽检散布 j=100/300 两档 a/D 0.65%/1.69%、旋转复现 1.51%，随机档全过。
+**残留（登记，不改）**：B7 散布 1000% 端点只做参数/单测（5.0、不加 clamp），端到端只到 300%
+（129 线性比值 1.06，重渲染收益低）；B8 旋转 j∈(50,100) 全部写 1.0（饱和）只有 124 B 级依据；
+F-6 角度抖动未按「≥25 dab × 3 档、≤15%」正式判据量测（极差估计量在 n=40 时抽样方差大，需先换模板匹配角标准差）。
+旧 `÷400` 的来历（PS 145% ≈ Krita 35% 单点锚定）与为何不能用它，见 107 报告 §10.3 与 129 报告。
 
-1. Krita 侧响应近似线性：`带高 ≈ 100 + 158·s`（`ScatterValue=s`，13 张探针，
-   斜率 129–183，源码依据 `research/KisScatterOption.cpp:36`：偏移 = U(−1,1)·diameter·s）。
-2. PS 侧响应超线性：增量 63 → 274 对应 jitter ×3，得 `G(j)=0.4883j+0.0014167j²`。
-3. 反解 s=G/158 → 二次式 `s=0.34j′+0.07j′²`（j′=jitter/100），实测：
-   100% 增量 71/66（目标 63，+12.7%/+4.8%）、300% 增量 275/197（目标 274，+0.4%/−28.1%）。
-4. **同一配置 300% 两次复现差 78px（297↔375）**——`band_height` 是「约 10 个笔尖里的极值」，
-   每次会话随机源不同（实测同参数两次带高 138/142/129）。判据是 2%，而该统计量的复现性
-   就有 ±7–13% → **无法证明 ≤2%**，按 107 任务口径回退，保留 `jitter/400`。
-5. 下一轮建议：换分布型统计量（如 Alpha 加权行标准差 + 多次重复平均）或固定随机种子再谈系数。
+### 10.4 纹理（v1.5.0 四条落地）——像素级 0.00% ✅
 
-### 10.4 缩放（纹理 scale）
+| 项 | v1.4.0 残差 | v1.5.0 处置 | 结果 |
+|---|---|---|---|
+| 缩放 200% | 差异比例 93.72% / max 93 / 相对残差 32.4% | s>100 预缩放内嵌 + `Scale=1.0`（135-1；解除两处 clamp） | **0.00% / max 1**（128 预缩放 24/24 达标）；单预设 +0.8 KB~+434 KB |
+| 对比度 >50 | `min(2.0,k)` 截断，C=84 结构性失真 | k 原值直写 + 9 位小数（135-4） | C=84→6.25、C=100→1e6；可表达网格 79/81 组掩码 0.00%/max≤1；UI 滑块仍只显示 0..2（越界属预期） |
+| 最小深度 | 曲线 0 端点写绝对强度，低压力端二次相乘 | 0 端点改比值 `s_m/s_d`（135-5） | 乘性曲线语义正确（d=50/Mnm=10 → 0.2，旧 0.1） |
+| hardMix 满覆盖 | 无偏置 | Strength=1.0 + 亮度 ±1/255 偏置（135-2） | 3/3 = **0.00% / max 0**；base<1 不下发（10.0–39.7%） |
 
-| 取值 | 差异比例 | max_delta | 相对残差 | 结论 |
-|---|---|---|---|---|
-| 50% | 0.00% | 1 | 0.8% | 一致 |
-| 100% | 0.00% | 0 | 0（锚点） | 一致 |
-| 200% | **93.72%** | **93** | **32.4%** | 需校准 |
+**残留（登记，不改）**：A5/B13 预缩放 <100% 核、预缩放 + 高对比度（C>50）/ 压感深度的端到端组合未量测；
+B9 b×C 交互区 multiply / subtract / linearBurn 76.680%、hardMix 57.570%（需先补 PS 真值再定修法；
+预烘焙 9/10 但 subtract 需反向烘焙）；B10 亮度越界区（C=−50 且 |b|>127）8/12 组超阈、最大 61.125%/max23
+（预烘焙 12/12=0.000% 但失去可编辑性；真实样本无命中）；B11 hardMix base<1：mid 10.043%–27.175%、
+soft 26.425%–39.657%（须逐 base 烘焙而 base 由引擎生成 ⇒ 不可落地）；B12 hardMix + 压感偏置阈值未量测。
 
-**200% 相对残差 32.4%，是 Krita Qt 重采样差异，转换侧无常数可修**（107 决策：不改代码）。
-100×100 画布上放大的图案由 Krita 自己的缩放算法生成，PS 与 Qt 的插值核不同；残差与
-depth 无关、在 S=200 固定 32.4%（`docs/研究报告/缩放深度-归因实验.md` §0），
-调任何映射常数都只会把已一致的 50%/100% 弄坏。
+### 10.5 其余已登记残差（不属于参数映射修复，逐条在 136 §四）
+
+- **结构性（3 条）**：B5 bVTy=1/3/4 未映射（语义不等价，等 F-7 一并裁决）；B11 hardMix base<1；A7 像素级残差
+  （8-bit 量化 + 1px 网格 + PS 真值自身 AA，本档判据不含像素级整图比对）。
+- **有条件（3 条）**：B1 大直径硬度；B8 旋转 j>50 饱和；B10 亮度越界区。
+- **未量测（12 条）**：F-3 minimumDepth 作用点、F-6 角度抖动手续、F-7 bVTy 5/6、F-9 Mnm、A5 两类预缩放组合、
+  B2/B3/B4、B6 bVTy 7/8 实机、B7 散布 1000%、B12 hardMix+压感、B13 纹理组合。
+- **待下轮（4 条）**：A6 130 h0 的 α0 半径 −4px（可选优化，不影响几何判据）；B9 b×C 交互；B14 真实样本人工目检；B15 文档旧表述（本任务已清）。

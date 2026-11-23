@@ -76,8 +76,9 @@ ABR_PATH = REPO / "tests" / "定量测试专用.abr"
 TEX_R64 = REPO / "research" / "测试用纹理.png"
 TEX_TIP_SRC = (REPO / "extracted" /
                "海怪笔刷-详情展示的勾线笔套装组18支_01_9e263557-527f-11e3-baf5-f373c7f93425.png")
+# 默认值用占位符（隐私门）；本机用 BRUSHCONVERTER_PS 覆盖。
 PS_EXE = Path(os.environ.get(
-    "BRUSHCONVERTER_PS", r"D:/program/PS2025/Adobe Photoshop 2025/Photoshop.exe"))
+    "BRUSHCONVERTER_PS", r"<LOCAL_APP_DIR>/PS2025/Adobe Photoshop 2025/Photoshop.exe"))
 PS_JSX = REPO / "tools" / "ps_export.jsx"
 PS_BRUSH_NAME = "定量测试用"
 

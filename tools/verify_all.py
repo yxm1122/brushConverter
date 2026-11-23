@@ -409,7 +409,9 @@ def _alpha_nonzero(path):
     from PIL import Image
     with Image.open(path) as im:
         rgba = im.convert("RGBA")
-        return sum(1 for value in rgba.getchannel("A").getdata() if value > 0)
+        # Pillow 14 起 Image.getdata() 移除（DeprecationWarning）；tobytes() 逐字节等价。
+        alpha = rgba.getchannel("A").tobytes()
+        return len(alpha) - alpha.count(0)
 
 
 def merge_feel_manifest(top_manifest_path=None, feel_manifest_path=None):

@@ -88,7 +88,8 @@ def test_two_runs_alpha_identical_within_tolerance(tmp_path):
     a2 = _alpha_channel(second)
     diff = ImageChops.difference(a1, a2)
     bbox = diff.getbbox()
-    max_diff = max(diff.getdata()) if bbox else 0
+    # Pillow 14 起 Image.getdata() 移除（DeprecationWarning）；tobytes() 逐字节等价。
+    max_diff = max(diff.tobytes()) if bbox else 0
     assert max_diff <= ALPHA_TOL, "Alpha 差异 %d 超过 tol=%d" % (max_diff, ALPHA_TOL)
     # RGB 通道应完全一致（两次都画同一预设、同一压感）
     rgb1 = Image.open(first).convert("RGB")

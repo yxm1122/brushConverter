@@ -55,8 +55,9 @@ TEXTURE2 = DIR_TEX / "tex2_gradnoise64.png"
 
 CANVAS_200 = {"width": 200, "height": 200, "dpi": 72}
 CANVAS_1100 = {"width": 1100, "height": 64, "dpi": 72}
-PS_EXE = Path(os.environ.get("BRUSHCONVERTER_PS", r"D:/program/PS2025/Adobe Photoshop 2025/Photoshop.exe"))
-PY = "D:/program/anaconda3/envs/brushConverter/python.exe"
+# 默认值用占位符（隐私门）；本机用 BRUSHCONVERTER_PS / BRUSHCONVERTER_PY 覆盖。
+PS_EXE = Path(os.environ.get("BRUSHCONVERTER_PS", r"<LOCAL_APP_DIR>/PS2025/Adobe Photoshop 2025/Photoshop.exe"))
+PY = os.environ.get("BRUSHCONVERTER_PY", sys.executable)
 
 TOL = 2
 PS_TEX_NAME = "bc128a_tex"

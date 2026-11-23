@@ -51,11 +51,12 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TOOLS = os.path.join(REPO, "tools")
 sys.path.insert(0, TOOLS)
 
+# 默认值一律用占位符（隐私门：公开仓库不写本机安装路径）；本机运行时用环境变量覆盖。
 KRITA_BIN = os.environ.get(
-    "BRUSHCONVERTER_KRITA", r"D:\program\Krita (x64)\bin\krita.com"
+    "BRUSHCONVERTER_KRITA", r"<LOCAL_APP_DIR>/Krita (x64)/bin/krita.com"
 )
 KRITARUNNER = os.environ.get(
-    "BRUSHCONVERTER_KRITARUNNER", r"D:\program\Krita (x64)\bin\kritarunner.exe"
+    "BRUSHCONVERTER_KRITARUNNER", r"<LOCAL_APP_DIR>/Krita (x64)/bin/kritarunner.exe"
 )
 PLUGIN_SRC = os.path.join(TOOLS, "krita_render_gui_plugin.py")
 ABR_DIR = os.path.join(REPO, "tests", "abr-generated")

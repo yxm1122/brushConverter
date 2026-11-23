@@ -1,11 +1,11 @@
 # brushConverter
 
-Convert Photoshop brush sets (`.abr`) into Krita brushes (`.kpp` presets / `.bundle` resource packs), with automatic brush-parameter mapping. Ships as both a command-line tool and a PySide6 GUI. **v1.4.0**
+Convert Photoshop brush sets (`.abr`) into Krita brushes (`.kpp` presets / `.bundle` resource packs), with automatic brush-parameter mapping. Ships as both a command-line tool and a PySide6 GUI. **v1.5.0**
 
 Photoshop 笔刷（`.abr`）转 Krita 笔刷（`.kpp` / `.bundle`）工具，支持参数自动映射，提供命令行与图形界面两种方式。
 
-- 采样笔尖 → 内嵌 PNG 笔尖；计算笔刷 → Krita `auto_brush`；支持 v1/v2 旧格式与 v6.1/v6.2 新格式。
-- 自动映射尺寸/间距/角度/压感动态/旋转/散布/纹理（PS UI 可选的 10 个纹理混合模式全部支持）。
+- 采样笔尖 → 内嵌 PNG 笔尖；计算笔刷 → Krita `png_brush`（v1.5.0 起按 PS 硬度剖面生成位图）；支持 v1/v2 旧格式与 v6.1/v6.2 新格式。
+- 自动映射尺寸/间距/角度/压感动态/旋转抖动/散布/纹理（PS UI 可选的 10 个纹理混合模式全部支持）。
 - 纹理 PNG 内嵌 + 缩放/深度（可随压感）/反相/混合模式/亮度/对比度映射；写出后回读校验、覆盖防呆。
 - 双笔刷/颜色动态/湿边等引擎差异大的参数暂不映射，转换前弹窗提醒。
 - 逐字段映射权威清单见 [`docs/parameter-mapping.md`](docs/parameter-mapping.md)；实现原理与踩坑见 [`docs/developer-guide.md`](docs/developer-guide.md)；版本变更见 [`releases/RELEASE_NOTES.md`](releases/RELEASE_NOTES.md)。
@@ -16,7 +16,7 @@ Photoshop 笔刷（`.abr`）转 Krita 笔刷（`.kpp` / `.bundle`）工具，支
 
 ![GUI 截图](docs/screenshot-gui.png)
 
-打开 .abr → 预览每支笔尖缩略图与名称 → 勾选要转换的笔刷（全选/全不选）→ 选产物格式（`.kpp` 每支一个，或 `.bundle` 资源包）→ 选输出目录 → 「开始转换」。含未映射参数的笔刷有 ⚠ 标注并弹窗确认；使用纹理的笔刷会说明亮度/对比度已按 Photoshop 公式校准（calibrated 默认）与模式映射情况。右上角可切换中文 / English（选择会记住）。
+打开 .abr → 预览每支笔尖缩略图与名称 → 勾选要转换的笔刷（全选/全不选）→ 选产物格式（`.kpp` 每支一个，或 `.bundle` 资源包）→ 选输出目录 → 「开始转换」。含未映射参数的笔刷有 ⚠ 标注并弹窗确认；使用纹理的笔刷会说明亮度/对比度已按 Photoshop 公式校准（v1.5.0 起唯一公式，legacy 开关已删除）与模式映射情况。右上角可切换中文 / English（选择会记住）。
 
 下载 `brushConverter-*-win64.zip`（见 [releases](https://github.com/yxm1122/brushConverter/releases)），解压后双击 `brushConverter.exe`。
 
@@ -65,8 +65,17 @@ pyinstaller brushconverter-gui.spec    # → dist/brushConverter/brushConverter.
 
 - 交付物：Krita 5.x 资源包 `.bundle`（一键导入）+ 自包含 `.kpp`（笔尖 base64 内嵌）。
 - 参数映射逐项清单见 [`docs/parameter-mapping.md`](docs/parameter-mapping.md)；纹理混合模式逐模式结论见其 §7.2（唯一真相 `docs/数据/mode-table.json`）。
-- 纹理亮度/对比度默认 calibrated 公式（v1.2.0 起，同引擎掩码空间差异 0.00%，见 parameter-mapping §7.1）；需 v1.1.2 旧行为时设 `BRUSHCONVERTER_TEXTURE_FORMULA=legacy` 回退。
+- 纹理亮度/对比度按 calibrated 公式（v1.2.0 起转正，同引擎掩码空间差异 0.00%，见 parameter-mapping §7.1）；**v1.5.0 起 legacy 开关已删除**（无运行时回退，只能 `git revert` + 重转）。
 - 双笔刷、颜色动态、湿边等暂不映射（引擎差异大）。
+
+### v1.5.0 升级必读
+
+- **旧 `.kpp` / `.bundle` 必须重转**：v1.5.0 三批改动（计算笔刷类型、散布/旋转换算、纹理预缩放）都改变产物字节与语义。
+- **计算笔刷类型变了**：`auto_brush` → `png_brush`（按 PS 硬度剖面生成位图；尺寸=PS 实际足印——PS 标称 200 的笔在 Krita 显示 290/250/204）。代价：Krita 里 **fade/硬度不可再调**，每支多 3–12 KB。
+- **散布数值 ×2、旋转抖动 j<50 ×2**：`ScatterValue = jitter/200`（旧 ÷400）、`RotationValue = min(1, jitter/50)`（旧 ÷100）。旧产物的散布偏小一半、小角度抖动偏小约 2 倍。
+- **纹理缩放 >100% 改为预缩放内嵌**：先按 PS 同核放大再内嵌、`Scale` 写 1.0；单预设体积 +0.8 KB~+434 KB，资源名/内容哈希随之变化；缩放/相位不可再在 Krita 里调。
+- **legacy 开关已删除**：`BRUSHCONVERTER_TEXTURE_FORMULA` 与旧公式分支已移除，无法回退到 v1.1.2 公式；整体回退只能 `git revert` + 重转。
+- 传感器 XML 写法与 v1.4.0 相同（17 组 `*Sensor` 写合法 `pressure` 占位，禁止空 `<params/>`）。
 
 ### v1.4.0 升级必读
 
@@ -91,9 +100,11 @@ pyinstaller brushconverter-gui.spec    # → dist/brushConverter/brushConverter.
 
 ## 已知限制（摘要）
 
-- **纹理混合模式**：PS「纹理 > 模式」UI 只有 **10 项可选**，本工具全部支持——8 可映射 / 1 需校准（`hardMix`）/ 1 不可映射（`Drkn` 变暗，PS 随深度换算子，按正片叠底近似并保留警告）。其余 37 个是 PS 内部枚举值，UI 选不到、与用户无关，**不计为限制**。完整 47 模式枚举研究与「0.00%≠语义等价」等边界见 [`parameter-mapping.md`](docs/parameter-mapping.md) §7.2。
-- **需校准参数**（实测超阈、未用系数硬凑）：间距非方形 100% 点 3.53%、硬度 h0/h50 结构性偏差、散布 100%/300% 残差 39.7%/51.1%、纹理缩放 200% 残差 32.4%；尺寸/角度不偏。残差表与复算命令见 parameter-mapping §10。
-- **结构性限制**：PS 对比度 > 50（Krita Contrast 上限 2）、PS 深度 > 83%（Krita 强度上限 1.0）无法精确表达，见 parameter-mapping §7.1。
+- **纹理混合模式**：PS「纹理 > 模式」UI 只有 **10 项可选**，本工具全部支持——8 可映射 / 1 需校准（`hardMix`，满覆盖笔尖 3/3 = 0.00%，base<1 时 10.0–39.7%）/ 1 不可映射（`Drkn` 变暗，PS 随深度换算子，按正片叠底近似并保留警告）。其余 37 个是 PS 内部枚举值，UI 选不到、与用户无关，**不计为限制**。完整 47 模式枚举研究与「0.00%≠语义等价」等边界见 [`parameter-mapping.md`](docs/parameter-mapping.md) §7.2、[`docs/数据/mode-table.json`](docs/数据/mode-table.json)。
+- **v1.5.0 已修掉的旧残差（旧产物里仍在）**：硬度 h0/h50 结构性偏差 → 计算笔刷改按 PS 剖面生成 `png_brush`（h0/h50/h100 过渡带 Δ0.858/0.058/0.485 px，几何级 3/3 达标）；散布 100%/300% 残差 39.7%/51.1% → 系数 ÷400 改 ÷200（a/D 相对差 0.65%/1.69%）；旋转 j<50 偏小约 2 倍 → `min(1, j/50)`；纹理缩放 200% 残差 32.4% → >100% 预缩放内嵌（0.00%/max 1）。**旧 `.kpp` 必须用 v1.5.0 重转**才能拿到这些修正。
+- **仍存在的残差（结构性/有条件/未量测，如实披露）**：间距非方形 100% 点的 3.53% 是 106 少周期量测伪差，131 多周期复测 9/9 组 ≤2%（最大 0.73%）；硬度余留大直径（h≥95、直径 ≳420px 超 2px）、中间硬度/椭圆/小直径未量测；散布 1000% 端点与旋转 j>50 饱和未量测；纹理亮度越界区（对比度 −50 且亮度绝对值 >127）8/12 组超阈（最大 61.125%）、b×C 交互区 multiply/subtract/linearBurn 76.680%、hardMix 57.570%；纹理预缩放 <100% 核与预缩放+高对比度组合未量测。逐条归属与复跑命令见 parameter-mapping §10 与 [`docs/验收报告/136-报告.md`](docs/验收报告/136-报告.md) §四（22 条残差登记）。
+- **结构性限制**：PS 对比度 > 50 时 Krita 参数域可写（v1.5.0 起不再截断为 2），但 Krita UI 滑块仍只显示 0..2（越界属预期）；PS 纹理深度 > 83% 时 Krita `Strength` 上限 1.0（饱和段无像素后果）。见 parameter-mapping §7.1。
+- **v1.5.0 产物不能在旧版 Krita 里回退**：legacy 纹理公式已删除，回退只能 `git revert` + 重转。
 
 ## 在 Krita 中验证
 

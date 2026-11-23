@@ -102,13 +102,14 @@ from brush_converter import convert as conv_mod                # noqa: E402
 # 常量
 # ---------------------------------------------------------------------------
 
+# 默认值一律用占位符（隐私门）；本机用 BRUSHCONVERTER_PS / BRUSHCONVERTER_KRITA 覆盖。
 PS_EXE = Path(os.environ.get(
     "BRUSHCONVERTER_PS",
-    r"D:/program/PS2025/Adobe Photoshop 2025/Photoshop.exe",
+    r"<LOCAL_APP_DIR>/PS2025/Adobe Photoshop 2025/Photoshop.exe",
 ))
 KRITA_BIN = Path(os.environ.get(
     "BRUSHCONVERTER_KRITA",
-    r"D:\program\Krita (x64)\bin\krita.com",
+    r"<LOCAL_APP_DIR>/Krita (x64)/bin/krita.com",
 ))
 KRITA_LOCK = REPO / ".tmp" / "krita.lock"
 PS_LOCK = REPO / ".tmp" / "ps.lock"

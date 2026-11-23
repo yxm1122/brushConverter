@@ -64,7 +64,9 @@ def sha256_of(path):
 def alpha_nonzero(png_path):
     with Image.open(png_path) as im:
         rgba = im.convert("RGBA")
-        return sum(1 for value in rgba.getchannel("A").getdata() if value > 0)
+        # Pillow 14 起 Image.getdata() 移除；tobytes() 逐字节等价。
+        alpha = rgba.getchannel("A").tobytes()
+        return len(alpha) - alpha.count(0)
 
 
 def image_size(png_path):

@@ -357,8 +357,9 @@ paintoppresets/*.kpp          自包含笔刷预设
 ### 7.1 格式层面
 
 1. **`.kpp` 是 PNG + iTXt 块，不是 ZIP**。预设 XML 经 zlib 压缩放进 `iTXt`（keyword=`preset`），旧 2.2 格式用 `zTXt` + version=`2.2`。
-2. **笔尖是 PNG，不是 GBR**。Krita 5.x 的 `png_brush` 把「全灰无 alpha」的 PNG 当 mask（白=墨、黑=透明）。所以直接用灰度 PNG 即可，无需 GBR、无需字节反转——这是阶段 3 推翻阶段 1「GBR 方案」的关键转折。
-3. **灰度约定**：ABR/GBR 存储 0=墨 255=透明；`png_brush` 白=墨。项目统一为「不透明蒙版 255=墨」。
+> **v1.5.0 纠正**：本条旧表述「白=墨」是错的（130/135 在 Krita 5.3.3 实测 + 2026-11-23 对 ABR 样本复核）。
+2. **笔尖是 PNG，不是 GBR**。Krita 5.x 的 L 模式 `png_brush` 把「全灰无 alpha」的 PNG 当 mask：**深(0)=墨、白(255)=透明**。所以直接用灰度 PNG 即可，无需 GBR——这是阶段 3 推翻阶段 1「GBR 方案」的关键转折。
+3. **灰度约定（正确极性）**：ABR 采样字节 **255=墨、0=透明**（实测 `tests/测试用.abr` 笔尖角点 raw=0、中心 raw=255）；Krita 的 L `png_brush` **深(0)=墨、白(255)=透明**。转换链内部位图统一为 **0=墨/255=透明**（`samples._decode_pixels` 做一次 `255−raw` 反相），与 Krita 极性一致；Krita 自己的 ABR importer 也做 `255−byte` 反相，所以 **ABR 字节→内嵌 PNG 字节是反相关，但落笔墨区极性经两次反相相消、结果与 PS 同极**。
 4. **bundle 的 `manifest.xml` 用 OpenDocument 命名空间**（`urn:oasis:names:tc:opendocument:xmlns:manifest:1.0`），不是自定义格式，容易写错。
 5. **Krita 官方导入 ABR 时不解析 desc**（`kis_abr_brush_collection.cpp` 只取 samp 位图、参数用默认值）。所以「参数映射」是本项目相对官方导入的增值点。
 
@@ -475,7 +476,7 @@ paintoppresets/*.kpp          自包含笔刷预设
     明确映射到压感/方向等控制源时才开启（`build_preset_xml` 里按需覆盖）。**空 `<params/>` 会
     让 Krita 的 `KisKritaSensorPack::read()` 在 sensorId 为空时早退**，后面的 `UseCurve` /
     `Value` / `commonCurve` 都不读，界面出现异常曲线或旧值（5.3.3 日志实测
-    `!sensorId.isEmpty()` 断言 19,850 次）。`d448d24` 只修了“默认压感”，空 XML 写法本身是错的；
+    `!sensorId.isEmpty()` 断言 19,850 次）。`d448d24`（2026-11-21 历史重写前的短哈希，现已失效）只修了“默认压感”，空 XML 写法本身是错的；
     2026-11-21 已改为合法 `pressure` 占位（回归 `tests/test_sensor_defaults_v140.py`）。
     **旧版产物必须重转。**
 29. **间距短边补偿只改 spacing，不改补白**。采样笔刷 `spacing = Spcn/100 × 短边/长边`
@@ -492,6 +493,23 @@ paintoppresets/*.kpp          自包含笔刷预设
 31. **公开 / 本地地址分隔**。函数地址、偏移、模块基址这类整数地址只留在本地逆向记录
     （`docs/优化提示词/`，不入公开仓库）；公开文档与矩阵一律用占位或只写结论，
     也不写本机绝对路径（通用规范第 11 条、任务 113）。
+
+### 7.9 v1.5.0 新增的坑（采样笔尖生成、预缩放哈希、legacy 删除）
+
+32. **采样笔尖生成位图沿用「0=墨」极性，外圈必须整圈 255（=透明）**。`hardness_tip.build_tip` 按剖面算 coverage α，
+    再写 `stored = 255−α`、`mask = 255−stored`；`verify_generated_tip` 断言「正方形 + 外圈整圈 255」，
+    失败即抛错（宁可转换失败也不产出补集/带透明边框的位图——130 首轮 5 组作废的教训）。
+    别再按旧文档「白=墨」写补集；极性推导与实测见 §7.1 第 2/3 条。
+33. **计算笔刷位图的正方形与边框 255 是结构性质，不是补白**。`build_tip` 边长 = `2·ceil(r_vis)+2`，
+    外环按「位图半径 ≥ 边长/2 − 1」强制归零，反相后自然整圈 255；它**不经** `_square_tip`。
+    铁律 17 的「补平方 + 边框 255」对采样笔尖仍是刻意做法，**不许为了间距/尺寸去改补白**（会同时改笔迹本体）。
+34. **纹理预缩放会改资源名与内容哈希 ⇒ 旧产物必重转**。v1.5.0（135-1）s>100 时先 `_prescale_texture_image`
+    重采样再内嵌，`tex_<sha256(内嵌PNG)前12>.png` 与 `PatternMD5Sum` 都按**新字节**重算、`Scale` 写 1.0；
+    `_texture_png_array` 的 tEXt 标记也按新像素数组派生。别把旧哈希写死，也别让不同内容复用旧资源名
+    （会踩 Krita 同名串用坑）。体积代价 +0.8 KB~+434 KB/预设。
+35. **legacy 纹理公式已物理删除（135）**。`BRUSHCONVERTER_TEXTURE_FORMULA` 与旧公式分支、旧用例全部移除
+    （引用 13 处 → 0）；不要按旧文档给「回退命令」——运行时没有回退，只能 `git revert` + 重转。
+    对比度 `min(2.0, k)` 同时删除：C>50 现在写 k 原值（9 位小数），Krita 滑块只显示 0..2 属预期。
 
 ## 8. 参考实现与样本
 

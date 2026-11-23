@@ -62,8 +62,9 @@ KPP_DIR = OUT / "kpp"
 WORK = OUT / "ps_work"
 RESULTS = OUT / "results.json"
 
+# 默认值用占位符（隐私门）；本机用 BRUSHCONVERTER_PS 覆盖。
 PS_EXE = Path(os.environ.get("BRUSHCONVERTER_PS",
-                             r"D:/program/PS2025/Adobe Photoshop 2025/Photoshop.exe"))
+                             r"<LOCAL_APP_DIR>/PS2025/Adobe Photoshop 2025/Photoshop.exe"))
 ABR_COMPUTED = REPO / "tests" / "定量测试专用.abr"
 ABR_SAMPLED = REPO / "tests" / "测试用.abr"
 BRUSH_COMPUTED = "定量测试用"
