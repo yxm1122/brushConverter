@@ -133,7 +133,7 @@
    "krita",
    "parser"
   ],
-  "krita_target": "计算笔刷按 PS 剖面生成 png_brush（尺寸=PS 实足印：D=200 的 h0/h50/h100 → 290/250/204），hfade/vfade 不再写；采样笔刷的硬度固化在位图。残差：D=200 三档过渡带 Δ0.858/0.058/0.485 px（133/136 几何级 3/3 过）；归属：有条件（B1 大直径 h≥95：D≳420 超 2px 绝对判据）+未量测（B2 中间硬度/椭圆组合、B3 D<50 量化）；复核：python -m pytest -q tests/test_hardness_tip_v150.py；2026-11-23",
+  "krita_target": "计算笔刷按 PS 剖面生成 png_brush（尺寸=PS 实足印：D=200 的 h0/h50/h100 → 290/250/204），hfade/vfade 不再写；采样笔刷的硬度固化在位图。残差：D=200 三档过渡带 Δ0.858/0.058/0.485 px（133/136 几何级 3/3 过）；第五轮新增三条——① 中间硬度 h∉{0,50,100} 超阈（N4/B2：h25 主轴 +19.94px / 短轴 +10.01px、h75 主轴 +8.24px / 短轴 +4.22px，D=200 几何级；根因=三档剖面按同半径 α 线性内插把过渡带拉宽）；② 大直径 h100 硬边超阈（N7/B1：D=600/800 Δ+3.15/+4.78px，实测失效边界 D≈453px；h95 贴边通过 Δ1.67/1.80px）；③ 小直径尺寸字段偏高（N4/B3：D=19/30/50 尺寸字段 +9.65/+6.48/+2.78%，几何 3/3 通过、无像素后果）。归属：有条件（B1）+已量测未修（B2/B3）；三类修法均未落地（B2 扩锚点或双参数剖面、B1 绝对像素核、B3 改 edge 公式）。复核：python -m pytest -q tests/test_hardness_tip_v150.py + python tools/exp_hardness_profile.py --experiment b2,b3,n7；2026-11-23",
   "verdict": "需校准",
   "ui_visibility": "有",
   "ui_control": "画笔笔尖形状/硬度"
@@ -216,8 +216,8 @@
    "krita",
    "parser"
   ],
-  "krita_target": "SizecommonCurve/OpacitycommonCurve/FlowcommonCurve/RatiocommonCurve 的 0 端点 = Mnm/100（端点模型维持，mapping 零改动）；v1.5.0 任务 135-5 只把纹理深度曲线的 0 端点改比值。残差：未量测（F-9/A4：PS 侧 6 批×16 段笔迹全平坦、未吃进 ABR fade 动态，且出图通路无压力 ramp）；归属：未量测；复核：python -m pytest -q tests/test_mapping.py；2026-11-23",
-  "verdict": "需校准",
+  "krita_target": "Size/Opacity/Flow/Ratio 四个 commonCurve 的 0 端点 = Mnm/100（百分比→曲线端点，精确单位换算，无经验系数）；v1.5.0 任务 135-5 只把纹理深度曲线的 0 端点改比值。残差：双端实测（146 A 级）——PS alpha=255·base·(Mnm+(100−Mnm)·p)/100 五组残差 ≤6.4 灰度，Krita alpha=255·(Mnm/100+(1−Mnm/100)·p) 与 PS 逐档差 0/0/1 灰度（Mnm=0/20/50）⇒ 差异比例 0.00%、max_delta 1 ≤2（像素级通过）；绝对值地板模型被 base=50+Mnm=50 组（端点 64–126，模型预测 128 平台）否掉。归属：无残差；遗留：Krita 侧 base<100 组合未单独渲染（PS 实测 + Krita 乘性源码支撑）、端点附近 1 灰度差属 8-bit 量化。复核：python -m pytest -q tests/test_mapping.py；2026-11-23",
+  "verdict": "可映射",
   "ui_visibility": "有",
   "ui_control": "传递/最小"
  },
@@ -273,8 +273,8 @@
    "krita",
    "parser"
   ],
-  "krita_target": "采样/计算笔刷均固化在位图：采样笔刷无独立字段；计算笔刷按 Rndn 沿短轴压缩生成椭圆 png_brush（v1.5.0 起，133-5）；auto_brush ratio=Rndn/100 链路 v1.5.0 起不在生产路径（133 迁移后仅留模板）。残差：未量测（B2 椭圆与中间硬度剖面组合）；归属：未量测；复核：python -m pytest -q tests/test_hardness_tip_v150.py；2026-11-23",
-  "verdict": "需校准",
+  "krita_target": "采样/计算笔刷均固化在位图：采样笔刷无独立字段；计算笔刷按 Rndn 沿短轴压缩生成椭圆 png_brush（v1.5.0 起，133-5），轴比=Rndn/100（精确比值，无经验系数）；auto_brush ratio=Rndn/100 链路 v1.5.0 起不在生产路径（133 迁移后仅留模板）。残差：椭圆轴比误差 0.37%–1.34%（N4/B2 六组：Rndn=50/80 × h=25/50/75，几何级 ≤2% 通过）；h=50 椭圆主/短轴过渡带差仅 +0.200/+0.003px（Rndn=80）。归属：无残差；附注：中间硬度过渡带偏宽属 Hrdn 行（不归本行）；D≠200 与 Rndn 其余取值未量测。复核：python tools/exp_hardness_profile.py --experiment b2 + python -m pytest -q tests/test_hardness_tip_v150.py；2026-11-23",
+  "verdict": "可映射",
   "ui_visibility": "有",
   "ui_control": "画笔笔尖形状/圆度"
  },
@@ -314,7 +314,7 @@
    "krita",
    "parser"
   ],
-  "krita_target": "spacing 属性 = Spcn/100 × 原始笔尖短边/长边（仅采样笔刷；严格正方形=1、近方形按实际、计算笔刷不补偿短边而按位图足印反算基准）。非方形 131 复测 9/9 组 ≤2%（最大 0.73%）；旧记的 3.53%/−3.4% 是 106 的少周期量测伪差（100% 点仅约 3.6 个周期），不再调系数。残差：0（判据内）；归属：未量测（B4 椭圆计算笔刷 spacing 基准）；复核：python -m pytest -q tests/test_param_calibration_v140.py；2026-11-23",
+  "krita_target": "spacing 属性 = Spcn/100 × 原始笔尖短边/长边（仅采样笔刷；严格正方形=1、近方形按实际、计算笔刷不补偿短边而按位图足印反算基准）。非方形 131 复测 9/9 组 ≤2%（最大 0.73%）；N4/B4 椭圆计算笔刷 50%/100% 中心距比 0.00%（10% 因 8-bit 量化把调制抹平不可判读，参数级步长 0.0490196×204=10.000px 精确）。残差：已测方向为 0（判据内），但 148 §六-2 实测 Krita 椭圆 dab 步长随笔划方向变（同一图水平段 160px / 垂直段 32px，spacing=1.6）而 PS 恒用短边（方向无关）⇒ 方向依赖组合（椭圆笔尖 + 笔划方向旋转）未闭环。归属：结构性（Krita spacing 基准的方向依赖）+未量测（非水平段；B4 只测水平长直线）；复核：python -m pytest -q tests/test_param_calibration_v140.py；2026-11-23",
   "verdict": "需校准",
   "ui_visibility": "有",
   "ui_control": "画笔笔尖形状/间距"
@@ -389,7 +389,7 @@
  },
  {
   "key": "bVTy",
-  "semantics": "动态控制源枚举（0关 / 1渐隐 / 2压力 / 3倾斜 / 4转轮 / 5初始方向 / 6笔划方向 / 7速度 / 8旋转；v1.5.0 按 124 A 级 9 值表修正，旧「5旋转/6方向/7初始方向」为错位）",
+  "semantics": "动态控制源枚举（0关 / 1渐隐 / 2压力 / 3倾斜 / 4转轮 / 5初始方向（整笔固定在初始段方向，148 A 级）/ 6笔划方向（逐段跟随当前方向）/ 7速度 / 8旋转；v1.5.0 按 124 A 级 9 值表修正，旧「5旋转/6方向/7初始方向」为错位）",
   "range": "int32；ABR 实测 0×327、2×106、5×1、6×12（1/3/4/7 样本未出现）",
   "sources": [
    "re",
@@ -397,7 +397,7 @@
    "krita",
    "parser"
   ],
-  "krita_target": "sensor XML @id：2→pressure；6→drawingangle；7→speed；8→rotation；5→无承载（_BVTY_SENSOR=None，真实样本新增告警）；1/3/4 不映射（与 Krita fade/ytilt/tangentialpressure 语义不等价）。残差：未量测（B5 1/3/4 未映射、B6 7/8 无 ABR 样本实机验证）；归属：结构性（B5）+未量测（B6）；复核：python -m pytest -q tests/test_mapping.py；2026-11-23",
+  "krita_target": "sensor XML @id：2→pressure；6→drawingangle；7→speed；8→rotation；5→无承载（_BVTY_SENSOR=None，真实样本新增告警）；1/3/4 不映射（与 Krita fade/ytilt/tangentialpressure 语义不等价）。残差：N3 实机（148 A 级）——6→drawingangle 等价成立（L 形拐角角差 ±90.0°，与 PS 相同）；5 无承载（PS=整笔固定在初始段方向，Krita=固定基准角 0°：VH/DD 起始方向有 90°/45° 残差，结构性）；7/8 自造 ABR 被 PS 正确加载回读（int:7/int:8），无板常量输入下两侧恒定（角差 ≤0.9°），真实速度/旋转动态响应未量测。归属：结构性（B5 的 1/3/4/5）+未量测（B6 动态响应）；复核：python -m pytest -q tests/test_mapping.py；2026-11-23",
   "verdict": "需校准",
   "ui_visibility": "有",
   "ui_control": "形状动态/控制；散布/控制；纹理/控制；颜色动态/控制；传递/控制"
@@ -854,10 +854,10 @@
    "krita",
    "parser"
   ],
-  "krita_target": "两把尺子分域：散布 ScatterValue = jitter/200（0..1000 → 0..5，不加 clamp）；旋转 RotationValue = min(1, jitter/50)（j>50 饱和）。残差：散布 a/D 相对差 0.65%/1.69%（≤10% 达标）、旋转 j=50 跨度 309.90°（复渲 1.51%，随机档通过）；归属：有条件（B8 旋转 j∈(50,100) 全写 1.0）+未量测（B7 散布 1000% 端点、F-6 角度抖动手续量测）；复核：python -m pytest -q tests/test_random_dynamics_v150.py；2026-11-23",
+  "krita_target": "两把尺子分域：散布 ScatterValue = jitter/200（0..1000 → 0..5，不加 clamp）；旋转 RotationValue = min(1, jitter/50)（j>50 饱和）。残差：散布 a/D 相对差 0.65%/1.69%（≤10% 达标）；旋转 j≥50 饱和 A 级（149：j=50/60/80/100 的 a_θ=184.50/183.33/181.34/184.50°，最大相对差 1.40%、复现 0.00%）；旋转 j<50：148 在改前映射测得幅度≈PS 的 2 倍（j=25 +38.20% FAIL；根因=Krita RotationSensor 同时启用 fuzzy+fuzzystroke 两个加法源 ⇒ 跨度 2×360°×R）；修法=只留 fuzzy（候选实测 −5.84%/−2.77%/−1.95% 三点 PASS，148 §3.3），149A 已落地该修法（去 fuzzystroke；改后 F-6 实机复测数字见 149A 报告）。另：Krita 旋转动态基线=180°（非 0°），PS j>50 为 U(−3.6j,+3.6j) 不裁剪按模环绕而非整圈均匀（形状残差，Krita 无承载）。归属：需校准维持（散布 ÷200 经验系数 + 旋转 min(1,j/50) 范围裁剪 + 形状残差结构性）；复核：python -m pytest -q tests/test_random_dynamics_v150.py；2026-11-23",
   "verdict": "需校准",
-  "ui_visibility": "未定",
-  "ui_control": ""
+  "ui_visibility": "有",
+  "ui_control": "形状动态/角度抖动"
  },
  {
   "key": "lightness",
@@ -881,7 +881,7 @@
    "krita",
    "parser"
   ],
-  "krita_target": "Texture/Strength/commonCurve 的 0 端点写比值 s_m/s_d（v1.5.0 起；Krita 强度是乘性曲线，比值可避免低压力端二次相乘），高度系不再额外 ×1.2 后封顶。残差：未量测（F-3/A1：PS 侧 minimumDepth 作用点造不出压力 ramp，参数地板与 alpha 地板二选一未定）；归属：未量测；复核：python -m pytest -q tests/test_texture_xml.py；2026-11-23",
+  "krita_target": "Texture/Strength/commonCurve 的 0 端点写比值 s_m/s_d（v1.5.0 起；Krita 强度是乘性曲线，比值可避免低压力端二次相乘），高度系不再额外 ×1.2 后封顶。残差：作用点已定（145 A 级）——PS minimumDepth 是深度动态曲线 0 端点的参数地板、不是 alpha 地板（无动态时对静态深度完全 no-op；有动态时 PS 实测 depth_eff=D·(Mnm/100+(1−Mnm/100)p)，m=0 六档逐档命中）；但现行实现量纲缺陷未修（145 D145-1：s_m=_texture_strength(depth_min) 把 minimumDepth 当绝对 depth% ⇒ textureDepth<100 时0 端点比值高估 100/depth 倍并被 min(1.0) clamp ⇒ m=20/50 双端不一致 max 120/84 灰度，m=0 差 ≤10 灰度=1 个量化步）；真实样本 16 个带纹理预设 minimumDepth 全 0 ⇒ 无像素后果。归属：需校准维持（量纲缺陷修法未落地：比值改 s_m=_texture_strength(depth×Mnm/100)，一行）+括注「参数域上限，无像素后果」；另 height 模式 8-bit 量化（12q 步=4.7%）使像素级 max_delta 判据不可达（D145-2，判据口径按参数级/乘减模式）。复核：python -m pytest -q tests/test_texture_xml.py；2026-11-23",
   "verdict": "需校准",
   "ui_visibility": "有",
   "ui_control": "纹理/最小深度"
@@ -1198,7 +1198,7 @@
    "re",
    "krita"
   ],
-  "krita_target": "ScatterValue（0..5）= scatter/200，按 jitter 原始值线性写、不加 clamp。残差：a/D 相对差 0.65%/1.69%（129 判据 ≤10% 达标）；归属：未量测（B7 1000% 端点只做参数/单测、端到端只到 300%）；复核：python -m pytest -q tests/test_random_dynamics_v150.py；2026-11-23",
+  "krita_target": "ScatterValue（0..5）= scatter/200，按 jitter 原始值线性写、不加 clamp。残差：a/D 相对差 0.65%/1.69%（129 判据 ≤10% 达标）；N4/B7 j=1000% 端点生产实现超阈（a/D 6.0077 vs PS 5.0048，相对 18.21%，根因=v1.5.0 计算笔刷尺寸字段=足印位图边长而 Krita 散布量按 diameter 计 ⇒ 按 24/20 放大；补偿变体 ScatterValue×spacing_basis 实测 0.01% 达标，未落地）。归属：需校准维持（÷200 为经验系数）+已量测未修（B7）；复核：python -m pytest -q tests/test_random_dynamics_v150.py；2026-11-23",
   "verdict": "需校准",
   "ui_visibility": "有",
   "ui_control": "散布/散布"
@@ -1213,7 +1213,7 @@
    "krita",
    "parser"
   ],
-  "krita_target": "PressureScatter + ScatterSensor + ScatterValue（散布量 = scatterDynamics.jitter/200；v1.5.0 由 ÷400 改 ÷200，两把尺子见 jitter 行）。残差：a/D 0.65%/1.69%（随机档 ≤10%）；归属：未量测（B7 1000% 端点未做端到端）；复核：python -m pytest -q tests/test_random_dynamics_v150.py；2026-11-23",
+  "krita_target": "PressureScatter + ScatterSensor + ScatterValue（散布量 = scatterDynamics.jitter/200；v1.5.0 由 ÷400 改 ÷200，两把尺子见 jitter 行）。残差：a/D 0.65%/1.69%（随机档 ≤10%）；N4/B7 j=1000% 端点生产实现 18.21% 超阈（补偿变体 0.01%，未落地；根因同 scatter 行=散布量按尺寸字段放大）。归属：需校准维持（÷200 经验系数）+已量测未修（B7）；复核：python -m pytest -q tests/test_random_dynamics_v150.py；2026-11-23",
   "verdict": "需校准",
   "ui_visibility": "有",
   "ui_control": "散布/散布"
@@ -1375,7 +1375,7 @@
  },
  {
   "key": "textureBlendMode",
-  "semantics": "纹理混合模式（BlnM 枚举成员）。47 个 PS 纹理模式已逐模式定论：可映射 22 / 需校准 1 / 不可映射 24 / 不可判定 0（无结论 0）。mapping._TEXTURING_MODE 已登记 34 个键（v0.4 新增 15 个，含 Mltp、Nrml、Dfrn、linearDodge、linearBurn、passThrough、blendSubtraction 等），未登记的模式回退 Multiply(0) 并保留警告。本键 verdict 保留「需校准」：22 个模式已转正、1 个（hardMix）有边界残差、24 个不可映射；逐模式结论与证据强度见 docs/数据/mode-table.json（唯一真相）",
+  "semantics": "纹理混合模式（BlnM 枚举成员）。47 个 PS 纹理模式已逐模式定论：可映射 22 / 需校准 1 / 不可映射 24 / 不可判定 0（无结论 0）。mapping._TEXTURING_MODE 已登记 34 个键（v0.4 新增 15 个，含 Mltp、Nrml、Dfrn、linearDodge、linearBurn、passThrough、blendSubtraction 等），未登记的模式回退 Multiply(0) 并保留警告。本键 verdict 保留「需校准」：22 个模式已转正、1 个（hardMix）仍有 base<1/b×C 残差、24 个不可映射；逐模式结论与证据强度见 docs/数据/mode-table.json（唯一真相）",
   "range": "enum；ABR 实测 Mltp 17、linearHeight 10、Hght 4、CBrn 3、Sbtr 2、CDdg 1、hardMix 1（共 38）",
   "sources": [
    "re",
@@ -1383,7 +1383,7 @@
    "krita",
    "parser"
   ],
-  "krita_target": "Texture/Pattern/TexturingMode（0..15，Krita 16 成员）；映射表 mapping._TEXTURING_MODE 34 键；未登记回退 Multiply(0)+警告。残差：hardMix 满覆盖 3/3 = 0.00%/max0，base<1 时 mid 10.043%–27.175% / soft 26.425%–39.657%（B11）；b×C 交互 multiply / subtract / linearBurn 76.680%、hardMix 57.570%（B9）；归属：结构性（B11）+待下轮（B9）+未量测（B12 hardMix+压感）；复核：python tools/render_mode_table.py --check；2026-11-23",
+  "krita_target": "Texture/Pattern/TexturingMode（0..15，Krita 16 成员）；映射表 mapping._TEXTURING_MODE 34 键；未登记回退 Multiply(0)+警告。残差：hardMix 满覆盖（base≡1）已由 v1.5.0 135-2 偏置闭环（135 3/3=0.00%/max0；147 压感 6 档 × Mnm=0/50 全 255、双端 0.00%/max0，B12 成立）；B9 已由 152 重测更正——128A 旧数字 76.680%/57.570% 作废（PS 真值文件名不带纹理后缀、t2 覆盖 t1，属配对错配）：b=50/c=50 且 base≡1 时 10 模式中 9/10 两纹理 0.000%/max≤1（C<0 区 5 组亦 0.000%/max1），唯一真残差仍是 hardMix 现行转换器 56.873%(t1)/38.498%(t2)/max255（根因=PS base≡1 恒 255 vs Krita 掩码饱和到 0；修法候选 b=0.5−0.5/c+1/255 实渲 0.000%/max0，未落地）；base<1 结构性残差现行 10.65%–96.81%（B11，useSoftTexturing=true 口径；候选 D 改 soft=false 22.38%–82.40% 仍全超阈）。归属：结构性（B11）+已量测未修（hardMix b×C 修法候选）+B12 已闭环；复核：python tools/render_mode_table.py --check + python -m pytest -q tests/test_texture_v150.py；2026-11-23",
   "verdict": "需校准",
   "ui_visibility": "有",
   "ui_control": "纹理/模式"
@@ -1398,7 +1398,7 @@
    "krita",
    "parser"
   ],
-  "krita_target": "Texture/Pattern/Brightness（-1..1，掩码阶段再 clamp 0..1）；满覆盖笔尖 + 恒定深度时写 ±1/255 偏置（135-2）。越界区（C=−50 且 PS 亮度绝对值 >127）现行闭式解 8/12 组超阈、最大 61.125%/max23，预烘焙 12/12=0.000% 但失去可编辑性，v1.5.0 只登记不落地（B10）。归属：有条件（B10 越界区登记）；复核：python -m pytest -q tests/test_texture_v150.py；2026-11-23",
+  "krita_target": "Texture/Pattern/Brightness（-1..1，掩码阶段再 clamp 0..1）；满覆盖笔尖 + 恒定深度时写 ±1/255 偏置（135-2）。越界区（C=−50 且 PS 亮度绝对值 >127）v1.6.0 已落地预烘焙（153：按 PS 8bit 链（C<0 先对比度后亮度 / C≥0 先亮度后对比度）把 B/C/Invert 烘进内嵌 PNG，Krita 三字段写中性 B=0/C=1/Invert=false）：端到端实渲 12/12=0.000%/max0–1（改前 8/12 超阈、最大 61.125%/max23）；代价=命中区纹理亮度/对比度/反相失去 PS 语义（可编辑性下降，使用者已接受）、每 (b,c,invert) 一份纹理资源、旧 .kpp 必须重转。残差：非越界区仍走 calibrated 闭式解（经验系数；B/C 链顺序随 C 符号翻转已由 152 单证）；B13 预缩放+C=80 组合 5.650%/max5 超阈（归 textureContrast 行/B13）。归属：需校准维持（calibrated 经验系数）+已落地（B10）；复核：python -m pytest -q tests/test_texture_v150.py tests/test_texture_b10_v160.py；2026-11-23",
   "verdict": "需校准",
   "ui_visibility": "有",
   "ui_control": "纹理/亮度"
@@ -1413,7 +1413,7 @@
    "krita",
    "parser"
   ],
-  "krita_target": "Texture/Pattern/Contrast：读取层无 clamp，k 原值直写（C=75→4、C=84→6.25、C=100→1e6）；C>50 用 9 位小数 + _format_number，仅 UI 滑块 0..2 显示越界。可表达网格 79/81 组掩码差异 0.00%/max≤1。残差：0（可表达域内）；归属：结构性（B9 b×C 交互区）+条件（UI 越界显示，需人工在 Krita 抽查 1 支）；复核：python -m pytest -q tests/test_texture_v150.py；2026-11-23",
+  "krita_target": "Texture/Pattern/Contrast：读取层无 clamp，k 原值直写（C=75→4、C=84→6.25、C=100→1e6）；C>50 用 9 位小数 + _format_number，仅 UI 滑块 0..2 显示越界。可表达网格 79/81 组掩码差异 0.00%/max≤1。B9 已由 152 重测更正：128A 的「b×C 交互 multiply/subtract/linearBurn 76.680%」作废（配对错配），正确配对后 b=50/c=50 下 9/10 模式两纹理 0.000%/max≤1（C<0 区 5 组亦 0.000%/max1）⇒ 本行原「B9 结构性」归属撤回；B10 越界区（C=−50 且 PS 亮度绝对值 >127）已由 153 预烘焙落地 12/12=0.000%。残差：B13 预缩放（s=200）+C=80 组合 5.650%/max5（d=50 组合 5.330%/max3），根因=8-bit 预缩放量化差被 k=5 放大（假设）；另 C>50 的 UI 滑块越界显示属参数域上限、无像素后果。归属：需校准维持（已量测未修 B13）；复核：python -m pytest -q tests/test_texture_v150.py tests/test_texture_b10_v160.py；2026-11-23",
   "verdict": "需校准",
   "ui_visibility": "有",
   "ui_control": "纹理/对比度"
@@ -1440,7 +1440,7 @@
    "krita",
    "parser"
   ],
-  "krita_target": "Texture/Strength/Value：高度系 min(1.0, 1.2×d/100)，非高度系 d/100。>83% 的「提前饱和」是 Krita 参数域上限（Strength≤1.0），不是结构性缺陷：饱和段与原值同像素（无像素后果），见 126 C-8。残差：0（饱和段无像素后果）；归属：结构性（登记，不再改）；复核：python -m pytest -q tests/test_texture_v150.py；2026-11-23",
+  "krita_target": "Texture/Strength/Value：高度系 min(1.0, 1.2×d/100)，非高度系 d/100。>83% 的「提前饱和」是 Krita 参数域上限（Strength≤1.0），不是结构性缺陷：饱和段与原值同像素（无像素后果），见 126 C-8。残差：映射含 1.2 经验系数 ⇒ 维持需校准；N2 实证（145/147）——height 模式输出按 12q 量化（1 q 步=12/255=4.7%），像素级 max_delta 判据在高度模式不可达（D145-2，判据口径按参数级/乘减模式）；147 hardMix 路径不使用深度（Strength 固定 1.0）；143 副产物：multiply 模式 + 深度动态组合在合成夹具上呈反向（depth_eff=t+(D−t)(1−m/100)(1−p)，残差 ≤2.9 深度%），真实样本 9/9 支深度动态笔刷全为 linearHeight（无 multiply 实例）⇒ 登记为模式特异边界；153 的 B10 预烘焙只覆盖 depth=100，B10+depth<100 的先后顺序未拟合。归属：需校准维持（×1.2 经验系数）+登记（multiply 特异边界、B10+depth 未测）；复核：python -m pytest -q tests/test_texture_v150.py；2026-11-23",
   "verdict": "需校准",
   "ui_visibility": "有",
   "ui_control": "纹理/深度"
@@ -1482,7 +1482,7 @@
    "krita",
    "parser"
   ],
-  "krita_target": "Texture/Pattern/Scale：v1.5.0 起 s>100 先用 PS 同核预缩放内嵌 PNG、Scale 写 1.0（单预设体积 +0.8 KB~+434 KB）；s≤100 仍 Scale=s/100；两处写入 clamp 已解除（Krita 读取无 clamp，UI 滑块 0..2）。残差：200% 预缩放后 0.00%/max1；归属：未量测（A5/B13 <100% 预缩放核、预缩放+高对比度/压感组合）；复核：python -m pytest -q tests/test_texture_v150.py；2026-11-23",
+  "krita_target": "Texture/Pattern/Scale：v1.5.0 起 s>100 先用 PS 同核预缩放内嵌 PNG、Scale 写 1.0（单预设体积 +0.8 KB~+434 KB）；s≤100 仍 Scale=s/100；两处写入 clamp 已解除（Krita 读取无 clamp，UI 滑块 0..2）。残差：200% 预缩放后 0.00%/max1；N4/A5 新测 <100%——s=50 现行 Qt 路径 0.000%/max1 通过、s=75 现行路径 88.720%/max94 超阈（源对齐预缩放 0.000%/max1，修法未落地；「100/s 为整数=中心对齐箱式、非整数=源对齐双线性」是 s=50/75 两点归纳的假设）；B13 预缩放+C=80 5.650%/max5、预缩放+d50 0.000%。归属：需校准维持（已量测未修 A5 s<100 非整数倍 + B13 高对比度组合）；修法=非整数倍缩小也走源对齐预缩放 + Scale=1.0（未落地）；复核：python -m pytest -q tests/test_texture_v150.py；2026-11-23",
   "verdict": "需校准",
   "ui_visibility": "有",
   "ui_control": "纹理/缩放"

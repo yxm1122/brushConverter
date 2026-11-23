@@ -31,9 +31,9 @@
  "column_semantics": {
   "verdict": "可映射=Krita 有承载且实测达标（≤2%/max≤2）；需校准=有承载但残差超阈且已定位；不可映射=无等价算子或 PS 侧产不出真值；不可判定=证据不足（本表 0 条，见 37 报告 §三-3）",
   "judge_kind": "像素比对（自有渲染）=PS 真值 vs 该模式自己的 Krita 渲染；像素比对（跨模式候选）=PS 真值 vs 别的 Krita 模式渲染；结构判定=靠枚举/静态证据；需校准（边界残差）",
-  "diff_ratio": "判定候选在 6 组中的最差差异比例（分母 W×H，|Δalpha|>2）",
+  "diff_ratio": "判定候选的差异比例（分母 W×H，|Δalpha|>2）：v0.4 三批为判定候选在 6 组中的最差值；任务 156 起 order 21（hardMix）更新为第五轮实渲「当前转换器行为」的最差值，见该行 note/v160_update",
   "diff_ratio_best": "同上最好值（用来看「离门槛多近」）",
-  "max_delta": "判定候选在 6 组中的最差 max_delta",
+  "max_delta": "判定候选在 6 组中的最差 max_delta；任务 156 起 order 21 的口径同 diff_ratio（第五轮实渲最差值）",
   "saturated_groups": "PS 真值 alpha_unique==1 的组数（饱和组无判别力）",
   "evidence_strength": "legacy 兼容别名：与 evidence_strength_legacy 同值，只为让只读工具 tools/render_mode_table.py 的渲染与 --check 继续工作；新口径请读 evidence_grade。",
   "distinguishable": "当前判据材料能否区分本行结论；false=像素不可区分（饱和/退化/塌缩）；null=无真值未测",
@@ -48,7 +48,9 @@
   "recheck_cmd": "一条在仓库根执行即可打印该行关键数字/证据的命令；只允许相对路径。「暂无（待任务 104）」= 当前材料无法给出可核对数值，任务 104 收尾必须清零或降级并写原因。",
   "recheck_at": "执行者实际跑出/核对 recheck_cmd 的日期（YYYY-MM-DD）。",
   "ui_visibility": "逐行 UI 可见性（与参数矩阵 8 栏同名同枚举）：有 = PS「纹理 > 模式」下拉实测可选（10/47，见 docs/数据/ps_texture_modes_ui.json）；无 = 仅内部枚举值、UI 选不到。只有「有」的行才计入用户可见的转换限制。",
-  "ui_control": "有 = 界面控件「纹理/模式」；无 = 空字符串（与参数矩阵同口径，保证机器可判）。"
+  "ui_control": "有 = 界面控件「纹理/模式」；无 = 空字符串（与参数矩阵同口径，保证机器可判）。",
+  "recheck_cmd_156": "任务 156 新增：第五轮结论的可跑复算命令（152 正确配对记录已进 tests/test_texture_formula_switch.py）",
+  "v160_update": "任务 156 对 order 21 的第五轮更新登记（B9 更正 + 135-2/147/153 现状；verdict 不变）"
  },
  "judging_rule": {
   "diff_tol": 2,
@@ -332,7 +334,8 @@
   },
   "by_evidence_strength_note": "legacy 口径：按 evidence_strength_legacy（旧 evidence_strength）计数，任务 103 起仅留档，不再用于覆盖率统计。",
   "by_evidence_types_note": "按 evidence_types 统计的「含该类型的行数」；一行可属多类，故合计大于 47。",
-  "by_ui_visibility_note": "逐行 ui_visibility 与 docs/参数矩阵.json 同名同枚举（有/无）；10 项 = PS「纹理 > 模式」下拉实测可见项（docs/数据/ps_texture_modes_ui.json count=10），其余 37 项是 PS 内部枚举值、UI 选不到。本字段由任务 137 补齐（116 §四 台账项 2）；有 = 用户可见限制，无 = 枚举研究归档。"
+  "by_ui_visibility_note": "逐行 ui_visibility 与 docs/参数矩阵.json 同名同枚举（有/无）；10 项 = PS「纹理 > 模式」下拉实测可见项（docs/数据/ps_texture_modes_ui.json count=10），其余 37 项是 PS 内部枚举值、UI 选不到。本字段由任务 137 补齐（116 §四 台账项 2）；有 = 用户可见限制，无 = 枚举研究归档。",
+  "by_verdict_note": "任务 156 重算：47 行 = 可映射 22 / 需校准 1 / 不可映射 24 / 不可判定 0；hardMix（order 21）经 135-2/147/152/153 重测仍维持需校准（B9 旧数字作废但 base<1 结构性残差 10.65%–96.81% + b×C 修法候选未落地），故 verdict 分布不变。"
  },
  "collapse": {
   "definition": "把有 PS 真值的模式按「6 组 alpha_sha256 元组」分类；同类 = 在这 6 组参数下 PS 出的是同一张像素",
@@ -1283,7 +1286,7 @@
    "ui_visibility": "有",
    "ui_control": "纹理/模式",
    "judge_kind": "需校准（边界残差）",
-   "diff_ratio": 0.0103,
+   "diff_ratio": 0.9681,
    "diff_ratio_best": 0.0,
    "max_delta": 255,
    "max_delta_best": 0,
@@ -1301,12 +1304,26 @@
    "distinguishable": true,
    "collapse_class": "P3",
    "collapse_class_size": 12,
-   "premise": "PS 真值与 Krita 自有渲染只差 103 px（掩码 T==1 的边界，src==0 处 Krita 给 0、PS 给 255）；转换侧无参数可修",
+   "premise": "判据材料＝单笔尖满覆盖(base=1)+100% 倒相纹理+6 组参数；这 6 组 PS 真值 6/6 饱和（u=1），0.00% 只能证明不冲突（本行 103 px 边界残差已由 v1.5.0 135-2 的满覆盖偏置关闭）；第五轮改用非饱和材料重测（b/c 双非零、压感 6 档、base<1 笔尖），残差与数字见 note/v160_update",
    "s1_premise": "条件成立",
    "batch_verdict": "B：需分模式校准",
-   "note": "仅 d100_b0_c0 差 103 px（掩码 T==1 边界），1.03% / max 255；转换侧无参数可修；【103 分级】A：PS UI 可见（下拉第 8 项「实色混合」）；5/6 组 0.00%，d100_b0_c0 残差 103 px/1.03%/max255 可复跑，且已定位到 Krita 算子严格 > 边界。",
-   "rationale": "5/6 组 0.00%，残差定位到 Krita 算子严格 > 边界（src==0 处 Krita 给 0、PS 给 255）。按判据 max_delta≤2 未达标 → 需校准；不判不可映射，因为 Krita 确有该模式。",
-   "changed_files": "不改（v1.2.1 已登记 mapping.py:46）"
+   "note": "【v0.4】仅 d100_b0_c0 差 103 px（掩码 T==1 边界），1.03%/max255；【v1.5.0 135-2】该边界由满覆盖偏置（Strength=1.0 + Brightness ±1/255）关闭：满覆盖 3/3=0.00%/max0；【第五轮 147】压感 6 档 × Mnm=0/50 全 255、PS/Krita 双端 0.00%/max0（B12 成立）；【第五轮 152 · B9 更正】128A 的 b×C 旧数字（multiply/subtract/linearBurn 76.680%、hardMix 57.570%）作废——PS 真值文件名不带纹理后缀、t2 覆盖 t1 属配对错配；正确配对后 10 模式中 9/10 两纹理 0.000%/max≤1（C<0 区 5 组亦 0.000%/max1），唯一真残差是 hardMix：b=50/c=50 且 base≡1 时现行转换器 56.873%(t1)/38.498%(t2)/max255（根因=PS base≡1 恒 255 与 Krita 掩码被压出 0），修法候选 b=0.5−0.5/c+1/255 实渲 0.000%/max0（未落地）；【B11 更新】base<1 现行 useSoftTexturing=true 残差 10.65%–96.81%（旧 10.043%–27.175%/26.425%–39.657% 为 soft=false 实验口径），候选 D（改 soft=false）22.38%–82.40% 仍全超阈、登记下一轮",
+   "rationale": "满覆盖 + 压感 + b=0 区已闭环（0.00%/max0，135/147）；b×C 双非零区仍 56.87%/38.50%（修法候选未落地），base<1 结构性 10.65%–96.81%（Krita 无等价承载）⇒ 按判据 max_delta≤2 未达标，维持需校准；不判不可映射：Krita 确有该模式且 9/10 模式 b×C 已达 0.000%。",
+   "changed_files": "v0.4 不改（v1.2.1 已登记 mapping.py:46）；v1.5.0 135-2 在 preset_xml.py 加满覆盖偏置；v1.6.0 153 在 convert.py 加 B10 命中时的 −1/255 分支",
+   "recheck_cmd_156": "PYTHONIOENCODING=utf-8 python -m pytest -q tests/test_texture_formula_switch.py（断言 152 正确配对：9 模式 0.000%/max≤1 + hardMix 真残差；.tmp/texture/152 在场时复核实渲数字）",
+   "recheck_at_156": "2026-11-23",
+   "v160_update": {
+    "task": "156",
+    "date": "2026-11-23",
+    "inputs": [
+     "docs/验收报告/135-报告.md",
+     "docs/验收报告/147-报告.md",
+     "docs/验收报告/152-报告.md",
+     "docs/验收报告/153-报告.md"
+    ],
+    "diff_ratio_basis": "现行转换器实渲最差值（152 conv 路径）：base<1 soft d10 = 96.81%/max201；b×C + base≡1 worst = 56.873%(t1)/38.498%(t2)/max255；满覆盖 b=0 与压感路径 = 0.000%/max0",
+    "verdict_unchanged_reason": "B9 旧数字作废后仍有 hardMix 真残差（b×C 修法候选未落地 + base<1 结构性 10.65%–96.81%），按判据 max_delta≤2 未达标 ⇒ 维持需校准；不改判不可映射"
+   }
   },
   {
    "order": 22,
