@@ -61,12 +61,12 @@
 
 | 文件 | 用途 | 生成/校验 |
 |---|---|---|
-| [`参数矩阵.json`](参数矩阵.json) | 137 行参数键结论（8 栏：semantics / range / sources / krita_target / verdict / ui_visibility / ui_control） | 手改 JSON 后跑 `python tools/render_matrix_md.py`，再跑 `python tools/check_matrix.py`（退出码 0 才算过） |
+| [`参数矩阵.json`](参数矩阵.json) | 137 行参数键结论（8 栏：semantics / range / sources / krita_target / verdict / ui_visibility / ui_control）。2026-11-23（任务 156）verdict 分布 = 可映射 24 / 需校准 12 / 无对应 61 / 未定 40（需校准 14→12；Mnm/Rndn 改可映射）；总行数仍 137 | 手改 JSON 后跑 `python tools/render_matrix_md.py`，再跑 `python tools/check_matrix.py`（退出码 0 才算过） |
 | [`参数矩阵.md`](参数矩阵.md) | 矩阵的渲染版 + 模式总表节 | 只由 `tools/render_matrix_md.py` 生成，**不许手改**（check_matrix 的 C9 会红） |
 | [`数据/ps_keys.json`](数据/ps_keys.json) | 逆向得到的 PS 参数键全集（125 条） | 任务 21 产出；check_matrix 的 C6a 依赖 |
 | [`数据/abr_keys.json`](数据/abr_keys.json) | 真实 .abr 样本里实测出现的键（91 条） | 任务 22 产出；check_matrix 的 C6b 依赖 |
 | [`数据/candidates.json`](数据/candidates.json) | 候选映射清单（跨模式候选、判据与置信度） | 任务 29 产出；模式判定时查 |
-| [`数据/mode-table.json`](数据/mode-table.json) | **纹理混合模式逐模式结论**（唯一真相；PS UI 仅 10 项可选，47 行为完整枚举归档） | `python tools/render_mode_table.py --build`；`--check` 校验与 `参数矩阵.md` 同步 |
+| [`数据/mode-table.json`](数据/mode-table.json) | **纹理混合模式逐模式结论**（唯一真相；PS UI 仅 10 项可选，47 行为完整枚举归档）。任务 156 起 order 21（hardMix）的 `diff_ratio` = 第五轮实渲最差值 **96.81%**（就地 patch，含 B9 更正后的真残差 56.87%/38.50% 与 B11 10.65%–96.81%） | `python tools/render_mode_table.py --check` 校验与 `参数矩阵.md` 同步；**禁跑 `--build`**（会丢 103/114/137 后补的 evidence_grade/recheck_cmd/ui_visibility 等字段） |
 | [`数据/mode-batch.json`](数据/mode-batch.json) | 三批（A/B/C）模式的批次成员、PS 真值状态、Krita 渲染登记 | `python tools/mode_batch.py --plan/--manifest`；重跑 `--manifest` 后须再跑 `render_mode_table.py --amend-data` |
 | [`数据/mode-align.json`](数据/mode-align.json) | PS 模式号 ↔ Krita TexturingMode 的对齐表（含 runtime_id） | 任务 33/37 数据；Krita 基线生成时断言用 |
 
@@ -231,21 +231,21 @@ Record = u32 len | 记录体（len 字节） | pad 到 4
 
 | 类别 | ABR 源 | Krita 目标 |
 |------|--------|-----------|
-| 尺寸 | `Dmtr` | `scale = Dmtr / max(笔尖宽, 笔尖高)`；采样笔尖内嵌 PNG 补零为正方形 |
-| 间距 | `Spcn`（#Prc） | 计算笔刷 `spacing = Spcn/100`；采样笔刷再乘短边/长边（见 `parameter-mapping.md` §1） |
+| 尺寸 | `Dmtr` | `scale = Dmtr / max(笔尖宽, 笔尖高)`；采样笔尖内嵌 PNG 补零为正方形；计算笔刷为硬度剖面生成的 `png_brush`（尺寸=PS 实际足印） |
+| 间距 | `Spcn`（#Prc） | 计算笔刷 `spacing = Spcn/100 × 标称直径/位图边长`；采样笔刷再乘短边/长边（见 `parameter-mapping.md` §1） |
 | 角度 | `Angl`（度） | `angle = math.radians(Angl % 360)` |
-| 硬度（计算笔刷） | `Hrdn` | `hfade/vfade = Hrdn/100` |
+| 硬度（计算笔刷） | `Hrdn` | v1.5.0 起按 PS 剖面生成 `png_brush` 位图（`hardness_tip.build_tip`），不再写 `hfade/vfade`（Krita 里硬度不可再调） |
 | 压感→大小 | `szVr.bVTy==2` + `minimumDiameter` | `SizecommonCurve` |
 | 压感→不透明度 | `opVr.Mnm` | `OpacitycommonCurve` |
 | 压感→流量 | `prVr.Mnm` | `FlowcommonCurve` |
 | 压感→宽高比 | `roundnessDynamics` + `minimumRoundness` | `RatiocommonCurve` |
-| 旋转 | `angleDynamics.bVTy` | `RotationSensor`（drawingangle/pressure） |
-| 散布 | `useScatter` + `scatterDynamics.jitter` | `PressureScatter` + `ScatterValue` |
+| 旋转 | `angleDynamics.bVTy` | `RotationSensor`（drawingangle / pressure / speed / rotation）；随机抖动只写 **1 条** fuzzy 加法源（禁止 fuzzystroke） |
+| 散布 | `useScatter` + `scatterDynamics.jitter` | `PressureScatter` + `ScatterValue = jitter/200`（`PressureScatter` 只是启用开关） |
 | 纹理 | `useTexture` + `Txtr.Idnt` + `textureScale/Depth/BlendMode/InvT/Brightness/Contrast` | `Texture/Pattern/*` + `Texture/Strength/*`（逐项见 `parameter-mapping.md` §7） |
 
-**控制源编码（bVTy）**：0=关、1=渐隐、2=压力、3=倾斜、4=转轮、5=旋转随机、6/7=初始方向/方向。映射到 Krita 传感器：pressure（bVTy=2）、drawingangle（bVTy=6/7，随笔迹方向）；bVTy=1/3/4/5 未映射（若 jitter>0 会在 GUI 提示「旋转控制源未映射」）。旋转/散布的逐项换算（含 bVTy=0 纯随机抖动的 fuzzy 传感器、`RotationValue=jitter/100`、随机度曲线归一化 `0,0;1,1;`）见 [`parameter-mapping.md`](parameter-mapping.md) §3、§8。
+**控制源编码（bVTy）**：0=关、1=渐隐、2=压力、3=倾斜、4=转轮、**5=初始方向、6=笔划方向、7=速度、8=旋转**（v1.5.0 任务 134-3 按 124 A 级 9 值表修正；旧文档写的「5 旋转 / 6 方向 / 7 初始方向」是错的）。映射到 Krita 传感器：pressure（2）、drawingangle（6）、speed（7）、rotation（8）；5/1/3/4 未映射（Krita 同名传感器语义不等价：`fade`=时间渐隐、`ytilt`=倾侧、`tangentialpressure`=转轮）。旋转/散布的逐项换算（含 bVTy=0 纯随机抖动的 fuzzy 传感器、`RotationValue=min(1,jitter/50)`、散布 `ScatterValue=jitter/200`、随机度曲线归一化 `0,0;1,1;`，且旋转只写 **1 条** fuzzy 随机曲线、禁止 fuzzystroke）见 [`parameter-mapping.md`](parameter-mapping.md) §3、§5、§8。
 
-**计算笔刷**（无 `sampledData` UUID，只有参数）：映射为 Krita 的 `auto_brush`（程序化圆形笔尖），`diameter`/`ratio`（圆度）/`hfade`/`vfade`（硬度）放进 `MaskGenerator`。
+**计算笔刷**（无 `sampledData` UUID，只有参数）：v1.5.0（任务 133）起映射为按 PS 硬度剖面生成的 `png_brush` 位图（`hardness_tip.build_tip`，尺寸=PS 实际足印），`auto_brush` 链路不在生产路径；Krita 里 fade/硬度不可再调。中间硬度/大直径/小直径的残差见 `parameter-mapping.md` §10.2、§10.5。
 
 完整逐字段清单见 [`parameter-mapping.md`](parameter-mapping.md)。
 
@@ -324,8 +324,13 @@ PS 纹理深度无论是否接传感器都要设为 `true`；深度随压感（`
   二进制导致非法 XML（Krita 官方 MR 修复），新版本以 `PatternMD5Sum` 为准。
 - `TexturingMode` 数值来自 Krita `KisTextureOptionData::TexturingMode`：Multiply=0、Subtract=1、Lightness=2、Gradient=3、Darken=4、Overlay=5、Color Dodge=6、Color Burn=7、Linear Dodge=8、Linear Burn=9、Hard Mix (Photoshop)=10、Hard Mix Softer (Photoshop)=11、Height=12、Linear Height=13、Height (Photoshop)=14、Linear Height (Photoshop)=15。ABR 的 `linearHeight` 优先映射到 15，避免误落到 Darken=4。v1.3.0 把 `_TEXTURING_MODE` 由 19 键扩到 **34 键**并逐模式定论：**PS UI 仅 10 项可选模式全部支持（8 可映射 / 1 需校准 hardMix / 1 不可映射 Drkn）**；完整 47 模式枚举归档为 22 可映射 / 1 需校准 / 24 不可映射（其中 23 个不可映射是 UI 选不到的内部值，不计为用户限制），未登记的模式回退 0 并警告；逐模式结论、证据强度与「0.00% ≠ 语义等价」的口径见 [`数据/mode-table.json`](数据/mode-table.json) 与 [`parameter-mapping.md`](parameter-mapping.md) §7.2。
 - 亮/对比度换算依据 Krita `KisTextureMaskInfo::recalculateMask()` 与 Photoshop/Krita 对照。**默认公式为 `calibrated`（v1.2.0 起，任务 12 拟合 + 任务 13 转正）**：对比度 `c_k = k`（PS 中心因子，`C<0→1+C/100`、`C>=0→1/(1-C/100)`）；亮度 `b_k = (1-k)/(510k) - v/255`（C>=0）或 `(1-k)/(510k) - v/(255k)`（C<0）；保留 3 位小数，最终 clamp 到 Krita UI 范围（亮度 [-1,1]、对比度 [0,2]）。掩码空间 A/B：`calibrated` 0.00% vs 旧公式 70.75%。
-  历史方案（`legacy`，v1.1.2 行为，可用环境变量回退）：所有模式统一亮度 `round(0.10-v/250,2)`，对比度用同一 PS 中心因子并 round 两位。开关与回退命令见 `parameter-mapping.md` §7.1。
+  历史方案（`legacy`，v1.1.2 行为，**v1.5.0 已物理删除**）：所有模式统一亮度 `round(0.10-v/250,2)`，对比度用同一 PS 中心因子并 round 两位。**没有运行时回退**（只能 `git revert` + 重转），见 §7.9 第 35 条与 `parameter-mapping.md` §7.1。
   Linear Height (Photoshop) 曾使用 0.30 基线与对比度倒数的特殊映射，实测效果不好，2026-08-27 确认取消。源码快照与来源链接见 `research/krita_texture/` 和 `research/README.md`。
+
+**v1.6.0 候选：亮度越界区预烘焙（任务 153）**：calibrated 反解的未截断亮度 `|b_k|>1`（等价 C=−50 且 PS 亮度绝对值 >127）时，
+转换器把 PS 的亮度/对比度/反相按 PS 8bit 链（C<0 先对比度后亮度 / C≥0 先亮度后对比度）烘进内嵌纹理 PNG，
+Krita 三字段写中性值 B=0/C=1/Invert=false；端到端 12/12 = 0.000%/max0–1。代价：命中区纹理字段失去 PS 语义（再调会二次叠加）、
+每 (b,c,invert) 一份纹理资源、旧 `.kpp` 必重转；非命中区仍走 calibrated 闭式解。依据：`docs/验收报告/153-报告.md`。
 
 ### 5.4 bundle 结构
 
@@ -398,12 +403,12 @@ paintoppresets/*.kpp          自包含笔刷预设
     判成败**不看退出码**（kritarunner 不透传，实测恒 0），看结果 JSON + PNG 产物 + Alpha 非零像素 > 0。
     证据：`docs/验收报告/04-报告.md`、`docs/验收报告/06-报告.md`、`docs/研究报告/krita-runner-可行性.md`。
 
-21. **纹理亮度/对比度有环境变量开关 `BRUSHCONVERTER_TEXTURE_FORMULA`，默认 `calibrated`，回退用 `legacy`**。
-    v1.2.0 起默认公式已从 v1.1.2 的经验公式（legacy）切到按 Photoshop 公式反解的 calibrated；两条路径都保留在
-    `preset_xml.py`，选择集中在 `_texture_formula()`；非法取值回退默认公式并向 stderr 打印一次警告。回退命令
-    （GUI 同理：启动 GUI 前设同一环境变量）：`BRUSHCONVERTER_TEXTURE_FORMULA=legacy python cli.py convert tests/测试用.abr -o converted`。
-    **改默认值会改变产物字节**：默认路径下 15/25 个 `.kpp` 与 v1.1.2 不同（恰为 15 支带纹理笔刷），显式 `legacy` 下 25/25 与 v1.1.2 的 sha256 全同。
-    回归用例 `tests/test_texture_formula_switch.py` 同时断言两条路径的具体数值。公式、A/B 数字与 7 条局限见 `docs/parameter-mapping.md` §7.1 与 `docs/验收报告/13-报告.md`。
+21. **历史说明：纹理亮度/对比度曾用环境变量开关（`BRUSHCONVERTER_TEXTURE_FORMULA`，v1.5.0 已删除，回退只能 `git revert`）**。
+    v1.2.0–v1.4.x 期间默认 `calibrated`、可切 `legacy`（v1.1.2 经验公式）；v1.5.0（任务 135）已把环境变量、legacy 分支与旧用例**物理删除**
+    （`preset_xml.py` 引用 13 处 → 0），只剩 calibrated 一条公式，**运行时没有回退路径**。旧文档里的
+    `BRUSHCONVERTER_TEXTURE_FORMULA=legacy python cli.py convert …` 命令对当前版本无效；整体回退 = `git revert` + 重转。
+    对比度 `min(2.0,k)` 也在同一任务删除（C>50 写 k 原值），见 §7.9 第 35 条。
+    回归用例 `tests/test_texture_formula_switch.py` 现只断言 calibrated 数值与 152 的 B9 记录；公式、A/B 数字与局限见 `docs/parameter-mapping.md` §7.1 与 `docs/验收报告/13-报告.md`。
 
 ### 7.6 纹理深度与资源命名层面（v1.2.1 新增）
 
@@ -510,6 +515,40 @@ paintoppresets/*.kpp          自包含笔刷预设
 35. **legacy 纹理公式已物理删除（135）**。`BRUSHCONVERTER_TEXTURE_FORMULA` 与旧公式分支、旧用例全部移除
     （引用 13 处 → 0）；不要按旧文档给「回退命令」——运行时没有回退，只能 `git revert` + 重转。
     对比度 `min(2.0, k)` 同时删除：C>50 现在写 k 原值（9 位小数），Krita 滑块只显示 0..2 属预期。
+    §7.5 第 21 条是同一事件的历史说明（已同步为「已删除」），两处不再矛盾。
+
+### 7.10 v1.6.0 候选新增的坑（构建 PATH、压感装置、旋转传感器、会话恢复、纹理预烘焙）
+
+36. **构建会话 PATH 会改变 PyInstaller 产物内容（任务 154）**。若 PATH 含 `<GIT_MINGW64_BIN>`（Git for Windows 自带 OpenSSL 3），
+    `_ssl.pyd`/`_hashlib.pyd` 的依赖 `libcrypto-3-x64.dll`（5,122,716 B）+ `libssl-3-x64.dll`（930,460 B）会被收进 `_internal/`：
+    目录 +2 文件 / **+6,053,176 B**（zip 约 +2.3 MB），构建日志少 3 条 `Library not found` WARNING；常态 PATH 则相反。
+    v1.4.0 与 v1.5.0 的约 6 MB 体积差就是这一条，不是代码/spec 差异（两版 spec 逐字节未变）。**POSIX 风格 PATH（`/c/...`）对 native Python 无效**，
+    须用 Windows 风格注入；发布前用 `PyInstaller.depend.bindepend.resolve_library_path('libssl-3-x64.dll')` 自检并记录构建机 PATH 快照。
+    不要用两版文件数/体积差反推代码变化。
+37. **PS 压感必须走官方脚本 API，且工具状态跨文档保留（任务 143）**。`PathItem.strokePath(ToolType.BRUSH, true)` 的第二参数才是「模拟压力」
+    （旧 `ps_export.jsx` 只传一个参数，走不到压力）；Action Manager `strk` 路线 PS 2025 直接报 8800，不要再试。
+    模拟压力 = 沿路径的三角波（两端 0、中点 1，线性），可作 0→1 压力源。PS 工具状态（opacity/flow/useTipDynamics）跨文档保留，
+    **每张 job 必须显式写死**（首版批曾把 F-9 的 opacity=50 漏进 hardMix 组，重跑才修正）；判复现性用像素差口径，
+    不能只看 sha256（跨会话有 1–6 灰度 AA 抖动）。
+38. **Krita 的 `RotationSensor` 不能同时写 `fuzzy` 与 `fuzzystroke`（任务 149A）**。Krita 把同一曲线选项下所有加法型传感器的值求和，
+    两个 [−1,1] 相加 ⇒ 随机跨度 **2×360°×R**（PS 是 360°×R）。正确写法是只留 1 条 `fuzzy` 曲线、幅度由 `RotationValue=min(1,jitter/50)` 缩放；
+    旧产物 j<50 幅度约为 PS 的 2 倍（j=25 +38.20%），改后实机三点 PASS。回归 `tests/test_rotation_source_v160.py` 钉死「加法随机源 == ['fuzzy']」。
+39. **Krita 的 Sessions 恢复对话框会阻塞脚本化笔刷（任务 148 事故）**。`%TEMP%` 遗留的 `KRITA_SWAP_FILE_*` 会触发「Sessions - Krita」会话恢复框，
+    插件轮询拿到 `activeWindow()=None` 时批次停住，直到工具超时（曾停约 7 分钟且被强制结束 Krita）。防复发：起批前把 `%TEMP%` 的
+    `KRITA_SWAP_FILE_*`/`.krita-*-autosave.kra` **移动**到备份目录（不删除）；批处理期间 `sessionOnStartup=0`；插件轮询时按标题自动关闭
+    Sessions/「会话」对话框；长渲染命令用后台 job 或显式 `timeoutMs≥600000`，不要用默认 120s 预算跑渲染。
+40. **纹理亮度越界区预烘焙后字段失去 PS 语义（任务 153）**。命中判据 = calibrated 反解的未截断亮度 `|b_k|>1`；命中时把 PS 8bit 链
+    （C<0 先对比度后亮度 / C≥0 先亮度后对比度）烘进内嵌 PNG、Krita 写 B=0/C=1/Invert=false，资源名/内容哈希/MD5 按新字节重算；
+    非命中区仍走 calibrated 闭式解。别把命中区的 brightness/contrast 当可双向编辑字段（再调会二次叠加），也别忘了旧 `.kpp` 必重转。
+41. **矩阵 verdict 语义按 D142-1（任务 156）**：「可映射」= 精确单位换算/枚举直映、**无经验系数**；「需校准」= 需经验系数、拟合公式、
+    范围裁剪，或已知结构性越界；「未量测」**不得单独作为 verdict 依据**（要么给可复算证据、要么给构造性理由）。第五轮据此把 `Mnm`/`Rndn`
+    改「可映射」、其余 12 行维持并写清归属——不要用「未量测」搪塞，也不要把「残差归零」等同于「可映射」（有经验系数即需校准）。
+42. **Krita 批量会话远比逐张快（129/152）**：一次 Krita 启动可连渲几十张，单张纯渲染约 **0.37s**（129 批量日志的逐张 `elapsed_s`），
+    而逐张每张 **11–14s**（144 实测含启动 22.9–24.3s）。批量路线要点：`BRUSHCONVERTER_KRITA` 环境变量必须传（否则回退逐张）；
+    批量会话里每个 `.kpp` 的内部 `<Preset name>` 必须唯一（否则 Krita 按内部名去重、只加载 1 个，表现为「预设未找到」）；失败自动回退逐张。
+43. **PS 真值文件名必须带纹理后缀（任务 152）**：多纹理实验的 m10 真值文件名不带纹理后缀时，后一批会覆盖前一批 ⇒ 得出「PS(tex2) 真值 vs
+    Krita(tex1) 渲染」的错配结论（B9 的 76.680%/57.570% 就是这么来的）。凡「多纹理 × 多模式」批量，真值与 Krita 文件名都必须包含纹理标识；
+    更正旧数字时写清作废根因，不要只改数。
 
 ## 8. 参考实现与样本
 
