@@ -346,6 +346,56 @@ def make_round_tip(size: int = DEFAULT_TIP_SIZE, hardness: float = DEFAULT_HARDN
     return bytes(pixels)
 
 
+def make_asym_tip(size: int = 100, hardness: float = 100.0) -> bytes:
+    """生成「旋转非对称」笔尖（任务 148：角度抖动量的模板匹配用）。
+
+    角度抖动量测的前提：笔尖形状**不能有任何旋转对称或镜像对称**，否则模板匹配
+    在 θ 与 −θ（或 θ+180°）上同时取得高分（124 §5.3 用椭圆失败、用「吃豆人」
+    只在 j≥25 能用）。本形状由三个不对称特征叠加：
+      ① 圆盘（半径 0.46·size、1px 羽化）；
+      ② 楔形缺口：以 +x 方向为中心、但**左窄右宽**（−30°..+58°），半径 >0.30R 起；
+      ③ 两个小圆洞：方向 210°（半径 0.60R、洞半径 0.15R）与方向 96°
+         （半径 0.74R、洞半径 0.07R）。
+    三个特征的角度/半径都不同，破掉 180° 与镜像对称；模板自相关曲线的次峰高度
+    由 tools/exp_scatter_stat.py 的 --angle-validate 段打印校验。
+
+    极性：ABR 采样字节 0=墨、255=透明（samples.py:64-67 会做 255-raw），
+    所以与 make_round_tip 一样写 255−alpha。
+    """
+    r = size / 2.0
+    radius = 0.46 * size
+    feather = 1.4
+    pix = bytearray(size * size)
+    wedge_lo, wedge_hi = math.radians(-30.0), math.radians(58.0)
+    hole1 = (math.radians(210.0), 0.60 * radius, 0.15 * radius)
+    hole2 = (math.radians(96.0), 0.74 * radius, 0.07 * radius)
+    for y in range(size):
+        for x in range(size):
+            dx = x + 0.5 - r
+            dy = y + 0.5 - r
+            dist = math.hypot(dx, dy)
+            inside = radius - dist
+            alpha = 0.0 if inside <= 0 else min(1.0, inside / feather)
+            if alpha > 0.0:
+                ang = math.atan2(dy, dx)
+                # ② 楔形缺口（左窄右宽，破镜像）：方向落在 [wedge_lo, wedge_hi] 且
+                #    距离超过 0.30R 时挖空。
+                in_wedge = (ang >= wedge_lo) and (ang <= wedge_hi) and (dist > 0.30 * radius)
+                if in_wedge:
+                    alpha = 0.0
+                else:
+                    for (hdir, hdist, hrad) in (hole1, hole2):
+                        hx = hdist * math.cos(hdir)
+                        hy = hdist * math.sin(hdir)
+                        if math.hypot(dx - hx, dy - hy) < hrad:
+                            alpha = 0.0
+                            break
+            # hardness 参数当前只用于接口一致（100 时边缘 1.4px 羽化已定）；
+            # 本任务只用 100，不额外软化（软边会削弱模板匹配的角向分辨率）。
+            pix[y * size + x] = 255 - int(round(alpha * 255.0))
+    return bytes(pix)
+
+
 def encode_samp_item(uuid: str, width: int, height: int, pixels: bytes,
                      compression: int = 0) -> bytes:
     """编码一个 v6.2 采样笔尖项（含 u32 项长与对齐填充）。
@@ -456,12 +506,34 @@ def _dyn(bvty: int = 0, jitter: float = 0.0, minimum: float = 0.0) -> DescValue:
     ])
 
 
+def _tip_dynamics_items(angle_bvty: int = 0, angle_jitter: float = 0.0,
+                        angle_minimum: float = 0.0) -> list[tuple[str, DescValue]]:
+    """笔尖动态（tipDynamics 族）键块，键序照抄真实样本（定量测试专用.abr 实测）。
+
+    真实样本里的顺序与固定值（照抄，不发明）：
+        brushProjection=false；minimumDiameter=0.0 #Prc；minimumRoundness=1.0 #Prc；
+        tiltScale=200.0 #Prc；szVr / angleDynamics / roundnessDynamics = brVr 动态。
+    PS 只在 useTipDynamics=true 时读这组键；本生成器**默认一个都不写**，
+    保证 110/111 既有产物逐字节不变（任务 148 新增能力，默认关闭）。
+    """
+    return [
+        ("brushProjection", boolean(False)),
+        ("minimumDiameter", untf(0.0, "#Prc")),
+        ("minimumRoundness", untf(1.0, "#Prc")),
+        ("tiltScale", untf(200.0, "#Prc")),
+        ("szVr", _dyn()),
+        ("angleDynamics", _dyn(bvty=angle_bvty, jitter=angle_jitter, minimum=angle_minimum)),
+        ("roundnessDynamics", _dyn()),
+    ]
+
+
 def build_preset(name: str, diameter: float, hardness: float, spacing: float,
                  angle: float, tip_uuid: str, tip_name: str,
                  roundness: float = 100.0,
                  scatter_jitter: float | None = None,
                  scatter_both_axes: bool = False,
-                 texture: dict | None = None) -> DescValue:
+                 texture: dict | None = None,
+                 tip_dynamics: dict | None = None) -> DescValue:
     """造一个「采样笔刷」预设（键集与样本 海怪笔刷#0 一致，另加 Hrdn）。
 
     键集说明：海怪样本的第一个预设只有 14 个顶层键（PS 自己写的、PS 能打开），
@@ -474,7 +546,13 @@ def build_preset(name: str, diameter: float, hardness: float, spacing: float,
       roundness       圆度（Rndn，%，100=圆；角度组用 30 让椭圆可测）；
       scatter_jitter  散布量（%，None=不启用；写了才加 useScatter 一族键）；
       texture         纹理设置 dict（None=不启用；写了才加 useTexture 一族键）。
+    任务 148 追加 tip_dynamics（None=不启用，110/111 产物逐字节不变）：
+      dict(bvty=int, jitter=float, minimum=float) → useTipDynamics=true 并写
+      tipDynamics 族七个键（brushProjection/minimumDiameter/minimumRoundness/
+      tiltScale/szVr/angleDynamics/roundnessDynamics）。
     """
+    td = tip_dynamics or {}
+    use_tip = bool(td)
     brsh = objc("sampledBrush", [
         ("Dmtr", untf(diameter, "#Pxl")),
         ("Hrdn", untf(hardness, "#Prc")),
@@ -490,7 +568,7 @@ def build_preset(name: str, diameter: float, hardness: float, spacing: float,
     items: list[tuple[str, DescValue]] = [
         ("Nm  ", text(name)),
         ("Brsh", brsh),
-        ("useTipDynamics", boolean(False)),
+        ("useTipDynamics", boolean(use_tip)),
         ("useScatter", boolean(scatter_jitter is not None)),
         ("dualBrush", objc("dualBrush", [("useDualBrush", boolean(False))])),
         ("brushGroup", objc("brushGroup", [("useBrushGroup", boolean(False))])),
@@ -503,6 +581,11 @@ def build_preset(name: str, diameter: float, hardness: float, spacing: float,
         ("useBrushSize", boolean(False)),
         ("useBrushPose", boolean(False)),
     ]
+    # 笔尖动态键只在启用时追加（任务 148；默认不写 ⇒ 110/111 产物不变）
+    if use_tip:
+        items.extend(_tip_dynamics_items(int(td.get("bvty", 0)),
+                                         float(td.get("jitter", 0.0)),
+                                         float(td.get("minimum", 0.0))))
     # 散布键只在启用时追加（保持 110 默认键序不变）
     if scatter_jitter is not None:
         items.extend(_scatter_items(scatter_jitter, scatter_both_axes))
@@ -553,13 +636,16 @@ def build_computed_preset(name: str, diameter: float, hardness: float, spacing: 
                           angle: float, roundness: float = 100.0,
                           scatter_jitter: float | None = None,
                           scatter_both_axes: bool = False,
-                          texture: dict | None = None) -> DescValue:
+                          texture: dict | None = None,
+                          tip_dynamics: dict | None = None) -> DescValue:
     """造一个「计算笔刷」预设（Brsh 类 = computedBrush，无采样笔尖）。
 
     键集照抄 tests/定量测试专用.abr 的 computedBrush：
     Dmtr/Hrdn/Angl/Rndn/Spcn/Intr/flipX/flipY（无 sampledData、无 Brsh.Nm）。
     计算笔刷的尺寸/硬度/圆度是**真参数**（不是烘在像素里），所以尺寸组、
     硬度组、角度组、散布组、缩放组都用它做载体。
+    任务 148：tip_dynamics（见 build_preset 同名参数）→ 计算笔刷的椭圆笔尖
+    （roundness<100）可被 angleDynamics 旋转，用于 F-7/B6 的 bVTy 实机验证。
     """
     brsh = objc("computedBrush", [
         ("Dmtr", untf(diameter, "#Pxl")),
@@ -571,10 +657,12 @@ def build_computed_preset(name: str, diameter: float, hardness: float, spacing: 
         ("flipX", boolean(False)),
         ("flipY", boolean(False)),
     ])
+    td = tip_dynamics or {}
+    use_tip = bool(td)
     items: list[tuple[str, DescValue]] = [
         ("Nm  ", text(name)),
         ("Brsh", brsh),
-        ("useTipDynamics", boolean(False)),
+        ("useTipDynamics", boolean(use_tip)),
         ("useScatter", boolean(scatter_jitter is not None)),
         ("dualBrush", objc("dualBrush", [("useDualBrush", boolean(False))])),
         ("brushGroup", objc("brushGroup", [("useBrushGroup", boolean(False))])),
@@ -587,6 +675,10 @@ def build_computed_preset(name: str, diameter: float, hardness: float, spacing: 
         ("useBrushSize", boolean(False)),
         ("useBrushPose", boolean(False)),
     ]
+    if use_tip:
+        items.extend(_tip_dynamics_items(int(td.get("bvty", 0)),
+                                         float(td.get("jitter", 0.0)),
+                                         float(td.get("minimum", 0.0))))
     if scatter_jitter is not None:
         items.extend(_scatter_items(scatter_jitter, scatter_both_axes))
     if texture is not None:
@@ -615,7 +707,9 @@ def build_abr_zero(name: str, diameter: float, hardness: float, spacing: float,
                    roundness: float = 100.0,
                    scatter_jitter: float | None = None,
                    scatter_both_axes: bool = False,
-                   texture: dict | None = None) -> bytes:
+                   texture: dict | None = None,
+                   tip_dynamics: dict | None = None,
+                   tip_kind: str = "round") -> bytes:
     """从零拼一个 v6.2 ABR：samp + [patt] + desc(1 个预设) + phry(1 个组)。
 
     默认参数（kind=sampled、方形笔尖、无散布/纹理）与 110 的产物逐字节一致，
@@ -628,13 +722,16 @@ def build_abr_zero(name: str, diameter: float, hardness: float, spacing: float,
                                        roundness=roundness,
                                        scatter_jitter=scatter_jitter,
                                        scatter_both_axes=scatter_both_axes,
-                                       texture=texture)
+                                       texture=texture,
+                                       tip_dynamics=tip_dynamics)
         sections = [encode_section("samp", b"")]
     else:
         w = tip_width if tip_width is not None else tip_size
         h = tip_height if tip_height is not None else tip_size
         hard = hardness if tip_hardness is None else tip_hardness
-        if (w, h) == (tip_size, tip_size) and tip_hardness is None:
+        if tip_kind == "asym":
+            pixels = make_asym_tip(w, hard)               # 任务 148：旋转非对称笔尖
+        elif (w, h) == (tip_size, tip_size) and tip_hardness is None:
             pixels = make_round_tip(tip_size, hardness)   # 110 原路径
         else:
             pixels = make_ellipse_tip(w, h, hard)
@@ -643,7 +740,8 @@ def build_abr_zero(name: str, diameter: float, hardness: float, spacing: float,
                               name + " 形状", roundness=roundness,
                               scatter_jitter=scatter_jitter,
                               scatter_both_axes=scatter_both_axes,
-                              texture=texture)
+                              texture=texture,
+                              tip_dynamics=tip_dynamics)
         sections = [encode_section("samp", samp)]
 
     if texture is not None:
@@ -1052,6 +1150,197 @@ def check_suite(out_dir: Path) -> int:
     return 0 if failed == 0 else 1
 
 
+# ---------------------------------------------------------------- 任务 148：角度夹具
+
+#: 角度夹具输出目录（.tmp 是 gitignored 证据区；不写 tests/，避免动回归基准目录）
+ANGLE_FIXTURE_OUT = _REPO_ROOT / ".tmp" / "random" / "abr"
+
+
+def angle_fixtures() -> list[dict]:
+    """任务 148/149 的角度实验 ABR 夹具清单（F-6 / F-7 / B6 / B8 共用）。
+
+    两类夹具：
+      1. bc148_asym.abr —— 采样笔刷 + **旋转非对称**笔尖（make_asym_tip），
+         D=100、间距 500%（孤立单 dab 阵列）、角度 0。angleDynamics 写 bVTy=0/
+         jitter=0 + useTipDynamics=true：PS 侧由工具选项按 job 写 jitter（124 已
+         实测这条路可行），ABR 里带 angleDynamics 是为了证明「ABR 能承载该键」。
+      2. bc148_bvty{5,6,7,8}.abr —— 计算笔刷、D=100、圆度 20%（椭圆长轴可测）、
+         间距 150%、角度 0；angleDynamics.bVTy=5/6/7/8、jitter=0 + useTipDynamics。
+         用于 F-7（5=初始方向 vs 6=笔划方向）与 B6（7=速度 / 8=旋转）。
+    """
+    items: list[dict] = []
+    items.append(dict(
+        file="bc148_asym.abr", name="bc148 asym tip", kind="sampled",
+        diameter=100.0, hardness=100.0, spacing=500.0, angle=0.0, roundness=100.0,
+        tip_size=100, tip_kind="asym",
+        uuid="bc148001-1480-4a5b-8c6d-000000000148",
+        tip_dynamics=dict(bvty=0, jitter=0.0),
+        note=("非对称采样笔尖（左窄右宽楔形缺口 + 两个偏置圆洞）；D=100、间距 500%"
+              "（孤立单 dab）；angleDynamics bVTy=0 jitter=0、useTipDynamics=true"),
+    ))
+    # bVTy=0 参照组（控制源=关）：用来判「L 形笔划里看到的逐段旋转」到底来自
+    # ABR 的 angleDynamics，还是 PS 对计算笔刷的默认行为（148 实测补的对照组）。
+    items.append(dict(
+        file="bc148_bvty0.abr", name="bc148 bvty0", kind="computed",
+        diameter=100.0, hardness=100.0, spacing=150.0, angle=0.0, roundness=20.0,
+        tip_dynamics=dict(bvty=0, jitter=0.0),
+        note=("计算笔刷 D=100、圆度 20%、间距 150%；angleDynamics.bVTy=0（关）"
+              " jitter=0、useTipDynamics=true（F-7 的参照组）"),
+    ))
+    for bvty in (5, 6, 7, 8):
+        items.append(dict(
+            file="bc148_bvty%d.abr" % bvty, name="bc148 bvty%d" % bvty, kind="computed",
+            diameter=100.0, hardness=100.0, spacing=150.0, angle=0.0, roundness=20.0,
+            tip_dynamics=dict(bvty=bvty, jitter=0.0),
+            note=("计算笔刷 D=100、圆度 20%%（椭圆长轴可测）、间距 150%%；"
+                  "angleDynamics.bVTy=%d（5=初始方向/6=笔划方向/7=速度/8=旋转）"
+                  " jitter=0、useTipDynamics=true" % bvty),
+        ))
+    return items
+
+
+def build_angle_fixture(spec: dict) -> bytes:
+    """按夹具规格生成 ABR 字节（只调 build_abr_zero 的新增参数）。"""
+    return build_abr_zero(
+        name=spec["name"], diameter=float(spec["diameter"]),
+        hardness=float(spec["hardness"]), spacing=float(spec["spacing"]),
+        angle=float(spec["angle"]), tip_size=int(spec.get("tip_size", DEFAULT_TIP_SIZE)),
+        uuid=spec.get("uuid", DEFAULT_UUID), kind=spec.get("kind", "sampled"),
+        roundness=float(spec.get("roundness", 100.0)),
+        tip_dynamics=spec.get("tip_dynamics"),
+        tip_kind=str(spec.get("tip_kind", "round")),
+    )
+
+
+def check_angle_fixture(path: Path, spec: dict) -> list[tuple[str, object, object, bool]]:
+    """回读一条角度夹具：解析器 + mapping 两侧都核（键值是否真落进 ABR）。"""
+    rows: list[tuple[str, object, object, bool]] = []
+
+    def ck(label: str, got, want) -> None:
+        rows.append((label, got, want, got == want))
+
+    abr = AbrFile.parse(path)
+    # 区段：samp + [patt] + desc + phry（无纹理 = 3 段）
+    ck("区段数", len(abr.sections), 4 if spec.get("texture") else 3)
+    presets = map_presets(abr)
+    ck("预设数", len(presets), 1)
+    if not presets:
+        return rows
+    p = presets[0]
+    ck("名称", p.name, spec["name"])
+    ck("直径", p.diameter, float(spec["diameter"]))
+    ck("硬度", p.hardness, float(spec["hardness"]))
+    ck("间距(%)", round(p.spacing * 100.0, 6), float(spec["spacing"]))
+    ck("角度", p.angle, float(spec["angle"]))
+    ck("圆度", p.roundness, float(spec.get("roundness", 100.0)))
+    ck("计算笔刷", p.is_computed, spec.get("kind", "sampled") == "computed")
+    # 动态回读（mapping 层）
+    td = spec.get("tip_dynamics") or {}
+    want_bvty = int(td.get("bvty", 0))
+    want_jitter = float(td.get("jitter", 0.0))
+    ck("angleDynamics.jitter(映射)", round(p.rotation_jitter, 6), want_jitter)
+    want_sensor = {5: None, 6: "drawingangle", 7: "speed", 8: "rotation"}.get(want_bvty, None)
+    if want_bvty == 0 and want_jitter == 0.0:
+        want_sensor = None
+    ck("Krita 旋转传感器(映射)", p.rotation_sensor, want_sensor)
+    # 原始描述符回读：useTipDynamics 与 angleDynamics.bVTy（不靠 mapping 转述）
+    top = D.parse_descriptor_block(abr.sections["desc"].data)
+    presets_raw = D.iter_brush_presets(top)
+    raw = presets_raw[0] if presets_raw else {}
+    ck("useTipDynamics(原文)", D.get_bool(raw, "useTipDynamics"), bool(td))
+    ang = D.get_obj(raw, "angleDynamics") if isinstance(raw, dict) else None
+    ck("angleDynamics 存在", ang is not None, bool(td))
+    if ang is not None:
+        ck("angleDynamics.bVTy(原文)", int(D.get_number(ang, "bVTy")), want_bvty)
+        jit = D.get_number(ang, "jitter")
+        ck("angleDynamics.jitter(原文)", round(float(jit), 6), want_jitter)
+    # 采样笔尖形状（生成位图必须「有墨有透明」；非对称夹具另核中心是墨）
+    if spec.get("kind", "sampled") == "sampled":
+        tip = abr.tips[0]
+        ck("笔尖尺寸(WxH)", (tip.width, tip.height),
+           (int(spec.get("tip_size", DEFAULT_TIP_SIZE)), int(spec.get("tip_size", DEFAULT_TIP_SIZE))))
+        ck("笔尖含墨(最大值)", int(tip.gray.max()), 255)
+        ck("笔尖含透明(最小值)", int(tip.gray.min()), 0)
+        if spec.get("tip_kind") == "asym":
+            h, w = tip.gray.shape
+            ck("笔尖中心是墨", int(tip.gray[h // 2, w // 2]) > 240, True)
+    return rows
+
+
+def angle_fixture_meta(spec: dict) -> dict:
+    return {
+        "file": spec["file"], "name": spec["name"], "kind": spec.get("kind", "sampled"),
+        "diameter": float(spec["diameter"]), "hardness": float(spec["hardness"]),
+        "spacing": float(spec["spacing"]), "angle": float(spec["angle"]),
+        "roundness": float(spec.get("roundness", 100.0)),
+        "tip_dynamics": spec.get("tip_dynamics"),
+        "tip_size": int(spec.get("tip_size", DEFAULT_TIP_SIZE)),
+        "tip_kind": spec.get("tip_kind", "round"),
+        "note": spec.get("note", ""),
+    }
+
+
+def run_angle_fixtures(out_dir: Path) -> int:
+    """生成任务 148/149 的角度夹具并逐支回读自检；任一支失败返回 1。"""
+    out_dir.mkdir(parents=True, exist_ok=True)
+    specs = angle_fixtures()
+    print("角度夹具（任务 148/149，共 %d 支）→ %s" % (len(specs), out_dir))
+    failed = 0
+    for spec in specs:
+        data = build_angle_fixture(spec)
+        out_path = out_dir / spec["file"]
+        out_path.write_bytes(data)
+        meta = angle_fixture_meta(spec)
+        meta["sha256"] = hashlib.sha256(data).hexdigest()
+        meta["bytes"] = len(data)
+        meta_path = out_path.with_suffix(".json")
+        meta_path.write_text(json.dumps(meta, ensure_ascii=False, indent=2) + "\n",
+                             encoding="utf-8")
+        rows = check_angle_fixture(out_path, spec)
+        ok = all(r[3] for r in rows)
+        print("  %-20s %-18s %s %d/%d 项  sha256=%s"
+              % (spec["file"], spec["name"], "通过" if ok else "失败",
+                 sum(1 for r in rows if r[3]), len(rows), meta["sha256"][:12]))
+        if not ok:
+            failed += 1
+            for label, got, want, good in rows:
+                if not good:
+                    print("      ! %s: 回读=%r 期望=%r" % (label, got, want))
+    # 非对称笔尖的形状预览（人工目检用；也是「破对称」的视觉证据）
+    asym = next((s for s in specs if s.get("tip_kind") == "asym"), None)
+    if asym is not None:
+        import numpy as np
+        from PIL import Image
+        pixels = make_asym_tip(int(asym.get("tip_size", 100)))
+        gray = 255 - np.frombuffer(pixels, dtype=np.uint8).reshape(
+            int(asym.get("tip_size", 100)), int(asym.get("tip_size", 100)))
+        Image.fromarray(gray, mode="L").save(out_dir / "asym_tip_preview.png")
+    print("角度夹具自检：%d/%d 支通过" % (len(specs) - failed, len(specs)))
+    return 0 if failed == 0 else 1
+
+
+def check_angle_fixtures(out_dir: Path) -> int:
+    """对已生成的角度夹具重跑回读自检（不写文件）；清单以 angle_fixtures() 为准。"""
+    failed = 0
+    for spec in angle_fixtures():
+        path = out_dir / spec["file"]
+        if not path.is_file():
+            print("  %s: 缺文件" % spec["file"])
+            failed += 1
+            continue
+        rows = check_angle_fixture(path, spec)
+        ok = all(r[3] for r in rows)
+        print("  %-20s %s %d/%d 项" % (spec["file"], "通过" if ok else "失败",
+                                      sum(1 for r in rows if r[3]), len(rows)))
+        if not ok:
+            failed += 1
+            for label, got, want, good in rows:
+                if not good:
+                    print("      ! %s: 回读=%r 期望=%r" % (label, got, want))
+    print("角度夹具重新自检：%d/%d 支通过" % (len(angle_fixtures()) - failed, len(angle_fixtures())))
+    return 0 if failed == 0 else 1
+
+
 # ---------------------------------------------------------------- 入口
 
 def main(argv: list[str] | None = None) -> int:
@@ -1093,6 +1382,12 @@ def main(argv: list[str] | None = None) -> int:
                     help="整套输出目录（默认 tests/abr-generated/）")
     ap.add_argument("--check-suite", action="store_true",
                     help="任务 111：重新自检整套笔刷（不写文件）")
+    ap.add_argument("--angle-fixtures", action="store_true",
+                    help="任务 148/149：生成角度夹具 ABR（非对称笔尖 + bVTy 5/6/7/8）")
+    ap.add_argument("--angle-fixtures-out", default=str(ANGLE_FIXTURE_OUT),
+                    help="角度夹具输出目录（默认 .tmp/random/abr）")
+    ap.add_argument("--check-angle-fixtures", action="store_true",
+                    help="任务 148/149：重新回读自检角度夹具（不写文件）")
     ap.add_argument("--check", default=None,
                     help="只自检：读回指定 .abr（同目录同名 .json 提供期望值）")
     ap.add_argument("--no-check", action="store_true", help="写完不做自检")
@@ -1102,6 +1397,10 @@ def main(argv: list[str] | None = None) -> int:
         return run_suite(Path(args.suite_out).resolve())
     if args.check_suite:
         return check_suite(Path(args.suite_out).resolve())
+    if args.angle_fixtures:
+        return run_angle_fixtures(Path(args.angle_fixtures_out).resolve())
+    if args.check_angle_fixtures:
+        return check_angle_fixtures(Path(args.angle_fixtures_out).resolve())
 
     if args.check:
         check_path = Path(args.check).resolve()
