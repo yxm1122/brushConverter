@@ -284,17 +284,20 @@ def _wait_extra_krita_gone(timeout=25.0):
     return False, sorted(extra)
 
 
-def render_one_gui(preset, out, size=(200, 200), stroke=120, pressure=1.0, timeout=DEFAULT_GUI_TIMEOUT_S):
+def render_one_gui(preset, out, size=(200, 200), stroke=120, pressure=1.0, timeout=DEFAULT_GUI_TIMEOUT_S,
+                   pressure2=None, strokes=None):
     """GUI 路线入口：失败时最多重试一次（首次失败常见原因是上一轮 Krita 未退干净）。"""
     result = _render_one_gui_once(preset, out, size=size, stroke=stroke,
-                                  pressure=pressure, timeout=timeout)
+                                  pressure=pressure, timeout=timeout, pressure2=pressure2,
+                                  strokes=strokes)
     if result["ok"]:
         return result
     reason_text = result.get("reason") or ""
     if ("未写结果文件" in reason_text) or ("timeout" in reason_text):
         time.sleep(2.0)
         retry = _render_one_gui_once(preset, out, size=size, stroke=stroke,
-                                     pressure=pressure, timeout=timeout)
+                                     pressure=pressure, timeout=timeout, pressure2=pressure2,
+                                     strokes=strokes)
         retry["retried"] = True
         if not retry["ok"]:
             retry["first_reason"] = result["reason"]
@@ -302,7 +305,8 @@ def render_one_gui(preset, out, size=(200, 200), stroke=120, pressure=1.0, timeo
     return result
 
 
-def _render_one_gui_once(preset, out, size=(200, 200), stroke=120, pressure=1.0, timeout=DEFAULT_GUI_TIMEOUT_S):
+def _render_one_gui_once(preset, out, size=(200, 200), stroke=120, pressure=1.0, timeout=DEFAULT_GUI_TIMEOUT_S,
+                         pressure2=None, strokes=None):
     """GUI 路线单次执行：真实 Krita 进程 + 启动插件完成「落笔 → 导出 PNG」。
 
     参数 preset 是 .kpp 文件路径；函数会把它临时装进 Krita 资源目录
@@ -372,6 +376,11 @@ def _render_one_gui_once(preset, out, size=(200, 200), stroke=120, pressure=1.0,
         env["BC_AUTO_SIZE"] = "%dx%d" % (int(size[0]), int(size[1]))
         env["BC_AUTO_STROKE"] = str(int(stroke))
         env["BC_AUTO_PRESSURE"] = str(float(pressure))
+        if pressure2 is not None:
+            env["BC_AUTO_PRESSURE2"] = str(float(pressure2))
+        if strokes is not None:
+            import json as _json
+            env["BC_AUTO_STROKES"] = _json.dumps(list(strokes), ensure_ascii=False)
         timed_out = False
         try:
             proc = subprocess.run([KRITA_BIN, "--nosplash"], env=env, timeout=timeout, capture_output=True)
@@ -440,14 +449,15 @@ def _render_one_gui_once(preset, out, size=(200, 200), stroke=120, pressure=1.0,
 
 
 def render_one(preset, out, size=(200, 200), stroke=120, pressure=1.0,
-               timeout=None, route="gui"):
-    """渲染单支笔（默认走 GUI 真实渲染路线）。"""
+               timeout=None, route="gui", pressure2=None, strokes=None):
+    """渲染单支笔（默认走 GUI 真实渲染路线）。pressure2=笔划终点压力（None=同 pressure）。"""
     if route == "headless":
         return render_one_headless(preset, out, size=size, stroke=stroke,
                                    pressure=pressure, timeout=timeout or DEFAULT_TIMEOUT_S)
     if route == "auto":
         result = render_one_gui(preset, out, size=size, stroke=stroke,
-                                pressure=pressure, timeout=timeout or DEFAULT_GUI_TIMEOUT_S)
+                                pressure=pressure, timeout=timeout or DEFAULT_GUI_TIMEOUT_S,
+                                pressure2=pressure2, strokes=strokes)
         if result["ok"]:
             return result
         fallback = render_one_headless(preset, out, size=size, stroke=stroke,
@@ -455,7 +465,8 @@ def render_one(preset, out, size=(200, 200), stroke=120, pressure=1.0,
         fallback["gui_reason"] = result["reason"]
         return fallback
     return render_one_gui(preset, out, size=size, stroke=stroke,
-                          pressure=pressure, timeout=timeout or DEFAULT_GUI_TIMEOUT_S)
+                          pressure=pressure, timeout=timeout or DEFAULT_GUI_TIMEOUT_S,
+                          pressure2=pressure2, strokes=strokes)
 
 
 def main():
@@ -464,7 +475,8 @@ def main():
     parser.add_argument("--out", required=True, help="输出 PNG 路径")
     parser.add_argument("--size", default="200x200", help="画布尺寸，形如 200x200")
     parser.add_argument("--stroke", type=int, default=120, help="笔划长度（像素）")
-    parser.add_argument("--pressure", type=float, default=1.0, help="压感值 0–1")
+    parser.add_argument("--pressure", type=float, default=1.0, help="压感值 0–1（起点）")
+    parser.add_argument("--pressure2", type=float, default=None, help="终点压感 0–1（缺省=--pressure）")
     parser.add_argument("--timeout", type=float, default=None, help="超时秒数（默认 GUI 180 / headless 120）")
     parser.add_argument("--route", choices=["gui", "headless", "auto"], default="gui")
     ns = parser.parse_args()
@@ -474,6 +486,7 @@ def main():
     result = render_one(
         ns.preset, ns.out, size=(int(parts[0]), int(parts[1])),
         stroke=ns.stroke, pressure=ns.pressure, timeout=ns.timeout, route=ns.route,
+        pressure2=ns.pressure2,
     )
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0 if result["ok"] else 2

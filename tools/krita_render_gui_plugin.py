@@ -16,7 +16,12 @@
     BC_AUTO_PRESET       备选：预设名字子串
     BC_AUTO_SIZE         画布尺寸，默认 200x200
     BC_AUTO_STROKE       笔划长度（像素），默认 120
-    BC_AUTO_PRESSURE     压感 0–1，默认 1.0
+    BC_AUTO_PRESSURE     压感 0–1，默认 1.0（笔划起点压力）
+    BC_AUTO_PRESSURE2    笔划终点压力 0–1；缺省=和 BC_AUTO_PRESSURE 相同（任务 144 新增：
+                         Node.paintLine 原生支持双端压力，可出「单图梯度」）
+    BC_AUTO_STROKES      任务 144 新增：JSON 数组，一次会话画多条笔迹（每条一行），
+                         元素 {"pressure","pressure2","stroke","y"}；设置后忽略上面单笔参数。
+                         用于「一图多档压力阶梯」，把 N 档从 N 次会话压到 1 次。
 """
 
 import json
@@ -124,13 +129,14 @@ class BCAutoRender(Extension):
         width, height = [int(part) for part in size_text.split("x")]
         stroke = int(os.environ.get("BC_AUTO_STROKE", "120"))
         pressure = float(os.environ.get("BC_AUTO_PRESSURE", "1.0"))
+        pressure2 = float(os.environ.get("BC_AUTO_PRESSURE2", pressure))
         out = os.environ.get("BC_AUTO_OUT")
         preset_file = os.environ.get("BC_AUTO_PRESET_FILE", "")
         preset_hint = os.environ.get("BC_AUTO_PRESET", "")
         started = time.time()
 
-        log("BEGIN size=%dx%d stroke=%d pressure=%.2f preset_file=%r hint=%r"
-            % (width, height, stroke, pressure, preset_file, preset_hint))
+        log("BEGIN size=%dx%d stroke=%d pressure=%.3f pressure2=%.3f preset_file=%r hint=%r"
+            % (width, height, stroke, pressure, pressure2, preset_file, preset_hint))
         doc = inst.createDocument(width, height, "bc_auto_render", "RGBA", "U8", "", 72.0)
         self.document = doc
         view = win.addView(doc)
@@ -172,9 +178,22 @@ class BCAutoRender(Extension):
         log("选用预设 name=%r filename=%r" % (chosen.name(), chosen.filename()))
         view.setCurrentBrushPreset(chosen)
 
-        y0 = height // 2
-        x0 = max(1, (width - stroke) // 2)
-        layer.paintLine(QPoint(x0, y0), QPoint(min(width - 1, x0 + stroke), y0), pressure, pressure)
+        strokes_env = os.environ.get("BC_AUTO_STROKES", "")
+        if strokes_env:
+            strokes = json.loads(strokes_env)
+        else:
+            strokes = [{"pressure": pressure, "pressure2": pressure2,
+                        "stroke": stroke, "y": height // 2}]
+        drawn = []
+        for st in strokes:
+            sp = float(st.get("pressure", pressure))
+            sp2 = float(st.get("pressure2", sp))
+            ln = int(st.get("stroke", stroke))
+            y0 = int(st.get("y", height // 2))
+            x0 = max(1, (width - ln) // 2)
+            layer.paintLine(QPoint(x0, y0), QPoint(min(width - 1, x0 + ln), y0), sp, sp2)
+            drawn.append({"pressure": sp, "pressure2": sp2, "stroke": ln, "x0": x0, "y": y0})
+            log("笔迹 pressure=%.3f..%.3f stroke=%d y=%d" % (sp, sp2, ln, y0))
         doc.refreshProjection()
         image = doc.projection(0, 0, width, height)
         out_dir = os.path.dirname(os.path.abspath(out))
@@ -193,7 +212,9 @@ class BCAutoRender(Extension):
             "preset": chosen.name(),
             "preset_file": os.path.basename(chosen.filename() or ""),
             "pressure": pressure,
+            "pressure2": pressure2,
             "stroke": stroke,
+            "strokes": drawn,
             "elapsed_s": round(time.time() - started, 3),
         })
 

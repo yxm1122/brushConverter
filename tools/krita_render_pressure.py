@@ -8,10 +8,19 @@ Krita 侧压感是否真实注入，由本脚本渲染后自动核验（四档�
 用法：
     python tools/krita_render_pressure.py \
         --preset "converted/kpp/003_大怪兽-圆头虚_用数位板.kpp" \
-        --pressure-profile 0.2,0.5,0.8,1.0 --stroke-length 120 \
-        --out-dir tests/baselines/feel --curve-out-dir tests/baselines/feel
+        --pressure-profile 0.1,0.25,0.4,0.55,0.7,0.85,1.0 --stroke-length 360 \
+        --out-dir .tmp/pressure/krita --curve-out-dir .tmp/pressure/krita
 
-产物：每个档位一张 PNG（`feel__<笔刷>__p<压感>__s<尺寸>.png`）+ 一份索引 JSON +（可选）逐档曲线 JSON。
+任务 144（v0.17）补强：
+- 默认档位改为 7 档 0.1/0.25/0.4/0.55/0.7/0.85/1.0（任务书口径）；
+- `--repeat N`：每档渲染 N 次（各自独立 Krita 会话），索引里逐档记 sha256 列表，
+  同档两次 sha256 相同 = 渲染确定性；不同档不同 = 压感真实注入；
+- `--gradient-end`：额外出一张「单图梯度」——paintLine(pressure=首档, pressure2=末档)
+  的双端压力图（插件/runner 已支持 BC_AUTO_PRESSURE2），并把逐列 alpha 剖面与
+  「多档阶梯」逐档 alpha 做对照（两种口径写进同一索引）。
+
+产物：每个档位一张 PNG（`feel__<笔刷>__p<压感>__s<尺寸>.png`，repeat>1 时带 `__r<次>`）
++ 一份索引 JSON +（可选）逐档曲线 JSON。
 
 注意：**同一时刻只允许一个 Krita GUI 渲染会话**（批量/全量 pytest 不要与本脚本并发）。
 """
@@ -128,10 +137,48 @@ def _merge_manifest(manifest_path, ns, index, entries):
     print("清单已合并：%s（现有 %d 条）" % (manifest_path, len(keep)))
 
 
+def _alpha_image(path):
+    """读 PNG → alpha ndarray（0..255）。"""
+    from PIL import Image
+    import numpy as np
+    with Image.open(path) as im:
+        return np.array(im.convert("RGBA"))[:, :, 3].astype(np.int16)
+
+
+def _stroke_value(path):
+    """阶梯图的口径：整条笔迹内部 alpha 均值（忽略 alpha=0 与最外 2px 边缘）。"""
+    import numpy as np
+    a = _alpha_image(path)
+    nz = a > 0
+    if not nz.any():
+        return None
+    cols = np.nonzero(nz.any(axis=0))[0]
+    xs = slice(cols[0] + 2, cols[-1] - 1)
+    sub = a[:, xs]
+    vals = sub[sub > 0]
+    return round(float(vals.mean()), 3) if vals.size else None
+
+
+def _column_profile(path):
+    """梯度图口径：逐列 alpha 均值（只对该列非零行求均值）。"""
+    import numpy as np
+    a = _alpha_image(path)
+    nz = a > 0
+    sums = a.sum(axis=0).astype(float)
+    counts = nz.sum(axis=0)
+    with np.errstate(invalid="ignore", divide="ignore"):
+        means = np.where(counts > 0, sums / np.maximum(counts, 1), 0.0)
+    return [round(float(v), 2) for v in means.tolist()], int(counts.sum())
+
+
 def main():
     parser = argparse.ArgumentParser(description="按压感档位渲染（复用 GUI 真实渲染路线）")
     parser.add_argument("--preset", required=True, help=".kpp 预设路径")
-    parser.add_argument("--pressure-profile", default="0.2,0.5,0.8,1.0", help="压感档位，逗号分隔，默认 0.2,0.5,0.8,1.0")
+    parser.add_argument("--pressure-profile", default="0.1,0.25,0.4,0.55,0.7,0.85,1.0",
+                        help="压感档位，逗号分隔，默认 7 档 0.1,0.25,0.4,0.55,0.7,0.85,1.0")
+    parser.add_argument("--repeat", type=int, default=1, help="每档独立渲染次数（默认 1；2 = 复现性校验）")
+    parser.add_argument("--gradient-end", type=float, default=None,
+                        help="额外出一张双端压力梯度图：起点=首档压力，终点=该值（0–1）")
     parser.add_argument("--stroke-length", type=int, default=120, help="笔划长度（像素），默认 120")
     parser.add_argument("--size", default="200x200", help="画布尺寸，默认 200x200")
     parser.add_argument("--out-dir", default=os.path.join(REPO_ROOT, "tests", "baselines", "feel"), help="PNG 输出目录")
@@ -159,47 +206,68 @@ def main():
     started_all = time.time()
     entries = []
 
+    repeats = max(1, int(ns.repeat))
     for grade in grades:
-        png_name = "feel__%s__p%.2f__s%dx%d.png" % (brush, grade, width, height)
-        png_path = os.path.join(ns.out_dir, png_name)
-        result = runner.render_one(
-            ns.preset, png_path, size=(width, height), stroke=ns.stroke_length,
-            pressure=grade, timeout=ns.timeout, route="gui",
-        )
+        runs = []
+        for rep in range(repeats):
+            suffix = "" if repeats <= 1 else "__r%d" % rep
+            png_name = "feel__%s__p%.2f__s%dx%d%s.png" % (brush, grade, width, height, suffix)
+            png_path = os.path.join(ns.out_dir, png_name)
+            result = runner.render_one(
+                ns.preset, png_path, size=(width, height), stroke=ns.stroke_length,
+                pressure=grade, timeout=ns.timeout, route="gui",
+            )
+            # 外壳会在 PNG 旁写 <png>.result.json 中间结果，这里读完就删，避免污染基线目录
+            sidecar = png_path + ".result.json"
+            if os.path.isfile(sidecar):
+                try:
+                    os.remove(sidecar)
+                except OSError:
+                    pass
+            run = {
+                "file": os.path.basename(png_path),
+                "ok": bool(result.get("ok")),
+                "alpha_nonzero": result.get("alpha_nonzero"),
+                "elapsed_s": result.get("elapsed_s"),
+                "sha256": sha256_of(png_path) if os.path.isfile(png_path) else None,
+                "reason": None if result.get("ok") else (result.get("reason") or "")[:300],
+            }
+            runs.append(run)
+        first = runs[0]
         entry = {
             "pressure": grade,
-            "file": os.path.basename(png_path),
-            "path": os.path.abspath(png_path),
+            "file": first["file"],
+            "path": os.path.abspath(os.path.join(ns.out_dir, first["file"])),
             "stroke_length": ns.stroke_length,
             "size": "%dx%d" % (width, height),
-            "ok": bool(result.get("ok")),
-            "alpha_nonzero": result.get("alpha_nonzero"),
-            "elapsed_s": result.get("elapsed_s"),
-            "sha256": sha256_of(png_path) if os.path.isfile(png_path) else None,
-            "reason": None if result.get("ok") else (result.get("reason") or "")[:300],
+            "ok": all(r["ok"] for r in runs),
+            "alpha_nonzero": first["alpha_nonzero"],
+            "elapsed_s": round(sum(r["elapsed_s"] or 0.0 for r in runs), 3),
+            "sha256": first["sha256"],
+            "reason": first["reason"],
+            "runs": runs,
         }
-        # 外壳会在 PNG 旁写 <png>.result.json 中间结果，这里读完就删，避免污染基线目录
-        sidecar = png_path + ".result.json"
-        if os.path.isfile(sidecar):
-            try:
-                os.remove(sidecar)
-            except OSError:
-                pass
-        if result.get("ok") and ns.curve_out_dir:
-            curve = feel_curve.extract_curves(png_path)
+        if repeats > 1:
+            hashes = {r["sha256"] for r in runs if r["sha256"]}
+            entry["repeat_runs"] = len(runs)
+            entry["repeat_identical"] = len(hashes) == 1
+        if entry["ok"] and ns.curve_out_dir:
+            curve = feel_curve.extract_curves(entry["path"])
             curve_path = os.path.join(ns.curve_out_dir, "%s__p%.2f__curve.json" % (brush, grade))
             feel_curve.save_curve(curve, curve_path)
             entry["curve_file"] = os.path.basename(curve_path)
             entry["max_width_px"] = max(curve["width"])
             entry["mean_opacity_01"] = sum(curve["opacity"]) / len(curve["opacity"])
         entries.append(entry)
-        print("[档位 %.2f] ok=%s alpha=%s elapsed=%.2fs" % (
-            grade, entry["ok"], entry["alpha_nonzero"], entry["elapsed_s"] or 0.0))
+        print("[档位 %.2f] ok=%s alpha=%s elapsed=%.2fs repeat=%s" % (
+            grade, entry["ok"], entry["alpha_nonzero"], entry["elapsed_s"] or 0.0,
+            entry.get("repeat_identical")))
 
-    # 压感是否真实注入：全部成功但四张图 sha256 完全相同 → 压感没生效
+    # 压感是否真实注入：全部成功且各档 sha256 不同 = 不同压力出了不同图
     hashes = [e["sha256"] for e in entries if e["sha256"]]
     all_ok = all(e["ok"] for e in entries) and len(entries) == len(grades)
     pressure_injected = all_ok and len(set(hashes)) > 1
+    repeat_stable = all(e.get("repeat_identical", True) for e in entries)
     index = {
         "schema_version": 1,
         "task": "14",
@@ -209,11 +277,64 @@ def main():
         "stroke_length": ns.stroke_length,
         "size": "%dx%d" % (width, height),
         "pressure_profile": grades,
+        "repeat": repeats,
+        "repeat_stable": repeat_stable,
         "pressure_injected": pressure_injected,
         "simulated": False,
         "total_elapsed_s": round(time.time() - started_all, 2),
         "entries": entries,
     }
+
+    # ---- 可选：单图梯度（双端压力）与多档阶梯的口径对照（任务 144）----
+    if ns.gradient_end is not None and all_ok:
+        g0 = grades[0]
+        g1 = float(ns.gradient_end)
+        gpath = os.path.join(ns.out_dir, "feel__%s__grad_p%.2f_to_p%.2f__s%dx%d.png" % (
+            brush, g0, g1, width, height))
+        gres = runner.render_one(
+            ns.preset, gpath, size=(width, height), stroke=ns.stroke_length,
+            pressure=g0, timeout=ns.timeout, route="gui", pressure2=g1,
+        )
+        sidecar = gpath + ".result.json"
+        if os.path.isfile(sidecar):
+            try:
+                os.remove(sidecar)
+            except OSError:
+                pass
+        grad = {
+            "file": os.path.basename(gpath),
+            "ok": bool(gres.get("ok")),
+            "reason": None if gres.get("ok") else (gres.get("reason") or "")[:300],
+            "pressure_start": g0,
+            "pressure_end": g1,
+            "sha256": sha256_of(gpath) if os.path.isfile(gpath) else None,
+            "alpha_nonzero": gres.get("alpha_nonzero"),
+        }
+        if grad["ok"] and os.path.isfile(gpath):
+            prof, _ = _column_profile(gpath)
+            x0 = max(1, (width - ns.stroke_length) // 2)
+            x1 = min(width - 1, x0 + ns.stroke_length)
+            compare = []
+            for entry in entries:
+                if not entry["ok"]:
+                    continue
+                stair = _stroke_value(entry["path"])
+                t = 0.0 if g1 == g0 else (entry["pressure"] - g0) / (g1 - g0)
+                xpos = int(round(x0 + max(0.0, min(1.0, t)) * (x1 - x0)))
+                gval = prof[xpos] if 0 <= xpos < len(prof) else None
+                compare.append({
+                    "pressure": entry["pressure"],
+                    "staircase_alpha_mean": stair,
+                    "gradient_x": xpos,
+                    "gradient_alpha_mean": gval,
+                    "abs_diff": (round(abs(stair - gval), 3)
+                                 if (stair is not None and gval is not None) else None),
+                })
+            grad["column_profile"] = prof
+            grad["compare"] = compare
+        index["gradient"] = grad
+        print("[梯度] ok=%s file=%s" % (grad["ok"], grad["file"]))
+
 
     if all_ok and not pressure_injected and ns.simulate_on_failure:
         # 降级：用 100% 档位的图模拟其余档位（如实标注 simulated）
@@ -248,8 +369,9 @@ def main():
     manifest_path = ns.manifest or os.path.join(ns.out_dir, "manifest.json")
     if all_ok:
         _merge_manifest(manifest_path, ns, index, entries)
-    print("总计 %d 档 / 成功 %d / 压感真实注入=%s / 总耗时 %.1fs" % (
-        len(entries), sum(1 for e in entries if e["ok"]), pressure_injected, index["total_elapsed_s"]))
+    print("总计 %d 档 / 成功 %d / 压感真实注入=%s / 同档复现稳定=%s / 总耗时 %.1fs" % (
+        len(entries), sum(1 for e in entries if e["ok"]), pressure_injected,
+        repeat_stable, index["total_elapsed_s"]))
     return 0 if all_ok else 1
 
 
