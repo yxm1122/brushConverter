@@ -8,10 +8,16 @@
   - 压感→不透明度：opVr.Mnm（opVr.bVTy==2）
   - 压感→流量：prVr.Mnm（prVr.bVTy==2）
   - 压感→宽高比：minimumRoundness（roundnessDynamics.bVTy==2）
-  - 旋转：angleDynamics.bVTy==6 → 随笔迹方向（drawingangle）；jitter 作为 Krita RotationValue 效果强度，随机度曲线固定 ±180°
-  - 散布：useScatter → 启用开关；scatterDynamics.jitter → 散布量
-    （经验换算 ScatterValue = jitter/400，见 preset_xml.py 散布分支）
+  - 旋转：angleDynamics.bVTy → Krita 旋转传感器（9 值枚举见 _bvty_sensor：2=压感/6=笔划方向
+    drawingangle/7=速度 speed/8=旋转 rotation；1=渐隐/3=倾斜/4=转轮/5=初始方向 无等价承载 →
+    None + 告警）；jitter 是旋转档（0..100）→ RotationValue=min(1, j/50)（j≥50 饱和整圈，
+    证据 124 B 级、F-6 未量测，见 preset_xml.rotation_value）
+  - 散布：useScatter → 启用开关；scatterDynamics.jitter 是散布档（0..1000）→ ScatterValue=jitter/200
+    （124 A 级量纲两端锚点 + 129 实测 a/D 最大相对差 0.21%；÷400 已被 129 否证；见
+    preset_xml.scatter_value）
     bVTy==2 → 压感控制，bVTy==0 → 恒定；bothAxes → 两轴
+  - jitter 同名两把尺子（任务 134-4）：散布 0..1000 / 其余六个动态 0..100，两处换算系数
+    不同（/200 vs /50 饱和），禁止合并成一个 /100 或 /400
   - 纹理：按 Krita 模式合成校准亮度/对比度；Linear Height (Photoshop) 使用独立基线
     与反向对比度映射，Krita UI 数值按两位小数输出
   - 计算笔刷 → 按 PS 硬度剖面生成采样笔尖（png_brush，v1.5.0 任务 133；130 实验定论：
@@ -134,7 +140,7 @@ class BrushPreset:
     opacity_curve: str | None = None
     flow_curve: str | None = None
     ratio_curve: str | None = None
-    rotation_sensor: str | None = None  # "pressure" | "drawingangle" | None
+    rotation_sensor: str | None = None  # "pressure" | "drawingangle" | "speed" | "rotation" | None
     rotation_jitter: float = 0.0
     scatter: bool = False                 # useScatter → 散布选项启用
     scatter_pressure: bool = False        # scatterDynamics.bVTy==2 → 散布量随压感
@@ -204,21 +210,40 @@ def _map_texture(p: dict[str, D.Value],
     )
 
 
+#: bVTy 控制源枚举 → Krita 旋转传感器 id（124 逆向 A 级 9 值表；任务 134-3）。
+#:
+#: 124-逆向-随机动态.md §4.1 逐值（9 条本地化串逐字读回 + 枚举表指针比较）：
+#:   0=Off 关 / 1=Fade 渐隐 / 2=Pen Pressure 压感 / 3=Pen Tilt 倾斜 /
+#:   4=Stylus Wheel 转轮 / 5=Initial Direction 初始方向 / 6=Direction 笔划方向 /
+#:   7=Speed 速度 / 8=Rotation 笔尖旋转。
+#: **旧注释/矩阵把 5 写成「旋转」、把 7 写成「初始方向」是错位**（矩阵由 137 回写）。
+#: Krita 侧承载（126 bVTy 行）：2→pressure、6→drawingangle、7→speed、8→rotation 直接承载。
+_BVTY_SENSOR = {
+    2: "pressure",
+    6: "drawingangle",
+    7: "speed",
+    8: "rotation",
+}
+_BVTY_NAMES = {
+    0: "关", 1: "渐隐", 2: "压感", 3: "倾斜", 4: "转轮",
+    5: "初始方向", 6: "笔划方向", 7: "速度", 8: "旋转",
+}
+#: 有语义但**本轮不映射**的 bVTy：126 的 bVTy 行把 1/3/4 标成 ⚠️（可映射但语义不同/
+#: 部分/候选），5 标 ⛔（Krita 无「笔划初始方向」传感器）。不写一个语义不等价的
+#: 传感器（那样只会把「丢效果」变成「错效果」），一律 None + 告警；见 134 报告决策项。
+_BVTY_UNMAPPED = {
+    1: "语义不同（PS 用 fStp 步数，Krita fade 是距离/时间）",
+    3: "部分可映射（PS 单轴角度 vs Krita 双轴 tilt）",
+    4: "候选（tangentialpressure 需硬件实机确认）",
+    5: "无 Krita 承载（笔划初始方向）",
+}
+
+
 def _bvty_sensor(bvty: float | None) -> str | None:
-    """Photoshop bVTy 控制源 → Krita 传感器 id。"""
+    """Photoshop bVTy 控制源 → Krita 旋转传感器 id（9 值枚举，124 A 级表）。"""
     if bvty is None:
         return None
-    b = int(bvty)
-    if b == 2:          # 压力
-        return "pressure"
-    if b in (6, 7):     # 初始方向 / 方向
-        return "drawingangle"
-    # 3=倾斜：Krita 预设的 RotationSensor 只实现了 pressure/drawingangle，
-    # 没有 tilt 分支；返回 None 让上层按「未映射」提示，而不是写一个
-    # 下游不会消费的传感器值（那样旋转效果会被静默丢弃）。
-    if b == 3:
-        return None
-    return None         # 0=off, 1=fade, 4=wheel, 5=rotation 暂不映射
+    return _BVTY_SENSOR.get(int(bvty))
 
 
 def map_presets(abr: AbrFile) -> list[BrushPreset]:
@@ -320,10 +345,17 @@ def map_presets(abr: AbrFile) -> list[BrushPreset]:
 
         texture = _map_texture(p, patterns) if D.get_bool(p, "useTexture") else None
         warnings = _collect_warnings(p, texture)
-        # 旋转控制源 bVTy=1(渐隐)/3(倾斜)/4(转轮)/5(旋转) 尚未映射；
-        # 若 jitter>0 说明 PS 中该效果实际存在，丢失效果需要提示。
-        if rotation_jitter > 0 and ang.get("bVTy") not in (0, 2, 6, 7, None):
-            warnings.append(f"旋转控制源(bVTy={int(ang['bVTy'])} 未映射)")
+        # 旋转控制源 bVTy（任务 134-3）。2/6/7/8 有 Krita 承载（见 _BVTY_SENSOR）；
+        # 1/3/4/5 无等价承载 → None + 告警。告警不再以 jitter>0 为前提：控制源本身
+        # （如 5=初始方向、1=渐隐）即使 jitter=0 也会改变旋转，丢了就是丢了。
+        _bvty = ang.get("bVTy")
+        if _bvty is not None:
+            _b = int(_bvty)
+            if _b in _BVTY_UNMAPPED:
+                warnings.append(
+                    f"旋转控制源(bVTy={_b} {_BVTY_NAMES[_b]} 未映射：{_BVTY_UNMAPPED[_b]})")
+            elif _b not in _BVTY_NAMES:
+                warnings.append(f"旋转控制源(bVTy={_b} 未知枚举 未映射)")
 
         out.append(BrushPreset(
             name=name,

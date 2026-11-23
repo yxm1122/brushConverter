@@ -128,10 +128,11 @@ def test_sampled_brush_angle_radians():
     assert f'angle="{math.radians(-33.0 % 360.0):g}"' in xml
 
 
-def test_rotation_jitter_uses_effect_strength_and_180_degree_curves():
+def test_rotation_jitter_uses_effect_strength_and_fuzzy_curves():
     from brush_converter.kpp.preset_xml import build_preset_xml
+    # v1.5.0 任务 134-2：RotationValue 由 j/100 改为 min(1, j/50)（124 B 级，F-6 未量测）
     xml = build_preset_xml("rotation", "", None, rotation_sensor="drawingangle", rotation_jitter=12.0)
-    assert 'RotationValue" type="internal">0.12' in xml
+    assert 'RotationValue" type="internal">0.24' in xml
     assert 'RotationUseCurve" type="internal">true' in xml
     # Krita UI 显示 ±180°，但 XML 的曲线坐标是归一化 0..1。
     assert '<ChildSensor id="fuzzy"> <curve>0,0;1,1;</curve>' in xml

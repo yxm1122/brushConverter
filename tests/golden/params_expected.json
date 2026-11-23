@@ -65,7 +65,7 @@
     "angle_deg": "Brsh.Angl=0",
     "scale": "Dmtr=112 ÷ max(183,143)=183 → 112/183",
     "size": "Dmtr=112 px",
-    "scatter_value": "scatterDynamics.jitter=0 → 0/400 = 0（见参数表第 5 节散布换算，任务 107 判定「需校准」未改系数）",
+    "scatter_value": "scatterDynamics.jitter=0 → 0/200 = 0（v1.5.0 任务 134 按 129 实测把散布档换算改为 jitter/200；0 值不受系数影响，故期望值未变，仅修正本说明）",
     "scatter_use_curve": "scatterDynamics.bVTy=0（恒定散布）→ UseCurve=false",
     "axis_x": "bothAxes=true → AxisX=true",
     "axis_y": "Krita 散布固定 AxisY=true"

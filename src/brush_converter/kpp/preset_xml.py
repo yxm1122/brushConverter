@@ -135,6 +135,39 @@ def _build_default_params() -> dict[str, tuple[str, str]]:
 DEFAULT_PARAMS = _build_default_params()
 
 
+# ---------------------------------------------------------------------------
+# 随机动态的两把尺子（v1.5.0 · 任务 134；132 落地清单 134-1/134-2/134-4）
+#
+# PS 的 jitter 是**同名两把尺子**（124 逆向 A 级）：散布对象里上限 1000（%），
+# 其余六个通用动态（尺寸/圆度/角度/流量/不透明度/颜色）上限 100（%）。
+# Krita 侧对应两个不同量纲的参数，**禁止共用一个 /100 或 /400**：
+#   - 散布档 ScatterValue：s = j/200（j 0..1000 → s 0..5.0，恰为 Krita 上限）；
+#   - 旋转档 RotationValue：R = min(1, j/50)（j 0..100，j≥50 饱和整圈）。
+# ---------------------------------------------------------------------------
+
+
+def scatter_value(jitter: float) -> float:
+    """散布档（PS scatterDynamics.jitter，0..1000 %）→ Krita ScatterValue（0..5.0）。
+
+    s = j/200，**不加 clamp**：1000% 换算恰为 Krita 上限 5.0（124 A 级量纲两端锚点；
+    129 实测 a/D 最大相对差 0.21%、Krita 三次重复极差 0.94%，÷400 为 5/5 超 50%）。
+    加 clamp 只会多一层「值相同但逻辑可能被误改」的风险，实测已证明不需要。
+    """
+    return float(jitter) / 200.0
+
+
+def rotation_value(jitter: float) -> float:
+    """旋转档（PS angleDynamics.jitter，0..100 %）→ Krita RotationValue（0..1）。
+
+    R = min(1, j/50)：Krita 的 fuzzy 随机旋转跨度 = 360° × R
+    （docs/研究报告/静态-形状颜色.md §3.5.1，A 级源码链）；PS 侧像素实测
+    j=50 已铺满整圈（124 §5.2，B 级：25/25、极差 352°、斜率 3.6–4.5°/1%），
+    即 j≥50 饱和整圈。j 的运行时上限 100，>=50 一律写 1.0（饱和，不是越界 2.0）。
+    **F-6（角度跨度 3 档复测）未量测 ⇒ 本条只有 B 级证据，不得写成已验证。**
+    """
+    return min(1.0, max(0.0, float(jitter)) / 50.0)
+
+
 def _pressure_sensor(curve: str | None = None) -> str:
     """压感传感器 XML。"""
     if curve is None:
@@ -159,10 +192,34 @@ def _fuzzy_random_sensor() -> str:
     """纯随机旋转传感器：只保留 fuzzy/fuzzystroke，不随笔迹方向。
 
     Photoshop angleDynamics.bVTy==0（控制=关）且 jitter>0 时是纯随机角度抖动，
-    Krita 用 fuzzy 随机曲线表达；随机幅度由 RotationValue（=jitter/100）缩放。
+    Krita 用 fuzzy 随机曲线表达；随机幅度由 RotationValue（=min(1, j/50)）缩放。
     """
     return (
         '<!DOCTYPE params> <params id="sensorslist"> '
+        '<ChildSensor id="fuzzy"> <curve>0,0;1,1;</curve> </ChildSensor> '
+        '<ChildSensor id="fuzzystroke"> <curve>0,0;1,1;</curve> </ChildSensor> '
+        '</params> '
+    )
+
+
+#: bVTy 控制源 → Krita 旋转传感器 id（124 A 级 9 值枚举；任务 134-3）。
+#:   7=Speed → Krita "speed"；8=Rotation → Krita "rotation"（id 全集见
+#:   docs/数据/krita_caps.json 的「传感器 id 全集」）。1/3/4/5 不在其中：
+#:   1=渐隐/3=倾斜/4=转轮 与 PS 语义不同、5=初始方向 Krita 无承载（见 mapping.py）。
+_ROTATION_CONTROL_SENSORS = ("speed", "rotation")
+
+
+def _control_rotation_sensor(sensor_id: str) -> str:
+    """「指定传感器控制 + fuzzy 随机」的旋转传感器 XML。
+
+    与 drawingangle 分支同构：sensorslist 里每个 ChildSensor 都会被激活
+    （KisKritaSensorPack::read 逐条 sensor->read + isActive=true）；fuzzy/fuzzystroke
+    是加法型随机源（isAdditive），speed/rotation 是缩放型控制源，与 drawingangle
+    （绝对角源）同样由 RotationValue 提供强度。区别只是控制源 id。
+    """
+    return (
+        '<!DOCTYPE params> <params id="sensorslist"> '
+        f'<ChildSensor id="{sensor_id}"/> '
         '<ChildSensor id="fuzzy"> <curve>0,0;1,1;</curve> </ChildSensor> '
         '<ChildSensor id="fuzzystroke"> <curve>0,0;1,1;</curve> </ChildSensor> '
         '</params> '
@@ -451,13 +508,19 @@ def build_preset_xml(
         set_string("RatioSensor", _pressure_sensor())
         set_internal("PressureRatio", "true")
         set_internal("RatioUseCurve", "true")
-    if rotation_sensor == "drawingangle":
-        # Photoshop angle jitter 直接映射为 Krita「旋转-效果强度」；
-        # Krita 的 fuzzy/fuzzystroke 曲线本身负责 ±180° 随机方向；
-        # 曲线 XML 使用归一化 0..1，不能直接写 UI 显示的 180。
-        set_string("RotationSensor", _drawing_angle_sensor())
+    if rotation_sensor == "drawingangle" or rotation_sensor in _ROTATION_CONTROL_SENSORS:
+        # Photoshop angleDynamics.jitter 直接映射为 Krita「旋转-效果强度」；
+        # Krita 的 fuzzy/fuzzystroke 曲线本身负责随机方向（曲线 XML 用归一化 0..1，
+        # 不能直接写 UI 显示的 180）。旋转档换算 R=min(1, j/50)（任务 134-2，
+        # 证据 124 B 级、F-6 未量测），j≥50 饱和整圈。
+        # 控制源：bVTy=6 → drawingangle（绝对角）；7=速度 → speed；8=旋转 → rotation
+        # （124 A 级枚举，任务 134-3）。
+        if rotation_sensor == "drawingangle":
+            set_string("RotationSensor", _drawing_angle_sensor())
+        else:
+            set_string("RotationSensor", _control_rotation_sensor(rotation_sensor))
         set_internal("PressureRotation", "true")
-        set_internal("RotationValue", f"{max(0.0, min(100.0, rotation_jitter)) / 100.0:g}")
+        set_internal("RotationValue", f"{rotation_value(rotation_jitter):g}")
         set_internal("RotationUseCurve", "true")
         set_internal("RotationUseSameCurve", "false")
         set_internal("RotationcurveMode", "1")
@@ -467,10 +530,10 @@ def build_preset_xml(
     elif rotation_jitter > 0:
         # PS angleDynamics.bVTy==0（控制=关）但 jitter>0：纯随机角度抖动，
         # 没有传感器。Krita 的「旋转-效果强度」仍需开启（PressureRotation=true），
-        # 用只有 fuzzy/fuzzystroke 的传感器表达随机，RotationValue=jitter/100。
+        # 用只有 fuzzy/fuzzystroke 的传感器表达随机，RotationValue=min(1, j/50)。
         set_string("RotationSensor", _fuzzy_random_sensor())
         set_internal("PressureRotation", "true")
-        set_internal("RotationValue", f"{max(0.0, min(100.0, rotation_jitter)) / 100.0:g}")
+        set_internal("RotationValue", f"{rotation_value(rotation_jitter):g}")
         set_internal("RotationUseCurve", "true")
         set_internal("RotationUseSameCurve", "false")
         set_internal("RotationcurveMode", "1")
@@ -485,12 +548,12 @@ def build_preset_xml(
             # 恒定散布：传感器串必须是合法 XML（pressure 占位），曲线关闭。
             set_string("ScatterSensor", _pressure_sensor())
             set_internal("ScatterUseCurve", "false")
-        # 散布量换算：PS jitter(0..1000%) → Krita ScatterValue(0..5.0)
-        # 任务 107 实测结论：线性系数无法同时对上 100%/300%（PS 响应超线性、Krita 线性），
-        # 且 300% 点的带高统计复现性 ±13%，无法证明 ≤2% → 保留 106 时的系数并标「需校准」。
-        # 依据与残差见 docs/parameter-mapping.md §10.3。
+        # 散布量换算：PS jitter(0..1000%) → Krita ScatterValue(0..5.0)，s = j/200，不 clamp。
+        # 证据：129 实验（/200：a/D 最大相对差 0.21%、三次重复极差 0.94%；
+        # ÷400：5/5 超 10%、最大 50.01%；107 的 39.7%/51.1% = 系数取错一半 + band_height 极值统计伪差）。
+        # 注意这是「散布档」，与旋转档（0..100 → min(1, j/50)）不是同一个尺子（任务 134-4）。
         if scatter_amount is not None:
-            set_internal("ScatterValue", f"{scatter_amount / 400.0:g}")
+            set_internal("ScatterValue", f"{scatter_value(scatter_amount):g}")
         # PS bothAxes → Krita 两个轴都开；否则只在 Y 轴（垂直笔迹方向）
         set_internal("Scattering/AxisX", "true" if scatter_both_axes else "false")
         set_internal("Scattering/AxisY", "true")
