@@ -36,9 +36,11 @@ Krita 5.3.3 对内嵌 8-bit 灰度 PNG 的笔尖按 **255 - 灰度值** 当不�
 from __future__ import annotations
 
 import argparse
+import copy
 import hashlib
 import json
 import math
+import re
 import subprocess
 import sys
 import time
@@ -590,6 +592,285 @@ def write_summary(result: dict) -> Path:
     return path
 
 
+
+# --------------------------------------------------------------------------- #
+# 七、生产路径实验（任务 150 B2/B3 + 151 N7）：PS 真值 vs 当前实现（v1.5.0 生产链）
+# --------------------------------------------------------------------------- #
+# 130（上文）的 A/B 双路径是「旧 auto_brush 对照 + 实验期手写位图生成器」；
+# v1.5.0（133）落地后**生产路径**是 convert._render_preset 的 png_brush 分支。
+# 本节的实验一律直接调用生产函数生成 .kpp，量的是「当前实现」而不是实验复刻。
+#
+# PS 真值由 .tmp/geom/ps_truth_geom.py 用 measure_deviation 的出图链一次出（串行），
+# 命名 bcgeom__<exp>__D<直径>__h<硬度>__r<圆度>.png（画布为正方形）。
+
+PROD_GRIDS: dict = {
+    "b2": {"diameters": [200.0], "hardness": [25.0, 50.0, 75.0],
+           "roundness": [50.0, 80.0], "canvas": 400, "shape": "ellipse",
+           "note": "中间硬度（0/50/100 之间插值）× 椭圆（Rndn=50/80）剖面组合"},
+    "b3": {"diameters": [19.0, 30.0, 50.0], "hardness": [0.0],
+           "roundness": [100.0], "canvas": 160, "shape": "circle",
+           "note": "小直径 h0 足印量化（D=19 公式 30px vs 理论 27.4px）"},
+    "n7": {"diameters": [600.0, 800.0], "hardness": [95.0, 100.0],
+           "roundness": [100.0], "canvas": 1000, "shape": "circle",
+           "note": "h≥95 大直径过渡带（B1 过渡带模型 (D/200)×1.9−1.9 的失效边界）"},
+}
+
+
+def prod_names(exp: str, d: float, h: float, r: float) -> tuple[str, str]:
+    stem = "bcgeom__%s__D%g__h%g__r%g" % (exp, d, h, r)
+    return stem + ".png", stem + ".kpp"
+
+
+def prod_items(experiments: list[str]) -> list[dict]:
+    items: list[dict] = []
+    for exp in experiments:
+        grid = PROD_GRIDS.get(exp)
+        if not grid:
+            raise SystemExit("未知生产路径实验：%r（可选 %r）" % (exp, list(PROD_GRIDS)))
+        for d in grid["diameters"]:
+            for h in grid["hardness"]:
+                for r in grid["roundness"]:
+                    ps_name, kpp_name = prod_names(exp, d, h, r)
+                    items.append({"exp": exp, "d": float(d), "h": float(h), "r": float(r),
+                                  "canvas": int(grid["canvas"]), "shape": grid["shape"],
+                                  "ps_file": ps_name, "kpp": kpp_name,
+                                  "key": "%s_D%g_h%g_r%g" % (exp, d, h, r)})
+    return items
+
+
+def build_prod_kpp(item: dict, kpp_dir: Path) -> dict:
+    """按 v1.5.0 生产链生成 .kpp：convert._render_preset 的 png_brush 分支。"""
+    bp = copy.deepcopy(md.base_preset("computed"))
+    # 与 130/131 同口径隔离：去掉与本次测量无关的动态/纹理/散布
+    bp.size_curve = None
+    bp.opacity_curve = None
+    bp.flow_curve = None
+    bp.ratio_curve = None
+    bp.rotation_sensor = None
+    bp.rotation_jitter = 0.0
+    bp.texture = None
+    bp.scatter = False
+    bp.scatter_pressure = False
+    bp.scatter_both_axes = False
+    bp.scatter_amount = None
+    bp.angle = 0.0
+    bp.spacing = SPACING_PCT / 100.0
+    bp.diameter = item["d"]
+    bp.hardness = item["h"]
+    bp.roundness = item["r"]
+    fname, xml, preview = conv_mod._render_preset(bp, 0)
+    data = build_kpp(xml, preview)
+    kpp_dir.mkdir(parents=True, exist_ok=True)
+    path = kpp_dir / item["kpp"]
+    path.write_bytes(data)
+    rb = read_preset_xml(path.read_bytes())
+
+    def grab(pat: str) -> str:
+        m = re.search(pat, rb)
+        return m.group(1) if m else ""
+
+    return {"kpp": str(path.relative_to(REPO)), "kpp_bytes": len(data),
+            "preset_filename": fname,
+            "brush_type": grab(r'<Brush type="([^"]+)"'),
+            "scale_field": grab(r'<Brush[^>]*scale="([^"]+)"'),
+            "spacing_field": grab(r'<Brush[^>]*spacing="([^"]+)"'),
+            "preset_diameter": grab(r'name="diameter"[^>]*>([^<]*)<'),
+            "embedded_png_bytes": len(data)}
+
+
+def prod_render_one(item: dict, kpp_path: Path, out_path: Path,
+                    determinism: bool = False) -> dict:
+    """渲染一张（可选重复一次做 IDAT 一致性检查）；调用方须持 .tmp/krita.lock。"""
+    reps = []
+    for i in range(1, (2 if determinism else 1) + 1):
+        out = out_path if i == 1 else out_path.with_name(
+            out_path.stem + "__rep2" + out_path.suffix)
+        res = None
+        for attempt in range(1, 4):
+            res = md.runner.render_one(str(kpp_path), str(out),
+                                       size=(item["canvas"], item["canvas"]),
+                                       stroke=STROKE, pressure=PRESSURE, timeout=180.0)
+            if res.get("ok"):
+                break
+            log("  [retry %d] %s 渲染失败：%s" % (attempt, out.name, res.get("reason")))
+            time.sleep(4.0)
+        if not res or not res.get("ok"):
+            raise RuntimeError("Krita 渲染失败：%s（%s）日志尾部：%s" % (
+                out.name, (res or {}).get("reason"),
+                ((res or {}).get("log_tail") or "")[-600:]))
+        reps.append({"png": out, "idat": md.idat_sha256(out),
+                     "alpha_nonzero": res.get("alpha_nonzero"),
+                     "elapsed_s": res.get("elapsed_s")})
+    info = {"png": reps[0]["png"], "idat": reps[0]["idat"],
+            "alpha_nonzero": reps[0]["alpha_nonzero"],
+            "elapsed_s": reps[0]["elapsed_s"]}
+    if determinism:
+        info["idat_rep2"] = reps[1]["idat"]
+        info["deterministic"] = reps[0]["idat"] == reps[1]["idat"]
+    return info
+
+
+def _axis_metrics(alpha: np.ndarray, shape: str) -> dict:
+    """主/短轴 10%→90% 过渡宽 + 包围盒尺寸。
+
+    主轴 = 水平（angle=0、Rndn<100 时 PS 长轴水平）；短轴 = 转置后同口径量测。
+    圆度=100 时两轴同值，仍并列给出作对照。
+    """
+    edge_major = md.measure_edge(alpha).get("edge_width")
+    edge_minor = md.measure_edge(alpha.T).get("edge_width")
+    x0, y0, x1, y1 = md.bbox_alpha(alpha, thr=BBOX_THR)
+    return {
+        "edge_major_px": None if edge_major is None else round(edge_major, 3),
+        "edge_minor_px": None if edge_minor is None else round(edge_minor, 3),
+        "bbox_w": int(x1 - x0 + 1) if x0 >= 0 else None,
+        "bbox_h": int(y1 - y0 + 1) if y0 >= 0 else None,
+        "shape": shape,
+    }
+
+
+def _geom_judge(ps_v, kt_v) -> dict | None:
+    if ps_v in (None, 0) or kt_v is None:
+        return None
+    absd = abs(float(kt_v) - float(ps_v))
+    rel = absd / float(ps_v)
+    return {"abs_px": round(absd, 3), "rel_pct": round(100.0 * rel, 2),
+            "pass_abs": bool(absd <= ABS_PX_TOL),
+            "pass_rel": bool(rel <= REL_TOL),
+            "pass": bool(absd <= ABS_PX_TOL or rel <= REL_TOL)}
+
+
+def run_production_experiments(experiments: list[str], render: bool,
+                               prod_workdir: Path, ps_dir: Path) -> int:
+    """B2/B3/N7：生产链 .kpp + PS 真值 → 主/短轴过渡宽、包围盒、像素差。"""
+    items = prod_items(experiments)
+    kpp_dir = prod_workdir / "kpp"
+    render_dir = prod_workdir / "render"
+    kpp_dir.mkdir(parents=True, exist_ok=True)
+    render_dir.mkdir(parents=True, exist_ok=True)
+    log("=== 生产路径实验：%d 组（%s）；PS 真值目录 %s ===" % (
+        len(items), ",".join(experiments), ps_dir.relative_to(REPO)))
+    info: dict = {}
+    for it in items:
+        it["ps_path"] = ps_dir / it["ps_file"]
+        if not it["ps_path"].is_file():
+            raise SystemExit("PS 真值缺失：%s（先跑 .tmp/geom/ps_truth_geom.py）" % it["ps_path"])
+        b = build_prod_kpp(it, kpp_dir)
+        it["kpp_info"] = b
+        log("  [build] %-18s brush=%s scale=%s spacing=%s 位图=%sB" % (
+            it["key"], b["brush_type"], b["scale_field"], b["spacing_field"],
+            b["embedded_png_bytes"]))
+    if render:
+        require_lock()
+        running = krita_running()
+        if running:
+            raise SystemExit("检测到已在运行的 krita.exe（%d 个），拒绝渲染：%r"
+                             % (len(running), running[:2]))
+        seen_det: set = set()
+        for it in items:
+            out = render_dir / ("%s__prod.png" % it["key"])
+            det = it["exp"] not in seen_det
+            r = prod_render_one(it, kpp_dir / it["kpp"], out, determinism=det)
+            seen_det.add(it["exp"])
+            r["png"] = str(r["png"])
+            info[it["key"]] = r
+            log("[render] %-18s -> %s（%.1fs，alpha=%s%s）" % (
+                it["key"], Path(r["png"]).name, r["elapsed_s"], r["alpha_nonzero"],
+                "，重复 IDAT=%s" % ("一致" if r.get("deterministic") else "不一致")
+                if det else ""))
+    else:
+        for it in items:
+            cands = sorted(render_dir.glob("%s__prod*.png" % it["key"]))
+            if cands:
+                info[it["key"]] = {"png": str(cands[0]), "idat": md.idat_sha256(cands[0]),
+                                   "alpha_nonzero": None, "elapsed_s": 0.0}
+        log("[render] 未加 --render：复用 %d/%d 组已有渲染" % (len(info), len(items)))
+
+    rows = []
+    for it in items:
+        r = info.get(it["key"])
+        if not r:
+            continue
+        ps = md.load_alpha(it["ps_path"])
+        kt = md.load_alpha(Path(r["png"]))
+        if ps.shape != kt.shape:
+            raise ValueError("画布不一致：PS %s vs Krita %s" % (ps.shape, kt.shape))
+        m_ps = _axis_metrics(ps, it["shape"])
+        m_kt = _axis_metrics(kt, it["shape"])
+        row = {"key": it["key"], "exp": it["exp"], "diameter": it["d"], "hardness": it["h"],
+               "roundness": it["r"], "canvas": it["canvas"], "shape": it["shape"],
+               "ps_file": str(it["ps_path"].relative_to(REPO)),
+               "krita_png": r["png"], "idat": r.get("idat"),
+               "deterministic": r.get("deterministic"),
+               "kpp": it["kpp_info"], "ps": m_ps, "kt": m_kt,
+               "pixel": md.metrics_alpha(ps, kt)}
+        row["major"] = _geom_judge(m_ps["edge_major_px"], m_kt["edge_major_px"])
+        row["minor"] = _geom_judge(m_ps["edge_minor_px"], m_kt["edge_minor_px"])
+        if m_ps["bbox_w"] and m_kt["bbox_w"]:
+            row["bbox_w_diff_px"] = int(m_kt["bbox_w"] - m_ps["bbox_w"])
+            row["bbox_h_diff_px"] = int(m_kt["bbox_h"] - m_ps["bbox_h"])
+        if m_ps["bbox_w"] and m_ps["bbox_h"]:
+            row["ps_axis_ratio"] = round(m_ps["bbox_w"] / m_ps["bbox_h"], 4)
+            row["kt_axis_ratio"] = round(m_kt["bbox_w"] / m_kt["bbox_h"], 4)
+            row["axis_ratio_diff_pct"] = round(
+                100.0 * abs(row["kt_axis_ratio"] - row["ps_axis_ratio"]) / row["ps_axis_ratio"], 2)
+        # B3 专用：生产公式 edge vs 理论 PS 足印（h0 的 r_vis/R=1.44）
+        if it["exp"] == "b3":
+            import brush_converter.hardness_tip as ht
+            edge = ht.tip_edge(it["h"], it["d"])
+            theory = ht.footprint_ratio(it["h"]) * it["d"]
+            row["formula_edge_px"] = int(edge)
+            row["theoretical_footprint_px"] = round(theory, 2)
+            row["formula_vs_theory_pct"] = round(100.0 * (edge / theory - 1.0), 2)
+            row["ps_bbox_max_px"] = max(m_ps["bbox_w"], m_ps["bbox_h"])
+            row["ps_bbox_vs_theory_pct"] = round(
+                100.0 * (row["ps_bbox_max_px"] / theory - 1.0), 2)
+        rows.append(row)
+        log("  %-18s PS 主/短 %s/%s  KT 主/短 %s/%s  主Δ%+.2fpx 短Δ%+.2fpx  判定=%s" % (
+            it["key"], m_ps["edge_major_px"], m_ps["edge_minor_px"],
+            m_kt["edge_major_px"], m_kt["edge_minor_px"],
+            row["major"]["abs_px"] if row["major"] else float("nan"),
+            row["minor"]["abs_px"] if row["minor"] else float("nan"),
+            "PASS" if (row["major"] or {}).get("pass") else "FAIL"))
+
+    result = {"generated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+              "argv": sys.argv[1:], "experiments": experiments,
+              "ps_dir": str(ps_dir.relative_to(REPO)),
+              "grids": {e: PROD_GRIDS[e] for e in experiments},
+              "render": info, "rows": rows,
+              "abs_px_tol": ABS_PX_TOL, "rel_tol": REL_TOL}
+    path = prod_workdir / "results_hardness.json"
+    path.write_text(json.dumps(result, ensure_ascii=False, indent=1), encoding="utf-8")
+    md_path = prod_workdir / "summary_hardness.md"
+    lines = ["# 150 B2/B3 + 151 N7 生产路径实验（.tmp/geom）\n",
+             "> 生产链 = convert._render_preset 的 png_brush 分支；判据 几何级：绝对差 ≤2px 或相对差 ≤2%。\n",
+             "\n| 组 | D | h | Rndn | 画布 | PS 主轴 | KT 主轴 | 主轴Δpx | 主轴Δ% | PS 短轴 | KT 短轴 | 短轴Δpx | 短轴Δ% | bboxΔw/h | 像素差% / max | 判定 |",
+             "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|\n"]
+    for r in rows:
+        maj, mnr = r.get("major") or {}, r.get("minor") or {}
+        lines.append("| %s | %g | %g | %g | %d | %s | %s | %s | %s | %s | %s | %s | %s | %+d/%+d | %.2f%% / %d | %s |" % (
+            r["key"], r["diameter"], r["hardness"], r["roundness"], r["canvas"],
+            r["ps"]["edge_major_px"], r["kt"]["edge_major_px"],
+            maj.get("abs_px"), maj.get("rel_pct"),
+            r["ps"]["edge_minor_px"], r["kt"]["edge_minor_px"],
+            mnr.get("abs_px"), mnr.get("rel_pct"),
+            r.get("bbox_w_diff_px"), r.get("bbox_h_diff_px"),
+            100.0 * r["pixel"]["diff_ratio"], r["pixel"]["max_delta"],
+            "PASS" if (maj.get("pass") and mnr.get("pass")) else "FAIL"))
+    lines.append("\n## B3 公式核对（生产 tip_edge vs PS 理论足印）\n")
+    lines.append("| D | h | 公式 edge | 理论足印 | 公式超理论 | PS bbox 最长边 | PS bbox vs 理论 |")
+    lines.append("|---|---|---|---|---|---|---|")
+    for r in rows:
+        if r["exp"] != "b3":
+            continue
+        lines.append("| %g | %g | %d | %.2f | %+.2f%% | %d | %+.2f%% |" % (
+            r["diameter"], r["hardness"], r["formula_edge_px"],
+            r["theoretical_footprint_px"], r["formula_vs_theory_pct"],
+            r["ps_bbox_max_px"], r["ps_bbox_vs_theory_pct"]))
+    md_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    log("[done] 结果 %s / 汇总 %s" % (path.relative_to(REPO), md_path.relative_to(REPO)))
+    return 0
+
+
 def _f(v) -> str:
     return "—" if v is None else ("%.2f" % float(v))
 
@@ -606,6 +887,10 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--workdir", default=None)
     ap.add_argument("--tip-polarity", default="inverted", choices=["inverted", "direct"],
                     help="位图灰度极性：inverted=255-α（Krita 5.3.3 实测口径，默认）；direct=α")
+    ap.add_argument("--experiment", default="",
+                    help="生产路径实验（任务 150/151）：b2,b3,n7（逗号分隔）；跑 PS 真值 vs 当前实现")
+    ap.add_argument("--prod-workdir", default="", help="生产路径实验产物目录（默认 .tmp/geom）")
+    ap.add_argument("--ps-dir", default="", help="生产路径实验的 PS 真值目录（默认 <prod-workdir>/ps）")
     args = ap.parse_args(argv)
 
     global WORK, TIP_DIR, KPP_DIR, RENDER_DIR, TIP_POLARITY_DEFAULT
@@ -614,6 +899,14 @@ def main(argv: list[str] | None = None) -> int:
     TIP_DIR = WORK / "tips" / args.tip_polarity
     KPP_DIR = WORK / "kpp" / args.tip_polarity
     RENDER_DIR = WORK / "render" / args.tip_polarity
+
+    if args.experiment:
+        prod_workdir = (Path(args.prod_workdir).resolve() if args.prod_workdir
+                        else (REPO / ".tmp" / "geom"))
+        ps_dir = (Path(args.ps_dir).resolve() if args.ps_dir
+                  else (prod_workdir / "ps"))
+        experiments = [e.strip() for e in args.experiment.split(",") if e.strip()]
+        return run_production_experiments(experiments, args.render, prod_workdir, ps_dir)
 
     hardness = [float(v) for v in args.hardness.split(",") if v.strip()]
     variants = [v.strip() for v in args.variant.split(",") if v.strip()]

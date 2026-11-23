@@ -89,6 +89,15 @@ CONFIGS: dict[str, dict] = {
         "dmtr": 112.0, "basis": 143.0 / 183.0, "hardness": None, "roundness": None,
         "canvas": (1400, 260), "stroke": 1300,
     },
+    # 任务 150-B4：椭圆计算笔刷的 spacing 基准（v1.5.0 生产路径 = png_brush）。
+    # PS 基准 = Dmtr × 短/长 = 200 × 50/100 = 100px；Krita 侧 production=True 走
+    # convert._render_preset，间距按 hardness_tip.spacing_basis 乘回（Dmtr×短/长 ÷ 位图边长）。
+    "ellipse_computed": {
+        "cls": "椭圆计算笔刷（Dmtr=200、Rndn=50、Hrdn=100）",
+        "preset": BRUSH_COMPUTED, "abr": ABR_COMPUTED,
+        "dmtr": 200.0, "basis": 0.5, "hardness": 100.0, "roundness": 50.0,
+        "canvas": (1600, 260), "stroke": 1500, "production": True,
+    },
 }
 SPACINGS = [10.0, 50.0, 100.0]
 GROUPS = list(CONFIGS)
@@ -183,6 +192,30 @@ def build_kpp_for(group: str, spacing: float) -> tuple[Path, dict]:
         bp.hardness = float(cfg["hardness"])
     if cfg["roundness"] is not None:
         bp.roundness = float(cfg["roundness"])
+
+    if cfg.get("production"):
+        # 任务 150-B4：v1.5.0 生产路径（计算笔刷 → 按 PS 硬度剖面生成的 png_brush）。
+        # 与 convert._render_preset 完全同一条链，间距补偿用 hardness_tip.spacing_basis。
+        bp.diameter = float(cfg["dmtr"])
+        fname, xml, preview = conv_mod._render_preset(bp, 0)
+        preset_name = fname.rsplit(".", 1)[0]
+        path = KPP_DIR / ("bc131__%s__v%s.kpp" % (group, fmt(spacing)))
+        KPP_DIR.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(build_kpp(xml, preview))
+
+        def _grab2(pat: str) -> str:
+            m = re.search(pat, xml)
+            return m.group(1) if m else ""
+        readback = {
+            "preset_name": preset_name,
+            "spacing": _grab2(r'<Brush[^>]*spacing="([^"]+)"'),
+            "brush_diameter": _grab2(r'name="diameter"[^>]*>([^<]*)<'),
+            "ratio": _grab2(r'<Brush[^>]*ratio="([^"]+)"'),
+            "scale": _grab2(r'<Brush[^>]*scale="([^"]+)"'),
+            "brush_type": _grab2(r'<Brush type="([^"]+)"'),
+            "kpp_file": path.name, "xml_bytes": len(xml),
+        }
+        return path, readback
 
     tip_png = None
     tip_name = None
