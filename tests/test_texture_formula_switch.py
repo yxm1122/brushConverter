@@ -26,9 +26,13 @@
 PS 侧真值仍是任务 12 的参数化公式 `tools.lut_fit.bc_transform`（pivot=127、
 order=sign_c）；Krita 侧真值 `tools/texture_mask.apply_three`
 （KisTextureMaskInfo::recalculateMask 的精确复刻）。
-**注意口径**：这是模型空间判据；b×C 同时非零时真实 PS 的残差（128A §五：
-multiply/subtract/linearBurn 76.68%、hardMix 57.57%）不在本文件 0.00% 的覆盖范围，
-由文件末尾的「记录组」登记、本轮不硬修。
+**注意口径（第五轮 152 更正）**：128A §五 的「b×C 交互区 4/10 超阈
+multiply/subtract/linearBurn 76.68%、hardMix 57.57%」是**测量错配**——128A 的 m10
+PS 真值文件名不带纹理后缀，t2 批覆盖了 t1 批（PS 用 tex2 真值 vs Krita 用 tex1
+渲染）。152 按纹理正确配对重测：10 模式中 **9/10 = 0.000%/max≤1**（C>0 与 C<0 的
+区内补测也全部 0.00%/max1）；唯一真残差是 hardMix 在 base≡1 且 b/c 同时非零时
+（PS 恒 255 vs Krita 掩码被压出 0，t1 56.87%/t2 38.50%，修法候选见 152 §2.4）。
+本文件末尾的「记录组」已按此更正（旧数字不再作为基准）。
 
 【直接运行本文件可打印 A/B 表】`python tests/test_texture_formula_switch.py`
 """
@@ -202,7 +206,12 @@ def test_calibrated_mask_equivalent_on_expressible_grid():
 
 
 def test_structural_limits_are_brightness_only():
-    """135-4 后：C>50 可表达；只剩亮度越界区（C<0 且 |b|>127）是结构性残差。"""
+    """135-4 后：C>50 可表达；只剩亮度越界区（C<0 且 |b|>127）闭式解不可表达。
+
+    153（N6/B10）起该区改走**预烘焙**（不是把它变成可表达）：convert._texture_xml
+    把亮度/对比度/反相烘进 PNG、Krita 写中性值，实渲 12/12 = 0.000%/max0–1。
+    本函数只断言「闭式解不可表达」这一事实（_expressible 判据未变）。
+    """
     assert _expressible(0, 75) and _expressible(0, 84) and _expressible(0, 100)
     assert not _expressible(-150, -50)
     assert not _expressible(150, -50)
@@ -211,35 +220,94 @@ def test_structural_limits_are_brightness_only():
 
 
 # ---------------------------------------------------------------------------
-# 4) 记录组：b×C 交互区残差（132 决策 4-A；本轮只登记、不硬修）
+# 4) b×C 交互区：**没有掩码生成残差**（152 更正；旧 128A 记录作废）
 # ---------------------------------------------------------------------------
-_BC_RECORD = _REPO_ROOT / ".tmp" / "128A" / "json" / "m10_analysis.json"
+#: 152 的正确配对真值（本地 gitignored；存在时额外复核实渲数字）
+_BC_RECORD_152 = _REPO_ROOT / ".tmp" / "texture" / "152" / "json" / "m10_analysis.json"
+#: 旧 128A 汇总（只用于证明「旧数字来自纹理错配」，不再作为基准）
+_BC_RECORD_128A = _REPO_ROOT / ".tmp" / "128A" / "json" / "m10_analysis.json"
+
+
+def _krita_mask_from_closed_form(b: int, c: int) -> np.ndarray:
+    """现行闭式解写出的 Krita 掩码（灰度 0..255 全取值网格，base 无关）。"""
+    b_k, c_k = texture_brightness_contrast(b, c)
+    grid = np.arange(256, dtype=np.float64) / 255.0
+    v = np.clip((grid - b_k) - 0.5, -1.0, 2.0)
+    return np.clip(np.rint((1.0 - np.clip(v * c_k + 0.5, 0.0, 1.0)) * 255.0),
+                   0.0, 255.0).astype(np.int16)
+
+
+def _ps_mask_reference(b: int, c: int) -> np.ndarray:
+    """PS 8bit 链参考（C<0 先对比度后亮度），灰度 0..255 全取值网格。"""
+    gray = np.arange(256, dtype=np.float64)
+    if c < 0:
+        k = max(0.5, 1.0 + c / 100.0)
+        v = np.clip(np.rint((gray - 127.5) * k + 127.5), 0, 255)
+        v = np.clip(np.rint(v + b), 0, 255)
+    else:
+        k = 1_000_000.0 if c >= 100 else 1.0 / (1.0 - c / 100.0)
+        v = np.clip(np.rint(gray + b), 0, 255)
+        v = np.clip(np.rint((v - 127.5) * k + 127.5), 0, 255)
+    return np.clip(255.0 - v, 0.0, 255.0).astype(np.int16)
+
+
+def test_bc_interaction_zone_masks_match_ps_chain():
+    """区内（不触发 B10 烘焙）的 b×C 组合：闭式解掩码 = PS 8bit 链，差 ≤1 级。
+
+    覆盖 152 重测的两类区：C>0 的 b=50/c=50（m10 组）与 C<0 的 b=−100…100/c=−50
+    （bcneg 补测组）。旧用例断言「76.680%/57.570% 已知残差」的依据是纹理错配，
+    已撤；本组改为正向等价断言（不依赖本地数据，可复跑）。
+    """
+    combos = [(50, 50), (-100, -50), (-50, -50), (0, -50), (50, -50), (100, -50)]
+    for b, c in combos:
+        assert not px.texture_bc_out_of_range(b, c)
+        closed = _krita_mask_from_closed_form(b, c)
+        ps = _ps_mask_reference(b, c)
+        diff = np.abs(closed - ps)
+        assert diff.max() <= 1, f"({b},{c}) 闭式解与 PS 链差 {diff.max()} 级"
+        assert float((diff > TOL).mean()) == 0.0
 
 
 @pytest.mark.skipif(
-    not _BC_RECORD.is_file(),
+    not _BC_RECORD_128A.is_file(),
     reason="任务 128A 本地实验汇总缺失（.tmp/128A 为 gitignored 本地数据）",
 )
-def test_bc_interaction_zone_residual_recorded():
-    """把 128A 实测的 b×C 交互区残差钉成「已知未修」的记录，防止被当成 0.00%。
+def test_bc_record_128a_was_texture_mismatch():
+    """把「旧数字作废的根因」钉住：128A 的 m10 真值按设计只有 t2 内容。
 
-    依据 128A §五（10 模式 d100/b50/c50，满覆盖笔尖，PS 真值 vs 现行闭式解）：
-    4/10 模式超阈 —— multiply / subtract / linearBurn 76.680%、hardMix 57.570%。
-    本轮按 132 决策 4-A **只登记不硬修**（修法需要先补 PS 真值，见 128A §六）。
-    本组只读上游实验汇总，不重新启动 PS/Krita、不新增实验。
+    128A 的 ps_f4 在两个纹理循环里写同一个 m10 文件名 ⇒ t2 批覆盖 t1 批，
+    因此旧汇总里的 closed=0.7668/0.5757 是「PS(tex2) vs Krita(tex1)」错配；
+    152 已按纹理配对重测，9/10 模式 0.000%。本组只读旧数据，不改它。
     """
     import json
 
     rows = {row["name"]: row for row in json.loads(
-        _BC_RECORD.read_text(encoding="utf-8"))["rows"]}
+        _BC_RECORD_128A.read_text(encoding="utf-8"))["rows"]}
     for name in ("multiply", "subtract", "linearBurn"):
         assert rows[name]["paths"]["closed"]["diff_ratio"] == pytest.approx(0.7668)
-        assert rows[name]["paths"]["closed"]["pass"] is False
-    hard = rows["hardMix"]["paths"]["closed"]
-    assert hard["diff_ratio"] == pytest.approx(0.5757)
-    assert hard["pass"] is False
-    # 预烘焙在同组 12/12/9-of-10 = 0.00%：证明残差出自「闭式解模型」而不是 Krita 算子
-    assert rows["multiply"]["paths"]["prebake"]["diff_ratio"] == 0.0
+    assert rows["hardMix"]["paths"]["closed"]["diff_ratio"] == pytest.approx(0.5757)
+
+
+@pytest.mark.skipif(
+    not _BC_RECORD_152.is_file(),
+    reason="任务 152 本地实验汇总缺失（.tmp/texture/152 为 gitignored 本地数据）",
+)
+def test_bc_record_152_paired_renders_pass():
+    """152 正确配对后的实渲记录：9/10 模式两纹理 0.000%/max≤1；hardMix 是真残差。"""
+    import json
+
+    rows = json.loads(_BC_RECORD_152.read_text(encoding="utf-8"))["rows"]
+    assert len(rows) == 20  # 10 模式 × 2 纹理
+    passed = 0
+    for row in rows:
+        if row["name"] == "hardMix":
+            closed = row["paths"]["closed"]
+            assert closed["diff_ratio"] > 0.3 and closed["pass"] is False
+            continue
+        closed = row["paths"]["closed"]
+        assert closed["diff_ratio"] == 0.0 and closed["max_delta"] <= 1 and closed["pass"]
+        passed += 1
+    assert passed == 18  # 9 模式 × 2 纹理
 
 
 # ---------------------------------------------------------------------------

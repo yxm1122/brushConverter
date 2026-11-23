@@ -24,7 +24,11 @@ from .kpp.bundle import (
     verify_bundle,
 )
 from .kpp.kpp_writer import read_preset_xml, render_tip_preview
-from .kpp.preset_xml import texture_brightness_contrast
+from .kpp.preset_xml import (
+    _texture_contrast_factor,
+    texture_bc_out_of_range,
+    texture_brightness_contrast,
+)
 from .hardness_tip import build_tip, verify_generated_tip
 from .mapping import _TEXTURING_MODE, BrushPreset, TextureSettings, map_presets
 
@@ -203,6 +207,50 @@ def _tip_is_full_coverage(tip: np.ndarray | None) -> bool:
     return bool(np.all(tip == 0))
 
 
+def _texture_gray_8bit(image: np.ndarray) -> np.ndarray:
+    """纹理位图 → 8bit 灰度（PS/Krita 图案灰度换算，B10 预烘焙用）。
+
+    Krita 源 KisTextureMaskInfo.cpp：gray = (r*11 + g*16 + b*5) / 32（整数除法）；
+    152 实测该式 + 修正后的 PS B/C 链能逐像素复现 PS 真值（两组 64×64 纹理、
+    C=−50 越界 12 组 0.000%/max0–1）。二维灰度原样返回（只做 0..255 截断）。
+    **未测**：彩色纹理（RGB 通道不同）时 PS 侧灰度权重是否与 Krita 相同——
+    152 的两组验证纹理都是灰度内容，153 报告已登记。
+    """
+    if image.ndim == 2:
+        return np.ascontiguousarray(np.clip(image, 0, 255).astype(np.uint8))
+    if image.ndim == 3 and image.shape[2] >= 3:
+        rgb = image[:, :, :3].astype(np.int32)
+        gray = (rgb[..., 0] * 11 + rgb[..., 1] * 16 + rgb[..., 2] * 5) // 32
+        return np.clip(gray, 0, 255).astype(np.uint8)
+    raise ValueError(f"纹理位图必须是二维灰度或三维 RGB，实际 shape={image.shape}")
+
+
+def _ps_texture_mask_8bit(image: np.ndarray, ps_brightness: float,
+                          ps_contrast: float, invert: bool) -> np.ndarray:
+    """把 PS 纹理亮度/对比度/反相按 PS 8bit 链烘成掩码（B10 越界区预烘焙，任务 153）。
+
+    PS 链的**运算顺序随对比度符号翻转**（152 §2.3/§四-9 A 级证据）：
+    - C < 0 ：先对比度（中心 127.5、k = 1 + C/100、截断）→ 再亮度（v + b、截断）→ 反相；
+    - C >= 0：先亮度（v + b、截断）→ 再对比度（k = 1/(1 − C/100)、截断）→ 反相。
+    b 为 PS 纹理亮度整数（−150..150），v 为图案 8bit 灰度；每步按 PS 8bit 行为截断。
+    实测（152）：C=−50 越界 12 组 0.000%/max0；C<0 区内 5 组 0.000%/max1；
+    C=+50 的 10 模式 multiply 组 0.000%/max1。这是「公式化预烘焙」，
+    不是把 PS 输出 alpha 直接当掩码的 oracle。
+    """
+    gray = _texture_gray_8bit(image).astype(np.float64)
+    k = _texture_contrast_factor(ps_contrast)  # 已按 C 合法域 clamp（-50..100）
+    b = float(int(round(ps_brightness)))
+    if ps_contrast < 0:
+        v = np.clip(np.rint((gray - 127.5) * k + 127.5), 0.0, 255.0)
+        v = np.clip(np.rint(v + b), 0.0, 255.0)
+    else:
+        v = np.clip(np.rint(gray + b), 0.0, 255.0)
+        v = np.clip(np.rint((v - 127.5) * k + 127.5), 0.0, 255.0)
+    if invert:
+        v = 255.0 - v
+    return np.clip(v, 0.0, 255.0).astype(np.uint8)
+
+
 def _texture_xml(bp: BrushPreset, full_coverage: bool | None = None) -> TextureXml | None:
     """把 Photoshop 纹理参数映射为 Krita 纹理选项（无位图时返回 None）。
 
@@ -218,8 +266,15 @@ def _texture_xml(bp: BrushPreset, full_coverage: bool | None = None) -> TextureX
     - 135-1：scale>100 先用 PS 同核预缩放（_prescale_texture_image）再内嵌，
       写 Scale=1.0；s≤100 保持原路径 Scale=s/100；两处 Scale 截断全部解除。
     - 135-2：hardMix + 满覆盖笔尖（base≡1）+ 恒定深度 → Strength=1.0 且
-      Brightness 偏置 ±1/255（符号随 Invert）；base<1 不下发，登记 10%–40% 残差。
-    - 135-3：亮度越界区（C=-50 且 |PS 亮度|>127）只登记残差、不改运行时路径。
+      Brightness 偏置 ±1/255（符号随 Invert）；base<1 不下发，登记残差（152 更新为
+      现行 UseSoftTexturing=true 行为 10.65%–96.81%）。
+    - **153（N6/B10，使用者 2026-11-23 已接受代价）**：亮度越界区
+      （C=−50 且 |PS 亮度|>127）改为「预烘焙落地」——把 PS 亮度/对比度/反相按
+      PS 8bit 链烘进内嵌纹理 PNG，Krita 侧写中性参数（B=0/C=1/Invert=false）。
+      旧行为只登记不落地：闭式解反解出 |b_k|>1 只能截断到 ±1，掩码空间 8/12
+      超阈（最大 61.125%/max23）；预烘焙后 12/12 = 0.000%/max0（152 实测）。
+      代价：该笔的纹理亮度/对比度/反相字段在 Krita 里不再可调出 PS 语义，
+      每 (b,c,invert) 组合一份纹理资源，旧 .kpp 必须重转。
     - 135-4：对比度 k 原值直写（不再 min(2.0) 截断，见 preset_xml）。
     - 135-5：minimumDepth 的曲线 0 端点写比值 s_m/s_d（Krita 强度是乘性的）。
     """
@@ -239,6 +294,13 @@ def _texture_xml(bp: BrushPreset, full_coverage: bool | None = None) -> TextureX
         if prescaled is not None:
             image = prescaled
             preset_scale = 1.0
+    # --- 153（N6/B10）：亮度越界区改为预烘焙 ---
+    # 判定 = calibrated 反解出的 b_k 越出 Krita 亮度域 [-1,1]（等价 B10 的
+    # 「C=−50 且 |PS 亮度|>127」）。命中则把 PS 的 亮度/对比度/反相 烘进像素，
+    # 后面三个 Krita 字段写中性值；预缩放已先做（沿用「先重采样后 b/c」假定）。
+    bake_bc = texture_bc_out_of_range(tex.brightness, tex.contrast)
+    if bake_bc:
+        image = _ps_texture_mask_8bit(image, tex.brightness, tex.contrast, tex.invert)
     # 图案资源名由「内嵌字节的 sha256」派生，而不是 PS 的 uuid：
     # Krita 5.3.3 遇到与图案库同名的资源时会**串用别人的图案**（实测：
     # tex_<uuid8>.png 与库内同名图案撞车，不同字节渲染出同一张错图，
@@ -256,6 +318,10 @@ def _texture_xml(bp: BrushPreset, full_coverage: bool | None = None) -> TextureX
     # 亮度/对比度只有 calibrated 一条路径（v1.5.0 删除 legacy 开关，任务 135-6）；
     # 公式、推导与限制见 docs/parameter-mapping.md 第 7 节。
     brightness, contrast = texture_brightness_contrast(tex.brightness, tex.contrast)
+    invert = tex.invert
+    if bake_bc:
+        # 153：亮度/对比度/反相已烘进像素 ⇒ Krita 三字段写中性值（否则会二次叠加）。
+        brightness, contrast, invert = 0.0, 1.0, False
     texturing_mode = _TEXTURING_MODE.get(tex.blend_mode, 0)
     strength = _texture_strength(tex.depth, tex.blend_mode)
     # --- 135-2：hardMix + 满覆盖 + 恒定深度：Strength=1.0 + 亮度 ±1/255 ---
@@ -267,7 +333,11 @@ def _texture_xml(bp: BrushPreset, full_coverage: bool | None = None) -> TextureX
     # 压感路径（Strength 随压力变）下偏置不再成立（阈值随 s 变），本轮不下发。
     if texturing_mode == 10 and full_coverage and not tex.pressure:
         strength = 1.0
-        brightness = brightness + (1.0 / 255.0 if tex.invert else -1.0 / 255.0)
+        if bake_bc:
+            # 烘后 Krita Invert=false：要抬高最终掩码 1 个 8-bit LSB 需 b=-1/255。
+            brightness = -1.0 / 255.0
+        else:
+            brightness = brightness + (1.0 / 255.0 if tex.invert else -1.0 / 255.0)
     strength_curve = None
     if tex.pressure:
         # --- 135-5：0 端点写比值 s_m/s_d（Krita 乘性：strength = Value × curve）---
@@ -284,7 +354,7 @@ def _texture_xml(bp: BrushPreset, full_coverage: bool | None = None) -> TextureX
         scale=preset_scale,
         brightness=brightness,
         contrast=contrast,
-        invert=tex.invert,
+        invert=invert,
         texturing_mode=texturing_mode,
         # Krita 文档明确指出：除 Height/Linear Height 外，Soft Texturing
         # 更接近 Photoshop；PS 专用 Height 模式本身不启用该优化。

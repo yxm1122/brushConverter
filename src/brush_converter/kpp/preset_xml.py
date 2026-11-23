@@ -307,6 +307,41 @@ def _texture_contrast_factor(ps_contrast: float) -> float:
     return 1.0 / (1.0 - c / 100.0)
 
 
+def _texture_brightness_calibrated_raw(
+    ps_brightness: float, ps_contrast: float
+) -> float:
+    """calibrated 亮度反解的**未截断**值（第五轮 153：越界判定用；不 round、不 clamp）。
+
+    与 _texture_brightness_contrast_calibrated 的闭式解同式：
+        b_k = center_fix − b/(255·k)   （C < 0）
+        b_k = center_fix − b/255       （C >= 0）
+    Krita 亮度只有 [-1,1] 可表达；反解值越界时现行映射只能截断到 ±1，掩码空间
+    产生结构性残差（B10：C=−50 且 |PS 亮度|>127，8/12 超阈、最大 61.125%/max23，
+    任务 128A F-4 / 152 §2.3）。命中即改走预烘焙（153 落地）。
+    """
+    k = _texture_contrast_factor(ps_contrast)
+    c = max(-50.0, min(100.0, ps_contrast))
+    if k <= 0.0:
+        return 0.0
+    center_fix = (1.0 - k) / (510.0 * k)
+    if c < 0.0:
+        return center_fix - ps_brightness / (255.0 * k)
+    return center_fix - ps_brightness / 255.0
+
+
+def texture_bc_out_of_range(ps_brightness: float, ps_contrast: float) -> bool:
+    """B10 越界区判定：calibrated 亮度反解超出 Krita 亮度域 [-1,1] 即命中。
+
+    等价于「C=−50 且 |PS 亮度| > 127」的 B10 定义（C=−50 时 k=0.5、边界在
+    b≈−127.25/+128.25；实测 b=±128 两端越界、±127 不越界），但按反解值判定
+    可覆盖一般 (b, c) 组合。命中时 convert._texture_xml 把亮度/对比度/反相按
+    PS 8bit 链烘进纹理 PNG，并把 Krita 三字段写中性值（B=0、C=1、Invert=false）。
+    代价（使用者 2026-11-23 已接受）：该笔的纹理亮度/对比度/反相字段在 Krita
+    里不再有 PS 语义；旧 .kpp 必须重转。
+    """
+    return abs(_texture_brightness_calibrated_raw(ps_brightness, ps_contrast)) > 1.0
+
+
 def _texture_brightness_contrast_calibrated(
     ps_brightness: float, ps_contrast: float
 ) -> tuple[float, float]:
@@ -319,16 +354,13 @@ def _texture_brightness_contrast_calibrated(
     上限 2；C<0 且 |PS 亮度| 很大时反解出的 b_k 超 [-1,1]（均属结构性失真）。
     """
     k = _texture_contrast_factor(ps_contrast)
-    c = max(-50.0, min(100.0, ps_contrast))  # C 合法域 clamp（PS 滑杆 -50..100）
     k_eff = max(0.0, k)  # 任务 135-4：删除 min(2.0, k) 截断，k 原值直写
     if k_eff <= 0.0:
         # PS 对比度合法范围是 -50..100，k 恒 >= 0.5；这里只做防御性中性回退。
         return 0.0, 1.0
-    center_fix = (1.0 - k_eff) / (510.0 * k_eff)
-    if c < 0.0:
-        brightness = center_fix - ps_brightness / (255.0 * k_eff)
-    else:
-        brightness = center_fix - ps_brightness / 255.0
+    # 第五轮 153：与 texture_bc_out_of_range 共用同一个未截断反解式，避免两处
+    # 公式漂移（上式已把 c clamp 到 -50..100，与 raw 函数一致）。
+    brightness = _texture_brightness_calibrated_raw(ps_brightness, ps_contrast)
     # 精度：k<=2（C<=50，旧行为）仍保留 3 位小数（v1.2.0 起的既有精度，不改）；
     # C>50 是 135-4 新解锁区、k 可到 1e6，3 位小数会让亮度阈值偏移 0.0005×k
     # 个掩码级（C=100 实测 1 个 mask 值被翻到两端、max_delta 128），因此该区
