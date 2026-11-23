@@ -128,7 +128,7 @@ def test_sampled_brush_angle_radians():
     assert f'angle="{math.radians(-33.0 % 360.0):g}"' in xml
 
 
-def test_rotation_jitter_uses_effect_strength_and_fuzzy_curves():
+def test_rotation_jitter_uses_effect_strength_and_single_fuzzy_source():
     from brush_converter.kpp.preset_xml import build_preset_xml
     # v1.5.0 任务 134-2：RotationValue 由 j/100 改为 min(1, j/50)（124 B 级，F-6 未量测）
     xml = build_preset_xml("rotation", "", None, rotation_sensor="drawingangle", rotation_jitter=12.0)
@@ -136,7 +136,11 @@ def test_rotation_jitter_uses_effect_strength_and_fuzzy_curves():
     assert 'RotationUseCurve" type="internal">true' in xml
     # Krita UI 显示 ±180°，但 XML 的曲线坐标是归一化 0..1。
     assert '<ChildSensor id="fuzzy"> <curve>0,0;1,1;</curve>' in xml
-    assert '<ChildSensor id="fuzzystroke"> <curve>0,0;1,1;</curve>' in xml
+    # 旧基准错在哪（149A）：fuzzy 与 fuzzystroke 都是**加法型**随机源，Krita 把同一个旋转
+    # 选项下的所有加法源求和（research/KisCurveOption.cpp:112-114），两者同开 ⇒ 随机跨度
+    # = 2×360°×R，是 PS（只有逐 dab 随机 ⇒ 360°×R）的两倍。148 实测 j=25 超 PS +38.20%，
+    # 只留 fuzzy 后 −5.84%。故 RotationSensor 只能有 1 个加法随机源。
+    assert '<ChildSensor id="fuzzystroke">' not in xml
 
 
 def test_sampled_tip_is_padded_to_square_for_krita():

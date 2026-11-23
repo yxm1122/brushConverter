@@ -78,14 +78,15 @@ def test_texture_strength_constant_without_sensor():
 
 def test_rotation_random_without_sensor_keeps_option_enabled():
     # PS angleDynamics.bVTy==0（无传感器）但 jitter>0：纯随机角度抖动。
-    # Krita「旋转」选项应开启（PressureRotation=true），用只有 fuzzy 的
+    # Krita「旋转」选项应开启（PressureRotation=true），用只有 fuzzy 一个加法随机源的
     # 传感器表达随机（不随笔迹方向，无 drawingangle），RotationValue=min(1, j/50)。
+    # 149A：不写 fuzzystroke —— 第二个加法源会让随机跨度翻成 2×360°×R（148 §3.3 根因）。
     xml = build_preset_xml("random-rot", "", None, rotation_sensor=None, rotation_jitter=20.0)
     assert 'PressureRotation" type="internal">true' in xml
     assert 'RotationValue" type="internal">0.4' in xml
     assert 'RotationUseCurve" type="internal">true' in xml
     assert '<ChildSensor id="fuzzy"> <curve>0,0;1,1;</curve>' in xml
-    assert '<ChildSensor id="fuzzystroke"> <curve>0,0;1,1;</curve>' in xml
+    assert '<ChildSensor id="fuzzystroke">' not in xml
     assert '<ChildSensor id="drawingangle"' not in xml
 
 

@@ -158,9 +158,12 @@ def rotation_value(jitter: float) -> float:
 
     R = min(1, j/50)：Krita 的 fuzzy 随机旋转跨度 = 360° × R
     （docs/研究报告/静态-形状颜色.md §3.5.1，A 级源码链）；PS 侧像素实测
-    j=50 已铺满整圈（124 §5.2，B 级：25/25、极差 352°、斜率 3.6–4.5°/1%），
+    j=50 已铺满整圈（124 §5.2 B 级 → 149 B8 升 A 级：j=50/60/80/100 四档最大相对差 1.40%），
     即 j≥50 饱和整圈。j 的运行时上限 100，>=50 一律写 1.0（饱和，不是越界 2.0）。
-    **F-6（角度跨度 3 档复测）未量测 ⇒ 本条只有 B 级证据，不得写成已验证。**
+    随机源必须只有 fuzzy 一个加法源（见下方规则），否则随机跨度会翻倍。
+    F-6 角度跨度判据：PS 真值 j=25/50/100 = 92.51°/179.00°/177.54°（148 A 级）；
+    只留 fuzzy 后 149A 实机复测 Krita = 89.53°/175.79°/176.32°，
+    相对差 −3.28%/−1.81%/−0.69%（随机档 ≤10%，三点 PASS；两次渲染复现 ≤4.73% ≤5%）。
     """
     return min(1.0, max(0.0, float(jitter)) / 50.0)
 
@@ -172,29 +175,42 @@ def _pressure_sensor(curve: str | None = None) -> str:
     return f'<!DOCTYPE params> <params id="pressure"> <curve>{curve}</curve> </params> '
 
 
+#: 旋转传感器只允许**一个加法型随机源**（fuzzy）。依据（A 级，源码链 + 实机）：
+#:   * fuzzy（每 dab 随机）与 fuzzystroke（每笔划一次随机）都是加法型；Krita 把同一选项
+#:     下所有加法源**求和**（research/KisCurveOption.cpp:112
+#:     "if (s->isAdditive()) components.additive += valueFromCurve"），再乘 RotationValue
+#:     参与模 2 环绕（同文件 :70）。两者同时开启 ⇒ 随机跨度 = **2×360°×R**。
+#:   * PS 的 angleDynamics 只有「逐 dab」随机，没有「整笔同随机」这一层，跨度应为
+#:     360°×R（148 实测：带双源的现产物 j=25 超 PS **+38.20%**；只留 fuzzy 后 **−5.84%**）。
+#:     149A 用改后 src 产物在 Krita 实机复测 j=25/50/100：相对差 −3.28%/−1.81%/−0.69%，
+#:     随机档三点 PASS（两次渲染复现 ≤4.73%）。
+#: 因此三个旋转传感器构造器（drawingangle / speed·rotation / 纯随机）都只写 fuzzy，
+#: 随机幅度统一由 RotationValue=min(1, j/50) 缩放。
 def _drawing_angle_sensor() -> str:
-    """「随笔迹方向旋转」传感器。Krita 界面将随机度曲线显示为 -180°..+180°，
-    但 XML 曲线值使用归一化范围 0..1；因此完整随机范围必须序列化为末点 1。"""
+    """「随笔迹方向旋转」传感器（drawingangle 绝对角源 + fuzzy 单随机源）。
+
+    Krita 界面将随机度曲线显示为 -180°..+180°，但 XML 曲线值使用归一化范围 0..1；
+    因此完整随机范围必须序列化为末点 1。随机源只留 fuzzy（模块顶部规则）。
+    """
     return (
         '<!DOCTYPE params> <params id="sensorslist"> '
         '<ChildSensor id="drawingangle" lockedAngleMode="0" fanCornersEnabled="0" '
         'fanCornersStep="30" angleOffset="0"/> '
         '<ChildSensor id="fuzzy"> <curve>0,0;1,1;</curve> </ChildSensor> '
-        '<ChildSensor id="fuzzystroke"> <curve>0,0;1,1;</curve> </ChildSensor> '
         '</params> '
     )
 
 
 def _fuzzy_random_sensor() -> str:
-    """纯随机旋转传感器：只保留 fuzzy/fuzzystroke，不随笔迹方向。
+    """纯随机旋转传感器：只保留 fuzzy 一个随机源，不随笔迹方向。
 
     Photoshop angleDynamics.bVTy==0（控制=关）且 jitter>0 时是纯随机角度抖动，
-    Krita 用 fuzzy 随机曲线表达；随机幅度由 RotationValue（=min(1, j/50)）缩放。
+    Krita 用 fuzzy（每 dab 随机）表达；随机幅度由 RotationValue（=min(1, j/50)）缩放。
+    不写 fuzzystroke（每笔划一次的第二个加法源会让跨度翻成 2×360°×R，模块顶部规则）。
     """
     return (
         '<!DOCTYPE params> <params id="sensorslist"> '
         '<ChildSensor id="fuzzy"> <curve>0,0;1,1;</curve> </ChildSensor> '
-        '<ChildSensor id="fuzzystroke"> <curve>0,0;1,1;</curve> </ChildSensor> '
         '</params> '
     )
 
@@ -210,15 +226,15 @@ def _control_rotation_sensor(sensor_id: str) -> str:
     """「指定传感器控制 + fuzzy 随机」的旋转传感器 XML。
 
     与 drawingangle 分支同构：sensorslist 里每个 ChildSensor 都会被激活
-    （KisKritaSensorPack::read 逐条 sensor->read + isActive=true）；fuzzy/fuzzystroke
-    是加法型随机源（isAdditive），speed/rotation 是缩放型控制源，与 drawingangle
+    （KisKritaSensorPack::read 逐条 sensor->read + isActive=true）；fuzzy 是唯一
+    加法型随机源（isAdditive），speed/rotation 是缩放型控制源，与 drawingangle
     （绝对角源）同样由 RotationValue 提供强度。区别只是控制源 id。
+    不写 fuzzystroke：第二个加法源会让随机跨度翻倍（模块顶部规则）。
     """
     return (
         '<!DOCTYPE params> <params id="sensorslist"> '
         f'<ChildSensor id="{sensor_id}"/> '
         '<ChildSensor id="fuzzy"> <curve>0,0;1,1;</curve> </ChildSensor> '
-        '<ChildSensor id="fuzzystroke"> <curve>0,0;1,1;</curve> </ChildSensor> '
         '</params> '
     )
 
@@ -507,9 +523,10 @@ def build_preset_xml(
         set_internal("RatioUseCurve", "true")
     if rotation_sensor == "drawingangle" or rotation_sensor in _ROTATION_CONTROL_SENSORS:
         # Photoshop angleDynamics.jitter 直接映射为 Krita「旋转-效果强度」；
-        # Krita 的 fuzzy/fuzzystroke 曲线本身负责随机方向（曲线 XML 用归一化 0..1，
+        # Krita 的 fuzzy 随机曲线本身负责随机方向（曲线 XML 用归一化 0..1，
         # 不能直接写 UI 显示的 180）。旋转档换算 R=min(1, j/50)（任务 134-2，
-        # 证据 124 B 级、F-6 未量测），j≥50 饱和整圈。
+        # 证据 124 B 级 + 148/149A 的 A 级 F-6 复测），j≥50 饱和整圈。
+        # 随机源只留 fuzzy（F-6 修法：双加法源会让跨度翻倍，见 _fuzzy_random_sensor 上方规则）。
         # 控制源：bVTy=6 → drawingangle（绝对角）；7=速度 → speed；8=旋转 → rotation
         # （124 A 级枚举，任务 134-3）。
         if rotation_sensor == "drawingangle":
@@ -527,7 +544,7 @@ def build_preset_xml(
     elif rotation_jitter > 0:
         # PS angleDynamics.bVTy==0（控制=关）但 jitter>0：纯随机角度抖动，
         # 没有传感器。Krita 的「旋转-效果强度」仍需开启（PressureRotation=true），
-        # 用只有 fuzzy/fuzzystroke 的传感器表达随机，RotationValue=min(1, j/50)。
+        # 用只有 fuzzy 一个加法随机源的传感器表达随机，RotationValue=min(1, j/50)。
         set_string("RotationSensor", _fuzzy_random_sensor())
         set_internal("PressureRotation", "true")
         set_internal("RotationValue", f"{rotation_value(rotation_jitter):g}")
