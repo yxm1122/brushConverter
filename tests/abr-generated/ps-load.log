@@ -1,8 +1,0 @@
-STEP 1 脚本开始
-PS_VERSION 26.9.0
-ABR_PATH <REPO>/tests/abr-generated/one-test.abr
-ABR_EXISTS true BYTES 5464
-LOAD_OK return=undefined
-SELECT_OK
-DOC_COUNT 0
-DONE

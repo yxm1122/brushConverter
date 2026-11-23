@@ -1,4 +1,0 @@
-STEP 1 脚本开始
-PS_VERSION 26.9.0
-ABR_PATH <REPO>/tests/abr-generated/one-test.abr
-ABR_EXISTS true BYTES 5456
