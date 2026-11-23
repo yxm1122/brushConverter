@@ -12,6 +12,12 @@
   python tools/exp_texture_bake.py render f2   # Krita 串行渲染（持 .tmp/krita.lock）
   python tools/exp_texture_bake.py analyze     # 全部数字 + 表格
   python tools/exp_texture_bake.py all
+  # 第五轮（任务 152）新增：N5 hardMix base<1 承载 + B9 b×C 交互区重测
+  python tools/exp_texture_bake.py n5kpp       # N5 候选 .kpp（ref/cur/bias/softer/prebake）
+  python tools/exp_texture_bake.py render n5   # Krita 批量渲染（一次会话；失败回退逐张）
+  python tools/exp_texture_bake.py analyze n5  # N5 承载候选量化表
+  python tools/exp_texture_bake.py render b9   # B9：m10 十模式 × 2 纹理 × cal/pre
+  python tools/exp_texture_bake.py render bc   # C<0 区内 b×C 补测（cal）
 
 口径：像素级判据 = |Δalpha|>2 的像素占比（分母 W×H）≤2% 且 max_delta≤2；
 几何/统计量按任务书 F-2/F-3/F-4 各节。
@@ -38,7 +44,10 @@ REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / "src"))
 sys.path.insert(0, str(REPO / "tools"))
 
-TMP = REPO / ".tmp" / "128A"
+# 第五轮（任务 152/153）：原始数据统一落 .tmp/texture/；默认 152 子区，153 可用
+# BRUSHCONVERTER_TEXTURE_TMP 指向 .tmp/texture/153（同一工具复用，不改逻辑）。
+TMP = Path(os.environ.get("BRUSHCONVERTER_TEXTURE_TMP")
+           or (REPO / ".tmp" / "texture" / "152"))
 DIR_TEX = TMP / "tex"
 DIR_ABR = TMP / "abr"
 DIR_KPP = TMP / "kpp"
@@ -494,6 +503,12 @@ def ps_f2():
 
 
 F4_COMBOS = ((-150, -50), (-140, -50), (-128, -50), (128, -50), (140, -50), (150, -50))
+# 第五轮（任务 152）新增：C<0 的「区内 b×C 交互」补测（|b|<=127，不在 B10 越界区）。
+# 用途：验证 C<0 的 PS 链顺序（先对比度后亮度）与现行闭式解在交互区的残差。
+BC_NEG_COMBOS = ((-100, -50), (-50, -50), (0, -50), (50, -50), (100, -50))
+# m10 的 PS 真值/预烘焙必须按「同一张纹理」配对：128A 旧实现里 m10 文件名不带纹理
+# 后缀，t2 批覆盖了 t1 批，导致「PS 用 tex2 真值 vs Krita 用 tex1 渲染」的错配
+# （B9 的 76.680%/57.570% 即由此产生）。第五轮文件名带纹理后缀，分析按同名配对。
 UI10 = (("Mltp", "char", "multiply", 0), ("Sbtr", "char", "subtract", 1),
         ("Drkn", "char", "darken", 4), ("Ovrl", "char", "overlay", 5),
         ("CDdg", "char", "colorDodge", 6), ("CBrn", "char", "colorBurn", 7),
@@ -518,10 +533,16 @@ def ps_f4():
             for mode_kind, mode_value, tag in (("char", "Mltp", "mul"), ("str", "linearHeight", "linh")):
                 jobs.append(ps_job("ps128a__ctl__c80__%s__d60.png" % tag, mode_kind, mode_value, 60,
                                    brightness=0, contrast=80, pattern_name=tname))
-            # 10 个 UI 模式 d=100 + C=50/b=50（预烘焙等价性用）
+            # C<0 区内 b×C 交互补测（第五轮 152）：multiply d=100，b=-100..100、c=-50
+            for b, c in BC_NEG_COMBOS:
+                jobs.append(ps_job("ps128a__bcneg__%s__b%d_c%d.png" % (tname[-4:], b, c),
+                                   "char", "Mltp", 100, brightness=b, contrast=c,
+                                   pattern_name=tname))
+            # 10 个 UI 模式 d=100 + C=50/b=50（预烘焙等价性用；文件名带纹理后缀）
             for ps_id, kind, name, enum in UI10:
-                jobs.append(ps_job("ps128a__m10__%s__d100_b50_c50.png" % name, kind, ps_id, 100,
-                                   brightness=50, contrast=50, pattern_name=tname))
+                jobs.append(ps_job("ps128a__m10__%s__%s__d100_b50_c50.png" % (tname[-4:], name),
+                                   kind, ps_id, 100, brightness=50, contrast=50,
+                                   pattern_name=tname))
             run_ps_batch("f4_%s" % tname[-4:], cover, "cover", CANVAS_200, tex_defs, jobs)
     finally:
         release_lock(PS_LOCK)
@@ -574,7 +595,8 @@ def pattern_res_name(png_bytes: bytes) -> str:
 
 
 def write_kpp_from_abr(abr_path: Path, png_bytes: bytes, tex: dict, out_path: Path,
-                       name_suffix: str = "") -> Path:
+                       name_suffix: str = "", preset_name: str | None = None,
+                       use_soft_texturing: bool = False) -> Path:
     AbrFile, map_presets, conv, TextureXml, build_preset_xml, build_kpp, render_tip_preview = _krita_imports()
     abr = AbrFile.parse(str(abr_path))
     presets = map_presets(abr)
@@ -600,10 +622,16 @@ def write_kpp_from_abr(abr_path: Path, png_bytes: bytes, tex: dict, out_path: Pa
         pattern_filename=pattern_res_name(png_bytes), png_bytes=png_bytes,
         scale=float(tex.get("scale", 1.0)), brightness=float(tex.get("brightness", 0.0)),
         contrast=float(tex.get("contrast", 1.0)), invert=bool(tex.get("invert", False)),
-        texturing_mode=int(tex.get("mode", 0)), use_soft_texturing=False,
+        texturing_mode=int(tex.get("mode", 0)),
+        use_soft_texturing=bool(tex.get("soft", use_soft_texturing)),
         strength=float(tex.get("strength", 1.0)), strength_curve=None, strength_pressure=False)
+    # 第五轮 152 坑：批量会话把几十个 .kpp 同时装进 Krita 资源库时，内部 <Preset name=>
+    # 必须互不相同 —— Krita 按内部名去重，同名的 40 个只加载 1 个（首轮实测「预置数=403」
+    # 只多 1 个、其余全部「预设未找到」）。逐张渲染路线不暴露该 bug。
+    if preset_name is None:
+        preset_name = bp.name + (name_suffix or "")
     xml = build_preset_xml(
-        name=bp.name + (name_suffix or ""), brush_definition=brush_def, tip_png=tip_png,
+        name=preset_name, brush_definition=brush_def, tip_png=tip_png,
         tip_name=tip_name, size_curve=bp.size_curve, opacity_curve=bp.opacity_curve,
         flow_curve=bp.flow_curve, ratio_curve=bp.ratio_curve,
         rotation_sensor=bp.rotation_sensor, rotation_jitter=bp.rotation_jitter,
@@ -650,13 +678,38 @@ def tex_mask_from_gray(gray: np.ndarray) -> np.ndarray:
     return np.clip(gray.astype(np.float64) / 255.0, 0.0, 1.0)
 
 
+def _ps_k_of(ps_c: float) -> float:
+    """PS 纹理对比度 → 中心乘法因子 k（与 preset_xml._texture_contrast_factor 同式）。"""
+    if ps_c <= -50.0:
+        return 0.5
+    if ps_c < 0.0:
+        return 1.0 + ps_c / 100.0
+    if ps_c >= 100.0:
+        return 1_000_000.0
+    return 1.0 / (1.0 - ps_c / 100.0)
+
+
 def ps_bc_mask(gray: np.ndarray, ps_b: float, ps_c: float, invert: bool = True) -> np.ndarray:
-    """PS 侧 8bit 链的连续模型：先减亮度并截断 → 以 0.5 为中心乘 k → 截断 → 反相。"""
+    """PS 侧 8bit 链的连续模型。
+
+    第五轮（任务 152）修正：PS 的运算**顺序随对比度符号翻转**，原实现一律「先亮度
+    后对比度」只在 C>=0 正确；C<0 实际是「先对比度（以 0.5 为中心乘 k、截断）再加减
+    亮度、再截断」。证据见报告 §B9：C=-50 的 12 组 f4 PS 真值上，修正后逐像素
+    0.000%/max0，修正前（旧实现）100%/max191。
+    - C >= 0：v = clip(m + b/255) → clip((v-0.5)*k+0.5)
+    - C <  0：v = clip((m-0.5)*k+0.5) → clip(v + b/255)
+    最后按 invert 取反（PS 的反相在链尾）。中间截断按 PS 8bit 行为逐步 clamp；
+    本模型不逐步做 8bit 舍入（实测 C>=0 组 max1、C<0 组 max0，见报告）。
+    """
     m = tex_mask_from_gray(gray).astype(np.float64)
-    k = (1_000_000.0 if ps_c >= 100.0 else
-         (1.0 + ps_c / 100.0 if ps_c < 0 else 1.0 / (1.0 - ps_c / 100.0)))
-    v = np.clip(m - ps_b / 255.0, 0.0, 1.0)
-    v = np.clip((v - 0.5) * k + 0.5, 0.0, 1.0)
+    k = _ps_k_of(ps_c)
+    b = ps_b / 255.0
+    if ps_c < 0:
+        v = np.clip((m - 0.5) * k + 0.5, 0.0, 1.0)
+        v = np.clip(v + b, 0.0, 1.0)
+    else:
+        v = np.clip(m + b, 0.0, 1.0)
+        v = np.clip((v - 0.5) * k + 0.5, 0.0, 1.0)
     if invert:
         v = 1.0 - v
     return np.clip(v, 0.0, 1.0)
@@ -746,17 +799,52 @@ def build_kpps():
             plan.append(("kpp", "ctl__c80__%s__d60__cal" % mode_tag,
                          dict(tex=dict(mode=mode_enum, strength=0.6, brightness=kb, contrast=kc,
                                        invert=True, scale=1.0), png=png_kr, abr=cover)))
-    # ---- 10 个 UI 模式：C=50/b=50（预烘焙 vs PS 真值）
-    for ps_id, kind, name, enum in UI10:
-        kb, kc = calibrated_bc(50, 50)
-        plan.append(("kpp", "m10__%s__d100__cal" % name,
-                     dict(tex=dict(mode=enum, strength=1.0, brightness=kb, contrast=kc,
-                                   invert=True, scale=1.0), png=tex1_png_kr, abr=cover)))
-        bake = bake_png_for_f4(tex1_gray, 50, 50, True, DIR_TEX / ("m10bake__%s.png" % name),
-                               "m10bake" + name)
-        plan.append(("kpp", "m10__%s__d100__pre" % name,
-                     dict(tex=dict(mode=enum, strength=1.0, brightness=0.0, contrast=1.0,
-                                   invert=False, scale=1.0), png=bake, abr=cover)))
+    # ---- 10 个 UI 模式：C=50/b=50（预烘焙 vs PS 真值）；第五轮 152 起按纹理配对
+    kb, kc = calibrated_bc(50, 50)
+    for tname, gray, png_kr in (("t1", tex1_gray, tex1_png_kr), ("t2", tex2_gray, tex2_png_kr)):
+        for ps_id, kind, name, enum in UI10:
+            plan.append(("kpp", "m10__%s__%s__d100__cal" % (tname, name),
+                         dict(tex=dict(mode=enum, strength=1.0, brightness=kb, contrast=kc,
+                                       invert=True, scale=1.0), png=png_kr, abr=cover)))
+            bake = bake_png_for_f4(gray, 50, 50, True,
+                                   DIR_TEX / ("m10bake__%s__%s.png" % (tname, name)),
+                                   "m10bake%s%s" % (tname, name))
+            plan.append(("kpp", "m10__%s__%s__d100__pre" % (tname, name),
+                         dict(tex=dict(mode=enum, strength=1.0, brightness=0.0, contrast=1.0,
+                                       invert=False, scale=1.0), png=bake, abr=cover)))
+            # 现行转换器行为（135-2）：hardMix + 满覆盖笔尖会再加 +1/255 偏置。
+            # 只对 mode 10 生成（其余模式无偏置，与 cal 相同，不重复渲染）。
+            if enum == 10:
+                plan.append(("kpp", "m10__%s__hardMix__d100__conv" % tname,
+                             dict(tex=dict(mode=10, strength=1.0,
+                                           brightness=kb + 1.0 / 255.0, contrast=kc,
+                                           invert=True, scale=1.0), png=png_kr, abr=cover)))
+                # 152 候选修法：PS 在 base≡1 时 hardMix 恒 255（与掩码无关）⇒ Krita 只要
+                # 保证「处理后掩码恒 > 0」即可恒定输出 1。
+                # Krita 链：mask = invert ? 1-clip(((g-b)-0.5)c+0.5) : clip(((g-b)-0.5)c+0.5)
+                #   invert=True 需 clip(...) < 1 对 g=1 成立 ⇔ b > 0.5 - 0.5/c；
+                #   invert=False 需 clip(...) > 0 对 g=0 成立 ⇔ b < 0.5 + 0.5/c。
+                # 取边界内各 1/255 余量（c=1 时退化为 135-2 的 ±1/255 规则）。
+                if True:  # 本组 m10 固定 invert=True
+                    b_fix = 0.5 - 0.5 / kc + 1.0 / 255.0
+                b_fix = max(-1.0, min(1.0, b_fix))
+                plan.append(("kpp", "m10__%s__hardMix__d100__fix" % tname,
+                             dict(tex=dict(mode=10, strength=1.0, brightness=b_fix,
+                                           contrast=kc, invert=True, scale=1.0),
+                                  png=png_kr, abr=cover)))
+    # ---- C<0 区内 b×C 交互（152 补测；multiply d=100）
+    for tname, gray, png_kr in (("t1", tex1_gray, tex1_png_kr), ("t2", tex2_gray, tex2_png_kr)):
+        for b, c in BC_NEG_COMBOS:
+            kb2, kc2 = calibrated_bc(b, c)
+            plan.append(("kpp", "bc__%s__b%d_c%d__cal" % (tname, b, c),
+                         dict(tex=dict(mode=0, strength=1.0, brightness=kb2, contrast=kc2,
+                                       invert=True, scale=1.0), png=png_kr, abr=cover)))
+            bake = bake_png_for_f4(gray, b, c, True,
+                                   DIR_TEX / ("bcbake__%s__b%d_c%d.png" % (tname, b, c)),
+                                   "bcbake%s%d%d" % (tname, b, c))
+            plan.append(("kpp", "bc__%s__b%d_c%d__pre" % (tname, b, c),
+                         dict(tex=dict(mode=0, strength=1.0, brightness=0.0, contrast=1.0,
+                                       invert=False, scale=1.0), png=bake, abr=cover)))
     # ---- F-3: 16 档压感 ramp（Krita 侧仅 1 组静态值对照，见报告口径）
     for m in F3_MINIMUMS:
         abr = DIR_ABR / ("f3_hard_m%d.abr" % m)
@@ -771,7 +859,8 @@ def build_kpps():
     for kind, name, spec in plan:
         out = DIR_KPP / (name + ".kpp")
         tex = dict(spec["tex"])
-        write_kpp_from_abr(spec["abr"], spec["png"], tex, out)
+        write_kpp_from_abr(spec["abr"], spec["png"], tex, out,
+                           preset_name="bc152 " + name)
         written += 1
     print("[KPP] 生成 %d 个 → %s" % (written, DIR_KPP))
     write_json("kpp_plan.json", [{"name": n, "abr": s["abr"].name} for _k, n, s in plan])
@@ -786,7 +875,259 @@ RENDER_GROUPS = {
     "m10": [("kpp", "m10__")],
     "f3": [("kpp", "f3__")],
     "rest": [("kpp", "f4__"), ("kpp", "ctl__"), ("kpp", "m10__")],
+    "b9": [("kpp", "m10__")],
+    "bc": [("kpp", "bc__")],
+    "n5": [("kpp", "n5")],   # 同时匹配 n5ref__* 与 n5__*
 }
+
+
+
+# 第五轮 152：批量渲染插件。与 exp_scatter_stat 的 BC129 插件同构，唯一差别是
+# **先等 Krita 资源库就绪**：本机 Krita 有 403 个预设，一次拷入 40+ 个内嵌 300×300
+# 笔尖的 .kpp 后资源扫描需要数秒；旧插件在窗口出现后立即取 resources("preset")，
+# 会拿到不完整的预设表（128/129 未踩到是因为每批只拷 1 个/少量预设）。
+TEXTURE_BATCH_PLUGIN_SRC = r'''
+# -*- coding: utf-8 -*-
+# 任务 152 批量渲染插件（运行时复制到 pykrita，会话后删除并还原 kritarc）。
+import json
+import os
+import time
+import traceback
+
+from PyQt5.QtCore import QPoint, QTimer
+from krita import Extension, Krita
+
+LOG = os.environ.get("BC129_LOG", "")
+
+
+def log(msg):
+    if not LOG:
+        return
+    try:
+        with open(LOG, "a", encoding="utf-8") as fh:
+            fh.write("[%s] %s\n" % (time.strftime("%H:%M:%S"), msg))
+    except Exception:
+        pass
+
+
+def write_result(payload):
+    path = os.environ.get("BC129_PRESULT")
+    if not path:
+        return
+    try:
+        with open(path, "w", encoding="utf-8") as fh:
+            json.dump(payload, fh, ensure_ascii=False, indent=1)
+    except Exception as exc:
+        log("写结果失败 %r" % (exc,))
+
+
+class BC152Batch(Extension):
+    """批量渲染插件（v2：非阻塞轮询资源库）。
+
+    教训（152 首轮实测）：在插件主线程里 while+sleep 轮询 inst.resources("preset")
+    会**卡住 Qt 事件循环**，Krita 的资源扫描反而永远不完成（等满 180s 仍缺 40 个预设，
+    直到放弃等待、开始跑任务后资源才陆续出现）。因此改成 QTimer 单次轮询链：
+    每次 tick 只取一次资源表、不阻塞，缺预设就 500ms 后再来，最多 240 次。
+    """
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.tries = 0
+        self.cfg = None
+        self.need = set()
+        QTimer.singleShot(1500, self._tick)
+
+    def setup(self):
+        pass
+
+    def createActions(self, window):
+        pass
+
+    def _load_cfg(self):
+        if self.cfg is None:
+            with open(os.environ["BC129_JOB"], "r", encoding="utf-8") as fh:
+                self.cfg = json.load(fh)
+            self.need = {str(job.get("preset_file", "")) for job in self.cfg["jobs"]}
+
+    def _tick(self):
+        self.tries += 1
+        try:
+            inst = Krita.instance()
+            win = inst.activeWindow()
+            if win is None:
+                if self.tries < 240:
+                    QTimer.singleShot(500, self._tick)
+                    return
+                write_result({"ok": False, "stage": "window", "reason": "240 次轮询仍无主窗口"})
+                self._finish()
+                return
+            self._load_cfg()
+            pmap = self._preset_map(inst)
+            missing = self.need - set(pmap.keys())
+            if missing and self.tries < 240:
+                QTimer.singleShot(500, self._tick)
+                return
+            log("预置数=%d 需要=%d 轮询=%d 仍缺=%d"
+                % (len(pmap), len(self.need), self.tries, len(missing)))
+            self._run(inst, win, pmap)
+        except Exception as exc:
+            log("异常 %r" % (exc,))
+            log(traceback.format_exc())
+            write_result({"ok": False, "stage": "exception", "reason": repr(exc)})
+        self._finish()
+
+    def _preset_map(self, inst):
+        presets = inst.resources("preset")
+        plist = list(presets.values()) if isinstance(presets, dict) else list(presets)
+        pmap = {}
+        for preset in plist:
+            try:
+                pmap[os.path.basename(preset.filename() or "")] = preset
+            except Exception:
+                continue
+        return pmap
+
+    def _run(self, inst, win, pmap):
+        jobs = self.cfg["jobs"]
+        results = []
+        doc = None
+        view = None
+        layer = None
+        for idx, job in enumerate(jobs):
+            res = {"file": job.get("file"), "out": job.get("out"), "ok": False,
+                   "error": "", "elapsed_s": 0.0}
+            started = time.time()
+            try:
+                preset = pmap.get(str(job.get("preset_file", "")))
+                if preset is None:
+                    raise RuntimeError("预设未找到：" + str(job.get("preset_file")))
+                if doc is None:
+                    doc = inst.createDocument(job["width"], job["height"], "bc152",
+                                              "RGBA", "U8", "", 72.0)
+                    for node in list(doc.topLevelNodes()):
+                        node.remove()
+                    view = win.addView(doc)
+                    if view is None:
+                        raise RuntimeError("addView 返回空")
+                    log("文档 %dx%d 已建" % (job["width"], job["height"]))
+                if layer is not None:
+                    layer.remove()
+                layer = doc.createNode("bc_paint", "paintlayer")
+                doc.rootNode().addChildNode(layer, None)
+                doc.setActiveNode(layer)
+                doc.refreshProjection()
+                view.setCurrentBrushPreset(preset)
+                y = job["height"] // 2
+                x0 = (job["width"] - job["stroke"]) // 2
+                x1 = min(job["width"] - 1, x0 + job["stroke"])
+                layer.paintLine(QPoint(x0, y), QPoint(x1, y), 1.0, 1.0)
+                doc.refreshProjection()
+                image = doc.projection(0, 0, job["width"], job["height"])
+                out_dir = os.path.dirname(job["out"])
+                if out_dir and not os.path.isdir(out_dir):
+                    os.makedirs(out_dir, exist_ok=True)
+                res["ok"] = bool(image.save(job["out"], "PNG"))
+            except Exception as exc:
+                res["error"] = repr(exc)
+                log("job %d 失败 %r" % (idx, exc))
+            res["elapsed_s"] = round(time.time() - started, 3)
+            results.append(res)
+            write_result({"ok": True, "stage": "running", "done": len(results), "jobs": results})
+            log("job %d/%d %s ok=%s %.2fs" % (idx + 1, len(jobs), res.get("file"),
+                                              res["ok"], res["elapsed_s"]))
+        try:
+            if doc is not None:
+                doc.setModified(False)
+                doc.close()
+        except Exception as exc:
+            log("关文档失败 %r" % (exc,))
+        write_result({"ok": True, "stage": "done", "done": len(results), "jobs": results})
+        log("全部完成 done=%d" % len(results))
+
+    def _finish(self):
+        QTimer.singleShot(1500, lambda: os._exit(0))
+        try:
+            action = Krita.instance().action("file_quit")
+            if action is not None:
+                action.trigger()
+        except Exception:
+            pass
+
+
+log("插件模块加载，注册 Extension")
+try:
+    Krita.instance().addExtension(BC152Batch(Krita.instance()))
+    log("Extension 已注册")
+except Exception as exc:
+    log("注册 Extension 异常 %r" % (exc,))
+    log(traceback.format_exc())
+'''
+
+BATCH_PLUGIN_NAME = "bc152_batch"
+
+def _render_batch_session(kpps: list[Path], size: tuple[int, int], stroke: int,
+                          tag: str) -> dict | None:
+    """一次 Krita GUI 会话批量渲染（第五轮 152 新增；复用 129 批量会话范式，只读导入）。
+
+    129/136 实测：单张 GUI 路线每次要 11–14s 启动，几十张就是几十分钟；批量会话
+    一次启动后 0.37s/张（.tmp/129/run_krita_all.log：190 张 70.4s）。本函数导入
+    tools/exp_scatter_stat.py 的 with_krita_session/run_krita_launch（**只读**，不改
+    该文件），把 .kpp 临时装进 Krita 预设目录、一次会话渲完、会话后自动清理并还原
+    kritarc/resourcecache。任何一步不可用或失败都返回 None，由调用方回退逐张路线。
+
+    返回 {kpp 路径字符串: {"ok","alpha_nonzero","elapsed_s","reason"}}；或 None。
+    """
+    try:
+        import exp_scatter_stat as ess
+    except Exception as exc:
+        print("[批量] 导入批量范式失败，回退逐张：%r" % (exc,))
+        return None
+    if not ess.krita_available():
+        print("[批量] Krita GUI 路线不可用，回退逐张")
+        return None
+    jobs = []
+    for kpp in kpps:
+        out = DIR_KR / (kpp.stem + ".png")
+        jobs.append({"file": out.name, "out": str(out), "preset_file": kpp.name,
+                     "width": size[0], "height": size[1], "stroke": stroke})
+    work = TMP / "work" / ("krita_%s" % tag)
+
+    def _run(paths: dict, installed: list[str]) -> dict:
+        for kpp in kpps:
+            dst = os.path.join(paths["presets"], kpp.name)
+            if not os.path.isfile(dst):
+                shutil.copyfile(str(kpp), dst)
+                installed.append(kpp.name)
+        return {"all": ess.run_krita_launch(jobs, work, tag)}
+
+    try:
+        payload = ess.with_krita_session(_run, BATCH_PLUGIN_NAME,
+                                         TEXTURE_BATCH_PLUGIN_SRC, "BC152 Texture Batch")
+        result = payload["result"]["all"]
+    except Exception as exc:
+        import traceback
+        traceback.print_exc()
+        print("[批量] 批量会话失败，回退逐张：%r" % (exc,))
+        return None
+    out_map: dict[str, dict] = {}
+    jobs_res = {os.path.basename(str(r.get("out"))): r for r in result.get("jobs") or []}
+    for kpp in kpps:
+        out = DIR_KR / (kpp.stem + ".png")
+        r = jobs_res.get(out.name) or {}
+        alpha = None
+        if out.is_file():
+            try:
+                alpha = int((load_alpha(out) > 0).sum())
+            except Exception:
+                alpha = None
+        ok = bool(r.get("ok")) and out.is_file() and bool(alpha)
+        out_map[str(kpp)] = {"ok": ok, "alpha_nonzero": alpha,
+                             "elapsed_s": r.get("elapsed_s"), "reason": r.get("error") or ""}
+        if not ok and out.is_file():
+            out.unlink()
+    print("[批量] %s：%d 张，会话总耗时 %.1fs（%d 失败）" % (
+        tag, len(kpps), result.get("elapsed_s") or 0.0,
+        sum(1 for v in out_map.values() if not v["ok"])))
+    return out_map
 
 
 def render_group(group: str):
@@ -800,6 +1141,14 @@ def render_group(group: str):
     kpps = sorted(set(kpps))
     if not kpps:
         raise SystemExit("没有 .kpp（先跑 kpp）")
+    if group == "f3":
+        size, stroke = (1100, 64), 1000
+    else:
+        size, stroke = (200, 200), 4   # stroke=0 插件不落笔（实测 alpha=0），取 4 让圆心=(98,100)
+    todo = [k for k in kpps if not (DIR_KR / (k.stem + ".png")).is_file()]
+    if not todo:
+        print("[渲染] %s：全部已存在，跳过" % group)
+        return 0
     ok = acquire_lock(KRITA_LOCK, label="128A-krita-%s" % group)
     if not ok:
         raise SystemExit("Krita 锁超时")
@@ -807,41 +1156,46 @@ def render_group(group: str):
     failed = 0
     try:
         t0 = time.time()
-        for i, kpp in enumerate(kpps, 1):
-            out = DIR_KR / (kpp.stem + ".png")
-            if out.is_file():
-                print("[%d/%d] 跳过已有 %s" % (i, len(kpps), out.name))
-                continue
-            if group == "f3":
-                size, stroke = (1100, 64), 1000
-            else:
-                size, stroke = (200, 200), 4   # stroke=0 插件不落笔（实测 alpha=0），取 4 让圆心=(98,100)
-            res = runner.render_one(str(kpp), str(out), size=size, stroke=stroke,
-                                    pressure=1.0, timeout=120, route="gui")
-            if not res.get("ok"):
-                # 单实例转发/残留进程会让下一次启动直接 rc=0（125/127 已登记）：清干净后重试一次
-                subprocess.run(["taskkill", "-F", "-IM", "krita.com"], stdout=DEVNULL, stderr=DEVNULL)
-                subprocess.run(["taskkill", "-F", "-IM", "krita.exe"], stdout=DEVNULL, stderr=DEVNULL)
-                time.sleep(4.0)
+        batch = _render_batch_session(todo, size, stroke, group)
+        if batch is not None:
+            for kpp in todo:
+                res = batch[str(kpp)]
+                out = DIR_KR / (kpp.stem + ".png")
+                log[out.name] = {"preset": kpp.name, "ok": bool(res.get("ok")),
+                                 "alpha_nonzero": res.get("alpha_nonzero"),
+                                 "elapsed_s": res.get("elapsed_s"),
+                                 "reason": (res.get("reason") or "")[:200]}
+                if not res.get("ok"):
+                    failed += 1
+                    print("[失败] %s : %s" % (out.name, (res.get("reason") or "")[:160]))
+        else:
+            for i, kpp in enumerate(todo, 1):
+                out = DIR_KR / (kpp.stem + ".png")
                 res = runner.render_one(str(kpp), str(out), size=size, stroke=stroke,
                                         pressure=1.0, timeout=120, route="gui")
-            entry = {"preset": kpp.name, "ok": bool(res.get("ok")),
-                     "alpha_nonzero": res.get("alpha_nonzero"),
-                     "elapsed_s": res.get("elapsed_s"), "reason": res.get("reason")}
-            log[out.name] = entry
-            if not res.get("ok"):
-                failed += 1
-                print("[%d/%d] 失败 %s : %s" % (i, len(kpps), out.name,
-                                                (res.get("reason") or "")[:160]))
-                # 不把失败图留成「已渲染」状态
-                if out.is_file():
-                    out.unlink()
-            else:
-                print("[%d/%d] ok %s %.1fs alpha=%s" % (
-                    i, len(kpps), out.name, res.get("elapsed_s") or 0.0, res.get("alpha_nonzero")))
-            sys.stdout.flush()
+                if not res.get("ok"):
+                    # 单实例转发/残留进程会让下一次启动直接 rc=0（125/127 已登记）：清干净后重试一次
+                    subprocess.run(["taskkill", "-F", "-IM", "krita.com"], stdout=DEVNULL, stderr=DEVNULL)
+                    subprocess.run(["taskkill", "-F", "-IM", "krita.exe"], stdout=DEVNULL, stderr=DEVNULL)
+                    time.sleep(4.0)
+                    res = runner.render_one(str(kpp), str(out), size=size, stroke=stroke,
+                                            pressure=1.0, timeout=120, route="gui")
+                entry = {"preset": kpp.name, "ok": bool(res.get("ok")),
+                         "alpha_nonzero": res.get("alpha_nonzero"),
+                         "elapsed_s": res.get("elapsed_s"), "reason": res.get("reason")}
+                log[out.name] = entry
+                if not res.get("ok"):
+                    failed += 1
+                    print("[%d/%d] 失败 %s : %s" % (i, len(todo), out.name,
+                                                    (res.get("reason") or "")[:160]))
+                    if out.is_file():
+                        out.unlink()
+                else:
+                    print("[%d/%d] ok %s %.1fs alpha=%s" % (
+                        i, len(todo), out.name, res.get("elapsed_s") or 0.0, res.get("alpha_nonzero")))
+                sys.stdout.flush()
         write_json("render_log_%s.json" % group, log)
-        print("[渲染] %s：%d 张 / 失败 %d / %.1fs" % (group, len(kpps), failed, time.time() - t0))
+        print("[渲染] %s：%d 张 / 失败 %d / %.1fs" % (group, len(todo), failed, time.time() - t0))
     finally:
         release_lock(KRITA_LOCK)
     return 1 if failed else 0
@@ -999,54 +1353,68 @@ def analyze_f4() -> dict:
 
 
 def analyze_m10() -> dict:
+    """B9：10 个 UI 纹理模式（d=100, b=50, c=50, 满覆盖笔尖），按纹理配对比较。
+
+    第五轮 152 修正：128A 的 m10 PS 真值文件名不带纹理后缀，t2 批覆盖 t1 批 ⇒ 旧报告
+    「闭式解 4/10 超阈 76.680%/57.570%」实际是「PS(tex2) vs Krita(tex1)」错配。本函数
+    按 t1/t2 双纹理分别比较，cal 用现行闭式解、pre 用（已修正顺序的）公式化预烘焙。
+    """
     import texture_mask as tm
     rows = []
     kb, kc = calibrated_bc(50, 50)
-    tile = tiled_gray(texture_gray(TEXTURE1), 200, 200).astype(np.float64)
-    ps_mask_txt = 1.0 - np.clip(tile / 255.0 - 0.0, 0.0, 1.0)
-    ps_mask = ps_bc_mask(tile, 50, 50, invert=True)
-    kr_mask = 1.0 - np.clip((np.clip(tile / 255.0 - kb, -1.0, 2.0) - 0.5) * kc + 0.5, 0.0, 1.0)
-    for ps_id, kind, name, enum in UI10:
-        ps_img = _ps("ps128a__m10__%s__d100_b50_c50.png" % name)
-        row = {"ps_member": ps_id, "name": name, "krita_enum": enum,
+    PS_SUFFIX = {"t1": "_tex", "t2": "tex2"}
+    for tname, tpath in (("t1", TEXTURE1), ("t2", TEXTURE2)):
+        tile = tiled_gray(texture_gray(tpath), 200, 200).astype(np.float64)
+        ps_mask = ps_bc_mask(tile, 50, 50, invert=True)
+        kr_mask = 1.0 - np.clip((np.clip(tile / 255.0 - kb, -1.0, 2.0) - 0.5) * kc + 0.5, 0.0, 1.0)
+        for ps_id, kind, name, enum in UI10:
+            ps_img = _ps("ps128a__m10__%s__%s__d100_b50_c50.png" % (PS_SUFFIX[tname], name))
+            row = {"texture": tname, "ps_member": ps_id, "name": name, "krita_enum": enum,
                    "paths": {}}
-        for ptag, fname in (("closed", "m10__%s__d100__cal.png" % name),
-                            ("prebake", "m10__%s__d100__pre.png" % name)):
-            row["paths"][ptag] = _pair(ps_img, _kr(fname))
-        # 离线：同一模式下「闭式解掩码」与「预烘焙掩码」的算子输出差（模式语义是否被改变）
-        try:
-            out_closed = tm.blend(np.ones_like(kr_mask, dtype=np.float32).astype(np.float32),
-                                  kr_mask.astype(np.float32), enum, strength=1.0)
-            out_pre = tm.blend(np.ones_like(ps_mask, dtype=np.float32).astype(np.float32),
-                               ps_mask.astype(np.float32), enum, strength=1.0)
-            d = np.abs(np.rint(out_closed * 255) - np.rint(out_pre * 255))
-            row["offline_operator_diff"] = {
-                "diff_ratio": round(float((d > TOL).mean()), 6),
-                "max_delta": int(d.max()),
-                "modes_same": bool(np.all(d <= TOL))}
-        except NotImplementedError as exc:
-            row["offline_operator_diff"] = {"error": str(exc)}
-        rows.append(row)
-    payload = {"task": "128A-10modes", "canvas": "200x200", "depth": 100,
+            for ptag, fname in (("closed", "m10__%s__%s__d100__cal.png" % (tname, name)),
+                                ("prebake", "m10__%s__%s__d100__pre.png" % (tname, name))):
+                row["paths"][ptag] = _pair(ps_img, _kr(fname))
+            if name == "hardMix":
+                row["paths"]["converter"] = _pair(
+                    ps_img, _kr("m10__%s__hardMix__d100__conv.png" % tname))
+                row["paths"]["fix_candidate"] = _pair(
+                    ps_img, _kr("m10__%s__hardMix__d100__fix.png" % tname))
+            try:
+                one = np.ones_like(kr_mask, dtype=np.float32)
+                out_closed = tm.blend(one, kr_mask.astype(np.float32), enum, strength=1.0)
+                out_pre = tm.blend(one, ps_mask.astype(np.float32), enum, strength=1.0)
+                d = np.abs(np.rint(out_closed * 255) - np.rint(out_pre * 255))
+                row["offline_operator_diff"] = {
+                    "diff_ratio": round(float((d > TOL).mean()), 6),
+                    "max_delta": int(d.max()),
+                    "modes_same": bool(np.all(d <= TOL))}
+            except NotImplementedError as exc:
+                row["offline_operator_diff"] = {"error": str(exc)}
+            rows.append(row)
+    payload = {"task": "152-B9-10modes", "canvas": "200x200", "depth": 100,
                "ps_brightness": 50, "ps_contrast": 50, "base": 1.0,
-               "note": ("10 个 PS「纹理>模式」UI 模式；cal=现行闭式解(含 clamp)，pre=把 PS 亮度/对比度"
-                        "预烘焙进 PNG + Krita 中性参数(B=0,C=1)" ),
+               "note": ("10 个 PS「纹理>模式」UI 模式 × 2 纹理；cal=现行闭式解，"
+                        "pre=公式化预烘焙（PS 亮度/对比度链烘进 PNG + Krita 中性参数 B=0/C=1）"),
                "rows": rows}
     write_json("m10_analysis.json", payload)
-    print("\n=== 10 个 UI 纹理模式（d=100, b=50, c=50, 满覆盖笔尖）===")
-    print("%-14s %4s %4s | %-22s %-22s | %-24s" % (
-        "PS 模式", "PSid", "枚举", "预烘焙 vs PS 真值", "闭式解 vs PS 真值", "同掩码下算子差(离线)"))
+    print("\n=== B9：10 个 UI 纹理模式（d=100, b=50, c=50, 满覆盖笔尖；按纹理配对）===")
+    print("%-3s %-14s %4s %4s | %-18s %-18s %-18s | %-18s" % (
+        "tex", "PS 模式", "PSid", "枚举", "闭式解 vs PS", "预烘焙 vs PS",
+        "转换器行为 vsPS", "同掩码算子差(离线)"))
     for r in rows:
         pre = r["paths"].get("prebake", {})
         clo = r["paths"].get("closed", {})
+        conv = r["paths"].get("converter", {})
+        fix = r["paths"].get("fix_candidate", {})
         off = r.get("offline_operator_diff", {})
         def fmt(m):
             if m.get("status") != "compared":
                 return "缺失"
-            return "%8.3f%%/max%-4d%s" % (m["diff_ratio"] * 100, m["max_delta"],
-                                          "✓" if m["pass"] else "✗")
-        print("%-14s %4s %4d | %-22s %-22s | %s" % (
-            r["name"], r["ps_member"], r["krita_enum"], fmt(pre), fmt(clo),
+            return "%7.3f%%/max%-3d%s" % (m["diff_ratio"] * 100, m["max_delta"],
+                                          "PASS" if m["pass"] else "FAIL")
+        print("%-3s %-14s %4s %4d | %-18s %-18s %-18s | %s" % (
+            r["texture"], r["name"], r["ps_member"], r["krita_enum"], fmt(clo), fmt(pre),
+            (fmt(conv) + ("→fix " + fmt(fix)) if fix else "") if conv else "-",
             ("同=%s max%d" % (off.get("modes_same"), off.get("max_delta", -1)))
             if "error" not in off else off["error"][:20]))
     return payload
@@ -1363,6 +1731,21 @@ def analyze() -> int:
     write_json("summary.json", summary)
     print("\n=== 汇总 ===")
     print(json.dumps(summary, ensure_ascii=False, indent=1))
+    bc = None
+    try:
+        bc = analyze_bc()
+    except Exception:
+        import traceback
+        traceback.print_exc()
+    try:
+        write_manifest({"task": "152", "statistics": {
+            "f2_rows": len((f2 or {}).get("rows", [])),
+            "f4_rows": len((f4 or {}).get("rows", [])),
+            "m10_rows": len((m10 or {}).get("rows", [])),
+            "bcneg_rows": len((bc or {}).get("rows", []))}})
+    except Exception:
+        import traceback
+        traceback.print_exc()
     return 0
 
 
@@ -1403,10 +1786,589 @@ def rebuild_prebake_truth() -> int:
     return 0
 
 
+
+# ---------------------------------------------------------------- 第五轮（任务 152）
+# N5：hardMix base<1「不牺牲可编辑性的承载」候选量化 + B9：b×C 交互区重测/补测
+# ---------------------------------------------------------------------------
+N5_TIPS = ("hard", "mid", "soft")
+N5_CAND_JSON = "n5_candidates.json"
+
+
+def write_kpp_no_texture(abr_path: Path, out_path: Path,
+                          preset_name: str | None = None) -> Path:
+    """生成「不带纹理」的参考 .kpp（Krita 侧 base 剖面测量用）。"""
+    AbrFile, map_presets, conv, TextureXml, build_preset_xml, build_kpp, render_tip_preview = _krita_imports()
+    abr = AbrFile.parse(str(abr_path))
+    presets = map_presets(abr)
+    if len(presets) != 1:
+        raise SystemExit("ABR 预设数 != 1：%s" % abr_path)
+    bp = presets[0]
+    square_tip = conv._square_tip(bp.tip_gray)
+    if square_tip.shape != bp.tip_gray.shape:
+        raise SystemExit("非正方形笔尖补白会把补白区当墨（本实验只用正方形笔尖）")
+    tip_png = conv._png_bytes(square_tip)
+    tip_name = bp.name.rsplit(".", 1)[0]
+    brush_def = conv._sampled_brush_def(tip_name, tip_png, bp)
+    preview = render_tip_preview(bp.tip_gray)
+    xml = build_preset_xml(
+        name=preset_name or (bp.name + " [n5ref] " + out_path.stem),
+        brush_definition=brush_def, tip_png=tip_png, tip_name=tip_name,
+        size_curve=bp.size_curve, opacity_curve=bp.opacity_curve, flow_curve=bp.flow_curve,
+        ratio_curve=bp.ratio_curve, rotation_sensor=bp.rotation_sensor,
+        rotation_jitter=bp.rotation_jitter, scatter=bp.scatter,
+        scatter_pressure=bp.scatter_pressure, scatter_both_axes=bp.scatter_both_axes,
+        scatter_amount=bp.scatter_amount, texture=None)
+    out_path.write_bytes(build_kpp(xml, preview))
+    return out_path
+
+
+def _n5_tex1_png() -> bytes:
+    return unique_png_bytes(TEXTURE1, "n5t1")
+
+
+def _n5_mode_to_kpp(mode: int) -> tuple[int, bool]:
+    """模型内部模式码 → (Krita TexturingMode, UseSoftTexturing)。"""
+    m = int(mode)
+    if m == 110:
+        return 10, True
+    if m == 111:
+        return 11, True
+    return m, False
+
+
+def n5_kpps():
+    """生成 N5 候选 .kpp（幂等）。
+
+    - n5ref__<tip>：无纹理参考（Krita 侧 base 剖面）
+    - n5__<tip>__d<d>__cur：现行转换行为（base<1 不下发偏置：strength=d/100）
+    - n5__<tip>__d<d>__bias：128A 常量偏置（strength=1、brightness=+1/255）
+    - n5__<tip>__d<d>__softer1 / softersd：Krita 11=Hard Mix Softer(PS) 两档强度
+    - n5__<tip>__d<d>__prebake：128A 式「按 PS base 逐像素烘焙」oracle（预期失败）
+    - n5__<tip>__d<d>__best_t / best_d：analyze n5 网格搜索出的最优参数组合
+      （best_t=每笔尖一套（s=1），best_d=每深度一套；见 n5_candidates.json）
+    """
+    ensure_dirs()
+    tex_png = _n5_tex1_png()
+    abrs = tips_abr()
+    plan = []
+    for tag in N5_TIPS:
+        abr = abrs[tag]
+        plan.append(("n5ref__%s" % tag, dict(tex=None, abr=abr)))
+        ref_png = _ps("ps128a__f2__%s__ref_notex.png" % tag)
+        base = load_alpha(ref_png).astype(np.float64) / 255.0 if ref_png.is_file() else None
+        for d in F2_DEPTHS:
+            s = d / 100.0
+            plan.append(("n5__%s__d%d__cur" % (tag, d),
+                         dict(tex=dict(mode=10, strength=s, brightness=0.0, contrast=1.0,
+                                       invert=True, scale=1.0), png=tex_png, abr=abr)))
+            # 现行转换器真实行为：convert._texture_xml 对非高度系写 UseSoftTexturing=true
+            # （hardMix 也在内）⇒ 与上面 soft=false 的 cur 不是同一算子；见 152 §N5。
+            plan.append(("n5__%s__d%d__conv" % (tag, d),
+                         dict(tex=dict(mode=10, strength=s, brightness=0.0, contrast=1.0,
+                                       invert=True, scale=1.0, soft=True),
+                              png=tex_png, abr=abr)))
+            plan.append(("n5__%s__d%d__bias" % (tag, d),
+                         dict(tex=dict(mode=10, strength=1.0, brightness=1.0 / 255.0,
+                                       contrast=1.0, invert=True, scale=1.0, soft=True),
+                              png=tex_png, abr=abr)))
+            plan.append(("n5__%s__d%d__softer1" % (tag, d),
+                         dict(tex=dict(mode=11, strength=1.0, brightness=0.0, contrast=1.0,
+                                       invert=True, scale=1.0), png=tex_png, abr=abr)))
+            plan.append(("n5__%s__d%d__softersd" % (tag, d),
+                         dict(tex=dict(mode=11, strength=s, brightness=0.0, contrast=1.0,
+                                       invert=True, scale=1.0), png=tex_png, abr=abr)))
+            ps_png = DIR_PS / ("ps128a__f2__%s__hardMix__d%d.png" % (tag, d))
+            if base is not None and ps_png.is_file():
+                ps_alpha = load_alpha(ps_png)
+                bake_png = bake_png_for_f2(
+                    base, ps_alpha, s, True, DIR_TEX / ("n5bake__%s__d%d.png" % (tag, d)),
+                    "n5bake%s%d" % (tag, d))
+                plan.append(("n5__%s__d%d__prebake" % (tag, d),
+                             dict(tex=dict(mode=10, strength=s, brightness=0.0,
+                                           contrast=1.0, invert=False, scale=1.0,
+                                           soft=False),
+                                  png=bake_png, abr=abr)))
+                # 同一份 oracle 掩码、但用现行转换器形态（UseSoftTexturing=true）渲染
+                plan.append(("n5__%s__d%d__prebake_conv" % (tag, d),
+                             dict(tex=dict(mode=10, strength=s, brightness=0.0,
+                                           contrast=1.0, invert=False, scale=1.0,
+                                           soft=True),
+                                  png=bake_png, abr=abr)))
+    cand_path = DIR_JSON / N5_CAND_JSON
+    if cand_path.is_file():
+        cand = json.loads(cand_path.read_text(encoding="utf-8"))
+        for tag in N5_TIPS:
+            for kind in ("best_t", "best_d"):
+                for d in F2_DEPTHS:
+                    spec = (cand.get(kind, {}).get(tag, {}) if kind == "best_t"
+                            else cand.get(kind, {}).get(tag, {}).get(str(d), {}))
+                    if not spec:
+                        continue
+                    k_mode, k_soft = _n5_mode_to_kpp(int(spec["mode"]))
+                    plan.append(("n5__%s__d%d__%s" % (tag, d, kind),
+                                 dict(tex=dict(mode=k_mode,
+                                               strength=float(spec.get("strength", 1.0)),
+                                               brightness=float(spec["brightness"]),
+                                               contrast=float(spec["contrast"]),
+                                               invert=bool(spec.get("invert", True)),
+                                               soft=k_soft, scale=1.0),
+                                      # 坑：此块在笔尖循环外，必须按 tg 取 ABR —— 旧实现
+                                      # 误用循环残留的 abr（=soft 笔尖），把 hard/mid 的
+                                      # best_* 全渲成 soft 笔尖（21:19 首轮实渲 67–75% 即此因）。
+                                      png=tex_png, abr=abrs[tag])))
+    written = 0
+    for name, spec in plan:
+        out = DIR_KPP / (name + ".kpp")
+        if spec.get("tex") is None:
+            write_kpp_no_texture(spec["abr"], out, preset_name="bc152 " + name)
+        else:
+            write_kpp_from_abr(spec["abr"], spec["png"], spec["tex"], out,
+                               preset_name="bc152 " + name)
+        written += 1
+    print("[N5-KPP] 生成 %d 个 → %s" % (written, DIR_KPP))
+    return 0
+
+
+# ---- N5 的 Krita 算子模型（mode 10/11/14/15；11 无 texture_mask 复刻，按源码补）
+def _n5_model_mask(tex_gray200: np.ndarray, cfg: dict) -> np.ndarray:
+    import texture_mask as tm
+    m = np.clip(tex_gray200.astype(np.float32) / np.float32(255.0), 0.0, 1.0)
+    return tm.apply_three(m, bool(cfg.get("invert", True)),
+                          float(cfg["brightness"]), float(cfg["contrast"]))
+
+
+#: 模型内部模式码：10=HardMix(soft=false)、110=HardMix(soft=true)、
+#: 11=Softer(soft=false)、111=Softer(soft=true)、14/15=Height/LinearHeight、0=Multiply
+def _n5_model_alpha(base: np.ndarray, proc: np.ndarray, mode: int, strength: float,
+                    soft: bool | None = None) -> np.ndarray:
+    """Krita 纹理算子模型（源码逐步复刻）。
+
+    mode 10 的 use_soft_texturing 分支（KisMaskingBrushCompositeOp.h）：
+    - soft=false：out = (src + dst*s > 1) ? 1 : 0
+    - soft=true ：u = src + (1-s) - src*(1-s)；out = (u + dst > 1 ? 1 : 0) * (dst + s - dst*s)
+      （第三个参数是 mul(..., unionShapeOpacity(dst, strength))）
+    mode 11（Hard Mix Softer PS）：clamp(3*dst - 2*inv(src))；soft=true 时 src 乘 s。
+    """
+    b = np.clip(base.astype(np.float32), 0.0, 1.0)
+    t = np.clip(proc.astype(np.float32), 0.0, 1.0)
+    s = float(np.clip(strength, 0.0, 1.0))
+    s8 = np.float32(np.floor(s * 255.0 + 0.5) / 255.0)
+    if mode in (10, 110):
+        if mode == 110 or soft:
+            inv_s = np.float32(1.0) - s8
+            u = t + inv_s - t * inv_s            # unionShapeOpacity(src, 1-s)
+            binary = np.where(u + b > np.float32(1.0), np.float32(1.0), np.float32(0.0))
+            factor = b + s8 - b * s8             # unionShapeOpacity(dst, s)
+            out = binary * factor
+        else:
+            out = np.where(t + b * s8 > np.float32(1.0), np.float32(1.0), np.float32(0.0))
+    elif mode in (11, 111):
+        if mode == 111 or soft:
+            out = np.clip(np.float32(3.0) * b - np.float32(2.0) * (np.float32(1.0) - t * s8),
+                          np.float32(0.0), np.float32(1.0))
+        else:
+            out = np.clip(np.float32(3.0) * b * s8 + np.float32(2.0) * t - np.float32(2.0),
+                          np.float32(0.0), np.float32(1.0))
+    elif mode == 14:  # Height (PS)：dst*(10s) - src
+        out = np.clip(b * (np.float32(10.0) * s8) - t, np.float32(0.0), np.float32(1.0))
+    elif mode == 15:  # Linear Height (PS)：max((1-src)*md, md-src)，md=dst*(10s)
+        md = b * (np.float32(10.0) * s8)
+        out = np.maximum((np.float32(1.0) - t) * md, md - t)
+        out = np.clip(out, np.float32(0.0), np.float32(1.0))
+    else:
+        out = np.clip(t * b * s8, np.float32(0.0), np.float32(1.0))  # 0 Multiply
+    return np.rint(out * np.float32(255.0)).astype(np.int16)
+
+
+def _n5_residual(pred_alpha8: np.ndarray, target_alpha8: np.ndarray) -> dict:
+    d = np.abs(pred_alpha8.astype(np.int16) - target_alpha8.astype(np.int16))
+    return {"diff_pixels": int(np.count_nonzero(d > TOL)),
+            "diff_ratio": round(float((d > TOL).mean()), 6),
+            "max_delta": int(d.max()), "mean_abs": round(float(d.mean()), 3),
+            "pass": bool((d > TOL).mean() <= 0.02 and d.max() <= TOL)}
+
+
+def _n5_grid_search(base: np.ndarray, proc_by_b: dict, target8: np.ndarray,
+                    modes=(10, 11, 14, 15), strengths=(1.0,),
+                    contrasts=(0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0),
+                    b_grid=None, tex_gray200=None) -> dict:
+    """在固定 base 上网格搜索 Krita 参数组合，返回全体最优（含分模式最优）。"""
+    import texture_mask as tm
+    if b_grid is None:
+        b_grid = np.round(np.arange(-0.5, 0.501, 1.0 / 32.0), 6)
+    target = np.clip(target8.astype(np.float32) / np.float32(255.0), 0.0, 1.0)
+    best = None
+    per_mode = {}
+    m_raw = np.clip(tex_gray200.astype(np.float32) / np.float32(255.0), 0.0, 1.0)
+    for mode in modes:
+        for c in contrasts:
+            for s in strengths:
+                for bv in b_grid:
+                    proc = tm.apply_three(m_raw, True, float(bv), float(c))
+                    pa = _n5_model_alpha(base, proc, mode, s)
+                    d = np.abs(pa.astype(np.int16) - target8.astype(np.int16))
+                    ratio = float((d > TOL).mean())
+                    entry = {"mode": int(mode), "brightness": round(float(bv), 6),
+                             "contrast": round(float(c), 6), "strength": float(s),
+                             "invert": True, "diff_ratio": round(ratio, 6),
+                             "max_delta": int(d.max())}
+                    if best is None or ratio < best["diff_ratio"]:
+                        best = entry
+                    if mode not in per_mode or ratio < per_mode[mode]["diff_ratio"]:
+                        per_mode[mode] = entry
+    return {"best": best, "per_mode": per_mode}
+
+
+def analyze_n5() -> dict:
+    """N5：量化候选 A（按 base 分档预烘焙）/ B（Krita 参数组合）/ C（登记结构性）。"""
+    ensure_dirs()
+    tex_gray200 = tiled_gray(texture_gray(TEXTURE1), 200, 200).astype(np.float64)
+    rows = []
+    cand_out = {"note": "N5 候选参数；best_t=每笔尖一套（strength=1），best_d=每深度一套",
+                "best_t": {}, "best_d": {}}
+    for tag in N5_TIPS:
+        kr_ref = _kr("n5ref__%s.png" % tag)
+        ps_ref = _ps("ps128a__f2__%s__ref_notex.png" % tag)
+        if not (kr_ref.is_file() and ps_ref.is_file()):
+            print("[跳过] %s 缺参考图（Krita=%s PS=%s）" % (tag, kr_ref.is_file(), ps_ref.is_file()))
+            continue
+        base_kr = load_alpha(kr_ref).astype(np.float64) / 255.0
+        base_ps = load_alpha(ps_ref).astype(np.float64) / 255.0
+        # base 剖面差异（PS vs Krita，同一张采样笔尖位图）：解释 128A 预烘焙失败
+        prof = {"ps_mean": round(float(base_ps.mean()), 4),
+                "kr_mean": round(float(base_kr.mean()), 4),
+                "mean_abs_diff": round(float(np.abs(base_ps - base_kr).mean()), 4),
+                "coverage_ps": round(float((base_ps > 0).mean()), 4),
+                "coverage_kr": round(float((base_kr > 0).mean()), 4)}
+        for d in F2_DEPTHS:
+            ps_img = _ps("ps128a__f2__%s__hardMix__d%d.png" % (tag, d))
+            if not ps_img.is_file():
+                continue
+            target8 = load_alpha(ps_img)
+            target = target8.astype(np.float64) / 255.0
+            s = d / 100.0
+            row = {"tip": tag, "depth": d, "base_profile": prof,
+                   "ps_alpha_unique": int(np.unique(target8).size),
+                   "ps_intermediate_px": int(((target8 > TOL) & (target8 < 255 - TOL)).sum()),
+                   "paths": {}, "candidate_B": {}, "candidate_A": {}}
+            # 目标连续值比例 = 任何二值算子（hardMix）的理论残差下限
+            row["binary_floor_ratio"] = round(
+                float(((target8 > TOL) & (target8 < 255 - TOL)).mean()), 6)
+            # ---- 路径对照（实渲 vs PS 真值）
+            # cur=二进制算子（soft=false，128A 口径）；conv=现行转换器行为（soft=true）
+            for ptag in ("cur", "conv", "bias", "softer1", "softersd", "prebake",
+                         "prebake_conv", "best_t", "best_d"):
+                kr = _kr("n5__%s__d%d__%s.png" % (tag, d, ptag))
+                m = _pair(ps_img, kr)
+                if m.get("status") == "compared":
+                    m["binary_floor_ratio"] = row["binary_floor_ratio"]
+                row["paths"][ptag] = m
+            # ---- 模型校验：用 Krita 自己的 base 预测 cur/bias/softer 渲染
+            for ptag, cfg in (
+                    ("cur", dict(mode=10, strength=s, brightness=0.0, contrast=1.0,
+                                 invert=True, soft=False)),
+                    ("conv", dict(mode=110, strength=s, brightness=0.0, contrast=1.0,
+                                  invert=True)),
+                    ("bias", dict(mode=110, strength=1.0, brightness=1.0 / 255.0,
+                                  contrast=1.0, invert=True)),
+                    ("softer1", dict(mode=11, strength=1.0, brightness=0.0, contrast=1.0,
+                                     invert=True)),
+                    ("softersd", dict(mode=11, strength=s, brightness=0.0, contrast=1.0,
+                                      invert=True))):
+                proc = _n5_model_mask(tex_gray200, cfg)
+                pred = _n5_model_alpha(base_kr, proc, int(cfg["mode"]), cfg["strength"],
+                                       soft=bool(cfg.get("soft", cfg["mode"] >= 110)))
+                model_vs_ps = _n5_residual(pred, target8)
+                kr = _kr("n5__%s__d%d__%s.png" % (tag, d, ptag))
+                model_vs_render = None
+                if kr.is_file():
+                    model_vs_render = _n5_residual(pred, load_alpha(kr))
+                row["paths"][ptag + "__model_vs_ps"] = model_vs_ps
+                row["paths"][ptag + "__model_vs_render"] = model_vs_render
+            # ---- 候选 B：参数组合最优（模型空间，用 Krita base）
+            grid_const = _n5_grid_search(base_kr, None, target8,
+                                         modes=(10, 110, 11, 14, 15), strengths=(1.0,),
+                                         b_grid=np.round(np.arange(-0.5, 0.501, 1.0 / 32.0), 6),
+                                         tex_gray200=tex_gray200)
+            row["candidate_B"]["per_tip_strength1"] = grid_const
+            grid_depth = _n5_grid_search(base_kr, None, target8,
+                                         modes=(10, 110, 11, 14, 15),
+                                         strengths=(s,),
+                                         b_grid=np.round(np.arange(-0.5, 0.501, 1.0 / 32.0), 6),
+                                         tex_gray200=tex_gray200)
+            row["candidate_B"]["per_depth_best"] = grid_depth
+            # ---- 候选 A：按 base 分档（预烘焙纹理 + 参数组合）
+            # 设定：每档一张预烘焙纹理，效果等价于把「PS 掩码字段」整体平移 δ_t；
+            #       档内像素共用同一个 δ_t（极端理想化：假设引擎能按像素的 base 选档）。
+            field = 1.0 - np.clip(tex_gray200 / 255.0, 0.0, 1.0)
+            deltas = np.arange(-0.5, 0.5001, 1.0 / 64.0)
+
+            def _a_pred(src: np.ndarray, beta: np.ndarray, soft: bool) -> np.ndarray:
+                """候选 A 的 Krita 输出预测：src=field+δ（clip 0..1）。"""
+                src = np.clip(src, 0.0, 1.0)
+                if soft:
+                    inv_s = 1.0 - s
+                    u = src + inv_s - src * inv_s
+                    bin_ = (u + beta > 1.0).astype(np.float64)
+                    factor = beta + s - beta * s
+                    return np.rint(bin_ * factor * 255.0).astype(np.int16)
+                return np.where(src + beta * s > 1.0, 255, 0).astype(np.int16)
+
+            def _tier_curve(soft: bool) -> dict:
+                out = {}
+                for K in (1, 2, 3, 4, 6, 8, 16):
+                    edges = np.linspace(0.0, 1.0, K + 1)
+                    pred = np.zeros_like(target8, dtype=np.int16)
+                    for t in range(K):
+                        lo, hi = edges[t], edges[t + 1]
+                        sel = ((base_kr >= lo) & (base_kr < hi)) if t < K - 1                             else (base_kr >= lo)
+                        if not sel.any():
+                            continue
+                        best_t = None
+                        for dv in deltas:
+                            p = _a_pred(field + dv, base_kr, soft)
+                            dd = np.abs(p[sel] - target8[sel])
+                            ratio = float((dd > TOL).mean())
+                            if best_t is None or ratio < best_t[0]:
+                                best_t = (ratio, float(dv), int(dd.max()))
+                        if best_t is not None:
+                            pred[sel] = _a_pred(field + best_t[1], base_kr, soft)[sel]
+                    out[str(K)] = {
+                        "diff_ratio": round(float((np.abs(pred - target8) > TOL).mean()), 6),
+                        "max_delta": int(np.abs(pred - target8).max())}
+                return out
+
+            tiers_soft = _tier_curve(True)     # 现行转换器形态（UseSoftTexturing=true）
+            tiers_bin = _tier_curve(False)     # 二值算子形态（128A 口径）
+            row["candidate_A"]["tiers_soft"] = tiers_soft
+            row["candidate_A"]["tiers_binary"] = tiers_bin
+            # 理论下限（soft 形态）：每像素可选输出 = {0, factor}，factor=base+s-base*s；
+            # 取「离 PS 目标更近的那个」也仍有超阈像素（连续值没法同时命中）。
+            factor = base_kr + s - base_kr * s
+            cand_hi = np.rint(factor * 255.0).astype(np.int16)
+            best_abs = np.minimum(np.abs(target8 - 0), np.abs(target8 - cand_hi))
+            oracle_soft_ratio = round(float((best_abs > TOL).mean()), 6)
+            row["candidate_A"]["oracle_soft"] = {
+                "diff_ratio": oracle_soft_ratio,
+                "note": ("soft=true 算子的逐像素 oracle（K=∞、不可落地）：每像素只能在"
+                         "「0 或 factor×255」两档里选，仍不能命中 PS 连续值。"
+                         "K=1…16 的 tiers_soft 均 ≥ 该值附近。")}
+            row["candidate_A"]["oracle_binary"] = {
+                "diff_ratio": row["binary_floor_ratio"],
+                "note": "二值算子的逐像素 oracle（K=∞）：理论下限 = PS 连续值像素占比。"}
+            row["candidate_A"]["realized_single_texture"] = {
+                "k_tiers": 1,
+                "diff_ratio_soft": tiers_soft.get("1", {}).get("diff_ratio"),
+                "diff_ratio_binary": tiers_bin.get("1", {}).get("diff_ratio"),
+                "note": ("单预设只能带 1 张纹理、无法按像素的 base 选档 ⇒ 可落地形态"
+                         "残差 = K=1（每档/每像素选档是理想化上界，不可落地）；"
+                         "且每增加一档就多 1 份纹理资源（体积见 volume）。")}
+            if tag == "hard":
+                row["candidate_A"]["note"] = (
+                    "base≡1（满覆盖）由 135-2 的 Strength=1 + 亮度 ±1/255 偏置解决"
+                    "（本任务 bias 路径 3/3 = 0.00%/max0）；候选 A 只对 base<1 有意义，"
+                    "本行仅作对照、不参与推荐。")
+            # 体积：每档一张纹理，按**原纹理尺寸**（64×64）烘成 8bit PNG 计实际字节数；
+            # 不用 200×200 画布尺寸（那会把体积高估 10×，不是真实资源尺寸）。
+            tier_src = texture_gray(TEXTURE1).astype(np.float64)
+            tier_mask = np.rint(np.clip(1.0 - tier_src / 255.0, 0.0, 1.0) * 255).astype(np.uint8)
+            bake_path = DIR_TEX / ("n5tier_size.png")
+            save_gray_png(bake_path, tier_mask, unique_tag="n5tier")
+            tex_png_size = len(unique_png_bytes(TEXTURE1, "n5t1"))
+            row["candidate_A"]["volume"] = {
+                "tier_png_bytes": int(bake_path.stat().st_size),
+                "orig_texture_png_bytes": int(tex_png_size),
+                "n_tiers_reference": 8,
+                "kb_per_tier_set_k8": round(bake_path.stat().st_size * 8 / 1024.0, 1)}
+            rows.append(row)
+            print("[N5] %-4s d=%3d 连续值=%.3f | conv=%s cur=%s bias=%s softer1=%s prebake=%s"
+                  % (tag, d, row["binary_floor_ratio"],
+                     _n5_fmt(row["paths"].get("conv")),
+                     _n5_fmt(row["paths"].get("cur")),
+                     _n5_fmt(row["paths"].get("bias")),
+                     _n5_fmt(row["paths"].get("softer1")),
+                     _n5_fmt(row["paths"].get("prebake"))))
+    # ---- 汇总：每笔尖写入候选参数（供 n5kpp 生成 best_* .kpp）
+    # best_t 口径 = 「每笔尖一套、strength=1」的承载规则：把 3 个深度各自网格搜索出的
+    # 候选配置（含分模式最优）放到 3 个深度上逐一复算，取「三档残差之和最小」的一套。
+    # 这是 in-sample 选参（同一批 PS 真值既当拟合目标又当评估集），报告必须写明。
+    cache = {}
+    for r in rows:
+        tag, d = r["tip"], r["depth"]
+        ps_img = _ps("ps128a__f2__%s__hardMix__d%d.png" % (tag, d))
+        kr_ref = _kr("n5ref__%s.png" % tag)
+        if ps_img.is_file() and kr_ref.is_file():
+            cache[(tag, d)] = (load_alpha(kr_ref).astype(np.float64) / 255.0, load_alpha(ps_img))
+
+    def _eval_cfg(tag: str, cfg: dict) -> dict:
+        per, total = {}, 0.0
+        for d in F2_DEPTHS:
+            if (tag, d) not in cache:
+                continue
+            base_kr, target8 = cache[(tag, d)]
+            proc = _n5_model_mask(tex_gray200, cfg)
+            pred = _n5_model_alpha(base_kr, proc, int(cfg["mode"]),
+                                   float(cfg.get("strength", 1.0)))
+            res = _n5_residual(pred, target8)
+            per[str(d)] = res
+            total += res["diff_ratio"]
+        return {"sum_ratio": round(total, 6), "per_depth": per}
+
+    for tag in N5_TIPS:
+        cands, seen = [], set()
+        for r in rows:
+            if r["tip"] != tag:
+                continue
+            outs = [r["candidate_B"]["per_tip_strength1"]["best"]]
+            outs.extend(r["candidate_B"]["per_tip_strength1"]["per_mode"].values())
+            for cfg in outs:
+                if not cfg:
+                    continue
+                key = (cfg["mode"], round(cfg["brightness"], 6),
+                       round(cfg["contrast"], 6), 1.0)
+                if key in seen:
+                    continue
+                seen.add(key)
+                cands.append(dict(cfg, strength=1.0))
+        if not cands:
+            continue
+        scored = [(_eval_cfg(tag, cfg), cfg) for cfg in cands]
+        scored.sort(key=lambda item: item[0]["sum_ratio"])
+        best_score, best_cfg = scored[0]
+        cand_out["best_t"][tag] = {
+            "mode": int(best_cfg["mode"]), "brightness": float(best_cfg["brightness"]),
+            "contrast": float(best_cfg["contrast"]), "strength": 1.0, "invert": True,
+            "sum_ratio": best_score["sum_ratio"],
+            "per_depth_diff_ratio": {k: v["diff_ratio"] for k, v in best_score["per_depth"].items()}}
+        for r in rows:
+            if r["tip"] == tag:
+                r["candidate_B"]["selected_per_tip"] = {
+                    "config": cand_out["best_t"][tag],
+                    "per_depth": best_score["per_depth"]}
+        # best_d：每深度一套（strength=d/100），取该深度网格搜索最优
+        for r in rows:
+            if r["tip"] != tag:
+                continue
+            bd = r["candidate_B"]["per_depth_best"]["best"]
+            if bd:
+                cand_out["best_d"].setdefault(tag, {})[str(r["depth"])] = dict(bd)
+    payload = {"task": "152-N5", "created": time.strftime("%Y-%m-%d %H:%M:%S"),
+               "criterion": {"ratio_max": 0.02, "max_delta_max": TOL},
+               "canvas": "200x200", "ps_mode": "hardMix (Krita 10)",
+               "texture": "research/测试用纹理.png",
+               "note": ("候选 A=按 base 分档预烘焙纹理（二进制 hardMix 算子，理论下限="
+                        "PS 连续 alpha 比例）；候选 B=Krita 参数组合（模型空间网格搜索，"
+                        "base 取 Krita 自己的无纹理渲染）；候选 C=登记结构性（现行行为）"),
+               "rows": rows, "candidates": cand_out}
+    write_json("n5_analysis.json", payload)
+    write_json(N5_CAND_JSON, cand_out)
+    print("\n=== N5 候选汇总（每笔尖/深度）===")
+    print("%-4s %4s %7s | %-22s %-22s | %-22s" % (
+        "tip", "d", "连续值", "候选B(每笔尖, s=1)", "候选B(每深度最优)",
+        "候选A(soft, K=1/4/16)"))
+    for r in rows:
+        sel = r["candidate_B"].get("selected_per_tip", {}).get("config", {})
+        bt = r["candidate_B"]["per_tip_strength1"]["best"]
+        bd = r["candidate_B"]["per_depth_best"]["best"]
+        ts = r["candidate_A"]["tiers_soft"]
+        print("%-4s %4d %7.3f | mode%-3d b=%-6.4f c=%-4.2f %.3f | mode%-3d b=%-6.4f c=%-4.2f %.3f | %.3f/%.3f/%.3f"
+              % (r["tip"], r["depth"], r["binary_floor_ratio"],
+                 bt["mode"], bt["brightness"], bt["contrast"], bt["diff_ratio"],
+                 bd["mode"], bd["brightness"], bd["contrast"], bd["diff_ratio"],
+                 ts["1"]["diff_ratio"], ts["4"]["diff_ratio"], ts["16"]["diff_ratio"]))
+        if sel:
+            print("      选中(每笔尖规则) mode%d b=%.4f c=%.2f s=1 → 三档之和 %.4f，逐档 %s"
+                  % (sel["mode"], sel["brightness"], sel["contrast"], sel["sum_ratio"],
+                     {k: v for k, v in sel["per_depth_diff_ratio"].items()}))
+    return payload
+
+
+def _n5_fmt(m: dict | None) -> str:
+    if not m or m.get("status") != "compared":
+        return "缺失"
+    return "%.2f%%/max%d" % (m["diff_ratio"] * 100, m["max_delta"])
+
+
+def analyze_bc() -> dict:
+    """B9 补测：C<0 区内 b×C 交互（b=-100..100、c=-50、multiply d=100）。"""
+    rows = []
+    PS_SUFFIX = {"t1": "_tex", "t2": "tex2"}
+    kb, kc = calibrated_bc(0, -50)
+    for tname, tpath in (("t1", TEXTURE1), ("t2", TEXTURE2)):
+        gray = tiled_gray(texture_gray(tpath), 200, 200).astype(np.float64)
+        for b, c in BC_NEG_COMBOS:
+            ps_img = _ps("ps128a__bcneg__%s__b%d_c%d.png" % (PS_SUFFIX[tname], b, c))
+            if not ps_img.is_file():
+                continue
+            kbb, kcc = calibrated_bc(b, c)
+            ps_mask = ps_bc_mask(gray, b, c, invert=True)
+            pa = np.rint(ps_mask * 255).astype(np.int16)
+            ps_a = load_alpha(ps_img)
+            formula = {"diff_ratio": round(float((np.abs(pa - ps_a) > TOL).mean()), 6),
+                       "max_delta": int(np.abs(pa - ps_a).max())}
+            row = {"texture": tname, "ps_b": b, "ps_c": c,
+                   "closed_b": kbb, "closed_c": kcc,
+                   "ps_truth_vs_formula": formula, "paths": {}}
+            for ptag, fname in (("closed", "bc__%s__b%d_c%d__cal.png" % (tname, b, c)),
+                                ("prebake", "bc__%s__b%d_c%d__pre.png" % (tname, b, c))):
+                row["paths"][ptag] = _pair(ps_img, _kr(fname))
+            rows.append(row)
+    payload = {"task": "152-B9-negBC", "canvas": "200x200", "mode": "multiply (Krita 0)",
+               "depth": 100, "criterion": {"ratio_max": 0.02, "max_delta_max": TOL},
+               "note": "C<0 区内 b×C 交互补测；PS 链顺序 = 先对比度后亮度（第五轮修正）",
+               "rows": rows}
+    write_json("bc_analysis.json", payload)
+    print("\n=== B9 补测：C<0 区内 b×C（b=-100..100, c=-50, multiply d=100）===")
+    print("%-3s %5s %4s %8s %8s | %-22s %-22s %-22s" % (
+        "tex", "PSb", "C", "b_k", "c_k", "PS公式 vs PS真值", "闭式解 vs PS真值", "公式化预烘焙"))
+    for r in rows:
+        clo = r["paths"].get("closed", {})
+        pre = r["paths"].get("prebake", {})
+        print("%-3s %5d %4d %8.4f %8.4f | %7.3f%%/max%-3d   | %-22s %-22s" % (
+            r["texture"], r["ps_b"], r["ps_c"], r["closed_b"], r["closed_c"],
+            r["ps_truth_vs_formula"]["diff_ratio"] * 100,
+            r["ps_truth_vs_formula"]["max_delta"],
+            _n5_fmt(clo), _n5_fmt(pre)))
+    return payload
+
+
+def write_manifest(extra: dict | None = None) -> Path:
+    """证据清单：任务/时间/命令/输入输出 sha256/统计量（第五轮 152/153 口径）。"""
+    files = []
+    for sub, d in (("ps", DIR_PS), ("krita", DIR_KR), ("kpp", DIR_KPP),
+                   ("tex", DIR_TEX), ("json", DIR_JSON)):
+        for p in sorted(d.glob("*")):
+            if p.is_file():
+                files.append({"area": sub, "name": p.name, "bytes": p.stat().st_size,
+                              "sha256": hashlib.sha256(p.read_bytes()).hexdigest()})
+    payload = {"task": (extra or {}).get("task", "152"),
+               "generated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+               "tmp_dir": TMP.as_posix(),
+               "commands": [
+                   "python tools/exp_texture_bake.py prep",
+                   "python tools/exp_texture_bake.py ps f2",
+                   "python tools/exp_texture_bake.py ps f4",
+                   "python tools/exp_texture_bake.py kpp",
+                   "python tools/exp_texture_bake.py n5kpp",
+                   "python tools/exp_texture_bake.py render n5",
+                   "python tools/exp_texture_bake.py render b9",
+                   "python tools/exp_texture_bake.py render bc",
+                   "python tools/exp_texture_bake.py analyze",
+                   "python tools/exp_texture_bake.py analyze n5"],
+               "files": files}
+    if extra:
+        payload.update(extra)
+    p = TMP / "manifest.json"
+    p.write_text(json.dumps(payload, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    print("[manifest] %s（%d 个文件）" % (p, len(files)))
+    return p
+
+
 # ---------------------------------------------------------------- 主入口
 def main(argv=None) -> int:
-    ap = argparse.ArgumentParser(description="128A 纹理上限预烘焙实验")
-    ap.add_argument("cmd", choices=("prep", "ps", "kpp", "prebake", "render", "analyze", "all"))
+    ap = argparse.ArgumentParser(description="128A 纹理上限预烘焙实验（第五轮 152/153 复用）")
+    ap.add_argument("cmd", choices=("prep", "ps", "kpp", "prebake", "render", "analyze",
+                                    "n5kpp", "all"))
     ap.add_argument("arg", nargs="?")
     ns = ap.parse_args(argv)
     ensure_dirs()
@@ -1416,11 +2378,20 @@ def main(argv=None) -> int:
         return {"f2": ps_f2, "f4": ps_f4, "f3": ps_f3}[ns.arg]()
     if ns.cmd == "kpp":
         return build_kpps()
+    if ns.cmd == "n5kpp":
+        return n5_kpps()
     if ns.cmd == "prebake":
         return rebuild_prebake_truth()
     if ns.cmd == "render":
         return render_group(ns.arg)
     if ns.cmd == "analyze":
+        if ns.arg == "n5":
+            analyze_n5()
+            write_manifest({"task": "152-N5", "statistics": {"n5_rows": "n5_analysis.json"}})
+            return 0
+        if ns.arg == "bc":
+            analyze_bc()
+            return 0
         return analyze()
     if ns.cmd == "all":
         return 0
