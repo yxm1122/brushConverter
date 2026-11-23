@@ -6,12 +6,11 @@
 默认参数集严格取自用户手动转换的 Krita 5.x 参考预设（199 项参数，
 145 internal + 54 string），保证参数名与类型和 Krita 实际输出一致。
 
-纹理亮度/对比度有两条实现路径（见文件中部「纹理亮度/对比度：公式开关」一节）：
-  - calibrated （默认，v1.2.0 起）任务 12 拟合出的 PS 纹理前置变换的精确逆；
-  - legacy     （历史方案，v1.1.2 及更早）经验公式，可用环境变量一键回退：
-        BRUSHCONVERTER_TEXTURE_FORMULA=legacy python cli.py convert ...
-回退理由：新公式是研究产物，一旦退化必须能立刻回到旧行为。
-转正依据（A/B 掩码空间 70.75% → 0.00%）与限制见 docs/parameter-mapping.md §7.1。
+纹理亮度/对比度只有一条实现路径（v1.5.0 · 任务 135-6 删除 legacy 开关）：
+  - calibrated：任务 12 拟合出的 PS 纹理前置变换的精确逆，v1.2.0 起转正、v1.5.0 起唯一；
+    A/B 掩码空间 70.75% → 0.00% 的转正依据与限制见 docs/parameter-mapping.md §7.1。
+  旧 v1.1.2 经验公式（亮度 0.10 - PS/250、对比度两位小数）已随开关一并删除；
+  需要回退只能 git revert 后重转（发布说明登记）。
 """
 
 from __future__ import annotations
@@ -19,9 +18,7 @@ from __future__ import annotations
 import base64
 import hashlib
 import math
-import os
 import re
-import sys
 from dataclasses import dataclass
 from xml.sax.saxutils import escape, quoteattr
 
@@ -283,7 +280,7 @@ def _resources_xml(resources: list[tuple[str, str, str, bytes]]) -> str:
 
 
 # ---------------------------------------------------------------------------
-# 纹理亮度/对比度：公式开关与两条实现（任务 13）
+# 纹理亮度/对比度：calibrated 唯一路径（v1.5.0 · 任务 135-6 删除 legacy 开关）
 #
 # PS 侧真值来自任务 12 拟合（见 docs/parameter-mapping.md §7.1）：
 #   对比度中心 p = 127（0..255 尺度），因子 k = 1+C/100（C<0）或 1/(1-C/100)（C>=0）；
@@ -291,39 +288,9 @@ def _resources_xml(resources: list[tuple[str, str, str, bytes]]) -> str:
 # Krita 侧真值来自 KisTextureMaskInfo::recalculateMask()（tools/texture_mask.py 精确复刻）：
 #   mask -= brightness；mask = (mask-0.5)*contrast + 0.5；再 clamp 0..1。
 # calibrated 就是把「Krita 的亮度/对比度两个参数」反解成让 Krita 掩码等于 PS 前置掩码的值。
+# 任务 135-4：k 不再截断到 2.0（C>50 时 k>2，Krita 读取层无 clamp；125 实测 C=80 的原值
+# 直写 0.00%/max 0，失败源是转换器自己的 min(2.0,k)）；亮度仍截断 [-1,1]（Krita 滑杆域）。
 # ---------------------------------------------------------------------------
-_TEXTURE_FORMULA_ENV = "BRUSHCONVERTER_TEXTURE_FORMULA"
-_TEXTURE_FORMULA_VALUES = ("legacy", "calibrated")
-#: 默认公式：v1.2.0 起转正为 calibrated（A/B 掩码空间 0.00% vs 旧公式 70.75%）
-_TEXTURE_FORMULA_DEFAULT = "calibrated"
-#: 已经警告过的非法环境变量值（同一个非法值只提示一次，避免批量转换刷屏）
-_TEXTURE_FORMULA_WARNED: set[str] = set()
-
-
-def _texture_formula() -> str:
-    """读取纹理亮度/对比度公式开关。
-
-    - 未设置环境变量 → calibrated（默认，v1.2.0 起转正）；
-    - legacy / calibrated（忽略大小写与首尾空白）→ 原样返回
-      （legacy 是 v1.1.2 历史方案，用 BRUSHCONVERTER_TEXTURE_FORMULA=legacy 回退）；
-    - 其它非法取值（含空字符串）→ 回退默认公式 calibrated，
-      并对同一个非法取值只打印一次警告（stderr）。
-    """
-    raw = os.environ.get(_TEXTURE_FORMULA_ENV)
-    if raw is None:
-        return _TEXTURE_FORMULA_DEFAULT
-    value = raw.strip().lower()
-    if value in _TEXTURE_FORMULA_VALUES:
-        return value
-    if raw not in _TEXTURE_FORMULA_WARNED:
-        _TEXTURE_FORMULA_WARNED.add(raw)
-        print(
-            f"[警告] 环境变量 {_TEXTURE_FORMULA_ENV}={raw!r} 非法"
-            f"（只接受 {'/'.join(_TEXTURE_FORMULA_VALUES)}），"
-            f"已回退默认公式 {_TEXTURE_FORMULA_DEFAULT}。",
-            file=sys.stderr,
-        )
-    return _TEXTURE_FORMULA_DEFAULT
 
 
 def _texture_contrast_factor(ps_contrast: float) -> float:
@@ -340,24 +307,6 @@ def _texture_contrast_factor(ps_contrast: float) -> float:
     return 1.0 / (1.0 - c / 100.0)
 
 
-def _texture_brightness_legacy(ps_brightness: float) -> float:
-    """历史方案（v1.1.2，勿改）：Krita 亮度 = 0.10 - PS亮度/250，两位小数，clamp [-1,1]。
-
-    保留此函数是任务 13 的硬性要求：开关必须能一键切回旧行为。
-    """
-    brightness = 0.10 - ps_brightness / 250.0
-    brightness = max(-1.0, min(1.0, round(brightness, 2)))
-    if brightness == 0:
-        return 0.0
-    return brightness
-
-
-def _texture_contrast_legacy(ps_contrast: float) -> float:
-    """历史方案（v1.1.2，勿改）：对比度直接取 PS 中心因子，两位小数，clamp [0,2]。"""
-    contrast = max(0.0, min(2.0, round(_texture_contrast_factor(ps_contrast), 2)))
-    return contrast
-
-
 def _texture_brightness_contrast_calibrated(
     ps_brightness: float, ps_contrast: float
 ) -> tuple[float, float]:
@@ -370,21 +319,25 @@ def _texture_brightness_contrast_calibrated(
     上限 2；C<0 且 |PS 亮度| 很大时反解出的 b_k 超 [-1,1]（均属结构性失真）。
     """
     k = _texture_contrast_factor(ps_contrast)
-    c = max(-50.0, min(100.0, ps_contrast))
-    k_eff = max(0.0, min(2.0, k))
+    c = max(-50.0, min(100.0, ps_contrast))  # C 合法域 clamp（PS 滑杆 -50..100）
+    k_eff = max(0.0, k)  # 任务 135-4：删除 min(2.0, k) 截断，k 原值直写
     if k_eff <= 0.0:
-        # PS 对比度合法范围是 -50..100，k 恒 >= 0.5；这里只做防御性回退。
-        return (_texture_brightness_legacy(ps_brightness),
-                _texture_contrast_legacy(ps_contrast))
+        # PS 对比度合法范围是 -50..100，k 恒 >= 0.5；这里只做防御性中性回退。
+        return 0.0, 1.0
     center_fix = (1.0 - k_eff) / (510.0 * k_eff)
     if c < 0.0:
         brightness = center_fix - ps_brightness / (255.0 * k_eff)
     else:
         brightness = center_fix - ps_brightness / 255.0
-    brightness = max(-1.0, min(1.0, round(brightness, 3)))
+    # 精度：k<=2（C<=50，旧行为）仍保留 3 位小数（v1.2.0 起的既有精度，不改）；
+    # C>50 是 135-4 新解锁区、k 可到 1e6，3 位小数会让亮度阈值偏移 0.0005×k
+    # 个掩码级（C=100 实测 1 个 mask 值被翻到两端、max_delta 128），因此该区
+    # 按 9 位小数写，保证反解在 8-bit 掩码空间仍然成立。
+    brightness = max(-1.0, min(1.0,
+                               round(brightness, 3 if k_eff <= 2.0 else 9)))
     if brightness == 0:
         brightness = 0.0
-    contrast = max(0.0, min(2.0, round(k_eff, 3)))
+    contrast = max(0.0, round(k_eff, 3))  # 135-4：保留 max(0) 防御，删除上限 2.0
     return brightness, contrast
 
 
@@ -393,14 +346,11 @@ def texture_brightness_contrast(
 ) -> tuple[float, float]:
     """PS 纹理亮度/对比度 → Krita Texture/Pattern/Brightness、Contrast。
 
-    由环境变量 BRUSHCONVERTER_TEXTURE_FORMULA 选择实现：
-      - calibrated （默认，v1.2.0 起）任务 12 拟合公式的精确逆；
-      - legacy     （历史方案）v1.1.2 经验公式，显式设置环境变量即可回退。
-    非法取值回退默认公式（calibrated）并只警告一次。
+    v1.5.0（任务 135-6）起 calibrated 是唯一路径：旧的 legacy 分支与
+    对应的环境变量开关已删除（连变量名一起清零，grep 结果为空）；函数名保留，
+    调用方（convert.py 与既有工具）不需要改。
     """
-    if _texture_formula() == "calibrated":
-        return _texture_brightness_contrast_calibrated(ps_brightness, ps_contrast)
-    return _texture_brightness_legacy(ps_brightness), _texture_contrast_legacy(ps_contrast)
+    return _texture_brightness_contrast_calibrated(ps_brightness, ps_contrast)
 
 
 @dataclass
@@ -411,7 +361,8 @@ class TextureXml:
     # （如 tex_0123456789ab.png，保证「重名 ⇒ 同内容」；旧版是 tex_<uuid8>.png）
     pattern_filename: str
     png_bytes: bytes
-    scale: float = 1.0      # 0.01..10，1=100%
+    # 1.0=100%；s<=100 时写 s/100（不再截断）；s>100 已预缩放成 Scale=1.0（任务 135-1）
+    scale: float = 1.0
     brightness: float = 0.0
     contrast: float = 1.0
     invert: bool = False
@@ -420,6 +371,18 @@ class TextureXml:
     strength: float = 1.0   # 0..1（PS textureDepth/100）
     strength_curve: str | None = None  # "x,y;x,y;"
     strength_pressure: bool = False
+
+
+def _format_number(value: float) -> str:
+    """Krita 数值参数 → XML 文本：整数值不带小数点/指数，其余用 :g（6 位有效数字）。
+
+    v1.5.0（任务 135-4）起 Contrast 可写 k>2（最大 1e6）：`f"{value:g}"` 会输出
+    "1e+06" 这种科学计数法，Krita 的 QString::toDouble 虽然可能接受，但 XML 里
+    写纯十进制更稳；整数分支保证 1e6 → "1000000"。
+    """
+    if float(value).is_integer():
+        return str(int(value))
+    return f"{value:g}"
 
 
 def _apply_texture(params: dict[str, tuple[str, str]], tex: TextureXml) -> None:
@@ -436,13 +399,15 @@ def _apply_texture(params: dict[str, tuple[str, str]], tex: TextureXml) -> None:
     set_string("Texture/Pattern/PatternFileName", tex.pattern_filename)
     set_string("Texture/Pattern/PatternMD5Sum", md5sum)
     set_string("Texture/Pattern/PatternMD5", "")  # 留空，避免 Krita 5.0 写二进制 bug
-    set_internal("Texture/Pattern/Scale", f"{max(0.01, min(10.0, tex.scale)):g}")
-    set_internal("Texture/Pattern/Brightness", f"{tex.brightness:g}")
-    set_internal("Texture/Pattern/Contrast", f"{tex.contrast:g}")
+    # 任务 135-1：Scale 原值直写（删除 [0.01,10] 截断；>100 时 convert 已预缩放，恒为 1.0）
+    set_internal("Texture/Pattern/Scale", _format_number(tex.scale))
+    set_internal("Texture/Pattern/Brightness", _format_number(tex.brightness))
+    set_internal("Texture/Pattern/Contrast", _format_number(tex.contrast))
     set_internal("Texture/Pattern/Invert", "true" if tex.invert else "false")
     set_internal("Texture/Pattern/TexturingMode", str(tex.texturing_mode))
     set_internal("Texture/Pattern/UseSoftTexturing", "true" if tex.use_soft_texturing else "false")
-    set_internal("Texture/Strength/Value", f"{max(0.0, min(1.0, tex.strength)):g}")
+    set_internal("Texture/Strength/Value",
+                 _format_number(max(0.0, min(1.0, tex.strength))))
     # Krita 的 PressureTexture/Strength/ 是「效果强度」选项的启用开关
     # （isChecked，见 KisKritaSensorPack::read：getBool("Pressure"+id)），
     # 与压感无关：PS 纹理深度无论是否接传感器都必须打开，否则该项被整体禁用。

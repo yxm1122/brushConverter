@@ -143,46 +143,58 @@ def test_non_height_modes_strength_unchanged(blend_mode, depth):
     assert _param_value(xml, "Texture/Strength/Value") == EXPECTED_NON_HEIGHT[depth]
 
 
+
+
+
 # ---------------------------------------------------------------------------
-# 2) 压感曲线路径：Texture/Strength/commonCurve 的 0 端点用同一套换算
+# 2) 压感曲线路径：Texture/Strength/commonCurve 的 0 端点（v1.5.0 任务 135-5 改比值）
+#
+# 旧基准错在哪：v1.2.1 的这组用例要求 0 端点写绝对强度 s_m（如 depth=10、
+# Mnm=10 → 0.12）。Krita 的强度是乘性的（strength = qBound(0,1, Value×curve)），
+# 低压力端会被再乘一次 Value：d=50 差 2×、d=10 差 10×、d=100 才无误差。
+# 任务 135-5 按 126 C-9 改为写比值 s_m/s_d；旧断言把已知错误语义钉成基准，故改写。
+# 高度系 ×1.2 在比值里约掉（s_m/s_d = depth_min/depth），所以高度系与非高度系
+# 在同深度下得到同一比值。PS 侧作用点未量测（128A F-3）⇒ 只落比值、不写常数项。
 # ---------------------------------------------------------------------------
 
 
 @pytest.mark.parametrize(
-    ("blend_mode", "depth_min", "expected"),
+    ("blend_mode", "ps_depth", "depth_min", "expected_curve", "expected_value"),
     [
-        ("linearHeight", 10, "0,0.12;1,1;"),
-        ("Hght", 10, "0,0.12;1,1;"),
-        ("linearHeightPS", 83, "0,0.996;1,1;"),
-        ("linearHeight", 100, "0,1;1,1;"),     # 高度系封顶 1.0
-        ("Mul ", 10, "0,0.1;1,1;"),
-        ("Sbtr", 83, "0,0.83;1,1;"),
-        ("Sbtr", 100, "0,1;1,1;"),
+        ("linearHeight", 50, 10, "0,0.2;1,1;", "0.6"),   # s_m/s_d = 0.12/0.6
+        ("Hght", 50, 10, "0,0.2;1,1;", "0.6"),
+        ("linearHeightPS", 10, 10, "0,1;1,1;", "0.12"),  # 端点相等 → 全开
+        ("linearHeight", 100, 100, "0,1;1,1;", "1"),
+        ("Mul ", 50, 10, "0,0.2;1,1;", "0.5"),
+        ("Sbtr", 50, 10, "0,0.2;1,1;", "0.5"),
+        ("Sbtr", 10, 10, "0,1;1,1;", "0.1"),
+        ("Mul ", 50, 100, "0,1;1,1;", "0.5"),           # s_m>s_d → 夹到曲线域 1
+        ("Mul ", 0, 10, "0,1;1,1;", "0"),                # s_d=0：Value=0，端点取 1
     ],
 )
-def test_pressure_curve_endpoints_follow_same_gain(
-        blend_mode, depth_min, expected):
-    """压感路径的曲线 0 端点：高度系同样 ×1.2，非高度系保持 depth_min/100。"""
-    texture = _texture(depth=10.0, blend_mode=blend_mode,
-                       depth_min=depth_min, pressure=True)
+def test_pressure_curve_endpoints_write_ratio(
+        blend_mode, ps_depth, depth_min, expected_curve, expected_value):
+    """压感路径的曲线 0 端点 = s_m/s_d（Krita 乘性语义；126 C-9 / 135-5）。"""
+    texture = _texture(depth=float(ps_depth), blend_mode=blend_mode,
+                       depth_min=float(depth_min), pressure=True)
     tex = _texture_xml_of(texture)
-    assert tex.strength_curve == expected
+    assert tex.strength_curve == expected_curve
     xml = _xml_of(texture)
-    assert _param_value(xml, "Texture/Strength/commonCurve") == expected
+    assert _param_value(xml, "Texture/Strength/commonCurve") == expected_curve
     assert _param_value(xml, "Texture/Strength/UseCurve") == "true"
-    # 曲线路径下恒定 Value 仍是深度对应的强度（1 端点 = 1）
-    assert _param_value(xml, "Texture/Strength/Value").endswith(
-        "0.12" if blend_mode in HEIGHT_MODES else "0.1")
+    assert _param_value(xml, "Texture/Strength/Value") == expected_value
 
 
 def test_pressure_curve_capped_at_one_for_height():
-    """高度系曲线 0 端点同样受 1.0 上限约束，不会写出 1.2。"""
+    """高度系曲线 0 端点同样受曲线域 1.0 上限约束（比值 >=1 时夹到 1，不会写出 1.2）。"""
     tex = _texture_xml_of(_texture(depth=100.0, depth_min=100.0,
                                    pressure=True, blend_mode="linearHeight"))
     assert tex.strength_curve == "0,1;1,1;"
     assert "0,1;1,1;" in _xml_of(_texture(depth=100.0, depth_min=100.0,
-                                          pressure=True,
-                                          blend_mode="linearHeight"))
+                                          pressure=True, blend_mode="linearHeight"))
+
+
+
 
 
 # ---------------------------------------------------------------------------

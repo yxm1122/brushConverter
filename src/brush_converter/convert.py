@@ -87,16 +87,18 @@ def _texture_strength(depth: float, blend_mode: str) -> float:
 
 
 def _texture_strength_min(depth_min: float, blend_mode: str) -> float:
-    """PS 压感→深度曲线最小值（textureDepthDynamics.Mnm）→ 曲线 0 端点强度。
+    """PS 压感→深度曲线最小值（textureDepthDynamics.Mnm）→ 低压力端**绝对强度**。
 
-    压感路径必须与恒定路径用同一套换算（含高度系 ×1.2 与封顶），否则曲线
-    两端口径不一致：0 端点会低估强度，渲染结果与 §17 的实测对不上。
+    与恒定路径同一套换算（含高度系 ×1.2 与封顶），保证曲线两端口径一致。
+    v1.5.0（任务 135-5）起它只作为比值的分子：Krita 的强度是乘性的
+    （strength = qBound(0, 1, Value × curve)），低压力端会被再乘一次 Value，
+    所以曲线 0 端点必须写 s_m/s_d 而不是 s_m（见 _texture_xml）。
     """
     return _texture_strength(depth_min, blend_mode)
 
 
-def _texture_png(texture: TextureSettings) -> bytes:
-    """纹理位图 → 内嵌 PNG 字节（RGB 或灰度，像素数据逐字节不变）。
+def _texture_png_array(img: np.ndarray) -> bytes:
+    """蒙版数组 → 内嵌 PNG 字节（RGB 或灰度，像素数据逐字节不变）。
 
     保存时追加一个只含元数据的 tEXt 块（keyword=brushconverter，
     内容=sha256=<像素数组 sha256 hex>），像素数据一字不动。两个实测坑：
@@ -109,8 +111,8 @@ def _texture_png(texture: TextureSettings) -> bytes:
     为什么每次都加、而不是只在「撞车时」加：转换器不知道接收方 Krita 图案库里
     有什么文件，无法提前判断是否会撞；固定加标记才能保证产物可复现、
     「重名 ⇒ 同内容」，也便于事后用 tEXt 里的像素哈希核对同一纹理。
+    v1.5.0（任务 135-1）：预缩放后的位图同样走这里，标记与内容哈希都按**新字节**派生。
     """
-    img = texture.image
     if img is None:
         raise ValueError("纹理位图不能为空")
     pixels = np.ascontiguousarray(img)
@@ -127,7 +129,81 @@ def _texture_png(texture: TextureSettings) -> bytes:
     return buf.getvalue()
 
 
-def _texture_xml(bp: BrushPreset) -> TextureXml | None:
+def _texture_png(texture: TextureSettings) -> bytes:
+    """纹理设置 → 内嵌 PNG 字节（既有回归用例沿用的入口，等价于 _texture_png_array）。"""
+    img = texture.image
+    if img is None:
+        raise ValueError("纹理位图不能为空")
+    return _texture_png_array(img)
+
+
+def _prescale_texture_image(img: np.ndarray, scale_pct: float) -> np.ndarray | None:
+    """PS 纹理缩放核：源对齐周期双线性预缩放到 round(边长 × s/100)（任务 135-1）。
+
+    依据 128 实验 §2.2 / §4：PS 的重采样是「源坐标 = 目标 i × 输入/输出、无 0.5
+    相位偏移、越界按图案周期回绕」，Krita 的 Qt 缩放是中心对齐 —— 两者差
+    0.5(k-1) 画布 px 的相位，真实高频纹理上造成 90%+ 超阈像素。转换侧用 PS 同核
+    预缩放后写 Texture/Pattern/Scale=1.0，Krita 不再重采样 ⇒ 24/24 = 0.00%/max≤1。
+    本函数是 tools/exp_texture_scale.py::prescale_gray 的移植（约 20 行 numpy）：
+
+    - 目标边长 = round(输入边长 × s/100)（高/宽各算各的，方纹理即 128 的口径）；
+    - 目标像素 i 的源坐标 = i × in/out（**不加 0.5**，这是与 Qt 的关键差别）；
+    - 负坐标/越界按图案尺寸取模回绕（等价「先重采样一片周期图案」）；
+    - 双线性后 8-bit 四舍五入；RGB 逐通道同核（线性核与灰度换算可交换）。
+    s≤100 不走这里（128 §6.1 的 <100% 核未测，保持原路径）。目标尺寸恰好等于
+    输入尺寸时返回 None（调用方保持原路径，避免无意义地改字节）。
+    """
+    if img.ndim not in (2, 3):
+        raise ValueError(f"纹理位图必须是二维灰度或三维 RGB，实际 shape={img.shape}")
+    factor = float(scale_pct) / 100.0
+    if factor <= 1.0:
+        # s<=100 不预缩放：128 §6.1 的 <100% 核未测，保持原路径（由调用方判 scale>100）
+        return None
+    ih, iw = img.shape[:2]
+    oh = max(1, int(round(ih * factor)))
+    ow = max(1, int(round(iw * factor)))
+    if (oh, ow) == (ih, iw):
+        return None
+    src_y = np.arange(oh, dtype=np.float64) * (ih / float(oh))
+    src_x = np.arange(ow, dtype=np.float64) * (iw / float(ow))
+    y0 = np.floor(src_y).astype(np.int64)
+    x0 = np.floor(src_x).astype(np.int64)
+    wy = (src_y - y0)[:, None]
+    wx = (src_x - x0)[None, :]
+    y0m, y1m = np.mod(y0, ih), np.mod(y0 + 1, ih)
+    x0m, x1m = np.mod(x0, iw), np.mod(x0 + 1, iw)
+
+    def _resample_plane(plane: np.ndarray) -> np.ndarray:
+        p = plane.astype(np.float64)
+        top = p[y0m][:, x0m] * (1.0 - wx) + p[y0m][:, x1m] * wx
+        bot = p[y1m][:, x0m] * (1.0 - wx) + p[y1m][:, x1m] * wx
+        return top * (1.0 - wy) + bot * wy
+
+    if img.ndim == 2:
+        out = _resample_plane(img)
+    else:
+        out = np.stack([_resample_plane(img[:, :, c]) for c in range(img.shape[2])],
+                       axis=2)
+    return np.clip(np.rint(out), 0.0, 255.0).astype(np.uint8)
+
+
+def _tip_is_full_coverage(tip: np.ndarray | None) -> bool:
+    """满覆盖笔尖判定（任务 135-2）：base≡1 ⇔ 笔尖位图**每个像素都是墨**。
+
+    极性（130 §三实测，勿猜）：Krita 5.3.3 的 L 模式 png_brush「深=墨、白 255=透明」；
+    转换链里 samples.py 的采样蒙版与 hardness_tip 生成的 stored 位图同为此约定
+    （0=墨、255=透明），所以「满覆盖」= 位图全 0。
+    128A §一 的 hard 档就是这种笔尖：PS 无纹理参考图 40000/40000 px 全 255（base≡1），
+    常量偏置（Strength=1.0 + 亮度 ±1/255）在它上面 3/3 = 0.00%/max 0。
+    只要存在软边/抗锯齿（1..254 的中间值）或透明区（255），就不算满覆盖：
+    128A 实测这类 base<1 笔尖偏置后仍 10%–40% 超阈，属登记残差、不下发偏置。
+    """
+    if tip is None or tip.size == 0:
+        return False
+    return bool(np.all(tip == 0))
+
+
+def _texture_xml(bp: BrushPreset, full_coverage: bool | None = None) -> TextureXml | None:
     """把 Photoshop 纹理参数映射为 Krita 纹理选项（无位图时返回 None）。
 
     映射目标是 Krita 模式合成后的最终效果；校准常数来自
@@ -137,47 +213,86 @@ def _texture_xml(bp: BrushPreset) -> TextureXml | None:
     - 高度系强度 ×1.2（抵消 PS W=12 vs Krita W=10，见 _texture_strength()）；
     - 图案资源名由内嵌字节的 sha256 派生 + 内嵌 PNG 追加 tEXt 标记
       （Krita 5.3.3 的「同名串用」与「同 md5 静默禁用」两个静默坑）。
+
+    v1.5.0（任务 135）本函数承载五条落地：
+    - 135-1：scale>100 先用 PS 同核预缩放（_prescale_texture_image）再内嵌，
+      写 Scale=1.0；s≤100 保持原路径 Scale=s/100；两处 Scale 截断全部解除。
+    - 135-2：hardMix + 满覆盖笔尖（base≡1）+ 恒定深度 → Strength=1.0 且
+      Brightness 偏置 ±1/255（符号随 Invert）；base<1 不下发，登记 10%–40% 残差。
+    - 135-3：亮度越界区（C=-50 且 |PS 亮度|>127）只登记残差、不改运行时路径。
+    - 135-4：对比度 k 原值直写（不再 min(2.0) 截断，见 preset_xml）。
+    - 135-5：minimumDepth 的曲线 0 端点写比值 s_m/s_d（Krita 强度是乘性的）。
     """
     tex = bp.texture
     if tex is None or tex.image is None:
         return None
+    if full_coverage is None:
+        # 直接调用（既有回归用例）时按笔尖位图就地判定；生产路径由 _render_preset
+        # 传入**实际内嵌**的那张位图（计算笔刷是 hardness_tip 生成的 stored）。
+        full_coverage = _tip_is_full_coverage(bp.tip_gray)
+    # --- 135-1：scale>100 → 预缩放内嵌 PNG + Scale=1.0（128 实测 24/24 达标）---
+    scale_pct = float(tex.scale)
+    image = tex.image
+    preset_scale = scale_pct / 100.0
+    if scale_pct > 100.0:
+        prescaled = _prescale_texture_image(image, scale_pct)
+        if prescaled is not None:
+            image = prescaled
+            preset_scale = 1.0
     # 图案资源名由「内嵌字节的 sha256」派生，而不是 PS 的 uuid：
     # Krita 5.3.3 遇到与图案库同名的资源时会**串用别人的图案**（实测：
     # tex_<uuid8>.png 与库内同名图案撞车，不同字节渲染出同一张错图，
     # 见实验-Krita侧-报告 §8.2）。用内容哈希命名可以保证「重名 ⇒ 同内容」，
     # 且同一输入两次转换得到同一名字与同一字节（确定性）。
     # 为什么不能只改名字：md5 去重坑仍然存在（同 md5 内嵌纹理被静默禁用），
-    # 必须同时给内嵌字节加 tEXt 标记，见 _texture_png()。
-    png_bytes = _texture_png(tex)
+    # 必须同时给内嵌字节加 tEXt 标记，见 _texture_png_array()。
+    # 135-1 的预缩放字节同样走这条派生规则：哈希与资源名都按**新字节**变，
+    # 绝不写死旧值（否则不同内容会共用同一个 tex_<sha12> 名）。
+    png_bytes = _texture_png_array(image)
     filename = f"tex_{hashlib.sha256(png_bytes).hexdigest()[:12]}.png"
     # Krita 源码的 KisTextureMaskInfo 直接执行：
     #   maskValue -= brightness
     #   maskValue = ((maskValue - 0.5) * contrast) + 0.5
-    # 因此 PS 纹理亮度/对比度 → Krita 两个参数的换算集中在
-    # preset_xml.texture_brightness_contrast() 里，由环境变量
-    # BRUSHCONVERTER_TEXTURE_FORMULA 选择路径：
-    #   calibrated （默认，v1.2.0 起）任务 12 拟合公式的精确逆；
-    #   legacy     （历史方案）v1.1.2 经验公式（亮度 0.10 - PS/250，对比度 PS 中心因子）。
+    # 亮度/对比度只有 calibrated 一条路径（v1.5.0 删除 legacy 开关，任务 135-6）；
     # 公式、推导与限制见 docs/parameter-mapping.md 第 7 节。
     brightness, contrast = texture_brightness_contrast(tex.brightness, tex.contrast)
+    texturing_mode = _TEXTURING_MODE.get(tex.blend_mode, 0)
+    strength = _texture_strength(tex.depth, tex.blend_mode)
+    # --- 135-2：hardMix + 满覆盖 + 恒定深度：Strength=1.0 + 亮度 ±1/255 ---
+    # 依据 128A §二：Krita hardMix 是 (src + dst*s > 1)，PS 在 base≡1 时对 8-bit
+    # 边界用 >=（实测 PS alpha 全 255）；s=1 时阈值降到 0，±1/255 把严格大于补成
+    # 等价于 >= ⇒ 3/3 = 0.00%/max 0（原路径 95.573%/52.377%/0.975%）。
+    # 符号随 Invert：Krita 的反相在亮度之后（src=1-(m-b)），要抬高最终掩码
+    # 1 个 8-bit LSB，Invert=true 时 b 取 +1/255、false 时取 -1/255。
+    # 压感路径（Strength 随压力变）下偏置不再成立（阈值随 s 变），本轮不下发。
+    if texturing_mode == 10 and full_coverage and not tex.pressure:
+        strength = 1.0
+        brightness = brightness + (1.0 / 255.0 if tex.invert else -1.0 / 255.0)
+    strength_curve = None
+    if tex.pressure:
+        # --- 135-5：0 端点写比值 s_m/s_d（Krita 乘性：strength = Value × curve）---
+        # 旧实现写绝对值 s_m，低压力端会被再乘一次 Value：d=50 差 2×、d=10 差 10×、
+        # d=100 无误差。PS 侧作用点未量测（128A F-3），所以本轮只落比值、
+        # **不写死乘/减模式的常数项**，也不宣称「已达标」。
+        s_d = _texture_strength(tex.depth, tex.blend_mode)
+        s_m = _texture_strength_min(tex.depth_min, tex.blend_mode)
+        ratio = 1.0 if s_d <= 0.0 else min(1.0, max(0.0, s_m / s_d))
+        strength_curve = f"0,{ratio:g};1,1;"
     return TextureXml(
         pattern_filename=filename,
         png_bytes=png_bytes,
-        scale=max(0.01, min(10.0, tex.scale / 100.0)),
+        scale=preset_scale,
         brightness=brightness,
         contrast=contrast,
         invert=tex.invert,
-        texturing_mode=_TEXTURING_MODE.get(tex.blend_mode, 0),
+        texturing_mode=texturing_mode,
         # Krita 文档明确指出：除 Height/Linear Height 外，Soft Texturing
         # 更接近 Photoshop；PS 专用 Height 模式本身不启用该优化。
         use_soft_texturing=(tex.blend_mode not in _HEIGHT_BLEND_MODES),
         # v1.2.1：高度系 ×1.2 且封顶 1.0；非高度系保持 depth/100 不动。
-        strength=_texture_strength(tex.depth, tex.blend_mode),
-        # 压感路径同样用 _texture_strength_min（高度系 ×1.2），否则两端口径不一。
-        strength_curve=(
-            f"0,{_texture_strength_min(tex.depth_min, tex.blend_mode):g};1,1;"
-            if tex.pressure else None
-        ),
+        # 135-2 的满覆盖 hardMix 例外（Strength 强制 1.0，见上）。
+        strength=strength,
+        strength_curve=strength_curve,
         strength_pressure=tex.pressure,
     )
 
@@ -323,6 +438,8 @@ def _render_preset(bp: BrushPreset, index: int) -> tuple[str, str, np.ndarray]:
     """渲染单个预设 → (文件名, 预设 XML, 预览 RGBA)。"""
     if bp.tip_gray is None and not bp.is_computed:
         raise ValueError(f"{bp.name}: 无笔尖位图")
+    # 135-2：满覆盖判定必须基于**实际内嵌**的那张笔尖位图（见 _tip_is_full_coverage）。
+    full_coverage = False
 
     if bp.is_computed:
         # v1.5.0（任务 133，132 落地清单 133-1/133-2/133-3）：计算笔刷由 auto_brush
@@ -336,6 +453,7 @@ def _render_preset(bp: BrushPreset, index: int) -> tuple[str, str, np.ndarray]:
         # 自检（130 verify_tip 口径）：正方形 + 外圈整圈 255，失败即报错，
         # 绝不静默产出「极性写反/带透明边框」的位图（130 首轮 5 组作废的教训）。
         verify_generated_tip(generated)
+        full_coverage = _tip_is_full_coverage(generated.stored)
         tip_png = _png_bytes(generated.stored)
         res_name = _safe_filename(bp.name, index).rsplit(".", 1)[0]
         # scale=1.0 → 预设尺寸字段 = 位图边长 = PS 足印；间距按「标称基准 / 位图边长」
@@ -350,6 +468,7 @@ def _render_preset(bp: BrushPreset, index: int) -> tuple[str, str, np.ndarray]:
         # 与映射时的 max(width,height) 基准保持一致，内嵌正方形笔尖。
         # 间距基准补偿在 _sampled_brush_def 里做（spacing × 短边/长边）。
         square_tip = _square_tip(bp.tip_gray)
+        full_coverage = _tip_is_full_coverage(square_tip)
         tip_png = _png_bytes(square_tip)
         res_name = _safe_filename(bp.name, index).rsplit(".", 1)[0]
         brush_def = _sampled_brush_def(res_name, tip_png, bp)
@@ -370,7 +489,7 @@ def _render_preset(bp: BrushPreset, index: int) -> tuple[str, str, np.ndarray]:
         scatter_pressure=bp.scatter_pressure,
         scatter_both_axes=bp.scatter_both_axes,
         scatter_amount=bp.scatter_amount,
-        texture=_texture_xml(bp),
+        texture=_texture_xml(bp, full_coverage=full_coverage),
     )
     return _safe_filename(bp.name, index), xml, preview
 
