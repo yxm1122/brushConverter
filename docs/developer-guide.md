@@ -40,7 +40,7 @@
 
 - [验收报告索引](<验收报告/INDEX.md>)与[研究报告索引](<研究报告/INDEX.md>)由原生成器维护；报告是“当时测出了什么”，不是“现在已通过什么”。不重排旧编号、不重写旧数据；勘误须说明原结论、失效范围、根因和新证据。
 - [验收归档目录](<验收报告/归档/>)保留三层验收记录；生成命令及退出码口径见[全量验收说明](<全量验收说明.md>)。历史实验图、JSON、kpp和二进制不因目录整齐而搬迁。
-- **本轮两份索引只读**：现有生成器还会计入本地未跟踪报告。验收索引不同步先保留失败，等文档检查工具补公开可见性，再由文档汇合阶段统一生成；不能把未实现的过滤参数写成可用命令。只读基线命令见§9。
+- **公开索引使用已实现的 `--tracked-only` 模式**：只收录顶层、Git已跟踪且未声明为内部/仅本地/预写/原始证据的报告；本地报告不公开。两份索引已在文档汇合阶段由主会话串行生成，日常只读检查见§9。默认旧模式仍保留，不用于维护这两份公开INDEX；可见性过滤不等于隐私门或发布批准。
 
 ### 0.4 常见接手路径
 
@@ -588,11 +588,12 @@ TEMP只约束运行期临时文件，不等于所有工具已隔离：先读工�
 ### 9.2 本轮可执行的只读检查
 
 
-a. 索引检查只是基线，不在此阶段重生成；验收报告索引若因本地未跟踪报告失败，如实留待公开可见性过滤与汇合，不能改索引凑绿。
+a. 文档合同与公开索引检查均已实现。以下命令只读：索引必须显式使用 `--tracked-only`，否则会按旧模式计入本地报告并与公开索引不一致。若检查失败先保留原始报错、区分可见性与真实断链；只有获准的任务主会话可用同参数去掉 `--check` 串行重生成，禁止手改生成物或削弱规则凑绿。
 
 ```powershell
-& $PY -B tools/render_archive_index.py --check
-& $PY -B tools/render_archive_index.py --dir docs/研究报告 --md docs/研究报告/INDEX.md --check
+& $PY -B tools/check_docs.py --check
+& $PY -B tools/render_archive_index.py --tracked-only --check
+& $PY -B tools/render_archive_index.py --dir docs/研究报告 --md docs/研究报告/INDEX.md --tracked-only --check
 & $PY -B tools/render_matrix_md.py --check
 & $PY -B tools/check_matrix.py
 & $PY -B tools/render_mode_table.py --check

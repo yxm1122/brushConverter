@@ -1,12 +1,14 @@
 # brushConverter v1.6.0（候选 · 待发布，未发布）
 
+This v1.6.0 candidate is not released and records changes after v1.5.0, including out-of-range texture brightness pre-baking and the single random source correction for rotation jitter. Existing outputs must be reconverted as described below; this is not a download or release announcement.
+
 > **状态：待发布（v1.6.0 候选，未发布）。** 本段登记 v1.5.0 之后工作区里的待发布变更；发布日期、tag 与 Release 均未确定，正式发布前以仓库现状及本文件最终修订为准。
 
 **升级必读：本轮有两处产物语义变化，旧 `.kpp` / `.bundle` 必须重转**：① 纹理亮度越界区改为预烘焙（命中区纹理字段失去 PS 可编辑语义）；② 旋转抖动 j<50 幅度修正（旧产物幅度约为 PS 的 2 倍）。
 
 ## 主要变化
 
-- **纹理亮度越界区改为预烘焙（任务 153）**：命中判据 = calibrated 反解的未截断亮度 `|b_k|>1`（等价「C=−50 且 PS 亮度绝对值 >127」）；PS 亮度/对比度/反相按 PS 8bit 链（C<0 先对比度后亮度 / C≥0 先亮度后对比度）烘进内嵌纹理 PNG，Krita 三字段写中性值 B=0、C=1、Invert=false。端到端实渲 **12/12 = 0.000%/max0–1**（改前同批 8/12 超阈、最大 61.125%/max23）；非命中区行为不变。
+- **纹理亮度越界区改为预烘焙（任务 153）**：命中判据 = calibrated 反解的未截断亮度 `|b_k|>1`（「C=−50 且 PS 亮度绝对值 >127」仅是旧实验切片，不是任意对比度的等价条件）；PS 亮度/对比度/反相按 PS 8bit 链（C<0 先对比度后亮度 / C≥0 先亮度后对比度）烘进内嵌纹理 PNG，Krita 三字段先写中性值 B=0、C=1、Invert=false；hardMix 满覆盖且无深度压感的专门分支随后令 B=−1/255。边界与代价统一见[映射参考§7.1](<../docs/parameter-mapping.md#texture-bc-current>)。端到端实渲 **12/12 = 0.000%/max0–1**（改前同批 8/12 超阈、最大 61.125%/max23）；非命中区行为不变。
 - **代价（使用者已接受）**：命中区笔刷的 Krita「纹理-亮度/对比度/反相」不再对应 PS 语义（再调会二次叠加）；每 (b,c,invert) 组合一份纹理资源（本组约 1.6–12 KB/张），资源名/内容哈希/MD5 按新字节派生。
 - **旋转抖动 j<50 幅度修正（任务 149A）**：`RotationSensor` 只保留 fuzzy 一个加法随机源（删除 fuzzystroke；两者都被 Krita 求和，旧写法使随机跨度=2×360°×R，PS 为 360°×R）。改后两批独立实机 j=25/50/100 相对 PS 的最大相对差 **4.06%**（≤10%）、两批复现 ≤4.73%（≤5%），对照改前 j=25 为 **+38.20%**；j≥50 两侧都铺满整圈、视觉等价，但随机序列不同；`bVTy=6/7/8` 且 `jitter>0` 同机制减半（未单独实机重测）。
 - **矩阵 14 → 12（任务 156）**：`Mnm`（146：双端 0.00%/max_delta 1）与 `Rndn`（150：椭圆轴比误差 0.37%–1.34%）由「需校准」改「可映射」；其余 12 行维持「需校准」并在矩阵写清构造性理由与归属；`jitter` 的 UI 可见性由「未定」改「有」（`形状动态/角度抖动`）。矩阵总行数仍 137、八栏结构不变。
