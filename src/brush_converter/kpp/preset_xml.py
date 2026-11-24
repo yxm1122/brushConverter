@@ -401,6 +401,35 @@ def texture_brightness_contrast(
     return _texture_brightness_contrast_calibrated(ps_brightness, ps_contrast)
 
 
+def texture_brightness_truncation(
+    ps_brightness: float, ps_contrast: float
+) -> dict[str, float | bool]:
+    """关闭“亮度越界预烘焙”时，写入 Krita 原生字段的截断量（任务168）。
+
+    现行的 calibrated 闭式解把亮度截断到 Krita 域 [-1,1]（滑杆可表达范围）。
+    开启烘焙时，PS 亮度/对比度/反相直接烘进像素、字段写中性值，所以没有截断；
+    关闭烘焙时必须保留字段，于是要把“PS 原值 → 实际写值”的差明确告诉用户，
+    不能把截断后的字段当成 PS 语义完整恢复。
+
+    返回键：
+    - raw：闭式解未截断值（Krita 亮度单位，±1 = 全黑/全白阈值）；
+    - written：实际写入 Texture/Pattern/Brightness 的值（已 round 并截断）；
+    - delta：written - raw（含 3/9 位小数舍入）；
+    - truncated：raw 是否超出 [-1,1]（= B10 越界区）。
+
+    本函数只做只读计算，不改写任何字段；边界由任务168 定向测试钉住
+    （C=−50 时 b=±127 不截断、b=±128 截断）。
+    """
+    raw = _texture_brightness_calibrated_raw(ps_brightness, ps_contrast)
+    written, _contrast = texture_brightness_contrast(ps_brightness, ps_contrast)
+    return {
+        "raw": raw,
+        "written": written,
+        "delta": written - raw,
+        "truncated": abs(raw) > 1.0,
+    }
+
+
 @dataclass
 class TextureXml:
     """Krita 纹理选项所需的数据（由 convert 从 TextureSettings 组装）。"""

@@ -5,6 +5,7 @@ from __future__ import annotations
 import base64
 import hashlib
 import io
+import math
 import re
 import struct
 import xml.etree.ElementTree as ET
@@ -16,6 +17,28 @@ from PIL import Image, PngImagePlugin
 
 from . import __version__
 from .abr import AbrFile
+from .export_options import (
+    ACTUAL_ALTERNATIVE,
+    ACTUAL_APPLIED,
+    ACTUAL_LABELS,
+    ACTUAL_NOT_APPLICABLE,
+    ACTUAL_PENDING_ALTERNATIVE,
+    SUMMARY_EVIDENCE_CONVERSION,
+    SWITCH_BAKE_TEXTURE_BC,
+    SWITCH_IDS,
+    SWITCH_INFO,
+    SWITCH_PRESCALE_TEXTURE,
+    SWITCH_RASTERIZE_COMPUTED,
+    ExportOptionState,
+    PresetIdentity,
+    PresetOptionRecord,
+    ProcessingSummary,
+    SwitchRecord,
+    preset_content_digest,
+    source_digest_of_file,
+    switch_applicability,
+)
+from .hardness_tip import build_tip, verify_generated_tip
 from .kpp import TextureXml, build_preset_xml, write_bundle, write_kpp
 from .kpp.bundle import (
     BundleVerifyResult,
@@ -28,8 +51,8 @@ from .kpp.preset_xml import (
     _texture_contrast_factor,
     texture_bc_out_of_range,
     texture_brightness_contrast,
+    texture_brightness_truncation,
 )
-from .hardness_tip import build_tip, verify_generated_tip
 from .mapping import _TEXTURING_MODE, BrushPreset, TextureSettings, map_presets
 
 
@@ -99,6 +122,215 @@ def _texture_strength_min(depth_min: float, blend_mode: str) -> float:
     所以曲线 0 端点必须写 s_m/s_d 而不是 s_m（见 _texture_xml）。
     """
     return _texture_strength(depth_min, blend_mode)
+
+
+# ---------------------------------------------------------------------------
+# 任务168：三项“牺牲可编辑性”处理的受控替代路径
+#
+# 背景：任务167 冻结了逐支身份与三开关的 applicable/enabled/actual 三层记录。
+# 本任务只把“关闭且适用”接到转换：开启/不适用时完全沿用现行处理（开工基线
+# 逐字节一致）；关闭时走下面三条独立路径，并把真实发生的处理与代价写进摘要。
+#
+# 纪律（逐条对应任务书）：
+#   1. 默认（plan=None 或三开关全开）不新增任何像素运算，不触发无意义烘焙；
+#   2. 原生替代分支是独立实现（_native_computed_brush_def + 结构自检），
+#      不把研究/回归用的 _computed_brush_def 当生产路径；
+#   3. 预缩放关闭 = 保留源纹理字节 + 原生 Scale；烘焙关闭 = 保留可调字段并
+#      明写截断，不偷偷换成另一条烘焙链。
+# ---------------------------------------------------------------------------
+
+_SWITCH_SUMMARY_WORDS: dict[str, tuple[str, str]] = {
+    SWITCH_RASTERIZE_COMPUTED: ("实际位图化", "原生可编辑"),
+    SWITCH_PRESCALE_TEXTURE: ("实际预缩放", "保留源纹理"),
+    SWITCH_BAKE_TEXTURE_BC: ("实际烘焙", "未烘焙（保留原生字段）"),
+}
+
+#: 现行处理（开关开启）的固定代价说明。默认路径必须与 167 开工基线一致，
+#: 所以这里只写文字，不参与任何数值计算。
+_APPLIED_REASONS: dict[str, str] = {
+    SWITCH_RASTERIZE_COMPUTED: (
+        "现行处理：按硬度剖面生成采样笔尖位图；代价=fade/硬度在 Krita 不可再调，"
+        "尺寸字段=PS 实际足印。"
+    ),
+    SWITCH_PRESCALE_TEXTURE: (
+        "现行处理：用 PS 同核预缩放内嵌 PNG 并写 Scale=1.0；"
+        "代价=图案资源不再是源尺寸，Scale 字段固定为 1。"
+    ),
+    SWITCH_BAKE_TEXTURE_BC: (
+        "现行处理：亮度/对比度/反相烘进纹理像素并写中性字段；"
+        "代价=该笔纹理的亮度/对比度/反相在 Krita 里不再有 PS 语义。"
+    ),
+}
+
+
+@dataclass(frozen=True)
+class ConversionSwitches:
+    """单支笔刷的三项有效勾选（值来自 ExportOptionState 或测试/CLI 显式输入）。"""
+
+    rasterize_computed: bool = True
+    prescale_texture: bool = True
+    bake_texture_bc: bool = True
+
+    def __post_init__(self) -> None:
+        for field_name in ("rasterize_computed", "prescale_texture", "bake_texture_bc"):
+            if type(getattr(self, field_name)) is not bool:
+                raise TypeError(f"{field_name} 必须是布尔（True/False）")
+
+    def enabled(self, switch_id: str) -> bool:
+        if switch_id == SWITCH_RASTERIZE_COMPUTED:
+            return self.rasterize_computed
+        if switch_id == SWITCH_PRESCALE_TEXTURE:
+            return self.prescale_texture
+        if switch_id == SWITCH_BAKE_TEXTURE_BC:
+            return self.bake_texture_bc
+        raise ValueError(f"未知开关 ID {switch_id!r}；冻结名单只有 {SWITCH_IDS}")
+
+
+#: 默认三开关：全部按现行外观优先处理（与任务167 的条件默认一致）。
+DEFAULT_CONVERSION_SWITCHES = ConversionSwitches()
+
+
+@dataclass(frozen=True)
+class SwitchOutcome:
+    """一项开关在**这一次真实渲染**里的结果（不是勾选快照）。"""
+
+    switch_id: str
+    applicable: bool
+    enabled: bool
+    actual: str
+    actual_reason: str
+    limited: bool = False
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "switch_id": self.switch_id,
+            "applicable": self.applicable,
+            "enabled": self.enabled,
+            "actual": self.actual,
+            "actual_reason": self.actual_reason,
+            "limited": self.limited,
+        }
+
+
+@dataclass(frozen=True)
+class PresetPlan:
+    """一支笔刷渲染前的处理计划；由 _render_preset 原样执行并写入摘要。"""
+
+    outcomes: tuple[SwitchOutcome, ...]
+    rasterize_effective: bool
+    prescale_effective: bool
+    bake_effective: bool
+    native_tip: bool
+
+    def outcome(self, switch_id: str) -> SwitchOutcome:
+        for item in self.outcomes:
+            if item.switch_id == switch_id:
+                return item
+        raise ValueError(f"未知开关 ID {switch_id!r}")
+
+    @property
+    def limited_switches(self) -> tuple[str, ...]:
+        return tuple(item.switch_id for item in self.outcomes if item.limited)
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "switches": {item.switch_id: item.to_dict() for item in self.outcomes},
+            "rasterize_effective": self.rasterize_effective,
+            "prescale_effective": self.prescale_effective,
+            "bake_effective": self.bake_effective,
+            "native_tip": self.native_tip,
+            "limited_switches": list(self.limited_switches),
+        }
+
+
+def _alternative_reason(bp: BrushPreset, switch_id: str) -> tuple[str, bool]:
+    """关闭一个适用开关后的中文代价说明；返回 (说明, 是否标受限)。"""
+    if switch_id == SWITCH_RASTERIZE_COMPUTED:
+        hardness = "50" if bp.hardness is None else f"{float(bp.hardness):g}"
+        return (
+            "已走原生 auto_brush：直径/间距/角度/圆度/硬度可在 Krita 调节。"
+            f"代价=硬度几何不同：Krita 的 fade 只作用在 1.00R 以内，PS 的软边会"
+            "伸出标称半径（130 实测 h0 过渡带 −19.81%、h50 +22.63%）；"
+            f"尺寸字段=标称直径（当前硬度 {hardness}% 时），不是 PS 实际足印；"
+            "hardMix 满覆盖偏置不下发。",
+            True,
+        )
+    texture = bp.texture
+    if texture is None:
+        return ("已保留原生字段（无纹理位图）。", False)
+    if switch_id == SWITCH_PRESCALE_TEXTURE:
+        native_scale = float(texture.scale) / 100.0
+        note = (
+            "已保留源纹理字节与原生缩放字段 Scale="
+            f"{native_scale:g}。代价=Krita 的 Qt 重采样与 PS 不同"
+            "（150%/200% 实测相对残差 22%/32%），外观可能有差；图案不再预缩放。"
+        )
+        if native_scale > 10.0:
+            note += (
+                " 注意：该 Scale 超出旧转换器曾按 10 截断的上界，"
+                "Krita 是否截断待 187 实机核验。"
+            )
+        return (note, native_scale > 10.0)
+    # SWITCH_BAKE_TEXTURE_BC：保留字段，但亮度反解可能超出 Krita 域
+    truncation = texture_brightness_truncation(texture.brightness, texture.contrast)
+    raw = float(truncation["raw"])
+    written = float(truncation["written"])
+    truncated = bool(truncation["truncated"])
+    note = (
+        "已保留 Krita 原生亮度/对比度/反相字段（亮度按 Krita 域 [-1,1] 截断："
+        f"反解 {raw:.4f} → 写 {written:.4f}）。"
+        "代价=PS 亮度越界区无法用 Krita 字段完全表达；152 实测掩码残差"
+        " 8/12 超阈、最大 61.125%/max23。本轮不烘焙，也不换成另一种烘焙链。"
+    )
+    return (note, truncated)
+
+
+def plan_preset(bp: BrushPreset, switches: ConversionSwitches | None = None) -> PresetPlan:
+    """按源事实与勾选计算一支笔刷的处理计划（纯函数，不做像素运算）。
+
+    - 不适用项一律 actual=not_applicable，勾选记录为 False（不适用不可强开；
+      勾选侧由 ExportOptionState 拒绝 true，这里只做防御性归零）；
+    - 适用且勾选 → applied（现行处理）；适用但未勾选 → alternative；
+    - alternative 的 limited=True 表示“字段可以改，但编辑含义/可表达范围
+      已与 PS 不同”，摘要必须显示“受限”，不得写成完整恢复。
+    """
+    chosen = DEFAULT_CONVERSION_SWITCHES if switches is None else switches
+    outcomes: list[SwitchOutcome] = []
+    effective: dict[str, bool] = {}
+    for switch_id in SWITCH_IDS:
+        applicability = switch_applicability(bp, switch_id)
+        enabled = bool(applicability.applicable and chosen.enabled(switch_id))
+        if not applicability.applicable:
+            actual = ACTUAL_NOT_APPLICABLE
+            reason = applicability.reason
+            limited = False
+            enabled = False
+        elif enabled:
+            actual = ACTUAL_APPLIED
+            reason = _APPLIED_REASONS[switch_id]
+            limited = False
+        else:
+            actual = ACTUAL_ALTERNATIVE
+            reason, limited = _alternative_reason(bp, switch_id)
+        effective[switch_id] = enabled
+        outcomes.append(
+            SwitchOutcome(
+                switch_id=switch_id,
+                applicable=applicability.applicable,
+                enabled=enabled,
+                actual=actual,
+                actual_reason=reason,
+                limited=limited,
+            )
+        )
+    rasterize_effective = bool(bp.is_computed and effective[SWITCH_RASTERIZE_COMPUTED])
+    return PresetPlan(
+        outcomes=tuple(outcomes),
+        rasterize_effective=rasterize_effective,
+        prescale_effective=effective[SWITCH_PRESCALE_TEXTURE],
+        bake_effective=effective[SWITCH_BAKE_TEXTURE_BC],
+        native_tip=bool(bp.is_computed and not rasterize_effective),
+    )
 
 
 def _texture_png_array(img: np.ndarray) -> bytes:
@@ -251,7 +483,8 @@ def _ps_texture_mask_8bit(image: np.ndarray, ps_brightness: float,
     return np.clip(v, 0.0, 255.0).astype(np.uint8)
 
 
-def _texture_xml(bp: BrushPreset, full_coverage: bool | None = None) -> TextureXml | None:
+def _texture_xml(bp: BrushPreset, full_coverage: bool | None = None, *,
+                 plan: PresetPlan | None = None) -> TextureXml | None:
     """把 Photoshop 纹理参数映射为 Krita 纹理选项（无位图时返回 None）。
 
     映射目标是 Krita 模式合成后的最终效果；校准常数来自
@@ -277,6 +510,10 @@ def _texture_xml(bp: BrushPreset, full_coverage: bool | None = None) -> TextureX
       每 (b,c,invert) 组合一份纹理资源，旧 .kpp 必须重转。
     - 135-4：对比度 k 原值直写（不再 min(2.0) 截断，见 preset_xml）。
     - 135-5：minimumDepth 的曲线 0 端点写比值 s_m/s_d（Krita 强度是乘性的）。
+
+    任务168（plan 参数，默认 None = 现行处理）：plan.prescale_effective=False 时
+    保留源纹理字节并写原生 Scale；plan.bake_effective=False 时不烘像素、保留
+    Krita 亮度/对比度/反相字段（截断量由 texture_brightness_truncation 说明）。
     """
     tex = bp.texture
     if tex is None or tex.image is None:
@@ -286,10 +523,13 @@ def _texture_xml(bp: BrushPreset, full_coverage: bool | None = None) -> TextureX
         # 传入**实际内嵌**的那张位图（计算笔刷是 hardness_tip 生成的 stored）。
         full_coverage = _tip_is_full_coverage(bp.tip_gray)
     # --- 135-1：scale>100 → 预缩放内嵌 PNG + Scale=1.0（128 实测 24/24 达标）---
+    # 任务168：plan 明确关闭预缩放时保留源纹理字节，Scale 写原生百分比；
+    # plan=None 表示默认（现行处理），逐字节等价于 135-1 原路径。
+    prescale_effective = True if plan is None else plan.prescale_effective
     scale_pct = float(tex.scale)
     image = tex.image
     preset_scale = scale_pct / 100.0
-    if scale_pct > 100.0:
+    if scale_pct > 100.0 and prescale_effective:
         prescaled = _prescale_texture_image(image, scale_pct)
         if prescaled is not None:
             image = prescaled
@@ -298,7 +538,11 @@ def _texture_xml(bp: BrushPreset, full_coverage: bool | None = None) -> TextureX
     # 判定 = calibrated 反解出的 b_k 越出 Krita 亮度域 [-1,1]（等价 B10 的
     # 「C=−50 且 |PS 亮度|>127」）。命中则把 PS 的 亮度/对比度/反相 烘进像素，
     # 后面三个 Krita 字段写中性值；预缩放已先做（沿用「先重采样后 b/c」假定）。
-    bake_bc = texture_bc_out_of_range(tex.brightness, tex.contrast)
+    # 任务168：plan 明确关闭烘焙时保留 Krita 原生字段（亮度按 [-1,1] 截断），
+    # 不改写像素，也不换成另一条烘焙链；截断量由 texture_brightness_truncation 说明。
+    bake_detected = texture_bc_out_of_range(tex.brightness, tex.contrast)
+    bake_effective = True if plan is None else plan.bake_effective
+    bake_bc = bake_detected and bake_effective
     if bake_bc:
         image = _ps_texture_mask_8bit(image, tex.brightness, tex.contrast, tex.invert)
     # 图案资源名由「内嵌字节的 sha256」派生，而不是 PS 的 uuid：
@@ -379,7 +623,9 @@ def _circle_mask(hardness: float, roundness: float,
     """按硬度/圆度生成一个圆形灰度蒙版（预览/实验夹具用）。
 
     v1.5.0 起计算笔刷的预设与预览都改用 `hardness_tip.build_tip` 生成的 PS 剖面位图，
-    本函数保留给 130 实验的路径 A 对照与既有回归用例（不是生产路径、也不是开关）。
+    本函数保留给 130 实验的路径 A 对照与既有回归用例。任务168 起它还负责**原生可编辑
+    分支的缩略图**（_native_computed_preview_mask）：同一套 fade 语义（软边只在
+    1.00R 以内），不参与 .kpp 的 brush_definition，因此不是位图化笔尖生成路径。
 
     预览始终把笔尖铺满画布的 90%，与 PS 主直径无关：真实尺寸由预设里
     auto_brush 的 diameter 决定，缩略图只反映形状与边缘软硬。
@@ -415,6 +661,60 @@ class ConvertResult:
     bundle_renamed: bool = False       # 目标同名但内容不同 → 自动加 _2/_3 后缀
     warnings: list[str] = field(default_factory=list)  # 需展示给用户的提示（防呆等）
     verify: BundleVerifyResult | None = None  # 写出后回读校验结论
+    # --- 任务168：逐支选项的真实运行记录（未传 option_state 时保持 None/空） ---
+    options_summary: ProcessingSummary | None = None  # evidence=conversion-run
+    option_plans: dict[str, PresetPlan] = field(default_factory=dict)
+
+    def option_summary_lines(self) -> list[str]:
+        """面向用户的中文摘要：分清实际烘焙/位图化/预缩放与未执行项及代价。
+
+        只汇总**本批真实渲染**的预设；没有传 option_state 时返回空列表
+        （默认路径的产物与开工基线逐字节一致，不伪造一份处理摘要）。
+        """
+        summary = self.options_summary
+        if summary is None:
+            return []
+        counts = summary.counts()
+        lines = [
+            f"逐支处理（真实运行）：共 {counts['total_presets']} 支；"
+            f"现行处理 {counts['applied']} 项、可编辑替代 {counts['alternative']} 项、"
+            f"不适用 {counts['not_applicable']} 项。"
+        ]
+        not_applicable_by_switch: dict[str, int] = {}
+        for item in summary.items:
+            for switch_id in SWITCH_IDS:
+                if item.switches[switch_id].actual == ACTUAL_NOT_APPLICABLE:
+                    not_applicable_by_switch[switch_id] = (
+                        not_applicable_by_switch.get(switch_id, 0) + 1)
+        for switch_id in SWITCH_IDS:
+            applied_word, alternative_word = _SWITCH_SUMMARY_WORDS[switch_id]
+            applied = alternative = limited = 0
+            for plan in self.option_plans.values():
+                outcome = plan.outcome(switch_id)
+                if outcome.actual == ACTUAL_APPLIED:
+                    applied += 1
+                elif outcome.actual == ACTUAL_ALTERNATIVE:
+                    alternative += 1
+                    if outcome.limited:
+                        limited += 1
+            line = (
+                f"{SWITCH_INFO[switch_id].title}：{applied_word} {applied} 项，"
+                f"{alternative_word} {alternative} 项，"
+                f"不适用 {not_applicable_by_switch.get(switch_id, 0)} 项"
+            )
+            if limited:
+                line += f"（其中 {limited} 项标受限）"
+            lines.append(line + "。")
+        for item in summary.items:
+            for switch_id in SWITCH_IDS:
+                switch = item.switches[switch_id]
+                if switch.actual == ACTUAL_NOT_APPLICABLE:
+                    continue
+                lines.append(
+                    f"· {item.identity.name} / {SWITCH_INFO[switch_id].title}："
+                    f"{'勾选' if switch.enabled else '未勾选'}；"
+                    f"实际={ACTUAL_LABELS[switch.actual]}；{switch.actual_reason}")
+        return lines
 
 
 
@@ -493,25 +793,126 @@ def _resolve_bundle_path(target: Path, content_hash8: str) -> tuple[Path, str]:
 
 
 def convert(abr_path: str, out_dir: str, make_bundle: bool = True,
-            make_standalone: bool = True) -> ConvertResult:
+            make_standalone: bool = True,
+            option_state: ExportOptionState | None = None) -> ConvertResult:
     """CLI 便捷入口：解析单个 .abr 文件并转换全部预设。
 
     返回 ConvertResult；GUI 走 convert_presets() 以支持子集转换。
+    option_state 非空时先核对源文件摘要，防止把另一份 ABR 的逐支开关套到本文件。
     """
+    if option_state is not None:
+        digest = source_digest_of_file(abr_path)
+        if digest != option_state.source_digest:
+            raise ValueError(
+                "导出选项状态来自另一份源文件"
+                f"（选项 {option_state.source_digest}，当前 {digest}）；请重新建立选项状态")
     abr = AbrFile.parse(abr_path)
     presets = map_presets(abr)
     return convert_presets(abr, presets, out_dir, make_bundle=make_bundle,
-                           make_standalone=make_standalone)
+                           make_standalone=make_standalone,
+                           option_state=option_state)
 
 
-def _render_preset(bp: BrushPreset, index: int) -> tuple[str, str, np.ndarray]:
-    """渲染单个预设 → (文件名, 预设 XML, 预览 RGBA)。"""
+def _native_computed_preview_mask(bp: BrushPreset) -> np.ndarray:
+    """原生可编辑分支的缩略图蒙版（与 auto_brush 同一套 fade 语义）。
+
+    只用于预览，不写进 .kpp；让缩略图反映“软边只在 1.00R 以内”的原生外观，
+    避免拿位图化预览冒充原生分支。
+    """
+    hardness = 50.0 if bp.hardness is None else float(bp.hardness)
+    return _circle_mask(hardness, float(bp.roundness))
+
+
+def _native_computed_brush_def(bp: BrushPreset) -> str:
+    """计算笔刷关闭位图化后的**生产级**原生可编辑定义（auto_brush）。
+
+    与 _computed_brush_def 的区别（任务168 明确要求）：
+    - 这是生产路径：每次生成后都跑 _verify_native_computed_brush 结构自检，
+      失败直接抛错，不静默产出错误定义；
+    - 代价写进计划/摘要：Krita 的 fade 只作用在 1.00R 以内，复刻不了 PS
+      “软边伸出标称半径”的几何（130 实测 h0 −19.81%、h50 +22.63%），
+      因此硬度字段可编辑，但含义不等于 PS 硬度；
+    - _computed_brush_def 仍只服务 130 实验与 107 回归，不是本分支的实现依赖。
+    """
+    from .kpp.preset_xml import auto_brush_definition
+
+    diameter = 30.0 if bp.diameter is None else float(bp.diameter)
+    definition = auto_brush_definition(diameter, bp.spacing, bp.angle,
+                                       bp.roundness, bp.hardness)
+    _verify_native_computed_brush(definition, bp)
+    return definition
+
+
+def _verify_native_computed_brush(brush_def: str, bp: BrushPreset) -> dict[str, object]:
+    """原生 auto_brush 定义的结构自检（不是 Krita 效果验证）。
+
+    只检查“写进去的字段就是源事实”：类型必须是 auto_brush（不是 png_brush）、
+    圆形 MaskGenerator 的 diameter/ratio/hfade/vfade 与 Brush 的 spacing/angle
+    和源参数一致。真实渲染效果与人眼观感统一留 187。
+    """
+    try:
+        root = ET.fromstring(brush_def)
+    except ET.ParseError as exc:
+        raise ValueError(f"生成的 auto_brush 定义不是合法 XML：{exc}") from exc
+    if root.tag != "Brush" or root.get("type") != "auto_brush":
+        raise ValueError(
+            "原生可编辑分支必须是 auto_brush，实际 %r" % (root.get("type"),))
+    if "png_brush" in brush_def:
+        raise ValueError("原生可编辑分支不得包含 png_brush")
+    mask = root.find("MaskGenerator")
+    if mask is None or mask.get("type") != "circle":
+        raise ValueError("原生可编辑分支必须带圆形 MaskGenerator")
+    diameter = 30.0 if bp.diameter is None else float(bp.diameter)
+    fade = 0.5 if bp.hardness is None else max(
+        0.0, min(1.0, float(bp.hardness) / 100.0))
+    ratio = max(1e-3, min(1.0, float(bp.roundness) / 100.0))
+    expected_mask = {"diameter": diameter, "hfade": fade, "vfade": fade, "ratio": ratio}
+    for attr, expected in expected_mask.items():
+        raw = mask.get(attr)
+        if raw is None:
+            raise ValueError(f"原生可编辑分支缺少 MaskGenerator/@{attr}")
+        # auto_brush_definition 用 :g（6 位有效数字）格式化，结构自检按相对
+        # 1e-4 比较即可；这里只防“字段写错/漏写”，不是精度校准。
+        if abs(float(raw) - float(expected)) > max(1e-6, abs(float(expected)) * 1e-4):
+            raise ValueError(
+                f"原生可编辑分支 {attr}={raw} 与源参数 {expected:g} 不一致")
+    expected_brush = {"spacing": float(bp.spacing),
+                      "angle": float(math.radians(bp.angle % 360.0))}
+    for attr, expected in expected_brush.items():
+        raw = root.get(attr)
+        if raw is None:
+            raise ValueError(f"原生可编辑分支缺少 Brush/@{attr}")
+        if abs(float(raw) - float(expected)) > max(1e-6, abs(float(expected)) * 1e-4):
+            raise ValueError(
+                f"原生可编辑分支 {attr}={raw} 与源参数 {expected:g} 不一致")
+    return {"type": "auto_brush", "diameter": diameter, "fade": fade, "ratio": ratio}
+
+
+def _render_preset(bp: BrushPreset, index: int, *,
+                   plan: PresetPlan | None = None) -> tuple[str, str, np.ndarray]:
+    """渲染单个预设 → (文件名, 预设 XML, 预览 RGBA)。
+
+    任务168：plan=None 或三开关全开时完全沿用开工基线；只有显式 plan 且
+    “关闭+适用”才走可编辑替代路径。返回仍是三元组，既有工具/回归调用不变。
+    """
     if bp.tip_gray is None and not bp.is_computed:
         raise ValueError(f"{bp.name}: 无笔尖位图")
     # 135-2：满覆盖判定必须基于**实际内嵌**的那张笔尖位图（见 _tip_is_full_coverage）。
     full_coverage = False
+    native_tip = plan is not None and plan.native_tip
 
-    if bp.is_computed:
+    if native_tip:
+        # 任务168 原生可编辑分支（仅计算笔刷、位图化开关关闭）：
+        # - 不内嵌笔尖位图，Krita 用 auto_brush 圆形蒙版，直径/间距/角度/圆度/
+        #   硬度（fade）都回到可编辑字段；
+        # - full_coverage 必须是 False：auto_brush 的 fade 边缘永远有软过渡，
+        #   不满足 135-2「每个像素都是墨」的前提，所以 hardMix 满覆盖偏置不下发；
+        # - 预览用同一套 fade 语义的圆形剖面，不拿位图化预览冒充原生外观。
+        brush_def = _native_computed_brush_def(bp)
+        tip_png = None
+        full_coverage = False
+        preview = render_tip_preview(_native_computed_preview_mask(bp))
+    elif bp.is_computed:
         # v1.5.0（任务 133，132 落地清单 133-1/133-2/133-3）：计算笔刷由 auto_brush
         # 改成「按 PS 硬度剖面生成的采样笔尖」。依据 130 实验：Krita 的 hfade/vfade 只
         # 作用在 1.00R 以内，复刻不了 PS「软边伸出标称半径」的 h0/h50（−15.60px/−19.81%、
@@ -559,17 +960,97 @@ def _render_preset(bp: BrushPreset, index: int) -> tuple[str, str, np.ndarray]:
         scatter_pressure=bp.scatter_pressure,
         scatter_both_axes=bp.scatter_both_axes,
         scatter_amount=bp.scatter_amount,
-        texture=_texture_xml(bp, full_coverage=full_coverage),
+        texture=_texture_xml(bp, full_coverage=full_coverage, plan=plan),
     )
     return _safe_filename(bp.name, index), xml, preview
 
 
+def _resolve_option_switches(
+    state: ExportOptionState, presets: list[BrushPreset]
+) -> list[tuple[str, ConversionSwitches]]:
+    """把转换子集映射到 state 的稳定 ID（对象身份优先，其次内容摘要+出现次序）。
+
+    调用方必须保证 presets 保持**源顺序**；筛选/排序只应影响显示，不应影响
+    转换顺序。内容完全相同的重复预设按出现次序对应，避免同内容共用错误开关。
+    预设在 state 中找不到时抛 ValueError，不静默退回默认值。
+    """
+    state_presets = {preset_id: state.preset(preset_id)
+                     for preset_id in state.preset_ids}
+    by_object_id = {id(value): preset_id for preset_id, value in state_presets.items()}
+    by_digest: dict[str, list[PresetIdentity]] = {}
+    for identity in state.identities:
+        by_digest.setdefault(identity.content_digest, []).append(identity)
+    used: dict[str, int] = {}
+    resolved: list[tuple[str, ConversionSwitches]] = []
+    for bp in presets:
+        preset_id = by_object_id.get(id(bp))
+        if preset_id is None:
+            digest = preset_content_digest(bp)
+            bucket = by_digest.get(digest, [])
+            index = used.get(digest, 0)
+            if index >= len(bucket):
+                raise ValueError(
+                    f"笔刷 {bp.name!r} 不在导出选项状态中（内容摘要 {digest} 不匹配）；"
+                    "请用同一批 BrushPreset 建立 ExportOptionState 并保持源顺序")
+            preset_id = bucket[index].preset_id
+            used[digest] = index + 1
+        resolved.append((
+            preset_id,
+            ConversionSwitches(
+                rasterize_computed=state.enabled(preset_id, SWITCH_RASTERIZE_COMPUTED),
+                prescale_texture=state.enabled(preset_id, SWITCH_PRESCALE_TEXTURE),
+                bake_texture_bc=state.enabled(preset_id, SWITCH_BAKE_TEXTURE_BC),
+            ),
+        ))
+    return resolved
+
+
+def _build_run_summary(
+    state: ExportOptionState, plans: dict[str, PresetPlan]
+) -> ProcessingSummary:
+    """用真实渲染计划覆盖 167 的契约基线 actual（evidence=conversion-run）。
+
+    actual 只来自 plan（本次要不要位图化/预缩放/烘焙），不照抄 enabled；
+    本批未渲染的预设（例如缺笔尖被跳过）不进入摘要，避免把“没做”写成“做了”。
+    """
+    items: list[PresetOptionRecord] = []
+    for preset_id in state.preset_ids:
+        plan = plans.get(preset_id)
+        if plan is None:
+            continue
+        record = state.record(preset_id)
+        switches: dict[str, SwitchRecord] = {}
+        for switch_id in SWITCH_IDS:
+            base = record.switches[switch_id]
+            outcome = plan.outcome(switch_id)
+            switches[switch_id] = SwitchRecord(
+                switch_id=switch_id,
+                applicable=base.applicable,
+                applicable_reason=base.applicable_reason,
+                enabled=base.enabled,
+                default_enabled=base.default_enabled,
+                actual=outcome.actual,
+                actual_reason=outcome.actual_reason,
+                pending_alternative=(outcome.actual == ACTUAL_PENDING_ALTERNATIVE),
+            )
+        items.append(PresetOptionRecord(identity=record.identity, switches=switches))
+    return ProcessingSummary(
+        source_digest=state.source_digest,
+        cancelled=False,
+        evidence=SUMMARY_EVIDENCE_CONVERSION,
+        items=tuple(items),
+    )
+
+
 def convert_presets(abr: AbrFile, presets: list[BrushPreset], out_dir: str,
-                    make_bundle: bool = True, make_standalone: bool = True) -> ConvertResult:
+                    make_bundle: bool = True, make_standalone: bool = True,
+                    option_state: ExportOptionState | None = None) -> ConvertResult:
     """把给定预设子集转成 .kpp / .bundle。
 
     make_bundle / make_standalone 至少一个为 True，对应「.bundle」与「.kpp」两种产物；
     两者都为 False 时不写任何文件，必须显式报错而不是假装转换成功。
+    option_state 非空时逐支读三开关并生成 evidence=conversion-run 的实际处理摘要；
+    option_state=None 时与开工基线逐字节一致。
     """
     if not make_bundle and not make_standalone:
         raise ValueError("make_bundle 与 make_standalone 至少需要一个为 True")
@@ -581,16 +1062,35 @@ def convert_presets(abr: AbrFile, presets: list[BrushPreset], out_dir: str,
     if make_standalone:
         kpp_dir.mkdir(parents=True, exist_ok=True)
 
+    resolved = _resolve_option_switches(option_state, presets) if option_state else None
+
     for i, bp in enumerate(presets):
         if bp.tip_gray is None and not bp.is_computed:
             result.skipped.append(f"{bp.name}: 无笔尖位图")
             continue
-        fname, xml, preview = _render_preset(bp, i)
+        plan: PresetPlan | None = None
+        if resolved is not None:
+            preset_id, switches = resolved[i]
+            plan = plan_preset(bp, switches)
+            result.option_plans[preset_id] = plan
+        fname, xml, preview = _render_preset(bp, i, plan=plan)
         result.kpp_files.append((fname, _build_kpp_bytes(xml, preview)))
         if make_standalone:
             write_kpp(str(kpp_dir / fname), xml, preview)
 
     result.texture_count = count_real_textures(result.kpp_files)
+
+    if option_state is not None:
+        result.options_summary = _build_run_summary(option_state, result.option_plans)
+        alternative = sum(
+            outcome.actual == ACTUAL_ALTERNATIVE
+            for plan in result.option_plans.values()
+            for outcome in plan.outcomes
+        )
+        if alternative:
+            result.warnings.append(
+                f"已按逐支选项走可编辑替代路径 {alternative} 项；"
+                "代价见 options_summary（未做人工效果确认）")
 
     if make_bundle and result.kpp_files:
         stem = getattr(abr, "name", None) or "converted"
@@ -655,7 +1155,8 @@ def _computed_brush_def(bp: BrushPreset) -> str:
     """生成计算笔刷的 auto_brush <Brush> 定义（程序化圆形笔尖）。
 
     **v1.5.0 起生产路径不再使用**：计算笔刷改由 `hardness_tip.build_tip` 生成采样笔尖
-    （任务 133，130 实验判「采样等价路线可行」）。本函数保留给两处不改的调用方——
+    （任务 133，130 实验判「采样等价路线可行」）。任务168 的原生可编辑分支也不调用
+    本函数，而是走 `_native_computed_brush_def`（带结构自检与代价说明）。本函数仅保留给
     130 实验复跑（`tools/exp_hardness_profile.py` 的路径 A 对照）与 107 的回归用例
     （`tests/test_param_calibration_v140.py`）——不是功能开关，也不能被重新接回生产。
     """
