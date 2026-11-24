@@ -18,13 +18,22 @@
 退出码：
   0  扫描完成（默认即使有 block 也返回 0，方便先取基线）
   1  --fail-on-block 且 block 命中 > 0
-  2  运行环境错误（不是 git 仓库、git 不可用等）
+  2  运行环境错误（不是 git 仓库、git 不可用、--artifact 路径无效等）
   3  自检失败（--selftest）
+  4  基线阻塞（--since-baseline 不存在 / 不是 HEAD 祖先 / 引用集合无法确认覆盖）
 
-用法：
-  python tools/privacy_scan.py
+三种口径（162A 起；--help 里按「日常增量 / 发布前全量」分组，不会混在一起）：
+
+  ① 发布前全量（默认；186 候选冻结后集中执行一次）
+     python tools/privacy_scan.py --include-untracked --fail-on-block
+  ② 日常增量（推荐；只扫基线之后，成本低，但不能替代发布门）
+     python tools/privacy_scan.py --since-baseline v1.5.0
+     python tools/privacy_scan.py --since-baseline HEAD --artifact 候选.zip
+  ③ 仅显式候选（补扫被 .gitignore 忽略的 ZIP/文件；不触发全量）
+     python tools/privacy_scan.py --artifact 候选.zip --artifact 某目录/
+
+  其它（调试/取证）：
   python tools/privacy_scan.py --json 扫描结果.json --text 扫描结果.txt
-  python tools/privacy_scan.py --fail-on-block
   python tools/privacy_scan.py --selftest
   python tools/privacy_scan.py --worktree-only
   python tools/privacy_scan.py --history-only
@@ -46,6 +55,7 @@ import re
 import socket
 import subprocess
 import sys
+import zipfile
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, Iterable
@@ -73,7 +83,8 @@ PROJECT_KNOWN_USERS = ["15" + "pro"]
 
 # 已发布 / 已推送的边界：这些提交里的命中只登记为 warn（改写会破坏已公开的 tag 与别人已 clone 的历史）。
 # 未推送范围（origin/main..HEAD）里的命中是 block，必须占位化后重写历史。
-PUBLISHED_TAG = "v" + "1.2.1"
+# 2026-11-24 任务 162A 使用者裁决：已发布边界从 v1.2.1 改为最新已发布 tag v1.5.0。
+PUBLISHED_TAG = "v" + "1.5.0"
 PUSHED_REF = "refs/remotes/origin/main"
 
 # 本轮新增/需要显式证明「扫过」的目录（覆盖清单，0 个文件即报 block：覆盖缺失）。
@@ -651,7 +662,13 @@ def scan_binaries(paths: list[str]) -> tuple[list[Hit], list[dict]]:
             size = full.stat().st_size
         except OSError:
             size = None
-        info: dict = {"path": rel, "binary": True, "size": size, "status": "ok"}
+        info: dict = {
+            "path": rel,
+            "binary": True,
+            "size": size,
+            "status": "ok",
+            "manual_review": "待人工目检（不代表已通过）",
+        }
         ext = Path(rel).suffix.lower()
         if ext in IMAGE_EXT:
             meta = inspect_image(full)
@@ -676,12 +693,13 @@ def scan_binaries(paths: list[str]) -> tuple[list[Hit], list[dict]]:
 # ---------------------------------------------------------------------------
 # ④ 元数据（提交历史）
 # ---------------------------------------------------------------------------
-def scan_history_metadata() -> tuple[list[Hit], list[dict]]:
+def scan_history_metadata(revspec: str = "--all") -> tuple[list[Hit], list[dict]]:
+    """扫描提交元数据；revspec 为 "--all"（发布前全量）或 "<基线>..<HEAD>"（日常增量）。"""
     hits: list[Hit] = []
     records: list[dict] = []
     raw = run_git(
         "log",
-        "--all",
+        revspec,
         "--date=iso",
         "--format=%H%x1f%an%x1f%ae%x1f%cn%x1f%ce%x1f%ad%x1f%B%x1e",
     )
@@ -759,9 +777,13 @@ def scan_history_metadata() -> tuple[list[Hit], list[dict]]:
     return list(uniq.values()), records
 
 
-def scan_history_content() -> list[Hit]:
-    """git log --all -p：逐条新增行扫描（已删除但历史上出现过的内容也会在这里命中）。"""
-    raw = run_git("log", "--all", "-p", "--no-renames", "--format=%x01COMMIT%x1f%H%x1f%B%x1e")
+def scan_history_content(revspec: str = "--all") -> list[Hit]:
+    """git log <revspec> -p：逐条新增行扫描。
+
+    基线之后新增、后来又删掉的内容同样会命中（它在引入它的那个提交里是新增行）；
+    未推送提交的命中仍按 block 处理，已公开历史只登记 warn、不改写。
+    """
+    raw = run_git("log", revspec, "-p", "--no-renames", "--format=%x01COMMIT%x1f%H%x1f%B%x1e")
     hits: list[Hit] = []
     commit = None
     subject = ""
@@ -1031,28 +1053,62 @@ def render_text(result: dict, max_per_rule: int) -> str:
     by_cat = result["counts"]["by_category"]
     lines: list[str] = []
     add = lines.append
-    add("=== brushConverter 开源前隐私扫描（任务 17） ===")
+    mode = result.get("scan_mode", {})
+    add("=== brushConverter 开源前隐私扫描（任务 17 / 162A） ===")
     add("block 命中数：%d" % result["counts"]["block"])
     add("warn  命中数：%d" % result["counts"]["warn"])
+    add("扫描模式：%s" % mode.get("label", "发布前全量（工作区 + 全部提交历史）"))
+    if mode.get("baseline"):
+        b = mode["baseline"]
+        add(
+            "基线校验：%s（%s）→ HEAD（%s）；基线后新增提交 %d 个；"
+            "已校验存在 / 祖先关系 / 引用集合"
+            % (b["ref"], b["commit"][:10], b["head"][:10], b["commits"])
+        )
+    if mode.get("artifacts"):
+        add("显式候选：%s" % "、".join(mode["artifacts"]))
+    if mode.get("kind") != "full":
+        add("口径：本次不是发布前全量扫描；候选冻结后仍须 186 执行全量（block 必须为 0）。")
     add("仓库根：%s" % PH_REPO)
     add("生成时间：%s" % result["generated_at"])
-    add(
-        "扫描范围：工作区受跟踪文件 %d 个 + 未跟踪新文件 %d 个（其中文本 %d / 二进制 %d）；历史提交 %d 个（--all）"
-        % (
-            result["worktree"]["tracked_files"],
-            result["worktree"].get("untracked_files", 0),
-            result["worktree"]["text_files"],
-            result["worktree"]["binary_files"],
-            result["history"]["commits"],
+    if mode.get("kind") == "artifact":
+        add(
+            "扫描范围：显式候选 %d 个根 / %d 个文件；未扫描工作区全量、未扫描全部历史"
+            % (len(mode.get("artifacts") or []), result.get("artifacts", {}).get("files", 0))
         )
-    )
-    add(
-        "文件类型覆盖：文本 %s"
-        % "、".join(
-            "%s×%d" % (k or "(无扩展名)", v)
-            for k, v in list(result["worktree"].get("text_extensions", {}).items())[:14]
+    elif mode.get("kind") == "incremental":
+        add(
+            "扫描范围：工作区增量文件 %d 个（未跟踪新文件 %d 个，其中文本 %d / 二进制 %d）；"
+            "基线后提交 %d 个（%s）"
+            % (
+                result["worktree"]["changed_files"],
+                result["worktree"].get("untracked_files", 0),
+                result["worktree"]["text_files"],
+                result["worktree"]["binary_files"],
+                result["history"]["commits"],
+                result["history"].get("revspec", "--all"),
+            )
         )
-    )
+    else:
+        add(
+            "扫描范围：工作区受跟踪文件 %d 个 + 未跟踪新文件 %d 个（其中文本 %d / 二进制 %d）；"
+            "历史提交 %d 个（--all）"
+            % (
+                result["worktree"]["tracked_files"],
+                result["worktree"].get("untracked_files", 0),
+                result["worktree"]["text_files"],
+                result["worktree"]["binary_files"],
+                result["history"]["commits"],
+            )
+        )
+    if result["worktree"]["text_files"]:
+        add(
+            "文件类型覆盖：文本 %s"
+            % "、".join(
+                "%s×%d" % (k or "(无扩展名)", v)
+                for k, v in list(result["worktree"].get("text_extensions", {}).items())[:14]
+            )
+        )
     add("分级口径：block=发布前必须清零；warn=允许保留但必须逐条说明理由")
     add("")
     add("一、分类统计")
@@ -1065,18 +1121,20 @@ def render_text(result: dict, max_per_rule: int) -> str:
     sc = result.get("scopes", {})
     ps = result.get("published_split", {})
     add(
-        "block 构成：工作区 %d 条 / 未推送历史 %d 条；已公开历史命中已降级为 warn（%d 条）"
+        "block 构成：工作区 %d 条 / 未推送历史 %d 条 / 显式候选 %d 条；已公开历史命中已降级为 warn（%d 条）"
         % (
             sc.get("worktree", {}).get("block", 0),
             ps.get("unpublished", {}).get("block", 0),
+            sc.get("artifact", {}).get("block", 0),
             ps.get("published", {}).get("warn", 0),
         )
     )
     add("")
-    add("一·五、覆盖清单（本轮新增目录，0 个文件即判覆盖缺失）")
-    for row in result.get("coverage", []):
-        add("- %s（%s）：%d 个文件" % (row["dir"], row["desc"], row["files"]))
-    add("")
+    if result.get("coverage"):
+        add("一·五、覆盖清单（本轮新增目录，0 个文件即判覆盖缺失）")
+        for row in result.get("coverage", []):
+            add("- %s（%s）：%d 个文件" % (row["dir"], row["desc"], row["files"]))
+        add("")
 
     def dump(severity: str) -> None:
         rows = [h for h in hits if h["severity"] == severity]
@@ -1110,16 +1168,25 @@ def render_text(result: dict, max_per_rule: int) -> str:
     dump("block")
     dump("warn")
 
-    add("四、工作区内部产物检查（git ls-files）")
-    if result["internal_artifacts"]:
-        for item in result["internal_artifacts"]:
-            add("- [block] %s（规则：%s）" % (item["path"], item["rule"]))
-    else:
-        add("（空：build/、dist/、releases/*.zip、converted/、extracted/、research/、tests/**/*.abr、")
-        add("  tests/**/*.kpp、result.json、.workbuddy/、.mnemon/、docs/优化提示词/、docs/工作流程/ 均未出现在 git ls-files 中）")
-    add("")
+    # 章节号随模式连续：artifact-only 没有「工作区内部产物」一节，避免出现跳号。
+    section_numbers = ["四", "五", "六"]
+    section = 0
+    if mode.get("kind") != "artifact":
+        add("四、工作区内部产物检查（本次扫描到的路径）")
+        section = 1
+        if result["internal_artifacts"]:
+            for item in result["internal_artifacts"]:
+                add("- [block] %s（规则：%s）" % (item["path"], item["rule"]))
+        else:
+            add("（空：build/、dist/、releases/*.zip、converted/、extracted/、research/、tests/**/*.abr、")
+            add("  tests/**/*.kpp、result.json、.workbuddy/、.mnemon/、docs/优化提示词/、docs/工作流程/ 均未出现在本次扫描路径中）")
+        add("")
 
-    add("五、受跟踪二进制/图片清单（%d 个，本项由人工执行）" % len(result["binaries"]))
+    add(
+        "%s、受跟踪二进制/图片清单（%d 个，仅登记待人工，不代表已通过）"
+        % (section_numbers[section], len(result["binaries"]))
+    )
+    section += 1
     for item in result["binaries"]:
         img = item.get("image") or {}
         extra = ""
@@ -1128,8 +1195,589 @@ def render_text(result: dict, max_per_rule: int) -> str:
         add("- %s（%s 字节%s）" % (item["path"], item.get("size"), extra))
     add("")
 
+    art = result.get("artifacts") or {}
+    if art.get("roots"):
+        add("%s、显式候选清单（--artifact；只读扫描，不代表已通过）" % section_numbers[section])
+        add("候选根：%s" % "、".join(art["roots"]))
+        shown = 0
+        for item in art.get("entries", []):
+            if shown >= max(1, max_per_rule):
+                break
+            label = item["path"] + ("!" + item["entry"] if item.get("entry") else "")
+            size = "" if item.get("size") is None else "（%s 字节）" % item["size"]
+            add("- %s%s：%s" % (label, size, item.get("status", "")))
+            shown += 1
+        total = len(art.get("entries", []))
+        if total > shown:
+            add("- ……（其余 %d 条见 --json）" % (total - shown))
+        add("说明：%s" % art.get("note", ""))
+        add("      二进制/图片只是登记待人工，不代表已人工目检通过；ZIP 条目未解压到外部目录。")
+        add("")
+
     add("结论：block=%d → %s" % (result["counts"]["block"], result["verdict"]))
     return "\n".join(lines)
+
+
+# ---------------------------------------------------------------------------
+# 162A：日常增量（--since-baseline）与显式候选（--artifact）
+#
+# 设计口径：
+#   * 日常增量只覆盖「基线 → 当前」：工作区新增/修改文件 + 新增提交的元数据与新增行。
+#   * 增量绝不静默退化为只扫 HEAD；基线不存在、不是 HEAD 祖先、或引用集合无法确认覆盖时，
+#     抛 BaselineBlocked，由 main 返回退出码 4。
+#   * --artifact 只接受当前仓库根内的显式候选；ZIP 只在内存中读取条目，绝不调用 extract；
+#     二进制/图片只登记「待人工目检」，不写成「已通过」。
+#   * 默认（不带增量参数）仍是发布前全量：工作区 + --all 全部历史，口径不变。
+# ---------------------------------------------------------------------------
+INCREMENTAL_EXIT_BLOCKED = 4
+
+# 限额读取：候选可以很大，但扫描器不能因此把整包读进内存或解压到外部。
+MAX_ARTIFACT_FILES = 2000
+MAX_ARTIFACT_TEXT_BYTES = 1024 * 1024
+MAX_ARCHIVE_ENTRIES = 1000
+MAX_ARCHIVE_ENTRY_BYTES = 8 * 1024 * 1024
+MAX_ARCHIVE_TOTAL_BYTES = 64 * 1024 * 1024
+MAX_ARCHIVE_TEXT_BYTES = 1024 * 1024
+ZIP_BOMB_MIN_BYTES = 1024 * 1024
+ZIP_BOMB_RATIO = 100
+
+
+class BaselineBlocked(RuntimeError):
+    """基线存在/祖先关系/引用集合无法确认覆盖：必须阻塞（退出码 4）。"""
+
+
+class ArtifactPathError(RuntimeError):
+    """--artifact 路径无效或越界（退出码 2）。"""
+
+
+def _run_git_allow_fail(*args: str) -> tuple[int, str, str]:
+    """执行只读 git 命令，允许失败：返回 (退出码, stdout, stderr)。"""
+    cmd = ["git", "-c", "core.quotepath=off", *args]
+    env = dict(os.environ)
+    env["GIT_PAGER"] = "cat"
+    try:
+        proc = subprocess.run(cmd, cwd=str(REPO_ROOT), capture_output=True, env=env)
+    except FileNotFoundError as exc:
+        raise RuntimeError("找不到 git：%s" % exc) from exc
+    return (
+        proc.returncode,
+        proc.stdout.decode("utf-8", "replace"),
+        proc.stderr.decode("utf-8", "replace"),
+    )
+
+
+def _git_output(*args: str) -> str:
+    rc, out, err = _run_git_allow_fail(*args)
+    if rc != 0:
+        raise RuntimeError("git %s 失败（退出码 %d）：%s" % (" ".join(args), rc, err.strip()[:400]))
+    return out
+
+
+def resolve_commit(ref: str) -> str | None:
+    """把分支/tag/短哈希解析成完整提交哈希；不存在或不是提交时返回 None。"""
+    rc, out, _ = _run_git_allow_fail("rev-parse", "--verify", "--quiet", ref + "^{commit}")
+    if rc != 0:
+        return None
+    return out.strip() or None
+
+
+def _rev_set(*args: str) -> set[str]:
+    return set(_git_output("rev-list", *args).split())
+
+
+def changed_worktree_files(base: str) -> list[str]:
+    """基线到当前工作树的新增/修改文件（含已提交与未提交；删除的文件不算）。"""
+    raw = _git_output("diff", "--name-only", "-z", "--diff-filter=ACMRT", base, "--")
+    return [p for p in raw.split("\x00") if p]
+
+
+def validate_baseline(ref: str) -> dict:
+    """校验增量基线；不能确认覆盖时抛 BaselineBlocked，绝不退化为只扫 HEAD。"""
+    head = resolve_commit("HEAD")
+    if head is None:
+        raise RuntimeError("无法解析 HEAD（当前仓库可能还没有提交）")
+    base = resolve_commit(ref)
+    if base is None:
+        raise BaselineBlocked(
+            "基线不存在或不是提交：%s（请给出已存在的提交/分支/tag，例如已发布 tag 或上次扫描的 HEAD）" % ref
+        )
+    rc_shallow, out_shallow, _ = _run_git_allow_fail("rev-parse", "--is-shallow-repository")
+    if rc_shallow == 0 and out_shallow.strip().lower() == "true":
+        raise BaselineBlocked("当前仓库是浅克隆（shallow clone）：基线之前的历史不完整，无法确认增量覆盖")
+    rc_anc, _, _ = _run_git_allow_fail("merge-base", "--is-ancestor", base, head)
+    if rc_anc == 1:
+        raise BaselineBlocked(
+            "基线 %s（%s）不是 HEAD（%s）的祖先：历史可能被改写或基线选错，拒绝只扫 HEAD"
+            % (ref, base[:10], head[:10])
+        )
+    if rc_anc != 0:
+        raise RuntimeError("git merge-base --is-ancestor 执行失败（退出码 %d）" % rc_anc)
+    # 可达集合同时纳入 HEAD（支持 detached HEAD：它不在任何分支引用里，但仍是当前历史）。
+    reachable = _rev_set("--all", head)
+    if base not in reachable:
+        raise BaselineBlocked(
+            "基线 %s（%s）不在当前引用与 HEAD 的可达历史里：历史可能已被改写，无法确认增量覆盖"
+            % (ref, base[:10])
+        )
+    # 引用集合校验：基线之后若还有提交只存在于其它引用（分支/tag/远端）而不在 HEAD 历史里，
+    # 只扫 BASE..HEAD 会漏掉它们；这种情况必须阻塞，让使用者先收敛引用或改用全量。
+    after_all = _rev_set("--all", head, "^" + base)
+    after_head = set(_git_output("rev-list", "%s..%s" % (base, head)).split())
+    extra = after_all - after_head
+    if extra:
+        sample = sorted(extra)[:3]
+        raise BaselineBlocked(
+            "基线之后有 %d 个提交只存在于其它引用、不在 HEAD 历史中（例如 %s）：增量无法确认覆盖；"
+            "请先收敛分支/引用，或改用发布前全量"
+            % (len(extra), "、".join(s[:10] for s in sample))
+        )
+    return {
+        "ref": ref,
+        "commit": base,
+        "head": head,
+        "commits": len(after_head),
+        "worktree_files": len(changed_worktree_files(base)) + len(untracked_files()),
+    }
+
+
+def _is_within(root: Path, target: Path) -> bool:
+    try:
+        target.relative_to(root)
+        return True
+    except ValueError:
+        return False
+
+
+def validate_artifact_paths(raw_paths: list[str]) -> list[dict]:
+    """校验 --artifact：只允许当前仓库根内的显式文件/目录；坏路径/越界整批拒绝（退出码 2）。"""
+    repo = REPO_ROOT.resolve()
+    resolved: list[dict] = []
+    errors: list[str] = []
+    seen: set[str] = set()
+    for raw in raw_paths:
+        given = Path(raw)
+        absolute = given if given.is_absolute() else (Path.cwd() / given)
+        if absolute.is_symlink():
+            errors.append("%s（不允许符号链接候选，请给真实路径）" % raw)
+            continue
+        try:
+            full = absolute.resolve()
+        except OSError as exc:
+            errors.append("%s（无法解析：%s）" % (raw, exc))
+            continue
+        if full == repo or not _is_within(repo, full):
+            errors.append("%s（越界：只允许仓库根 %s 内的显式候选）" % (raw, PH_REPO))
+            continue
+        if ".git" in full.parts:
+            errors.append("%s（不允许扫描 .git 内部）" % raw)
+            continue
+        if not full.exists():
+            errors.append("%s（路径不存在）" % raw)
+            continue
+        if not (full.is_file() or full.is_dir()):
+            errors.append("%s（既不是普通文件也不是目录）" % raw)
+            continue
+        key = str(full)
+        if key in seen:
+            continue
+        seen.add(key)
+        resolved.append({"path": full, "display": full.relative_to(repo).as_posix()})
+    if errors:
+        raise ArtifactPathError("；".join(errors))
+    return resolved
+
+
+def _artifact_hit(
+    category: str,
+    rule: str,
+    severity: str,
+    location: str,
+    matched: str,
+    evidence: str,
+    note: str = "",
+) -> Hit:
+    return Hit(
+        category=category,
+        rule=rule,
+        severity=severity,
+        scope="artifact",
+        location=location,
+        matched=matched[:200],
+        evidence=evidence[:240],
+        note=note,
+    )
+
+
+def _zip_entry_name_unsafe(name: str) -> bool:
+    """ZIP 条目名安全判断：拒绝 ..、绝对路径、盘符、反斜杠穿越与 NUL。"""
+    if not name or "\x00" in name:
+        return True
+    if name.startswith(("/", "\\")) or re.match(r"^[A-Za-z]:", name):
+        return True
+    normalized = name.replace("\\", "/")
+    parts = [p for p in normalized.split("/") if p not in ("", ".")]
+    return any(p == ".." for p in parts)
+
+
+def _zip_entry_is_symlink(info: zipfile.ZipInfo) -> bool:
+    return ((info.external_attr >> 16) & 0o170000) == 0o120000
+
+
+def scan_zip_artifact(full: Path, display: str) -> tuple[list[Hit], list[dict], list[dict], list[dict]]:
+    """只读扫描 ZIP：条目在内存中读取，绝不解压到外部目录。
+
+    返回 (hits, entries, manual, inventory)。穿越/炸弹/超限一律登记为 block 并跳过读取；
+    二进制/图片只进人工清单，不给出「通过」结论。
+    """
+    hits: list[Hit] = []
+    entries: list[dict] = []
+    manual: list[dict] = []
+    inventory: list[dict] = []
+    try:
+        zf = zipfile.ZipFile(full)
+    except (zipfile.BadZipFile, OSError) as exc:
+        hits.append(
+            _artifact_hit(
+                "artifact",
+                "artifact_zip_unreadable",
+                "block",
+                display,
+                "无法读取 ZIP",
+                "%s: %s" % (type(exc).__name__, exc),
+                "；显式候选 ZIP 打不开，内容无法确认，按阻塞处理",
+            )
+        )
+        return hits, entries, manual, inventory
+    try:
+        infos = zf.infolist()
+        if len(infos) > MAX_ARCHIVE_ENTRIES:
+            hits.append(
+                _artifact_hit(
+                    "artifact",
+                    "artifact_zip_entry_limit",
+                    "block",
+                    display,
+                    "条目数 %d 超过上限 %d" % (len(infos), MAX_ARCHIVE_ENTRIES),
+                    "；为避免解压炸弹，整包未读取",
+                    "；请拆分候选或由人工检查",
+                )
+            )
+            return hits, entries, manual, inventory
+        total = 0
+        for info in infos:
+            name = info.filename
+            location = "%s!%s" % (display, name)
+            if _zip_entry_name_unsafe(name):
+                hits.append(
+                    _artifact_hit(
+                        "artifact",
+                        "artifact_zip_traversal",
+                        "block",
+                        location,
+                        "可疑条目名：%s" % name[:120],
+                        "；条目名含 ..、绝对路径或盘符，拒绝读取/解压",
+                        "；不解压、不落盘；由人工核对来源",
+                    )
+                )
+                continue
+            if info.is_dir():
+                continue
+            if _zip_entry_is_symlink(info):
+                hits.append(
+                    _artifact_hit(
+                        "artifact",
+                        "artifact_zip_symlink",
+                        "block",
+                        location,
+                        "符号链接条目",
+                        "；ZIP 内的符号链接不在扫描范围，拒绝读取",
+                        "；如确需检查，请在隔离环境解包",
+                    )
+                )
+                continue
+            if info.file_size >= ZIP_BOMB_MIN_BYTES and info.compress_size > 0:
+                ratio = info.file_size / max(info.compress_size, 1)
+                if ratio >= ZIP_BOMB_RATIO:
+                    hits.append(
+                        _artifact_hit(
+                            "artifact",
+                            "artifact_zip_bomb_suspected",
+                            "block",
+                            location,
+                            "解压比 %.0f:1（%d → %d 字节）"
+                            % (ratio, info.compress_size, info.file_size),
+                            "；疑似解压炸弹，停止读取该条目",
+                            "；不解压、不落盘",
+                        )
+                    )
+                    continue
+            if info.file_size > MAX_ARCHIVE_ENTRY_BYTES:
+                hits.append(
+                    _artifact_hit(
+                        "artifact",
+                        "artifact_zip_entry_limit",
+                        "block",
+                        location,
+                        "条目解压后 %d 字节超过上限 %d" % (info.file_size, MAX_ARCHIVE_ENTRY_BYTES),
+                        "；不读取该条目",
+                        "；请拆分候选或由人工检查",
+                    )
+                )
+                continue
+            total += info.file_size
+            if total > MAX_ARCHIVE_TOTAL_BYTES:
+                hits.append(
+                    _artifact_hit(
+                        "artifact",
+                        "artifact_zip_total_limit",
+                        "block",
+                        display,
+                        "累计解压后 %d 字节超过上限 %d" % (total, MAX_ARCHIVE_TOTAL_BYTES),
+                        "；剩余条目未读取",
+                        "；请拆分候选或由人工检查",
+                    )
+                )
+                break
+            try:
+                with zf.open(info) as fp:
+                    data = fp.read(MAX_ARCHIVE_TEXT_BYTES + 8192)
+            except (RuntimeError, OSError, zipfile.BadZipFile) as exc:
+                hits.append(
+                    _artifact_hit(
+                        "artifact",
+                        "artifact_zip_read_error",
+                        "block",
+                        location,
+                        "条目读取失败",
+                        "%s: %s" % (type(exc).__name__, exc),
+                        "；内容无法确认",
+                    )
+                )
+                continue
+            truncated = len(data) > MAX_ARCHIVE_TEXT_BYTES
+            if truncated:
+                data = data[:MAX_ARCHIVE_TEXT_BYTES]
+            if looks_binary(data[:8192], name):
+                manual.append(
+                    {
+                        "path": display,
+                        "entry": name,
+                        "size": info.file_size,
+                        "status": "待人工目检（压缩包内二进制/图片；未解压，不代表已通过）",
+                    }
+                )
+                inventory.append(
+                    {
+                        "path": "%s!%s" % (display, name),
+                        "kind": Path(name).suffix.lower() or "binary",
+                        "size": info.file_size,
+                        "manual_review": "待人工目检（不代表已通过）",
+                    }
+                )
+                continue
+            text = data.decode("utf-8", "replace")
+            hits.extend(scan_text(text, location, "artifact"))
+            if truncated:
+                hits.append(
+                    _artifact_hit(
+                        "artifact",
+                        "artifact_text_truncated",
+                        "warn",
+                        location,
+                        "只读到 %d 字节" % MAX_ARCHIVE_TEXT_BYTES,
+                        "；压缩包内文本超过读取上限，剩余内容未扫描",
+                        "；需人工检查或拆分候选",
+                    )
+                )
+            entries.append(
+                {
+                    "path": display,
+                    "entry": name,
+                    "size": info.file_size,
+                    "status": "已扫描" + ("（截断，剩余待人工）" if truncated else ""),
+                }
+            )
+    finally:
+        zf.close()
+    return hits, entries, manual, inventory
+
+
+def _collect_artifact_files(root: dict) -> tuple[list[tuple[Path, str]], list[Hit]]:
+    """展开 --artifact 目录；跳过符号链接与 .git，超过文件数上限时阻塞。"""
+    full: Path = root["path"]
+    display: str = root["display"]
+    hits: list[Hit] = []
+    files: list[tuple[Path, str]] = []
+    if full.is_file():
+        return [(full, display)], hits
+    repo = REPO_ROOT.resolve()
+    for dirpath, dirnames, filenames in os.walk(full):
+        dirnames[:] = sorted(
+            d for d in dirnames if d != ".git" and not (Path(dirpath) / d).is_symlink()
+        )
+        for name in sorted(filenames):
+            path = Path(dirpath) / name
+            shown = path.relative_to(repo).as_posix() if _is_within(repo, path) else str(path)
+            if path.is_symlink():
+                hits.append(
+                    _artifact_hit(
+                        "artifact",
+                        "artifact_symlink_skipped",
+                        "warn",
+                        shown,
+                        "符号链接",
+                        "；显式候选目录里的符号链接不跟随，未扫描",
+                        "；确需检查请给真实路径",
+                    )
+                )
+                continue
+            try:
+                resolved = path.resolve()
+            except OSError as exc:
+                hits.append(
+                    _artifact_hit(
+                        "artifact", "artifact_read_error", "warn", shown, "无法解析", str(exc),
+                        "；确认路径",
+                    )
+                )
+                continue
+            if not _is_within(repo, resolved):
+                hits.append(
+                    _artifact_hit(
+                        "artifact", "artifact_path_escape", "block", shown, "越界",
+                        "；候选目录里的文件解析后落在仓库根之外", "；不读取该文件",
+                    )
+                )
+                continue
+            files.append((path, resolved.relative_to(repo).as_posix()))
+            if len(files) >= MAX_ARTIFACT_FILES:
+                hits.append(
+                    _artifact_hit(
+                        "artifact",
+                        "artifact_file_limit",
+                        "block",
+                        display,
+                        "候选文件数达到上限 %d" % MAX_ARTIFACT_FILES,
+                        "；为避免长时间扫描，后续文件未纳入",
+                        "；请缩小候选目录范围",
+                    )
+                )
+                return files, hits
+    return files, hits
+
+
+def scan_artifact_paths(roots: list[dict]) -> dict:
+    """扫描显式候选：文本逐行过规则，ZIP 只读条目，二进制/图片只登记待人工。"""
+    hits: list[Hit] = []
+    entries: list[dict] = []
+    manual: list[dict] = []
+    inventory: list[dict] = []
+    candidates: list[tuple[Path, str]] = []
+    for root in roots:
+        got, more = _collect_artifact_files(root)
+        candidates.extend(got)
+        hits.extend(more)
+    if not candidates:
+        # 显式候选里一个文件都没有：不能给出「干净」的暗示，至少留一条 warn 让使用者确认。
+        hits.append(
+            _artifact_hit(
+                "artifact",
+                "artifact_empty_root",
+                "warn",
+                "、".join(root["display"] for root in roots),
+                "0 个文件",
+                "；显式候选里没有可扫描文件",
+                "；确认路径是否选对",
+            )
+        )
+    for full, display in candidates:
+        try:
+            size = full.stat().st_size
+        except OSError as exc:
+            hits.append(
+                _artifact_hit(
+                    "artifact", "artifact_read_error", "warn", display, "读取失败", str(exc),
+                    "；确认路径",
+                )
+            )
+            continue
+        # 文件名本身也要过规则（候选文件名里可能带用户名/家目录）
+        hits.extend(scan_text(display, display + "（候选文件名）", "artifact"))
+        if full.suffix.lower() == ".zip":
+            zh, ze, zm, zi = scan_zip_artifact(full, display)
+            hits.extend(zh)
+            entries.extend(ze)
+            manual.extend(zm)
+            inventory.extend(zi)
+            continue
+        try:
+            with full.open("rb") as fp:
+                data = fp.read(MAX_ARTIFACT_TEXT_BYTES + 1)
+        except OSError as exc:
+            hits.append(
+                _artifact_hit(
+                    "artifact", "artifact_read_error", "warn", display, "读取失败", str(exc),
+                    "；确认路径",
+                )
+            )
+            continue
+        truncated = len(data) > MAX_ARTIFACT_TEXT_BYTES
+        if looks_binary(data[:8192], display):
+            info = {
+                "path": display,
+                "size": size,
+                "status": "待人工目检（二进制/图片；不代表已通过）",
+                "manual_review": True,
+            }
+            if Path(display).suffix.lower() in IMAGE_EXT:
+                info["image"] = inspect_image(full)
+            entries.append(info)
+            manual.append({"path": display, "size": size, "status": info["status"]})
+            hits.append(
+                _artifact_hit(
+                    "binary",
+                    "artifact_binary",
+                    "warn",
+                    display,
+                    Path(display).suffix.lower() or "binary",
+                    "显式候选二进制/图片：扫描器不能看内容",
+                    "；仅登记待人工目检，不代表已通过",
+                )
+            )
+            continue
+        if truncated:
+            data = data[:MAX_ARTIFACT_TEXT_BYTES]
+        text = data.decode("utf-8", "replace")
+        hits.extend(scan_text(text, display, "artifact"))
+        if truncated:
+            hits.append(
+                _artifact_hit(
+                    "artifact",
+                    "artifact_text_truncated",
+                    "warn",
+                    display,
+                    "只读到 %d 字节" % MAX_ARTIFACT_TEXT_BYTES,
+                    "；候选文本超过读取上限，剩余内容未扫描",
+                    "；需人工检查或拆分候选",
+                )
+            )
+        entries.append(
+            {
+                "path": display,
+                "size": size,
+                "status": "已扫描" + ("（截断，剩余待人工）" if truncated else ""),
+            }
+        )
+    uniq: dict[tuple, Hit] = {}
+    for h in hits:
+        uniq.setdefault(h.key(), h)
+    return {
+        "hits": list(uniq.values()),
+        "entries": entries,
+        "manual": manual,
+        "inventory": inventory,
+        "files": len(candidates),
+    }
 
 
 def build_result(args) -> dict:
@@ -1153,13 +1801,58 @@ def build_result(args) -> dict:
     want_worktree = not args.history_only
     want_history = not args.worktree_only
 
+    # 162A 三种模式：默认（不给增量参数）仍是「工作区 + 全部历史」的发布前全量，
+    # 保持 17/39/159 的既有口径不变。
+    baseline = None
+    scan_kind = "full"
+    artifact_roots: list[dict] = []
+    artifact_hits: list[Hit] = []
+    artifact_entries: list[dict] = []
+    artifact_manual: list[dict] = []
+    artifact_inventory: list[dict] = []
+    artifact_files = 0
+    history_revspec = "--all"
+
+    artifact_args = list(getattr(args, "artifact", None) or [])
+    baseline_ref = getattr(args, "since_baseline", None)
+    if artifact_args:
+        # 路径校验先做：坏路径/越界要立刻退出，不能退化成「扫了别的」。
+        artifact_roots = validate_artifact_paths(artifact_args)
+    if baseline_ref:
+        if args.worktree_only or args.history_only:
+            raise RuntimeError(
+                "--since-baseline 不能与 --worktree-only/--history-only 同时使用（增量必须同时看工作区与历史）"
+            )
+        baseline = validate_baseline(baseline_ref)
+        scan_kind = "incremental"
+        want_worktree = True
+        want_history = True
+    elif artifact_args:
+        if args.worktree_only or args.history_only:
+            raise RuntimeError(
+                "--artifact 不能与 --worktree-only/--history-only 同时使用（只查显式候选时不要限定扫描方向）"
+            )
+        # 只查显式候选：不扫工作区全量、不扫全部历史，避免日常检查触发全量成本。
+        scan_kind = "artifact"
+        want_worktree = False
+        want_history = False
+
     if want_worktree:
-        paths = tracked_files()
-        if args.include_untracked:
+        if baseline is not None:
+            # 工作区增量：基线→工作树的全部新增/修改文件（含已提交与未提交），
+            # 加上尚未跟踪、但未被 .gitignore 排除的新文件（待审二进制也在这里）。
+            paths = changed_worktree_files(baseline["commit"])
             known = set(paths)
             extra = [p for p in untracked_files() if p not in known]
             untracked_count = len(extra)
             paths = paths + extra
+        else:
+            paths = tracked_files()
+            if args.include_untracked:
+                known = set(paths)
+                extra = [p for p in untracked_files() if p not in known]
+                untracked_count = len(extra)
+                paths = paths + extra
         for rel in paths:
             full = REPO_ROOT / rel
             try:
@@ -1200,9 +1893,10 @@ def build_result(args) -> dict:
         internal_hits = check_internal_artifacts(paths)
         worktree_hits.extend(internal_hits)
         internal = [{"path": h.location, "rule": h.rule} for h in internal_hits]
-        # 覆盖清单（本轮新增目录必须真的被扫到；0 个文件即 block）
-        coverage_rows = coverage_report(paths)
-        worktree_hits.extend(coverage_hits(coverage_rows))
+        # 覆盖清单只对发布前全量有意义：日常增量没有动到的目录当然可能是 0 个文件。
+        if scan_kind == "full":
+            coverage_rows = coverage_report(paths)
+            worktree_hits.extend(coverage_hits(coverage_rows))
         # 扫描器自身也必须干净（即使它还没被跟踪）
         if SELF_PATH.exists():
             try:
@@ -1217,12 +1911,22 @@ def build_result(args) -> dict:
             except OSError:
                 pass
 
-    if want_history:
-        hist_meta_hits, records = scan_history_metadata()
-        commit_count = len(records)
-        hist_content_hits = scan_history_content()
+    if artifact_roots:
+        artifact = scan_artifact_paths(artifact_roots)
+        artifact_hits = artifact["hits"]
+        artifact_entries = artifact["entries"]
+        artifact_manual = artifact["manual"]
+        artifact_inventory = artifact["inventory"]
+        artifact_files = artifact["files"]
 
-    hits = worktree_hits + hist_meta_hits + hist_content_hits
+    if want_history:
+        # 增量只看基线之后的新增提交；默认仍是 --all（发布前全量）。
+        history_revspec = "%s..%s" % (baseline["commit"], baseline["head"]) if baseline else "--all"
+        hist_meta_hits, records = scan_history_metadata(history_revspec)
+        commit_count = len(records)
+        hist_content_hits = scan_history_content(history_revspec)
+
+    hits = worktree_hits + hist_meta_hits + hist_content_hits + artifact_hits
     uniq: dict[tuple, Hit] = {}
     for h in hits:
         uniq.setdefault(h.key(), h)
@@ -1235,7 +1939,11 @@ def build_result(args) -> dict:
         ),
     )
     counts = count_by(hits)
-    scopes: dict = {"worktree": {"block": 0, "warn": 0}, "history": {"block": 0, "warn": 0}}
+    scopes: dict = {
+        "worktree": {"block": 0, "warn": 0},
+        "history": {"block": 0, "warn": 0},
+        "artifact": {"block": 0, "warn": 0},
+    }
     published_split: dict = {"published": {"block": 0, "warn": 0}, "unpublished": {"block": 0, "warn": 0}}
     for h in hits:
         scopes.setdefault(h.scope, {"block": 0, "warn": 0})[h.severity] += 1
@@ -1243,14 +1951,45 @@ def build_result(args) -> dict:
             published_split["published" if h.published else "unpublished"][h.severity] += 1
     block_total = sum(c["block"] for c in counts.values())
     warn_total = sum(c["warn"] for c in counts.values())
-    verdict = (
-        "允许进入发布（仍需完成报告里的人工目检项）"
-        if block_total == 0
-        else "不允许发布：block 未清零"
-    )
+    # 只有发布前全量才配说「允许发布」；日常增量绝不冒充发布门。
+    if block_total == 0:
+        verdict = (
+            "允许进入发布（仍需完成报告里的人工目检项）"
+            if scan_kind == "full"
+            else "增量扫描未发现 block（不代表发布前全量已通过；186 仍需全量）"
+        )
+    else:
+        verdict = (
+            "不允许发布：block 未清零"
+            if scan_kind == "full"
+            else "增量扫描发现 block：未通过，须先处置"
+        )
+    mode_labels = {
+        "full": "发布前全量（工作区受跟踪文件 + 全部提交历史 --all）",
+        "incremental": "日常增量（基线 %s → HEAD；工作区改动 + 新增提交）"
+        % (baseline["ref"] if baseline else "?"),
+        "artifact": "仅显式候选（不扫工作区全量、不扫全部历史）",
+    }
     return {
         "generated_at": started.isoformat(timespec="seconds"),
         "repo_root": PH_REPO,
+        "scan_mode": {
+            "kind": scan_kind,
+            "label": mode_labels[scan_kind],
+            "release_gate": scan_kind == "full",
+            "baseline": baseline,
+            "artifacts": [r["display"] for r in artifact_roots],
+            "history_revspec": history_revspec,
+        },
+        "baseline": baseline,
+        "artifacts": {
+            "roots": [r["display"] for r in artifact_roots],
+            "files": artifact_files,
+            "entries": artifact_entries,
+            "manual": artifact_manual,
+            "inventory": artifact_inventory,
+            "note": "二进制/图片仅登记待人工目检，不代表已通过；ZIP 只读内容、不解压到外部",
+        },
         "placeholder_policy": {
             "home": PH_HOME,
             "user": PH_USER,
@@ -1261,6 +2000,8 @@ def build_result(args) -> dict:
             "neutral_identity": "%s <%s>" % (NEUTRAL_NAME, NEUTRAL_EMAIL),
         },
         "worktree": {
+            "mode": scan_kind,
+            "changed_files": len(paths),
             "tracked_files": len(paths) - untracked_count,
             "untracked_files": untracked_count,
             "scanned_files": len(paths),
@@ -1268,10 +2009,13 @@ def build_result(args) -> dict:
             "binary_files": binary_files,
             "text_extensions": dict(sorted(text_ext_counts.items(), key=lambda kv: -kv[1])),
             "scanned_self": (
-                SELF_PATH.relative_to(REPO_ROOT).as_posix() if SELF_PATH.exists() else None
+                SELF_PATH.relative_to(REPO_ROOT).as_posix()
+                if SELF_PATH.exists() and _is_within(REPO_ROOT, SELF_PATH)
+                else (SELF_PATH.name if SELF_PATH.exists() else None)
             ),
         },
         "history": {
+            "revspec": history_revspec,
             "commits": commit_count,
             "published_tag": PUBLISHED_TAG,
             "published_commits": len(PUBLISHED_COMMITS),
@@ -1396,32 +2140,70 @@ def build_identity_names() -> list[str]:
 
 def main(argv: list[str] | None = None) -> int:
     global RULES
-    parser = argparse.ArgumentParser(description="brushConverter 开源前隐私扫描（任务 17）")
-    parser.add_argument("--json", metavar="PATH", help="把完整 JSON 结果写到指定路径")
-    parser.add_argument("--text", metavar="PATH", help="把文本报告写到指定路径")
-    parser.add_argument("--fail-on-block", action="store_true", help="block 命中 > 0 时退出码 1")
-    parser.add_argument("--worktree-only", action="store_true", help="只扫工作区")
-    parser.add_argument("--history-only", action="store_true", help="只扫提交历史")
-    parser.add_argument(
+    parser = argparse.ArgumentParser(
+        description="brushConverter 开源前隐私扫描（任务 17 / 162A）",
+        epilog=(
+            "口径区分（--help 必须看清）：\n"
+            "  日常增量（推荐，成本低）：--since-baseline <基线提交/分支/tag>\n"
+            "    只扫基线之后的工作区新增/修改文件与新增提交（作者/提交者/提交信息/新增行，\n"
+            "    含后来又被删掉的敏感行）；可再叠加 --artifact。它不能替代发布门，\n"
+            "    结论不会写成「允许发布」。\n"
+            "  发布前全量（186 候选冻结后集中执行一次）：不带任何增量参数。\n"
+            "    工作区 + --all 全部提交历史；冻结后应加 --include-untracked --fail-on-block，block 必须为 0。\n"
+            "  仅显式候选：只给 --artifact 时，只扫这些候选（含被 .gitignore 忽略的 ZIP），\n"
+            "    不扫工作区全量、不扫全部历史。\n"
+            "退出码：0 完成；1 --fail-on-block 且 block>0；2 参数/环境错误；3 自检失败；\n"
+            "        4 基线阻塞（不存在/不是 HEAD 祖先/引用集合无法确认覆盖；绝不静默退为只扫 HEAD）。"
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    daily = parser.add_argument_group("日常增量（推荐；不能替代发布门）")
+    daily.add_argument(
+        "--since-baseline",
+        metavar="REF",
+        help=(
+            "显式基线（提交/分支/tag）。只扫基线之后的工作区改动与新增提交；"
+            "基线不存在、不是 HEAD 祖先或引用集合无法确认覆盖时退出码 4（阻塞）"
+        ),
+    )
+    daily.add_argument(
+        "--artifact",
+        metavar="PATH",
+        action="append",
+        help=(
+            "可重复。显式候选文件/目录（相对路径按当前命令目录解析，解析后必须在仓库根内；"
+            "允许被 .gitignore 忽略的 ZIP）。ZIP 只读条目、不解压到外部；"
+            "二进制/图片只登记待人工，不代表已通过。单独使用时只扫候选，不触发全量"
+        ),
+    )
+    full = parser.add_argument_group("发布前全量（186 候选冻结后集中执行）")
+    full.add_argument(
         "--include-untracked",
         action="store_true",
-        help="把尚未跟踪、也没被 .gitignore 排除的新文件一并纳入（收尾增量扫描用）",
+        help="把尚未跟踪、也没被 .gitignore 排除的新文件一并纳入（全量收尾用）",
     )
-    parser.add_argument("--selftest", action="store_true", help="只跑内置自检（不读仓库、不写文件）")
-    parser.add_argument(
+    full.add_argument("--fail-on-block", action="store_true", help="block 命中 > 0 时退出码 1")
+    scope = parser.add_argument_group("扫描范围与输出（调试/取证）")
+    scope.add_argument("--worktree-only", action="store_true", help="只扫工作区（不能与增量/候选参数同用）")
+    scope.add_argument("--history-only", action="store_true", help="只扫提交历史（不能与增量/候选参数同用）")
+    scope.add_argument("--json", metavar="PATH", help="把完整 JSON 结果写到指定路径")
+    scope.add_argument("--text", metavar="PATH", help="把文本报告写到指定路径")
+    scope.add_argument("--max-per-rule", type=int, default=500, help="文本报告里同一规则最多打印多少条")
+    scope.add_argument("--quiet", action="store_true", help="不打印文本报告（只写文件）")
+    tool = parser.add_argument_group("自检与占位化（维护用）")
+    tool.add_argument("--selftest", action="store_true", help="只跑内置自检（不读仓库、不写文件）")
+    tool.add_argument(
         "--fix-worktree",
         action="store_true",
         help="预览工作区占位化（配合 --apply 才写回文件）",
     )
-    parser.add_argument(
+    tool.add_argument(
         "--fix-tree",
         action="store_true",
         help="对当前目录整棵树做占位化（供 git filter-branch --tree-filter 重写历史调用）",
     )
-    parser.add_argument("--root", metavar="PATH", help="扫描根（默认仓库根；历史重写时指定原仓库根）")
-    parser.add_argument("--apply", action="store_true", help="与 --fix-worktree/--fix-tree 连用：真正写回文件")
-    parser.add_argument("--max-per-rule", type=int, default=500, help="文本报告里同一规则最多打印多少条")
-    parser.add_argument("--quiet", action="store_true", help="不打印文本报告（只写文件）")
+    tool.add_argument("--root", metavar="PATH", help="扫描根（默认仓库根；历史重写时指定原仓库根）")
+    tool.add_argument("--apply", action="store_true", help="与 --fix-worktree/--fix-tree 连用：真正写回文件")
     args = parser.parse_args(argv)
 
     if args.selftest:
@@ -1481,6 +2263,17 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         result = build_result(args)
+    except BaselineBlocked as exc:
+        # 基线不能确认覆盖：阻塞退出，绝不静默退化到只扫 HEAD。
+        print("[基线阻塞] " + str(exc), file=sys.stderr)
+        print(
+            "[基线阻塞] 未执行任何扫描，也未退化为只扫 HEAD；请处置基线/引用后重跑，或改用发布前全量。",
+            file=sys.stderr,
+        )
+        return INCREMENTAL_EXIT_BLOCKED
+    except ArtifactPathError as exc:
+        print("[错误] --artifact 路径无效：" + str(exc), file=sys.stderr)
+        return 2
     except RuntimeError as exc:
         print("[错误] " + str(exc), file=sys.stderr)
         return 2
