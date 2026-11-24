@@ -1,15 +1,18 @@
 # ABR → Krita 完整参数映射清单
 
-> 引擎：现阶段仅像素引擎（paintbrush）。源数据来自 `海怪笔刷…18支.abr`（v6.2，20 预设）。
-> ✅ = 已实现，⛔ = 不映射（原因见右侧），⚠️ = 已尽量映射但仍保留提示（如 `TxtC` / `protectTexture` 在 Krita 无对应）；
-> ❓ = 待确认（**历史记号**，本表现已无待确认项：早期两处已全部落地，见任务 16 的 `docs/归档/文档对齐报告.md`）。
+> **English abstract**: Field-level mapping reference for ABR-to-Krita conversion. The published version is v1.5.0; v1.6.0 is an unpublished candidate. Implementation status, measured evidence, known residuals and unverified combinations are reported separately.
+>
+> 引擎：现阶段仅像素引擎（paintbrush）。早期字段来源样本为自备商用ABR，后续证据覆盖范围逐节注明，不承诺任意笔刷精确等价。
+> **版本边界**：v1.5.0已发布；149A单随机源与153亮度越界预烘焙属于本地v1.6.0候选，尚未发布。逐支开关、安全取消、元信息/标签扩展仍是本轮计划，不据此杜撰API。
+> ✅=实现该映射分支，不等于任意参数域像素精确或人工已验；⛔=不映射；⚠️=已知限制/待量测边界。历史❓记号不替代[参数矩阵](<参数矩阵.json>)中的“未定”。模式verdict/证据等级以[模式总表](<数据/mode-table.json>)为准，参数verdict以矩阵为准，两种对象不混算。
+> 维护与验证入口见[开发指南](<developer-guide.md#maintenance-checks>)；旧方案看[归档说明](<归档/维护参考与归档说明.md>)。本页保留既有§1–§10标题锚点，历史报告与JSON原证据不重写。
 
 ## 1. 笔尖与基础属性
 
 | ABR 键 | 含义 | → Krita | 映射公式 | 状态 |
 |--------|------|---------|----------|------|
 | `samp` 位图 + `sampledData` UUID | 采样笔尖 | png_brush 内嵌笔尖 | 灰度 PNG，**深=墨 / 255=白=透明**（ABR 原始字节 255=墨，`samples._decode_pixels` 做一次 `255−raw`；与 Krita 极性一致，见 developer-guide §7.1 第 2/3 条） | ✅ |
-| `Brsh.Dmtr` | 主直径 px | `scale` | `scale = Dmtr / max(笔尖宽, 笔尖高)`；采样笔尖内嵌 PNG 补零为正方形 | ✅（Krita 显示尺寸修正） |
+| `Brsh.Dmtr` | 主直径 px | `scale` | `scale = Dmtr / max(笔尖宽, 笔尖高)`；采样笔尖内嵌PNG以255居中补白为正方形（不改现行补白） | ✅（Krita 显示尺寸修正） |
 | `Brsh.Spcn` | 间距 % | `spacing` | 计算笔刷：`spacing = Spcn/100 × 标称直径/位图足印边长`（v1.5.0 起计算笔刷也是 png_brush，按足印反算基准）；采样笔刷：`spacing = Spcn/100 × 原始笔尖短边/长边`（v1.4.0 任务 107 基准补偿） | ✅ / ⚠️需校准（131 复测 9/9 ≤2%，见 §10.1） |
 | `Brsh.Angl` | 角度（度） | `angle` | `math.radians(Angl % 360)`（度→弧度，负角先 normalize 到 [0,360)） | ✅ |
 | `Brsh.Rndn` | 圆度 % | （采样笔刷不映射，见注①） | — | ⛔ |
@@ -23,8 +26,7 @@
 > 1.253 / 1.281 / 1.325（长宽比 1.280），方形组 1.013–1.020，计算笔刷 0.982–1.000。
 > 修法**只动间距换算这一层**：`spacing × 短边/长边`（比值来自 `BrushPreset.spacing_basis`，
 > 由 `mapping.py` 从原始笔尖宽高算出、在 `convert._sampled_brush_def` 里乘上）。
-> **补白代码一行未改**（铁律 17）；间距基准比为**严格正方形=1；近方形按实际短/长边；计算笔刷不补偿**
-> （如 86×84 → 0.977，方形组实测误差 1.69–2.01% → 0.68–1.18%；计算笔刷 spacing 原样，走 `_computed_brush_def()`）。
+> **补白代码未改**；短边/长边补偿仅针对采样笔刷：严格正方形=1，近方形按实际短/长边（如86×84→0.977）。计算笔刷不套采样短边比，但v1.5.0起需按“标称直径/生成位图足印边长”反算spacing，生产路径是png_brush，见§2；不再按107当时的auto_brush描述理解现状。
 > 106 单周期实测：25.28%→**0.11%**、28.09%→**0.18%**、32.46%→**3.53%**；
 > **131 用 2 次重复、9/9 组复测 ≤2%（最大 0.73%），3.53% 是 106 少周期量测伪差**（100% 点仅约 3.6 个周期，见 §10.1）。
 
@@ -44,7 +46,7 @@
 | `Hrdn` | 位图（`png_brush`） | 按剖面表生成位图，**不再写 `hfade/vfade`** | ✅（v1.5.0；Krita 里硬度/fade 不可再调；中间硬度残差见 §10.5） |
 | `Rndn` | 位图（`png_brush`） | 圆度 <100 时把剖面沿短轴压缩成椭圆再栅格化（轴序与旧 `ratio` 相同） | ✅（轴比 0.37%–1.34%，第五轮 150/156 判「可映射」） |
 | `Angl` | `angle` | `math.radians(Angl % 360)`（度→弧度，负角 normalize） | ✅ |
-| `Spcn` | `spacing` | `Spcn/100 × 标称直径/位图边长`（硬度越高位图越大，步长按标称直径反算，否则 h0 步长会被放大 1.45 倍） | ✅ |
+| `Spcn` | `spacing` | `Spcn/100 × 标称直径/位图边长`（软边足印可能大于标称直径，步长按标称直径反算，否则 h0 步长会被放大 1.45 倍） | ✅ |
 
 > **代价（发布说明必写）**：① Krita 里 `fade`/硬度不可再调（已烘焙进位图）；② 尺寸显示值 = PS 实际足印
 > （PS 标称 200 → Krita 290/250/204）；③ 每支笔多 3–12 KB（h100 @D=200 的 .kpp 5,588→9,143 B）。
@@ -91,7 +93,7 @@
 | ABR 键 | 含义 | → Krita | 映射公式 | 状态 |
 |--------|------|---------|----------|------|
 | `useScatter` | 启用散布 | `PressureScatter=true`（散布开关） | — | ✅ |
-| `scatterDynamics.jitter` | 散布量（0–1000%） | `ScatterValue`（0–5.0） | `ScatterValue = jitter / 200`（v1.5.0 任务 134-1；端点 1000%→5.0，不加 clamp） | ✅ / ⚠️需校准（a/D 0.65%/1.69%；1000% 端点未量测，见 §10.3） |
+| `scatterDynamics.jitter` | 散布量（0–1000%） | `ScatterValue`（0–5.0） | `ScatterValue = jitter / 200`（v1.5.0 任务 134-1；端点 1000%→5.0，不加 clamp） | ✅ / ⚠️需校准（常规a/D 0.65%/1.69%；1000%端点已由150量测，生产实现18.21%超阈、补偿候选未落地，见§10.3） |
 | `scatterDynamics.bVTy==2` | 散布量随压感 | `ScatterSensor=pressure` + `ScatterUseCurve=true` | — | ✅ |
 | `scatterDynamics.bVTy==0` | 散布恒定 | `ScatterSensor=pressure`（合法占位）+ `ScatterUseCurve=false`（关闭曲线） | — | ✅ |
 | `bothAxes` | 两轴 | `AxisX`/`AxisY` | True→AxisX=Y=True；False→AxisX=False,Y=True | ✅ |
@@ -105,7 +107,7 @@
 > 129 用 60 样本、分布型统计量（a/D）实测判定 `÷400` 在 5/5 配置超 10%（最大 50.01%）、`÷200` 最大相对差 0.21%；
 > 134 端到端抽检 a/D 相对差 **0.65%（j=100）/ 1.69%（j=300）**，两次渲染复现 0.08%/0.24%。
 > 散布档与旋转档是**两把尺子**（散布 `j/200`、旋转 `min(1, j/50)`），禁止共用系数。
-> 残差：1000% 端点只做参数/单测、端到端只到 300%（见 §10.3 的 B7）。
+> 残差：1000%端点已量测，B7生产实现18.21%超阈；这不是“只做单测/尚未量测”，也未因补偿候选达标而修复生产实现，见§10.3。
 
 ## 6. 不映射（引擎差异大，已列为后续增强）
 
@@ -114,14 +116,14 @@
 | `dualBrush` | 双笔刷 | Krita 是 masking brush 机制，语义不同 |
 | `useColorDynamics`（`H`/`Strt`/`Brgh`/`purity`/`clVr`） | 颜色动态 | 两软件颜色模型差异大 |
 | `Wtdg`（湿边） | 湿边 | 像素引擎需「Wet」选项，暂不启用 |
-| `Nose`/`Rpt`（喷嘴/重复） | — | 喷枪特性，暂不映射 |
+| `Nose`/`Rpt`（噪点/重复） | — | 历史“喷嘴”译名已撤回；当前不映射，不据旧名推断为已支持喷枪特性 |
 | `brushProjection` / `useBrushPose` | 投影/姿态 | 高级倾斜特性，暂不映射 |
 
 ## 7. 纹理（Texture）✅（v1.1 新增）
 
 > 纹理数据源：ABR `patt` 区段（按 UUID 匹配 `Txtr.Idnt`），资源以 PNG 内嵌
 > （`type="patterns"`，与 Krita 5.x 官方样本一致）。格式细节见
-> `docs/developer-guide.md` 与 `docs/归档/texture-mapping-proposal.md`。
+> [开发指南§5](<developer-guide.md>)是现行格式参考；[早期纹理方案](<归档/texture-mapping-proposal.md>)仅保留演进过程，不与当前实现并列作为格式权威。
 
 | ABR 键 | → Krita 参数 | 映射公式 | 状态 |
 |--------|--------------|----------|------|
@@ -133,18 +135,19 @@
 | `textureDepth`（%） | `Texture/Strength/Value` | 高度系 `min(1, 1.2×textureDepth/100)`；非高度系 `textureDepth/100`（0..1，v1.2.1） | ✅ / ⚠️（>83% 是 Krita Strength≤1.0 参数域上限、饱和段无像素后果；映射含 ×1.2 经验系数，height 模式 12q 量化判据不可达，见 §7.1 局限 3 与 §10.4） |
 | `textureDepthDynamics.bVTy==2` | `PressureTexture/Strength/` + `Texture/Strength/UseCurve` | `true` + `true`（压感曲线，最小值见下） | ✅ |
 | `textureDepthDynamics.bVTy==0` | `PressureTexture/Strength/` + `Texture/Strength/UseCurve` | `true` + `false`（效果强度开启、无传感器，恒定用 Value） | ✅ |
-| `textureDepthDynamics.Mnm` | `Texture/Strength/commonCurve` | **v1.5.0（135-5）0 端点写比值** `0,s_m/s_d;1,1;`（`s_m` = 最小深度对应强度、`s_d` = 深度对应强度；各自高度系 ×1.2 后封顶）。Krita 强度是乘性曲线，比值可避免低压力端二次相乘（仅 bVTy==2） | ✅ |
+| `textureDepthDynamics.Mnm` | `Texture/Strength/commonCurve` | **v1.5.0（135-5）0 端点写比值** `0,s_m/s_d;1,1;`（`s_m` = 最小深度对应强度、`s_d` = 深度对应强度；各自高度系 ×1.2 后封顶）。Krita 强度是乘性曲线，比值可避免低压力端二次相乘（仅 bVTy==2） | ⚠️实现比值路径，但minimumDepth仍有D145-1量纲缺陷，见§10.5；不把字段写入当端到端通过 |
 | `InvT` | `Texture/Pattern/Invert` | 直接 | ✅ |
 | `textureBlendMode` | `Texture/Pattern/TexturingMode` | 按 `mapping._TEXTURING_MODE`（v1.3.0 起 **34 个键**）取 Krita 枚举值：`linearHeight`→15、`height`→14、`hardMix`→10、`Mltp`→0、`Sbtr`→1、`Dfrn`→1、`blendSubtraction`→1、`Ovrl`→5、`CDdg`→6、`CBrn`→7、`linearDodge`→8、`linearBurn`→9 等；未登记的模式回退 Multiply(0) 并保留一条警告；v1.5.0（135-2）另加：hardMix + 满覆盖笔尖 + 恒定深度 → Strength=1.0 + 亮度 ±1/255 偏置 | UI 10 项：✅ 8 / 🧪 1 / ⛔ 1（hardMix：满覆盖/压感 0.00%，base<1 结构性、b×C 真残差 56.87%/38.50%；另 37 内部值不计限制，见 §7.2、§10.4） |
-| `textureBrightness`（PS -150..150） | `Texture/Pattern/Brightness` | `b_k = (1-k)/(510k) - v/255`（C≥0）或 `(1-k)/(510k) - v/(255k)`（C<0），保留 3 位小数，写入 clamp [-1,1]；满覆盖笔尖 + 恒定深度时另写 ±1/255 偏置（135-2）。越界区（\|未截断 b_k\|>1，等价 C=−50 且 \|v\|>127）第五轮（153）起改为预烘焙：PS 8bit 链烘进 PNG、Krita 写中性 B=0/C=1/Invert=false，实渲 12/12=0.000%/max0–1；代价与旧 .kpp 必重转见 §7.1 | ✅ / ⚠️（v1.5.0 起唯一公式，legacy 已删除；越界区第五轮 153 起改为预烘焙，见 §7.1） |
+| `textureBrightness`（PS -150..150） | `Texture/Pattern/Brightness` | `b_k = (1-k)/(510k) - v/255`（C≥0）或 `(1-k)/(510k) - v/(255k)`（C<0），保留 3 位小数，写入 clamp [-1,1]；满覆盖笔尖 + 恒定深度时另写 ±1/255 偏置（135-2）。越界区（\|未截断 b_k\|>1，C=−50且\|v\|>127是旧实验网格切片，非任意C的等价条件）第五轮（153）起改为预烘焙：PS 8bit 链烘进 PNG、Krita写中性B=0/C=1/Invert=false（hardMix满覆盖且无深度压感分支另叠加−1/255偏置），实渲 12/12=0.000%/max0–1；代价与旧 .kpp 必重转见 §7.1 | ✅ / ⚠️（v1.5.0 起唯一公式，legacy 已删除；越界区第五轮 153 起改为预烘焙，见 §7.1） |
 | `textureContrast`（PS -50..100） | `Texture/Pattern/Contrast` | 中心因子 `k`（C<0：1+C/100；C≥0：1/(1-C/100)）**原值直写、不再 min(2.0, k) 截断**（135-4）；C>50 用 9 位小数 + `_format_number`；写入域无 clamp（Krita 读取无 clamp，仅 UI 滑块 0..2 显示越界） | ✅ / ⚠️（C=84→6.25、C=100→1e6；B13 预缩放+C=80 5.650%，见 §10.4） |
 | `TxtC` / `interpretation` | — | Krita 无对应，静默忽略（源文件默认值） | ⚠️ |
 | `protectTexture` | — | Krita 无对应，保留轻量警告 | ⚠️ |
 
 > 亮/对比度映射依据 Krita `KisTextureMaskInfo::recalculateMask()` 与 `research/测试结果2`、`research/krita结果`：
 > 所有模式统一使用普通校准（Linear Height (Photoshop) 曾用 0.30 基线/对比度倒数的特殊映射，实测效果不好，2026-08-27 确认取消）。
-> Krita UI 显示两位小数：legacy 严格按 0.01 舍入（v1.1.2 行为）；
-> calibrated 保留 3 位小数（Krita 用 `getDouble` 原样读取预设值，理由与风险见 §7.1 局限 5）。
+> 旧legacy的两位小数只适用于历史实现，当前没有该运行时分支。calibrated亮度常规保留3位小数，C>50对比度使用9位小数；Krita读取值与UI滑块显示范围不是一回事，局限见§7.1。
+
+<a id="texture-bc-current"></a>
 
 ### 7.1 纹理亮度/对比度：单条公式（v1.2.0 转正，v1.5.0 起 legacy 开关已删除）
 
@@ -197,8 +200,7 @@ b_k = (1-k)/(510k) - b/(255k)     （C <  0，亮度在对比度之后 → 反�
    C=84 → 6.25、C=100 → 1e6）。v1.5.0（135-4）改为 **k 原值直写 + `_format_number` 9 位小数**，
    Krita 读取层无 clamp，掩码可表达网格 79/81 组差异 0.00%/max≤1；**遗留**是 Krita 笔刷编辑器滑块只显示
    0..2（值越界属预期，需人工在 Krita 里抽查 1 支确认可编辑性，尚未做）。
-2. **Krita 亮度范围 [-1,1]**：C<0 且反解出的 `b_k` 越界时按边界截断。实测阈值约
-   `C=-50 且 PS 亮度 < -127 或 > 127`（参数网格中 b=±150 与 C=-50 的两组）。**第五轮（153）起该区改为预烘焙、不再截断**，见下方「第五轮新增：亮度越界区预烘焙」。
+2. **Krita亮度范围[-1,1]**：v1.5.0在C<0且反解越界时会写边界值；第五轮153在候选管线先用未截断亮度判越界并改为预烘焙，见下文。C=−50、b=±150是旧参数网格中的两组，不能把它写成一般参数域的唯一命中条件。
 3. **PS 深度 > 83% 与 Krita `Strength≤1.0`（v1.5.0 复核：参数域上限，不是结构性缺陷）**：PS 高度/线性高度用
    `12·q`（`q = round(depth·2.55)`）加权，Krita 同一算子写 `10·s`，换算 `strength ≈ 1.2·depth/100`。
    PS 深度 > 约 83% 时映射值被封顶 1.0，但**饱和段与原值同像素（无像素后果）**——PS 高度系本身在该区已饱和，
@@ -218,10 +220,10 @@ b_k = (1-k)/(510k) - b/(255k)     （C <  0，亮度在对比度之后 → 反�
 
 **第五轮新增：亮度越界区预烘焙（任务 153，已落地；v1.6.0 候选）**
 
-命中判据：`texture_bc_out_of_range(b, c)` = calibrated 反解的**未截断值** `|b_k| > 1`（等价于「C=−50 且 PS 亮度绝对值 >127」，可覆盖一般组合）。命中时不再把 `b_k` 截断到 ±1：
+命中判据：`texture_bc_out_of_range(b, c)` 检查calibrated反解的未截断值 `|b_k|>1`；这是一般判据，C=−50且PS亮度绝对值>127只是当C=−50时的旧实验切片，不与任意C等价。命中时不再把亮度硬截断到±1：
 
-- 按 **PS 8bit 链**把亮度/对比度/反相烘进内嵌纹理 PNG（C<0 先对比度后亮度；C≥0 先亮度后对比度；先 clip 再反相）；
-- Krita 三字段写**中性值**：`Texture/Pattern/Brightness=0`、`Contrast=1`、`Invert=false`；hardMix 满覆盖的 −1/255 偏置分支改为在烘后掩码上等价抬高 1 LSB。
+- 按**PS 8bit链**把亮度/对比度/反相烘进内嵌PNG（C<0先对比度后亮度，C≥0先亮度后对比度）；
+- 中性字段B=0/C=1/Invert=false；**hardMix满覆盖且无深度压感的专门分支例外**：烘后再令B=−1/255，等价抬高1 LSB，不能把“中性B=0”推广成所有产物的逐字节断言。实现见[转换管线](<../src/brush_converter/convert.py#L297-L350>)。
 
 结果：端到端实渲 **12/12 = 0.000%/max0–1**（改前同批 8/12 超阈、最大 61.125%/max23；边界 ±128 组两侧本就一致）。
 
@@ -240,7 +242,7 @@ b_k = (1-k)/(510k) - b/(255k)     （C <  0，亮度在对比度之后 → 反�
    （`s = Texture/Strength/Value`），归一化后两侧固定相差 `2q`，与量化无关
    （d10 时两侧 q 同为 26，量化阶差最多 2 灰度级）。修法：高度系
    `Texture/Strength/Value = min(1.0, 1.2 × depth/100)`，压感曲线路径的 0 端点同样用
-   `min(1.0, 1.2 × depth_min/100)`；**非高度系（multiply / subtract / hardMix）一律不动**。
+   `min(1.0, 1.2 × depth_min/100)` 是v1.2.1当时的0端点说明；当前v1.5.0起写强度比值，见上方映射表及§10.5量纲缺陷，不能把旧绝对值照写回去。**非高度系（multiply / subtract / hardMix）不加此增益**。
    - 依据：`docs/验收报告/实验-归因-报告.md` §4.2/§4.3（根因 `PS=12q−u` vs `Krita=10q−u`，差 2q）；
      `docs/验收报告/实验-Krita侧-报告.md` §17（2026-11-19 fixA 实测）。
    - 实测（d10/scale=100，PS 真值对照）：mean\|Δ\| **43.31 → 1.39**、max **52 → 2**、
@@ -266,6 +268,8 @@ b_k = (1-k)/(510k) - b/(255k)     （C <  0，亮度在对比度之后 → 反�
      Krita 图案库里有什么文件，无法预判撞车。所以两件事必须一起做、且每次都做。
    - 依据：`docs/验收报告/实验-Krita侧-报告.md` §8.2；修复回归用例
      `tests/test_texture_v121_fixes.py`。
+
+<a id="texture-modes-current"></a>
 
 ### 7.2 纹理混合模式逐模式结论（v1.3.0；`docs/数据/mode-table.json` 为唯一真相）
 
@@ -358,28 +362,24 @@ b_k = (1-k)/(510k) - b/(255k)     （C <  0，亮度在对比度之后 → 反�
 
 - 完全重复的预设（同名 + 同 UUID + 同 Dmtr）只保留首个。当前文件因此去掉 1 个重复的「淘宝店」横幅笔刷（20 → 19）。
 
+<a id="residual-current"></a>
+
 ## 10. 参数偏差实测与残差（第五轮 v0.17–v0.19 口径；目标 v1.6.0 候选）
 
 > 证据来源：v1.4.0 = 任务 106/107；v1.5.0 = 129/131/133/134/135 四批实验 + 136 收口（`docs/验收报告/136-报告.md` §四）；
 > 第五轮（2026-11-23）= 143/144（PS/Krita 压感装置）、145（F-3 minimumDepth）、146（F-9 Mnm）、147（B12 hardMix+压感）、
 > 148（F-6/F-7/B6）、149（B8 旋转饱和）、149A（旋转 fuzzy 单源修法落地）、150（N4 几何/缩放）、151（N7 大直径）、
 > 152（N5 base<1 + B9 更正）、153（N6 B10 预烘焙落地）、156（N1 矩阵 14 行清账）。逐行结论以参数矩阵为准。
-> **判据四档（`docs/优化提示词/01-通用规范.md` 第 22 条，不许放宽）**：
+> **现行四档判据（本页保留完整限定，不放宽）**：具体验证入口与退出码见[验证说明](<验证体系使用说明.md>)；旧说明中的单项摘要不能覆盖以下联合条件。
 > 像素级 差异比例 ≤2% 且 max_delta ≤2；几何级 绝对差 ≤2px 或相对差 ≤2%；
 > 随机统计 带高中位数相对差 ≤10% 且两次渲染复现性 ≤5%；结构性 有原文证据 + Krita 无承载/有上限，登记残差不再改。
-> 复算命令（只读入库图，不重渲；**别随手 `--force`**——散布随机种子每次会话不同，会把入库证据覆盖成另一组数）：
+> **复核分层，不覆盖旧证据**：本节数据是原报告的当时结论，不是任务164重新量测。当前只读结构与生成一致性命令见[开发指南§9](<developer-guide.md#maintenance-checks>)；新一轮全量与应用渲染等183/187。
 >
-> ```bash
-> python tools/measure_deviation.py --param spacing  --values 10,50,100 --analyze
-> python tools/measure_deviation.py --param hardness --values 0,50,100   --analyze
-> python tools/measure_deviation.py --param scatter  --values 0,100,300  --analyze
-> python tools/measure_deviation.py --param scale    --values 50,100,200 --analyze
-> python -m pytest -q tests/test_hardness_tip_v150.py tests/test_random_dynamics_v150.py tests/test_texture_v150.py \
->      tests/test_texture_b10_v160.py tests/test_rotation_source_v160.py
-> ```
+> **旧复算工具不是全程只读**：[measure_deviation的主流程](<../tools/measure_deviation.py#L1621-L1654>)即使传--analyze也会回写results，并由[update_manifest](<../tools/measure_deviation.py#L1566-L1615>)改manifest。原来的“只读入库图”只描述图像输入，不代表不写旧JSON。这里撤下可误直接运行的旧命令，不在本工作区回写已有证据；确需复跑，先在工作区内单独副本核实全部固定输出，原件/旧基准只读，光改TEMP不够，也不加--force。
 >
-> 注意：`measure_deviation` 读的是 106/107 的**旧口径**存储数据（硬度 auto_brush、散布 ÷400、缩放无预缩放），
-> 它复算出来的是「v1.4.0 当时的残差」；v1.5.0 及第五轮的新口径由 pytest 断言与 `docs/验收报告/143–156` 给出。
+> **当前实现回归线索**：[硬度用例](<../tests/test_hardness_tip_v150.py>)、[随机动态](<../tests/test_random_dynamics_v150.py>)、[纹理](<../tests/test_texture_v150.py>)、[B10](<../tests/test_texture_b10_v160.py>)、[单随机源](<../tests/test_rotation_source_v160.py>)。由获授权回归任务核验应用依赖后，在工作区内指定basetemp/cache_dir串行运行，不将跳过写成通过。
+>
+> 106/107旧数据的auto_brush、÷400和无预缩放只说明v1.4.0当时口径；后续结论按各行报告/JSON真相核对，不用旧工具重算值覆盖本表。
 
 ### 10.1 间距（采样笔尖短边补偿已收口 ✅；椭圆方向依赖登记）
 
@@ -445,7 +445,7 @@ bVTy=6/7/8 且 jitter>0 的随机幅度同机制减半但**未单独实机重测
 
 | 项 | v1.5.0 残差 | 第五轮处置/结论 | 结果 |
 |---|---|---|---|
-| 亮度越界区（B10） | 现行闭式解 8/12 组超阈、最大 61.125%/max23 | **153 已落地预烘焙**：命中判据 \|未截断 b_k\|>1（等价 C=−50 且 \|b\|>127）；PS 8bit 链（C<0 先对比度后亮度 / C≥0 先亮度后对比度）烘进内嵌 PNG，Krita 三字段写中性 B=0/C=1/Invert=false | **12/12 = 0.000%/max0–1**（改前同批 8/12 超阈）；代价：命中区纹理 B/C/Invert 失 PS 语义、每 (b,c,invert) 一份纹理资源、旧 .kpp 必重转；非命中区行为不变 |
+| 亮度越界区（B10） | 现行闭式解 8/12 组超阈、最大 61.125%/max23 | **153 已落地预烘焙**：命中判据 \|未截断 b_k\|>1（C=−50且\|b\|>127是旧实验切片）；PS 8bit 链（C<0 先对比度后亮度 / C≥0 先亮度后对比度）烘进内嵌 PNG，Krita中性B/C/Invert起点（hardMix满覆盖无压感例外另叠加−1/255，见§7.1） | **12/12 = 0.000%/max0–1**（改前同批 8/12 超阈）；代价：命中区纹理 B/C/Invert 失 PS 语义、每 (b,c,invert) 一份纹理资源、旧 .kpp 必重转；非命中区行为不变 |
 | b×C 交互区（B9） | 旧数字 multiply/subtract/linearBurn **76.680%**、hardMix **57.570%** **全部作废**（128A 配对错配） | 152 按纹理正确配对重测（b=50/c=50、base≡1）：**9/10 模式两纹理 0.000%/max≤1**（C<0 区 5 组亦 0.000%/max1）；唯一真残差=hardMix **56.873%(t1)/38.498%(t2)/max255**；修法候选 b=0.5−0.5/c+1/255 实渲 0.000%/max0（未落地） | 掩码生成无残差；不再作为 multiply/subtract/linearBurn 的残差 |
 | 缩放 <100%（A5） | 未量测 | 150：s=50 现行 Qt 路径 **0.000%/max1** 通过；**s=75 现行路径 88.720%/max94 超阈**（源对齐预缩放 0.000%/max1，未落地） | 需校准维持（真实样本 scale 全 ≤100，会命中 s=75） |
 | 预缩放+高对比度（B13） | 未量测 | 150：s=200+C=80 **5.650%/max5**（d=50 组合 5.330%/max3）；s=200+d50 0.000%/max1；raw 路径 47.920%/max255 | 需校准维持（8-bit 预缩放量化被 k=5 放大，假设未单证） |
