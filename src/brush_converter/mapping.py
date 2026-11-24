@@ -212,7 +212,7 @@ def _map_texture(p: dict[str, D.Value],
 
 #: bVTy 控制源枚举 → Krita 旋转传感器 id（124 逆向 A 级 9 值表；任务 134-3）。
 #:
-#: 124-逆向-随机动态.md §4.1 逐值（9 条本地化串逐字读回 + 枚举表指针比较）：
+#: docs/工作流程/归档/124-逆向-随机动态.md §4.1 逐值（9 条本地化串逐字读回 + 枚举表指针比较）：
 #:   0=Off 关 / 1=Fade 渐隐 / 2=Pen Pressure 压感 / 3=Pen Tilt 倾斜 /
 #:   4=Stylus Wheel 转轮 / 5=Initial Direction 初始方向 / 6=Direction 笔划方向 /
 #:   7=Speed 速度 / 8=Rotation 笔尖旋转。
