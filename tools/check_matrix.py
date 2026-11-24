@@ -14,6 +14,7 @@
      a) sources 含 re    <=> 该键在 docs/数据/ps_keys.json 里
      b) sources 含 abr   <=> 该键在 docs/数据/abr_keys.json 里
      c) sources 含 parser<=> 该键作为字符串字面量出现在 src/brush_converter/**/*.py
+        （身份 JSON 模块 export_options.py 不参与：字段名与 ABR 键同名不是解析证据）
      d) krita_target 与 verdict 自洽：无对应 => krita_target=无对应；未定 => krita_target=未定；
         sources 含 krita <=> krita_target 不是 无对应/未定
   C7 基线防回退：总行数 >= BASELINE_KEYS；「逆向有而 ABR 无」行数 >= BASELINE_RE_ONLY
@@ -81,14 +82,24 @@ def load_json(path: pathlib.Path, label: str) -> object:
         raise SystemExit(2)
 
 
+#: C6c 只把“解析/映射模块”里的字面量当作 parser 证据。export_options.py 是
+#: 任务167 的逐支身份 JSON 字段名（如 "brightness"/"flow"/"scatter"），同名纯属
+#: 撞车，它不解析 ABR 键。2026-11-24 任务168 经使用者授权窄修排除该模块，
+#: 不改矩阵结论、不改其它扫描范围。
+PARSER_SCAN_EXCLUDED = frozenset({"export_options.py"})
+
+
 def parser_literals() -> set[str]:
     """src/brush_converter/**/*.py 里的字符串字面量（ast 精确匹配，排除 docstring）。
 
     与任务 22 的 in_repo_parser 判据一致；本脚本自带实现，避免依赖一次性脚本。
+    身份 JSON 模块（PARSER_SCAN_EXCLUDED）不参与 C6c，理由见上方常量注释。
     """
     root = REPO / "src/brush_converter"
     lits: set[str] = set()
     for p in sorted(root.rglob("*.py")):
+        if p.name in PARSER_SCAN_EXCLUDED:
+            continue
         tree = ast.parse(p.read_text(encoding="utf-8"))
         docs = set()
         for node in ast.walk(tree):

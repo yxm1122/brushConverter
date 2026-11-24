@@ -703,3 +703,17 @@ def test_alternative_paths_require_explicit_off():
     assert on.native_tip is False and off.native_tip is True
     assert on.limited_switches == ()
     assert set(off.limited_switches) == {SWITCH_RASTERIZE_COMPUTED, SWITCH_BAKE_TEXTURE_BC}
+
+
+
+def test_matrix_parser_scan_excludes_identity_json_keys():
+    """check_matrix C6c 不得把 167 身份 JSON 的同名字段当成解析器字面量。
+
+    2026-11-24 使用者授权窄修：只排除 export_options.py，保留真实解析器字面量。
+    """
+    from tools import check_matrix
+
+    literals = check_matrix.parser_literals()
+    for key in ("brightness", "flow", "scatter"):
+        assert key not in literals, f"{key} 只是身份 JSON 字段名，不是解析器字面量"
+    assert "textureBrightness" in literals  # 真实解析器字面量仍在扫描范围内
