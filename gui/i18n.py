@@ -120,6 +120,168 @@ _STRINGS: dict[str, dict[str, str]] = {
     },
 }
 
+# 170逐支控件：两种语言共用同一组键，数值判断仍来自转换器。
+_STRINGS["zh"].update({
+    "file_section": "文件",
+    "reload": "重新载入",
+    "processing": "逐支处理与编辑能力",
+    "process_help": "点击笔刷行或“查看/调整”编辑三项处理；列表复选框只决定是否导出。",
+    "no_current": "请选择一支可见笔刷查看处理说明。",
+    "reset_notice": "适用项默认开启；换文件或重新载入会恢复条件默认，不记忆手动开关。",
+    "search": "搜索名称、稳定 ID 或源序号…",
+    "filter_label": "筛选：",
+    "sort_label": "排序：",
+    "filter_all": "全部笔刷",
+    "filter_selected": "仅已选",
+    "filter_computed": "计算笔刷",
+    "filter_sampled": "采样笔刷",
+    "filter_affected": "有适用处理",
+    "sort_source": "源顺序",
+    "sort_name_asc": "名称升序",
+    "sort_name_desc": "名称降序",
+    "select_all": "全选可见项",
+    "select_none": "取消可见项选择",
+    "count": "共 {total} 支 · 可见 {visible} 支 · 总已选 {sel} 支 · 隐藏已选 {hidden} 支",
+    "edit_brush": "查看/调整",
+    "brush_identity": "源序号 {ordinal} · {id}",
+    "current_selected": "本支已选中导出（即使隐藏也会导出）",
+    "current_unselected": "本支未选中，不会导出；处理开关可先调整。",
+    "switch_rasterize_computed": "计算笔刷位图化",
+    "switch_prescale_texture": "纹理预缩放",
+    "switch_bake_texture_bc": "亮度越界预烘焙",
+    "use_processing": "采用该处理（外观优先）",
+    "applicable": "适用",
+    "not_applicable": "不适用（不可开启）",
+    "switch_on": "开启",
+    "switch_off": "关闭／原生替代",
+    "limited": "受限",
+    "switch_status": "{applicability} · 当前{enabled} · 条件默认{default}",
+    "choice_consequences": "开启：{on}\n\n关闭：{off}",
+    "expected_state": "预计：{state}",
+    "actual_applied": "执行外观优先处理",
+    "actual_alternative": "使用原生可编辑替代",
+    "actual_not_applicable": "不执行此项（不适用）",
+    "actual_not_processed": "未处理",
+    "effect_rasterize_computed_on": "按 PS 硬度剖面生成位图；Krita 的 fade/硬度不能再调，尺寸显示为 PS 实际足印。",
+    "effect_rasterize_computed_off": "保留原生 auto_brush，直径/间距/角度/圆度/硬度可调（受限）。Krita fade 仅在 1.00R 内，PS 软边会伸出标称半径；既有 h0/h50 过渡带差为 −19.81%/+22.63%。尺寸为标称直径（当前硬度 {hardness}%），不再下发 hardMix 满覆盖偏置。",
+    "effect_prescale_texture_on": "把预缩放后的图案内嵌，导出 Scale=1；源图案尺寸/缩放基准被改写，之后调节 Scale 不再沿用源图案基准。",
+    "effect_prescale_texture_off": "保留源纹理尺寸和原生 Scale={scale}。代价：Krita Qt 与 PS 重采样不同，150%/200% 既有相对残差约 22%/32%，外观可能不同。{scale_note}",
+    "scale_limit_note": "受限：Scale 超过 10，目标 Krita 是否截断尚待实机确认。",
+    "effect_bake_texture_bc_on": "把亮度/对比度/反相烘进纹理像素，导出中性字段；这些字段不再具有源 PS 参数语义。",
+    "effect_bake_texture_bc_off": "保留 Krita 原生亮度/对比度/反相字段（受限）；亮度反解 {raw:.4f} → 按 [-1,1] 截断写入 {written:.4f}。PS 越界区不能完整表达：既有 12 组中 8 组超阈，最大残差 61.125%/max23；不烘焙、不换另一条烘焙链。",
+    "skipped_tip": "缺少采样笔尖位图：预计跳过整支，三项处理均不计入预计命中。",
+    "export_title": "导出前逐支确认",
+    "export_intro": "最终选中 {n} 支（含隐藏已选 {hidden} 支）。以下是预计处理清单，不是成功记录；实际结果以本次运行记录为准。",
+    "export_counts": "预计执行 {applied} 项 · 原生替代 {alternative} 项（受限 {limited} 项）· 预计跳过 {skipped} 支",
+    "export_target": "输出格式 {format} · 目录 {directory}",
+    "export_caution": "关闭处理可保留部分编辑能力，但不保证 Photoshop 外观一致；既有残差不在本轮校准。请在目标 Krita 中确认实际效果。",
+    "confirm_export": "确认并导出",
+    "cancel_export": "返回调整",
+    "forecast_brush": "[{ordinal}] {name} · {id}",
+    "forecast_switch": "  {title}：{state}；{reason}",
+    "missing_digest": "解析未返回源字节摘要，不能安全建立逐支身份，请重新载入。",
+    "failure_phase": "失败阶段（技术代码）：{phase}",
+    "failure_status": "交付状态：{status}",
+    "retained_files": "保留现场（请核对路径，不自动清理）：",
+    "blocked_files": "受阻项目（保留原始字段与原因）：",
+    "rolled_back_files": "已按清单回滚：",
+    "transaction_failed": "写出失败，请核对保留清单",
+    "transaction_rolled_back": "写出失败，已按清单回滚",
+    "transaction_partial_blocked": "部分受阻：有现场保留，不能宣称全有或全无",
+    "transaction_cancelled": "已取消，未交付本批文件",
+    "raw_details": "原始技术详情（保留原始输出语言）：",
+    "run_heading": "本次运行记录（处理过不等于已交付）",
+    "run_missing": "该支未产生处理记录（跳过或未处理），不计为命中。",
+    "result_committed": "本批已完整交付",
+    "result_reused_only": "本批全部复用同内容文件（未重写）",
+    "result_empty": "未选择笔刷：未写出文件",
+    "result_all_skipped": "全部跳过：未写出文件",
+    "result_cancelled": "已取消：本批未交付文件",
+    "result_unknown": "未确认交付，请核对原始详情",
+    "result_detail": "跳过 {skipped} 支 · 未处理 {not_processed} 支",
+    "busy_close": "后台任务尚未结束，请等本批结束后再关闭窗口。"
+})
+_STRINGS["en"].update({
+    "file_section": "File",
+    "reload": "Reload",
+    "processing": "Per-brush processing & editability",
+    "process_help": "Click a brush row or View / Adjust for its three processing options; list checkboxes control export selection only.",
+    "no_current": "Choose a visible brush to inspect its processing options.",
+    "reset_notice": "Applicable options start enabled. Opening or reloading a file resets conditional defaults; manual switches are not remembered.",
+    "search": "Search name, stable ID or source ordinal…",
+    "filter_label": "Filter:",
+    "sort_label": "Sort:",
+    "filter_all": "All brushes",
+    "filter_selected": "Selected only",
+    "filter_computed": "Computed brushes",
+    "filter_sampled": "Sampled brushes",
+    "filter_affected": "Has applicable processing",
+    "sort_source": "Source order",
+    "sort_name_asc": "Name ascending",
+    "sort_name_desc": "Name descending",
+    "select_all": "Select visible",
+    "select_none": "Deselect visible",
+    "count": "Total {total} · Visible {visible} · Selected {sel} · Hidden selected {hidden}",
+    "edit_brush": "View / Adjust",
+    "brush_identity": "Source #{ordinal} · {id}",
+    "current_selected": "Selected for export (including when hidden)",
+    "current_unselected": "Not selected; will not be exported. Processing options can still be adjusted.",
+    "switch_rasterize_computed": "Rasterize computed brush",
+    "switch_prescale_texture": "Pre-scale texture",
+    "switch_bake_texture_bc": "Bake out-of-range brightness",
+    "use_processing": "Apply this processing (appearance first)",
+    "applicable": "Applicable",
+    "not_applicable": "Not applicable (cannot enable)",
+    "switch_on": "enabled",
+    "switch_off": "disabled / native alternative",
+    "limited": "limited",
+    "switch_status": "{applicability} · Now {enabled} · Conditional default {default}",
+    "choice_consequences": "Enabled: {on}\n\nDisabled: {off}",
+    "expected_state": "Expected: {state}",
+    "actual_applied": "Apply appearance-first processing",
+    "actual_alternative": "Use editable native alternative",
+    "actual_not_applicable": "Do not apply (not applicable)",
+    "actual_not_processed": "Not processed",
+    "effect_rasterize_computed_on": "Generate a bitmap from the PS hardness profile. Krita fade/hardness is no longer editable; size shows the actual PS footprint.",
+    "effect_rasterize_computed_off": "Keep native auto_brush with editable diameter/spacing/angle/roundness/hardness (limited). Krita fade acts only within 1.00R, while PS soft edges extend beyond the nominal radius; existing h0/h50 transition-width differences are -19.81%/+22.63%. Size is nominal (current hardness {hardness}%), and the hardMix full-coverage bias is not applied.",
+    "effect_prescale_texture_on": "Embed the pre-scaled pattern with exported Scale=1. The original pattern dimensions/scale basis change; later Scale edits no longer use the original pattern basis.",
+    "effect_prescale_texture_off": "Keep original pattern dimensions and native Scale={scale}. Cost: Krita Qt and PS resampling differ; existing relative residuals at 150%/200% are about 22%/32%, so appearance may differ. {scale_note}",
+    "scale_limit_note": "Limited: Scale exceeds 10; clipping in the target Krita still needs real-application verification.",
+    "effect_bake_texture_bc_on": "Bake brightness/contrast/invert into texture pixels and export neutral fields; these fields no longer have the source PS parameter semantics.",
+    "effect_bake_texture_bc_off": "Keep native Krita brightness/contrast/invert fields (limited); reverse-mapped brightness {raw:.4f} is clipped to [-1,1] and written as {written:.4f}. PS out-of-range values cannot be fully expressed: 8 of 12 existing cases exceeded tolerance, with maximum residual 61.125%/max23. No baking or replacement baking chain.",
+    "skipped_tip": "Missing sampled-tip bitmap: this entire brush is expected to be skipped; none of its three processing options count as expected hits.",
+    "export_title": "Confirm per-brush export",
+    "export_intro": "Final selection: {n} brushes (including {hidden} hidden selected). This is an expected processing list, not a success record; consult this run's actual record for results.",
+    "export_counts": "Expected processing {applied} · Native alternatives {alternative} (limited {limited}) · Brushes expected to skip {skipped}",
+    "export_target": "Format {format} · Directory {directory}",
+    "export_caution": "Disabling processing can retain some editability but does not guarantee Photoshop appearance. Existing residuals are not recalibrated here. Verify the actual result in the target Krita.",
+    "confirm_export": "Confirm & Export",
+    "cancel_export": "Back to options",
+    "forecast_brush": "[{ordinal}] {name} · {id}",
+    "forecast_switch": "  {title}: {state}; {reason}",
+    "missing_digest": "Parsing returned no source-byte digest. Stable per-brush identity cannot be established safely; reload the file.",
+    "failure_phase": "Failure phase (technical code): {phase}",
+    "failure_status": "Delivery status: {status}",
+    "retained_files": "Retained scene (verify paths; no automatic cleanup):",
+    "blocked_files": "Blocked items (original fields and reasons preserved):",
+    "rolled_back_files": "Rolled back according to the manifest:",
+    "transaction_failed": "Writing failed; inspect the retained list",
+    "transaction_rolled_back": "Writing failed; manifest rollback completed",
+    "transaction_partial_blocked": "Partly blocked: retained files remain; not an all-or-nothing result",
+    "transaction_cancelled": "Cancelled; this batch was not delivered",
+    "raw_details": "Raw technical details (original output language preserved):",
+    "run_heading": "This run's processing record (processed does not mean delivered)",
+    "run_missing": "No processing record for this brush (skipped or not processed); not counted as a hit.",
+    "result_committed": "The whole batch was delivered",
+    "result_reused_only": "The whole batch reused identical existing files (not rewritten)",
+    "result_empty": "No brushes selected: no files written",
+    "result_all_skipped": "All brushes skipped: no files written",
+    "result_cancelled": "Cancelled: no files from this batch were delivered",
+    "result_unknown": "Delivery is unconfirmed; inspect the raw details",
+    "result_detail": "Skipped {skipped} · Not processed {not_processed}",
+    "busy_close": "A background task is still running. Wait for this batch to finish before closing."
+})
+
 # 未映射警告来自 mapping.py，中文固定文案；英文界面下显示时翻译。
 _WARNINGS_EN: dict[str, str] = {
     "颜色动态": "Color dynamics",
@@ -171,3 +333,68 @@ def tr_warning(warning: str) -> str:
     if m:
         return f"Rotation control source (bVTy={m.group(1)} not mapped)"
     return _WARNINGS_EN.get(warning, warning)
+
+
+def tr_applicability(reason: str) -> str:
+    """仅翻译契约返回的理由，不另造一套适用性判断。"""
+    if get_language() == "zh":
+        return reason
+    exact = {
+        "计算笔刷（无自带位图），现行路径按硬度剖面生成采样笔尖位图":
+            "Computed brush without a built-in bitmap; the current path generates a sampled tip from its hardness profile.",
+        "采样笔尖自带位图，无需位图化":
+            "The sampled tip already has a bitmap; rasterization is unnecessary.",
+        "无纹理图案位图（现行管线不写纹理，预缩放/烘焙都无从发生）":
+            "No texture-pattern bitmap; the current pipeline writes no texture, so neither pre-scaling nor baking can occur.",
+        "纹理位图为空，现行管线不做预缩放":
+            "The texture bitmap is empty; the current pipeline does not pre-scale it.",
+        "亮度/对比度反解超出 Krita 亮度域 [-1,1]，现行管线预烘焙":
+            "Reverse-mapped brightness/contrast exceeds Krita's brightness domain [-1,1]; the current pipeline pre-bakes it.",
+        "亮度/对比度在 Krita 可表达范围内，现行管线写原生字段":
+            "Brightness/contrast is within Krita's expressible range; the current pipeline writes native fields.",
+    }
+    if reason in exact:
+        return exact[reason]
+    patterns = (
+        (r"纹理缩放 (.+)% ≤ 100%（或不是有限数），现行管线不做预缩放",
+         "Texture scale {0}% is <=100% (or not finite); no pre-scaling."),
+        (r"纹理位图维度异常 shape=(.+)（现行管线会报错，不做预缩放）",
+         "Invalid texture bitmap dimensions {0}; conversion will report an error, not pre-scale it."),
+        (r"纹理缩放 (.+)% 无法计算目标尺寸",
+         "Cannot calculate the target dimensions for texture scale {0}%."),
+        (r"预缩放后边长仍为 (.+)（四舍五入到原尺寸），现行管线保持原图",
+         "Rounded pre-scaled dimensions remain {0}; the original image is kept."),
+        (r"纹理缩放 (.+)% > 100% 且目标边长变为 (.+)，现行管线预缩放",
+         "Texture scale {0}% is >100% and dimensions change to {1}; the current pipeline pre-scales it."),
+    )
+    for pattern, template in patterns:
+        match = re.fullmatch(pattern, reason)
+        if match:
+            return template.format(*match.groups())
+    _log.warning("适用性理由缺少英文翻译: %s", reason)
+    return reason
+
+
+def processing_reason(preset, outcome) -> str:
+    """按生产计划展示代价；数值换算复用生产helper，不改actual或limited。"""
+    if not outcome.applicable:
+        return tr_applicability(outcome.actual_reason)
+    suffix = "on" if outcome.actual == "applied" else "off"
+    values = {}
+    if suffix == "off":
+        if outcome.switch_id == "rasterize_computed":
+            values["hardness"] = f"{50 if preset.hardness is None else preset.hardness:g}"
+        elif outcome.switch_id == "prescale_texture":
+            values["scale"] = f"{float(preset.texture.scale) / 100:g}"
+            values["scale_note"] = tr("scale_limit_note") if outcome.limited else ""
+        elif outcome.switch_id == "bake_texture_bc":
+            from brush_converter.kpp.preset_xml import texture_brightness_truncation
+            values = texture_brightness_truncation(
+                preset.texture.brightness, preset.texture.contrast)
+    return tr(f"effect_{outcome.switch_id}_{suffix}", **values)
+
+
+def outcome_label(outcome) -> str:
+    """预计/实际共用术语，受限必须显式标出，不能只显示“关闭”。"""
+    text = tr(f"actual_{outcome.actual}")
+    return f"{text} ({tr('limited')})" if outcome.limited else text
