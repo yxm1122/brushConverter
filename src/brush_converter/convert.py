@@ -22,29 +22,49 @@ from .export_options import (
     ACTUAL_APPLIED,
     ACTUAL_LABELS,
     ACTUAL_NOT_APPLICABLE,
+    ACTUAL_NOT_PROCESSED,
     ACTUAL_PENDING_ALTERNATIVE,
+    CANCELLED_PHASE,
+    PHASE_CONVERT,
+    PHASE_DONE,
+    PHASE_PREPARE,
+    PHASE_WRITE,
     SUMMARY_EVIDENCE_CONVERSION,
     SWITCH_BAKE_TEXTURE_BC,
     SWITCH_IDS,
     SWITCH_INFO,
     SWITCH_PRESCALE_TEXTURE,
     SWITCH_RASTERIZE_COMPUTED,
+    CancelCallback,
+    CancelToken,
+    ConversionCancelled,
     ExportOptionState,
     PresetIdentity,
     PresetOptionRecord,
     ProcessingSummary,
+    ProgressCallback,
+    ProgressEvent,
     SwitchRecord,
+    notify_progress,
     preset_content_digest,
     source_digest_of_file,
     switch_applicability,
 )
+from .export_transaction import (
+    RESULT_STATUS_ALL_SKIPPED,
+    RESULT_STATUS_CANCELLED,
+    RESULT_STATUS_EMPTY,
+    ExportTransaction,
+    ExportTransactionError,
+    TransactionSummary,
+)
 from .hardness_tip import build_tip, verify_generated_tip
-from .kpp import TextureXml, build_preset_xml, write_bundle, write_kpp
+from .kpp import TextureXml, build_preset_xml
 from .kpp.bundle import (
     BundleVerifyResult,
+    build_bundle_bytes,
     bundle_content_hash8,
     bundle_content_hash8_of_file,
-    verify_bundle,
 )
 from .kpp.kpp_writer import read_preset_xml, render_tip_preview
 from .kpp.preset_xml import (
@@ -664,6 +684,31 @@ class ConvertResult:
     # --- 任务168：逐支选项的真实运行记录（未传 option_state 时保持 None/空） ---
     options_summary: ProcessingSummary | None = None  # evidence=conversion-run
     option_plans: dict[str, PresetPlan] = field(default_factory=dict)
+    # --- 任务169：安全写出与取消 ---
+    # 机器值：committed / reused_only / empty / all_skipped / cancelled；
+    # 失败会在抛出 ExportTransactionError 前写入 transaction.summary。
+    status: str = ""
+    cancelled: bool = False
+    cancel_reason: str = ""
+    not_processed: list[str] = field(default_factory=list)  # 取消时未处理的笔刷名
+    rendered_in_memory: int = 0  # 取消前已在内存生成、但未写盘的支数
+    standalone_paths: dict[str, str] = field(default_factory=dict)  # 逻辑名→最终独立 kpp 路径
+    transaction: TransactionSummary | None = None
+
+    def status_message(self) -> str:
+        """面向用户的一句话结论；取消时绝不返回“转换成功”之类字样。"""
+        if self.transaction is not None:
+            text = self.transaction.status_message()
+            if self.cancelled and self.rendered_in_memory:
+                text += f"（取消前已在内存生成 {self.rendered_in_memory} 支，未写盘）"
+            return text
+        if self.status == RESULT_STATUS_EMPTY:
+            return "零选中：未写出任何文件"
+        if self.status == RESULT_STATUS_ALL_SKIPPED:
+            return "全部跳过（缺少笔尖位图）：未写出任何文件"
+        if self.status == RESULT_STATUS_CANCELLED:
+            return "已取消：本批未交付任何文件"
+        return "未交付任何文件"
 
     def option_summary_lines(self) -> list[str]:
         """面向用户的中文摘要：分清实际烘焙/位图化/预缩放与未执行项及代价。
@@ -775,6 +820,10 @@ def count_real_textures(kpp_files: list[tuple[str, bytes]]) -> int:
 def _resolve_bundle_path(target: Path, content_hash8: str) -> tuple[Path, str]:
     """决定 .bundle 落盘路径，绝不静默覆盖。
 
+    **任务169 起生产路径不再直接调用**：convert_presets 改用
+    export_transaction.ExportTransaction（先暂存验证、再按事务清单交付）。
+    本函数保留给旧工具与 developer-guide 的追溯引用，不构成第二套写出路径。
+
     返回 (路径, 状态)，状态取 "new" / "reused" / "renamed"：
     - 目标不存在 → 直接写；
     - 目标已存在且逻辑内容哈希相同 → 复用（不重复写，避免白写几十 MB）；
@@ -794,11 +843,19 @@ def _resolve_bundle_path(target: Path, content_hash8: str) -> tuple[Path, str]:
 
 def convert(abr_path: str, out_dir: str, make_bundle: bool = True,
             make_standalone: bool = True,
-            option_state: ExportOptionState | None = None) -> ConvertResult:
+            option_state: ExportOptionState | None = None,
+            cancel: CancelToken | None = None,
+            cancel_callback: CancelCallback | None = None,
+            progress: ProgressCallback | None = None,
+            staging_dir: str | None = None) -> ConvertResult:
     """CLI 便捷入口：解析单个 .abr 文件并转换全部预设。
 
     返回 ConvertResult；GUI 走 convert_presets() 以支持子集转换。
     option_state 非空时先核对源文件摘要，防止把另一份 ABR 的逐支开关套到本文件。
+
+    任务169 新增参数只影响写出与进度，默认值下产物与旧版逐字节一致：
+    cancel / cancel_callback 提供协作式取消（不强杀线程）；progress 接收冻结的
+    ProgressEvent；staging_dir 供测试/高级调用方指定同卷的本次专属暂存目录。
     """
     if option_state is not None:
         digest = source_digest_of_file(abr_path)
@@ -810,7 +867,9 @@ def convert(abr_path: str, out_dir: str, make_bundle: bool = True,
     presets = map_presets(abr)
     return convert_presets(abr, presets, out_dir, make_bundle=make_bundle,
                            make_standalone=make_standalone,
-                           option_state=option_state)
+                           option_state=option_state, cancel=cancel,
+                           cancel_callback=cancel_callback, progress=progress,
+                           staging_dir=staging_dir)
 
 
 def _native_computed_preview_mask(bp: BrushPreset) -> np.ndarray:
@@ -1042,86 +1101,277 @@ def _build_run_summary(
     )
 
 
-def convert_presets(abr: AbrFile, presets: list[BrushPreset], out_dir: str,
-                    make_bundle: bool = True, make_standalone: bool = True,
-                    option_state: ExportOptionState | None = None) -> ConvertResult:
-    """把给定预设子集转成 .kpp / .bundle。
+def _build_cancelled_summary(
+    state: ExportOptionState,
+    plans: dict[str, PresetPlan],
+    skipped_ids: set[str] | None = None,
+) -> ProcessingSummary:
+    """整批取消时的真实运行摘要：已渲染的按 plan 记，未处理的写 not_processed。
+
+    任务 167 冻结值里 not_processed 的标签就是“未处理（整批取消）”；这里
+    不把已取消的批次伪装成 0 支，也不把没渲染的支写成已执行现行处理。
+    """
+    items: list[PresetOptionRecord] = []
+    for preset_id in state.preset_ids:
+        record = state.record(preset_id)
+        plan = plans.get(preset_id)
+        switches: dict[str, SwitchRecord] = {}
+        for switch_id in SWITCH_IDS:
+            base = record.switches[switch_id]
+            if plan is None:
+                if skipped_ids and preset_id in skipped_ids:
+                    reason = "该支被跳过（无笔尖位图），不是取消导致"
+                else:
+                    reason = "整批取消，该支未处理"
+                switches[switch_id] = SwitchRecord(
+                    switch_id=switch_id,
+                    applicable=base.applicable,
+                    applicable_reason=base.applicable_reason,
+                    enabled=base.enabled,
+                    default_enabled=base.default_enabled,
+                    actual=ACTUAL_NOT_PROCESSED,
+                    actual_reason=reason,
+                    pending_alternative=False,
+                )
+                continue
+            outcome = plan.outcome(switch_id)
+            switches[switch_id] = SwitchRecord(
+                switch_id=switch_id,
+                applicable=base.applicable,
+                applicable_reason=base.applicable_reason,
+                enabled=base.enabled,
+                default_enabled=base.default_enabled,
+                actual=outcome.actual,
+                actual_reason=outcome.actual_reason,
+                pending_alternative=(outcome.actual == ACTUAL_PENDING_ALTERNATIVE),
+            )
+        items.append(PresetOptionRecord(identity=record.identity, switches=switches))
+    return ProcessingSummary(
+        source_digest=state.source_digest,
+        cancelled=True,
+        evidence=SUMMARY_EVIDENCE_CONVERSION,
+        items=tuple(items),
+    )
+
+
+def convert_presets(
+    abr: AbrFile, presets: list[BrushPreset], out_dir: str,
+    make_bundle: bool = True, make_standalone: bool = True,
+    option_state: ExportOptionState | None = None,
+    cancel: CancelToken | None = None,
+    cancel_callback: CancelCallback | None = None,
+    progress: ProgressCallback | None = None,
+    staging_dir: str | None = None,
+) -> ConvertResult:
+    """把给定预设子集转成 .kpp / .bundle（先暂存、回读验证、再交付）。
 
     make_bundle / make_standalone 至少一个为 True，对应「.bundle」与「.kpp」两种产物；
     两者都为 False 时不写任何文件，必须显式报错而不是假装转换成功。
     option_state 非空时逐支读三开关并生成 evidence=conversion-run 的实际处理摘要；
     option_state=None 时与开工基线逐字节一致。
+
+    任务169 的写出纪律（默认参数下产物字节不变，只改变写出顺序与失败处理）：
+
+    - 全部产物先落在本次专属暂存目录并逐个回读校验，完成后才进入短暂、
+      不可取消的最终交付；取消或暂存失败时目标目录不出现本批文件；
+    - 独立 kpp 与 bundle 都不覆盖旧同名文件：同内容复用（mtime 不变），
+      不同内容顺延 _2/_3，并把结果写进 warnings 与 transaction 清单；
+    - 取消只在每支笔开始前检查（协作检查点），不杀线程；已开始的一支允许
+      完成内存产物，但整批不发布，摘要 cancelled=True、未处理支写 not_processed；
+    - 零选中/全跳过不创建目录、不写文件，status 分别为 empty / all_skipped。
     """
     if not make_bundle and not make_standalone:
         raise ValueError("make_bundle 与 make_standalone 至少需要一个为 True")
-    out = Path(out_dir)
-    out.mkdir(parents=True, exist_ok=True)
 
-    result = ConvertResult(out_dir=str(out), presets=presets)
-    kpp_dir = out / "kpp"
-    if make_standalone:
-        kpp_dir.mkdir(parents=True, exist_ok=True)
-
+    total = len(presets)
+    result = ConvertResult(out_dir=str(out_dir), presets=presets)
     resolved = _resolve_option_switches(option_state, presets) if option_state else None
 
-    for i, bp in enumerate(presets):
-        if bp.tip_gray is None and not bp.is_computed:
-            result.skipped.append(f"{bp.name}: 无笔尖位图")
-            continue
-        plan: PresetPlan | None = None
-        if resolved is not None:
-            preset_id, switches = resolved[i]
-            plan = plan_preset(bp, switches)
-            result.option_plans[preset_id] = plan
-        fname, xml, preview = _render_preset(bp, i, plan=plan)
-        result.kpp_files.append((fname, _build_kpp_bytes(xml, preview)))
-        if make_standalone:
-            write_kpp(str(kpp_dir / fname), xml, preview)
+    def notify(phase: str, completed: int, *, message: str = "",
+               preset_id: str | None = None, cancelled: bool = False) -> None:
+        """冻结事件校验后交给回调；回调为 None 时只是不订阅，不算失败。"""
+        if progress is None:
+            return
+        notify_progress(progress, ProgressEvent(
+            phase=phase,
+            total=total,
+            completed=min(max(completed, 0), total),
+            preset_id=preset_id,
+            message=message,
+            cancelled=cancelled,
+        ))
 
-    result.texture_count = count_real_textures(result.kpp_files)
+    if total == 0:
+        result.status = RESULT_STATUS_EMPTY
+        notify(PHASE_PREPARE, 0, message="未选择任何笔刷，未写出文件")
+        notify(PHASE_DONE, 0, message="零选中：没有创建目录或文件")
+        return result
 
-    if option_state is not None:
-        result.options_summary = _build_run_summary(option_state, result.option_plans)
-        alternative = sum(
-            outcome.actual == ACTUAL_ALTERNATIVE
-            for plan in result.option_plans.values()
-            for outcome in plan.outcomes
-        )
-        if alternative:
-            result.warnings.append(
-                f"已按逐支选项走可编辑替代路径 {alternative} 项；"
-                "代价见 options_summary（未做人工效果确认）")
+    skipped_indices = {
+        index for index, bp in enumerate(presets)
+        if bp.tip_gray is None and not bp.is_computed
+    }
+    for index in sorted(skipped_indices):
+        result.skipped.append(f"{presets[index].name}: 无笔尖位图")
+    if len(skipped_indices) == total:
+        result.status = RESULT_STATUS_ALL_SKIPPED
+        result.warnings.append("全部笔刷都缺少笔尖位图，未写出任何文件")
+        notify(PHASE_PREPARE, 0, message="全部笔刷缺少笔尖位图，未写出文件")
+        notify(PHASE_DONE, total, message=f"全部跳过（{total} 支）：未创建目录或文件")
+        return result
 
-    if make_bundle and result.kpp_files:
-        stem = getattr(abr, "name", None) or "converted"
-        # v1.3.1：产物名带版本号 + 逻辑内容短哈希，让「同名 ⇒ 同内容」成立。
-        # 版本号让不同版本的产物不会互相覆盖，hash8 让同内容可被识别复用。
-        result.content_hash8 = bundle_content_hash8(result.kpp_files)
-        base = out / f"{stem}_v{__version__}_{result.content_hash8}.bundle"
-        target, state = _resolve_bundle_path(base, result.content_hash8)
-        result.bundle_reused = state == "reused"
+    transaction = ExportTransaction(
+        out_dir,
+        staging_dir=staging_dir,
+        token=cancel,
+        cancel_callback=cancel_callback,
+        progress=progress,
+        total=total,
+        make_standalone=make_standalone,
+    )
+    processed = 0
+    try:
+        transaction.begin()
+        result.out_dir = str(transaction.out_dir)
+        notify(PHASE_PREPARE, 0, message="已创建本次专属暂存目录；此阶段可取消")
+        for i, bp in enumerate(presets):
+            transaction.checkpoint()
+            if i in skipped_indices:
+                processed += 1
+                notify(PHASE_CONVERT, processed, message=f"跳过 {bp.name}（无笔尖位图）")
+                continue
+            plan: PresetPlan | None = None
+            preset_id: str | None = None
+            if resolved is not None:
+                preset_id, switches = resolved[i]
+                plan = plan_preset(bp, switches)
+                result.option_plans[preset_id] = plan
+            fname, xml, preview = _render_preset(bp, i, plan=plan)
+            data = _build_kpp_bytes(xml, preview)
+            result.kpp_files.append((fname, data))
+            if make_standalone:
+                item = transaction.stage_kpp(fname, data)
+                result.standalone_paths[fname] = item.final_path
+            processed += 1
+            notify(PHASE_CONVERT, processed, preset_id=preset_id,
+                   message=f"已转换 {bp.name}（{processed}/{total}）")
+
+        result.texture_count = count_real_textures(result.kpp_files)
+
+        if option_state is not None:
+            result.options_summary = _build_run_summary(option_state, result.option_plans)
+            alternative = sum(
+                outcome.actual == ACTUAL_ALTERNATIVE
+                for plan in result.option_plans.values()
+                for outcome in plan.outcomes
+            )
+            if alternative:
+                result.warnings.append(
+                    f"已按逐支选项走可编辑替代路径 {alternative} 项；"
+                    "代价见 options_summary（未做人工效果确认）")
+
+        if make_bundle and result.kpp_files:
+            stem = getattr(abr, "name", None) or "converted"
+            # v1.3.1：产物名带版本号 + 逻辑内容短哈希，让「同名 ⇒ 同内容」成立。
+            # 版本号让不同版本的产物不会互相覆盖，hash8 让同内容可被识别复用。
+            result.content_hash8 = bundle_content_hash8(result.kpp_files)
+            base = transaction.out_dir / (
+                f"{stem}_v{__version__}_{result.content_hash8}.bundle")
+            bundle_bytes = build_bundle_bytes(result.kpp_files, base.stem)
+            item = transaction.stage_bundle(
+                base.name, bundle_bytes, result.content_hash8)
+            result.bundle_path = item.final_path
+            # 旧版命名（stem.bundle）留在同目录时只提示，不覆盖也不删。
+            legacy = transaction.out_dir / f"{stem}.bundle"
+            if legacy.exists() and legacy.resolve() != Path(item.final_path).resolve():
+                result.warnings.append(
+                    f"检测到旧版命名产物 {legacy.name}：v1.3.1 不覆盖旧文件，"
+                    f"新产物为 {item.final_name}")
+
+        # 最后一个允许取消的提示；随后 commit() 内部把阶段标成不可取消。
+        notify(PHASE_WRITE, total,
+               message="全部产物已在暂存目录通过回读校验；最终交付阶段不可取消")
+        summary = transaction.commit()
+        result.transaction = summary
+        result.status = summary.status
+        result.bundle_reused = summary.bundle_reused
+        result.bundle_renamed = summary.bundle_renamed
+        result.verify = summary.bundle_verify
+        result.warnings.extend(summary.warnings)
+        # 保留 v1.3.1 起就有的两条用户提示（既有测试按原文案断言）：
+        # 复用不重写、重名顺延且旧文件未覆盖。事务层另有更细的清单。
+        bundle_items = [entry for entry in summary.items if entry.kind == "bundle"]
         if result.bundle_reused:
-            # 同内容产物已存在：直接复用，绝不再写一遍（写盘会改 mtime，
-            # 也会让「未重复写入」这句提示变成假话）。
-            result.bundle_path = str(target)
-        else:
-            result.bundle_path = write_bundle(str(target), result.kpp_files)
-        result.bundle_renamed = state == "renamed"
-        if state == "reused":
             result.warnings.append("已存在同内容产物，未重复写入")
-        elif state == "renamed":
+        elif result.bundle_renamed and bundle_items:
             result.warnings.append(
-                f"目标同名文件内容不同，已重命名为 {target.name}（原文件未覆盖）")
-        # 旧版命名（stem.bundle）留在同目录时只提示，不覆盖也不删：
-        # 「主要针对旧版 stem.bundle」的防呆落在这里最安全。
-        legacy = out / f"{stem}.bundle"
-        if legacy.exists():
+                f"目标同名文件内容不同，已重命名为 {bundle_items[0].final_name}"
+                "（原文件未覆盖）")
+        kpp_reused = [entry for entry in summary.items
+                      if entry.kind == "kpp" and entry.state == "reused"]
+        kpp_renamed = [entry for entry in summary.items
+                       if entry.kind == "kpp" and entry.renamed_from]
+        if kpp_reused:
             result.warnings.append(
-                f"检测到旧版命名产物 {legacy.name}：v1.3.1 不覆盖旧文件，"
-                f"新产物为 {target.name}")
-        # 写出后回读校验（verify_bundle 不抛异常，失败结论进 result.verify）
-        result.verify = verify_bundle(result.bundle_path)
-    return result
+                f"{len(kpp_reused)} 个独立 kpp 已存在同内容文件，未重复写入")
+        if kpp_renamed:
+            result.warnings.append(
+                "独立 kpp 目标同名但内容不同，已顺延编号（原文件未覆盖）："
+                + "、".join(entry.final_name for entry in kpp_renamed))
+        if summary.cancel_requested_late:
+            result.warnings.append(
+                "取消请求在不可取消的最终交付阶段到达；本批已完整交付，未留下半成品")
+        # 完成事件发生在交付之后：界面回调抛错不能把已交付的批次改写成失败。
+        try:
+            notify(PHASE_DONE, total, message=summary.status_message())
+        except Exception as exc:  # noqa: BLE001
+            result.warnings.append(
+                f"进度回调在完成事件中抛错（产物已交付，未回滚）：{exc}")
+        return result
+    except ConversionCancelled as exc:
+        summary = transaction.cancel(exc.reason)
+        result.transaction = summary
+        result.status = RESULT_STATUS_CANCELLED
+        result.cancelled = True
+        result.cancel_reason = exc.reason
+        result.rendered_in_memory = len(result.kpp_files)
+        result.not_processed = [bp.name for bp in presets[processed:]]
+        # 取消后不得把内存产物当作已交付：清空产物字段，避免 GUI/CLI 误显示。
+        result.kpp_files = []
+        result.texture_count = 0
+        result.bundle_path = None
+        result.content_hash8 = ""
+        result.verify = None
+        result.standalone_paths = {}
+        if option_state is not None:
+            skipped_ids = {
+                resolved[index][0] for index in skipped_indices
+            } if resolved is not None else set()
+            result.options_summary = _build_cancelled_summary(
+                option_state, result.option_plans, skipped_ids)
+        result.warnings.append(summary.status_message())
+        result.warnings.extend(summary.warnings)
+        notify(CANCELLED_PHASE, processed,
+               message=f"已取消：{exc.reason}", cancelled=True)
+        return result
+    except ExportTransactionError as exc:
+        # 事务内部可能已有 summary（受阻/保留清单）；若没有，补一份清理后的清单。
+        # 无论哪种情况都要先让事务清理本次暂存，避免把暂存目录留在工作区。
+        summary = transaction.fail(exc)
+        if exc.summary is None:
+            exc.summary = summary
+        exc.phase = exc.phase or summary.phase
+        raise
+    except OSError as exc:
+        # 真实的磁盘/权限错误：清理本次暂存，并把事务清单挂到异常上。
+        summary = transaction.fail(exc)
+        raise ExportTransactionError(
+            f"安全写出失败：{exc}", phase=summary.phase,
+            summary=summary, cause=exc) from exc
+    except Exception as exc:
+        # 其它渲染/校验失败：清理本次暂存后原样抛出；不把失败写成部分成功。
+        transaction.fail(exc)
+        raise
 
 
 def _sampled_brush_def(res_name: str, tip_png: bytes, bp: BrushPreset,
