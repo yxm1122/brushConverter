@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 import numpy as np
-from PySide6.QtCore import QSettings, QSignalBlocker, Qt, Slot
+from PySide6.QtCore import QSettings, QSignalBlocker, Qt, QTimer, Slot
 from PySide6.QtGui import QImage, QPixmap
 from PySide6.QtWidgets import (
     QApplication,
@@ -26,6 +26,7 @@ from PySide6.QtWidgets import (
     QMainWindow,
     QMessageBox,
     QPlainTextEdit,
+    QProgressBar,
     QPushButton,
     QRadioButton,
     QScrollArea,
@@ -57,7 +58,7 @@ from .i18n import (
     tr_applicability,
     tr_warning,
 )
-from .workers import ConvertFailure, ConvertWorker, ParseWorker
+from .workers import ConvertFailure, ConvertWorker, ParseCancelled, ParseWorker, WorkerProgress
 
 
 def _gray_to_pixmap(gray: np.ndarray | None, size: int = 64) -> QPixmap:
@@ -185,6 +186,11 @@ class MainWindow(QMainWindow):
         self._parse_worker: ParseWorker | None = None
         self._convert_worker: ConvertWorker | None = None
         self._active_workers = set()
+        self._worker_results = {}
+        self._progress: WorkerProgress | None = None
+        self._cancel_state = ""
+        self._close_pending = False
+        self._last_result = None
         self._export_snapshot: ExportSnapshot | None = None
         self._items: dict[str, tuple[QListWidgetItem, BrushItemWidget]] = {}
         self._build_ui()
@@ -323,7 +329,20 @@ class MainWindow(QMainWindow):
         root.addWidget(self.out_group)
         self.convert_btn = QPushButton()
         self.convert_btn.clicked.connect(self._on_convert)
-        root.addWidget(self.convert_btn)
+        actions = QHBoxLayout()
+        actions.addWidget(self.convert_btn)
+        self.cancel_btn = QPushButton()
+        self.cancel_btn.clicked.connect(self._on_cancel)
+        self.cancel_btn.setEnabled(False)
+        actions.addWidget(self.cancel_btn)
+        self.abort_close_btn = QPushButton()
+        self.abort_close_btn.clicked.connect(self._abort_close)
+        self.abort_close_btn.setVisible(False)
+        actions.addWidget(self.abort_close_btn)
+        root.addLayout(actions)
+        self.progress_bar = QProgressBar()
+        self.progress_bar.setVisible(False)
+        root.addWidget(self.progress_bar)
         self.status_label = QLabel()
         self.status_label.setTextFormat(Qt.TextFormat.PlainText)
         self.status_label.setWordWrap(True)
@@ -340,6 +359,7 @@ class MainWindow(QMainWindow):
                             (self.fmt_label, "format"), (self.radio_kpp, "kpp"),
                             (self.radio_bundle, "bundle"), (self.out_dir_label, "out_dir"),
                             (self.browse_btn, "browse"), (self.convert_btn, "convert"),
+                             (self.cancel_btn, "cancel"), (self.abort_close_btn, "abort_close"),
                             (self.filter_label, "filter_label"), (self.sort_label, "sort_label"),
                             (self.process_help, "process_help"), (self.reset_label, "reset_notice")):
             widget.setText(tr(key))
@@ -361,15 +381,86 @@ class MainWindow(QMainWindow):
         self._refresh_status()
 
     def _refresh_status(self) -> None:
-        self.status_label.setText(tr(self._status[0], **self._status[1]) if self._status else "")
+        text = tr(self._status[0], **self._status[1]) if self._status else ""
+        if self._close_pending:
+            text += "\n" + tr("close_waiting")
+        self.status_label.setText(text)
 
     def _set_busy(self, busy: bool) -> None:
         self._busy = busy
         for group in (self.file_group, self.list_group, self.process_group, self.out_group):
-            group.setEnabled(not busy)
+            group.setEnabled(not busy and not self._close_pending)
         self._update_count()
+        self._update_cancel_button()
+
+    def _update_cancel_button(self) -> None:
+        self.cancel_btn.setEnabled(self._busy and bool(self._active_workers) and
+            self._cancel_state not in ("cancel_requested", "stopping", "delivering", "finishing"))
+        self.abort_close_btn.setVisible(self._close_pending and self._busy)
+
+    @Slot(object)
+    def _on_progress(self, progress: WorkerProgress) -> None:
+        """控件仅在主线程槽中更新；过期线程的排队信号不得污染下一批。"""
+        sender = self.sender()
+        if sender is not None and sender not in self._active_workers:
+            return
+        self._progress = progress
+        event = progress.event
+        self.progress_bar.setVisible(True)
+        if progress.stage == "convert" and event is not None and event.total:
+            self.progress_bar.setRange(0, event.total)
+            self.progress_bar.setValue(event.completed)
+            self.progress_bar.setFormat(tr("progress_count", completed=event.completed, total=event.total))
+        else:
+            # 无细粒度计数的阶段用忙碌指示；没有定时器生成假百分比。
+            self.progress_bar.setRange(0, 0)
+        if progress.stage == "deliver":
+            self._cancel_state = "delivering"
+        elif progress.stage in ("done", "cancelled", "parse_complete"):
+            self._cancel_state = "finishing"
+        self._render_progress()
+        self._update_cancel_button()
+
+    def _render_progress(self) -> None:
+        if self._cancel_state in ("cancel_requested", "stopping", "delivering", "finishing"):
+            self._set_status("progress_" + self._cancel_state)
+        elif self._progress is not None:
+            event = self._progress.event
+            self._set_status("progress_" + self._progress.stage,
+                completed=event.completed if event else 0, total=event.total if event else 0,
+                preset_id=(event.preset_id or "—") if event else "—")
+
+    @Slot(str)
+    def _on_control_changed(self, state: str) -> None:
+        sender = self.sender()
+        if sender is not None and sender not in self._active_workers:
+            return
+        self._apply_control_state(state)
+
+    def _apply_control_state(self, state: str) -> None:
+        """信号槽和按钮回调共用；按钮的sender不是后台线程，不能当过期信号丢掉。"""
+        # 信号可能仍在队列中，交付/收尾之后不能倒退为“正在停止”。
+        if self._cancel_state in ("delivering", "finishing") and state != "delivering":
+            return
+        self._cancel_state = state
+        self._render_progress()
+        self._update_cancel_button()
+
+    def _on_cancel(self) -> None:
+        """只发协作请求；事务越过最后检查点时，以最终交付结果为准。"""
+        for worker in tuple(self._active_workers):
+            if not hasattr(worker, "request_cancel"):
+                continue
+            reply = worker.request_cancel()
+            state = {"accepted": "cancel_requested", "already_requested": "cancel_requested",
+                     "too_late": "delivering", "finished": "finishing"}[reply]
+            if self._cancel_state == "stopping" and reply == "already_requested":
+                state = "stopping"
+            self._apply_control_state(state)
 
     def _on_lang_changed(self, index: int) -> None:
+        if self._busy or self._close_pending:
+            return
         lang = self.lang_combo.itemData(index)
         if lang != get_language():
             set_language(lang)
@@ -377,17 +468,19 @@ class MainWindow(QMainWindow):
             self._retranslate()
 
     def _on_open(self) -> None:
+        if self._busy or self._close_pending:
+            return
         path, _ = QFileDialog.getOpenFileName(self, tr("select_abr"), "", tr("abr_filter"))
         if path:
             self._load_file(path)
 
     def _on_reload(self) -> None:
-        if self._file_path and not self._busy:
+        if self._file_path and not self._busy and not self._close_pending:
             self._load_file(self._file_path)
 
     def _load_file(self, path: str) -> None:
         """开始载入就清旧状态；失败不允许用旧文件的配置继续导出。"""
-        if self._busy:
+        if self._busy or self._close_pending:
             return
         self._file_path = path
         self.file_label.setText(path)
@@ -402,14 +495,33 @@ class MainWindow(QMainWindow):
         self._populate()
         self._set_busy(True)
         self._set_status("parsing")
-        self._parse_worker = ParseWorker(path, self)
-        self._parse_worker.done.connect(self._on_parsed)
-        self._track_worker(self._parse_worker)
-        self._parse_worker.start()
+        self._cancel_state = "running"
+        try:
+            self._parse_worker = ParseWorker(path, self)
+            self._parse_worker.done.connect(self._on_parsed)
+            self._track_worker(self._parse_worker)
+            self._parse_worker.start()
+        except Exception as exc:  # noqa: BLE001
+            self._release_failed_start(self._parse_worker)
+            self._set_status("parse_failed")
+            QMessageBox.critical(self, tr("parse_failed"), str(exc))
 
-    def _on_parsed(self, abr, presets) -> None:
+    @Slot(object, object)
+    def _on_parsed(self, abr, presets, *, source_digest=None, show_dialog=True) -> None:
+        sender = self.sender()
+        if sender is not None:
+            if sender is self._parse_worker and sender in self._active_workers:
+                self._worker_results[sender] = (abr, presets)
+            return
+        self._apply_parsed(abr, presets, source_digest=source_digest, show_dialog=show_dialog)
+
+    def _apply_parsed(self, abr, presets, *, source_digest=None, show_dialog=True) -> None:
+        """仅在主线程且线程结束后应用；与信号入口分离以拒绝过期done。"""
+        if isinstance(presets, ParseCancelled):
+            self._set_status("parse_cancelled")
+            return
         if abr is not None:
-            digest = self._parse_worker.source_digest if self._parse_worker else None
+            digest = source_digest or (self._parse_worker.source_digest if self._parse_worker else None)
             if not digest:
                 abr, presets = None, tr("missing_digest")
             else:
@@ -421,15 +533,17 @@ class MainWindow(QMainWindow):
             self._presets = []
             self._selection = None
         self._populate()
-        self._set_busy(False)
+        self._set_busy(bool(self._active_workers))
         if abr is None:
             self._set_status()
-            QMessageBox.critical(self, tr("parse_failed"), str(presets))
+            if show_dialog:
+                QMessageBox.critical(self, tr("parse_failed"), str(presets))
         elif not presets:
             self._set_status()
             detail = "\n".join(getattr(abr, "diagnostics", []) or [])
-            QMessageBox.warning(self, tr("no_brushes_title"), tr("no_brushes_body",
-                version=f"{abr.version}.{abr.subversion}", detail=detail or tr("no_brushes_no_detail")))
+            if show_dialog:
+                QMessageBox.warning(self, tr("no_brushes_title"), tr("no_brushes_body",
+                    version=f"{abr.version}.{abr.subversion}", detail=detail or tr("no_brushes_no_detail")))
         else:
             self._set_status("loaded", n=len(presets))
 
@@ -468,12 +582,16 @@ class MainWindow(QMainWindow):
         item.setSizeHint(card.sizeHint())
 
     def _on_view_changed(self, *_args) -> None:
+        if self._busy or self._close_pending:
+            return
         if self._selection:
             self._selection.set_view(query=self.search_edit.text(),
                                      filter_mode=self.filter_combo.currentData())
         self._apply_view()
 
     def _on_sort_changed(self, *_args) -> None:
+        if self._busy or self._close_pending:
+            return
         if self._selection:
             self._selection.set_view(sort_mode=self.sort_combo.currentData())
         self._populate()
@@ -494,11 +612,13 @@ class MainWindow(QMainWindow):
         self._refresh_detail()
 
     def _on_checked(self, key: str, value: bool) -> None:
+        if self._busy or self._close_pending:
+            return
         self._selection.set_selected(key, value)
         self._apply_view()
 
     def _set_all(self, checked: bool) -> None:
-        if not self._selection:
+        if self._busy or self._close_pending or not self._selection:
             return
         self._selection.set_visible_selected(checked)
         for key, (_item, card) in self._items.items():
@@ -510,8 +630,9 @@ class MainWindow(QMainWindow):
         counts = self._selection.counts if self._selection else dict(total=0, visible=0, sel=0, hidden=0)
         self.count_label.setText(tr("count", **counts))
         self.count_label.setStyleSheet("font-weight:bold;" if counts["hidden"] else "")
-        self.convert_btn.setEnabled(not self._busy and self._abr is not None and counts["sel"] > 0)
-        self.reload_btn.setEnabled(not self._busy and self._file_path is not None)
+        self.convert_btn.setEnabled(not self._busy and not self._close_pending and
+                                    self._abr is not None and counts["sel"] > 0)
+        self.reload_btn.setEnabled(not self._busy and not self._close_pending and self._file_path is not None)
 
     def _refresh_detail(self) -> None:
         key = self._selection.focused_id if self._selection else None
@@ -552,6 +673,8 @@ class MainWindow(QMainWindow):
             self.switch_reasons[switch].setText(reason)
 
     def _on_switch_changed(self, switch: str, enabled: bool) -> None:
+        if self._busy or self._close_pending:
+            return
         key = self._selection.focused_id
         self._selection.options.set_override(key, switch, enabled)
         self._refresh_card(key)
@@ -563,12 +686,14 @@ class MainWindow(QMainWindow):
         return [self._selection.options.preset(key) for key in self._selection.selected_ids]
 
     def _on_browse(self) -> None:
+        if self._busy or self._close_pending:
+            return
         directory = QFileDialog.getExistingDirectory(self, tr("select_out_dir"), self.out_dir_edit.text())
         if directory:
             self.out_dir_edit.setText(directory)
 
     def _on_convert(self) -> None:
-        if self._abr is None or self._selection is None or self._busy:
+        if self._abr is None or self._selection is None or self._busy or self._close_pending:
             return
         if not self._selection.selected_ids:
             QMessageBox.information(self, tr("hint"), tr("need_select"))
@@ -582,27 +707,86 @@ class MainWindow(QMainWindow):
         self._export_snapshot = snapshot
         self._set_busy(True)
         self._set_status("converting")
-        self._convert_worker = ConvertWorker(self._abr, list(snapshot.presets), out_dir,
-                                            make_bundle, not make_bundle, self, snapshot=snapshot)
-        self._convert_worker.done.connect(self._on_converted)
-        self._track_worker(self._convert_worker)
-        self._convert_worker.start()
+        self._cancel_state = "running"
+        try:
+            self._convert_worker = ConvertWorker(self._abr, list(snapshot.presets), out_dir,
+                                                make_bundle, not make_bundle, self, snapshot=snapshot)
+            self._convert_worker.done.connect(self._on_converted)
+            self._track_worker(self._convert_worker)
+            self._convert_worker.start()
+        except Exception as exc:  # noqa: BLE001
+            self._release_failed_start(self._convert_worker)
+            self._export_snapshot = None
+            self._show_failure(ConvertFailure(str(exc), "start"))
 
     def _track_worker(self, worker) -> None:
         """finished才表示线程真正结束；保留活动集合防止短暂重叠时漏掉关窗检查。"""
         self._active_workers.add(worker)
+        self._progress = None
+        self._last_result = None
+        self.progress_bar.setVisible(True)
+        self.progress_bar.setRange(0, 0)
+        for name, slot in (("progress", self._on_progress), ("control_changed", self._on_control_changed)):
+            signal = getattr(worker, name, None)
+            if signal is not None:
+                signal.connect(slot, Qt.ConnectionType.QueuedConnection)
         worker.finished.connect(self._on_worker_finished)
+        self._update_cancel_button()
 
     @Slot()
     def _on_worker_finished(self) -> None:
         """在主线程按对象身份清引用，再延迟释放，避免悬空Qt句柄和大数据泄漏。"""
         worker = self.sender()
+        if worker not in self._active_workers:
+            return
+        parsed = self._parse_worker is worker
+        converted = self._convert_worker is worker
+        result = self._worker_results.pop(worker, None)
+        digest = getattr(worker, "source_digest", None)
+        self._active_workers.discard(worker)
+        if parsed:
+            self._parse_worker = None
+        if converted:
+            self._convert_worker = None
+        worker.deleteLater()
+        self._cancel_state = ""
+        self.progress_bar.setVisible(False)
+        self._set_busy(bool(self._active_workers))
+        if parsed:
+            abr, presets = result if result is not None else (None, tr("worker_no_result"))
+            if abr is None and not isinstance(presets, ParseCancelled):
+                self._close_pending = False
+            self._apply_parsed(abr, presets, source_digest=digest, show_dialog=not self._close_pending)
+        elif converted:
+            if result is None:
+                result = ConvertFailure(tr("worker_no_result"))
+            # 清理受阻/失败不能静默关窗丢现场；保留清单让使用者确认。
+            summary = getattr(result, "transaction", None)
+            if isinstance(result, (ConvertFailure, str)) or (summary is not None and
+                    (getattr(summary, "retained", ()) or getattr(summary, "blocked", ()))):
+                self._close_pending = False
+            try:
+                self._apply_converted(result, show_dialog=not self._close_pending)
+            finally:
+                self._export_snapshot = None
+        self._update_cancel_button()
+        if self._close_pending and not self._active_workers:
+            # 仅排队安全关窗，不阻塞主线程、不生成任何进度百分比。
+            QTimer.singleShot(0, self._finish_close)
+
+    def _release_failed_start(self, worker) -> None:
+        """start/快照构造异常也恢复按钮，未启动线程无需也不允许强杀。"""
+        self._active_workers.discard(worker)
+        self._worker_results.pop(worker, None)
         if self._parse_worker is worker:
             self._parse_worker = None
         if self._convert_worker is worker:
             self._convert_worker = None
-        self._active_workers.discard(worker)
-        worker.deleteLater()
+        if worker is not None:
+            worker.deleteLater()
+        self._cancel_state = ""
+        self.progress_bar.setVisible(False)
+        self._set_busy(bool(self._active_workers))
 
     def _show_failure(self, failure: ConvertFailure) -> None:
         """结构化失败不是成功：保留清单直接可见，全部原始字段仍可展开。"""
@@ -630,9 +814,19 @@ class MainWindow(QMainWindow):
         message.setDetailedText(tr("raw_details") + "\n" + "\n\n".join(details))
         message.exec()
 
-    def _on_converted(self, result) -> None:
-        """169状态先于摘要，取消/全跳过/未写出不冒充转换成功。"""
-        self._set_busy(False)
+    @Slot(object)
+    def _on_converted(self, result, *, show_dialog=True) -> None:
+        """done先保存结果，finished后才恢复输入并展示；过期done直接忽略。"""
+        sender = self.sender()
+        if sender is not None:
+            if sender is self._convert_worker and sender in self._active_workers:
+                self._worker_results[sender] = result
+            return
+        self._apply_converted(result, show_dialog=show_dialog)
+
+    def _apply_converted(self, result, *, show_dialog=True) -> None:
+        self._last_result = result
+        self._set_busy(bool(self._active_workers))
         if isinstance(result, (ConvertFailure, str)):
             self._show_failure(ConvertFailure(result) if isinstance(result, str) else result)
             return
@@ -640,8 +834,14 @@ class MainWindow(QMainWindow):
         key = f"result_{r.status}"
         if r.status not in ("committed", "reused_only", "empty", "all_skipped", "cancelled"):
             key = "result_unknown"
-        self._set_status(key)
-        lines = [tr(key), tr("done_summary", n=len(r.kpp_files), tex=r.texture_count),
+        late = bool(r.transaction and getattr(r.transaction, "cancel_requested_late", False))
+        status_key = "result_cancel_late" if late else key
+        status_args = {"result": tr(key)} if late else {}
+        self._set_status(status_key, **status_args)
+        result_text = tr(status_key, **status_args)
+        if not show_dialog:
+            return
+        lines = [result_text, tr("done_summary", n=len(r.kpp_files), tex=r.texture_count),
                  tr("result_detail", skipped=len(r.skipped), not_processed=len(r.not_processed))]
         paths = ([r.bundle_path] if r.bundle_path else []) + list(r.standalone_paths.values())
         if paths:
@@ -677,22 +877,63 @@ class MainWindow(QMainWindow):
         message = QMessageBox(self)
         message.setWindowTitle(tr("done_title") if r.status in ("committed", "reused_only") else tr("hint"))
         message.setTextFormat(Qt.TextFormat.PlainText)
-        message.setText(tr(key))
+        message.setText(result_text)
         # 输出位置直接可见；逐支长记录放在可展开详情，不靠用户猜文件在哪里。
         brief = [tr("done_summary", n=len(r.kpp_files), tex=r.texture_count),
                  tr("result_detail", skipped=len(r.skipped), not_processed=len(r.not_processed))]
         if paths:
             brief.append(tr("done_body", paths="\n".join(paths)))
+        if r.transaction and getattr(r.transaction, "retained", ()):
+            brief.append(tr("retained_files") + "\n" + "\n".join(r.transaction.retained))
         message.setInformativeText("\n\n".join(brief))
         message.setDetailedText("\n\n".join(lines))
         message.exec()
 
+    def _choose_close_action(self) -> bool:
+        """每次运行由使用者选择；Esc/默认项是取消关闭，绝不默认强停。"""
+        message = QMessageBox(self)
+        message.setWindowTitle(tr("close_title"))
+        message.setText(tr("close_question"))
+        message.setTextFormat(Qt.TextFormat.PlainText)
+        wait = message.addButton(tr("close_wait"), QMessageBox.ButtonRole.AcceptRole)
+        keep = message.addButton(tr("close_keep"), QMessageBox.ButtonRole.RejectRole)
+        message.setDefaultButton(keep)
+        message.setEscapeButton(keep)
+        message.exec()
+        return message.clickedButton() is wait
+
+    def _abort_close(self) -> None:
+        """取消的是关窗计划；已发出的整批取消不能撤回，允许停止后再次运行。"""
+        self._close_pending = False
+        self._set_busy(bool(self._active_workers))
+        self._refresh_status()
+
+    def _finish_close(self) -> None:
+        if self._close_pending and not self._active_workers:
+            self.close()
+
     def closeEvent(self, event) -> None:
-        """不强杀后台；172接取消前，任务未结束时仅阻止关窗。"""
-        if any(worker.isRunning() for worker in self._active_workers):
-            self._set_status("busy_close")
-            event.ignore()
-            return
+        """不阻塞等待、不强杀；最终交付只能等待完成或取消关窗。"""
+        if self._active_workers:
+            # 真实QThread即使已停止也等finished排队槽收齐，避免漏掉最终结果。
+            active = any(worker.isRunning() or hasattr(worker, "isFinished")
+                         for worker in self._active_workers)
+            if active:
+                event.ignore()
+                if self._close_pending:
+                    return
+                if self._choose_close_action():
+                    # 提问自身有事件循环；回答时线程可能已结束，必须重新核对。
+                    if not self._active_workers:
+                        self._close_pending = False
+                        super().closeEvent(event)
+                        return
+                    self._close_pending = True
+                    self._on_cancel()
+                    self._update_cancel_button()
+                    self._refresh_status()
+                return
+        self._close_pending = False
         super().closeEvent(event)
 
 

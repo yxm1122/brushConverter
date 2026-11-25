@@ -282,6 +282,56 @@ _STRINGS["en"].update({
     "busy_close": "A background task is still running. Wait for this batch to finish before closing."
 })
 
+# 172真实阶段与安全关闭：数字仅来自生产事件，不虚构验证/交付百分比。
+_STRINGS["zh"].update({
+    "cancel": "取消本批",
+    "abort_close": "取消关闭（不撤回停止请求）",
+    "progress_count": "已处理 {completed}/{total} 支（含跳过，非整批交付进度）",
+    "progress_read": "正在读取源文件；当前步骤没有可测百分比。",
+    "progress_parse": "正在解析 ABR；当前解析步骤完成后才响应取消。",
+    "progress_map": "正在映射笔刷；在步骤边界检查取消，不强行中断。",
+    "progress_prepare": "准备本批安全暂存；尚未交付，可取消。",
+    "progress_convert": "逐支生成/暂存校验：已处理 {completed}/{total} 支（含跳过），尚未交付。稳定 ID：{preset_id}",
+    "progress_verify": "逐支生成已结束（{completed}/{total} 支，含跳过）；正在准备/验证本批产物，尚未交付。",
+    "progress_verified": "全部产物已通过暂存回读校验；等待最后安全检查点，仍可请求取消。",
+    "progress_delivering": "最终交付中：不可取消。正在放置/回读产物，请等待完整交付或事务失败清单。",
+    "progress_cancel_requested": "取消请求已接收，等待安全检查点；若最终交付已开始，本批仍将完成，不代表已经取消。",
+    "progress_stopping": "正在安全停止并清理本批暂存；清理与线程结束确认前，不能再次运行。",
+    "progress_finishing": "后台正在收尾；以线程结束后的实际结果为准，输入仍被冻结。",
+    "parse_cancelled": "解析已取消：没有导出文件，可重新载入。",
+    "result_cancel_late": "取消请求晚于最终安全检查点，未中断本批；实际结果：{result}",
+    "worker_no_result": "后台线程已结束但没有返回结果；交付状态未确认，请保留现场。",
+    "close_title": "后台任务尚未结束",
+    "close_question": "等待安全停止后关闭，还是取消本次关闭？\n等待会向可取消阶段发出停止请求；最终交付阶段不能中断，只能等待本批完成。不会强杀线程或 Krita/PS。",
+    "close_wait": "等待安全停止后关闭",
+    "close_keep": "取消本次关闭",
+    "close_waiting": "已安排安全退出：线程结束后关闭；可取消关闭，但已发出的停止请求不能撤回。",
+})
+_STRINGS["en"].update({
+    "cancel": "Cancel batch",
+    "abort_close": "Keep window open (stop request remains)",
+    "progress_count": "Processed {completed}/{total} brushes (includes skipped; not batch delivery progress)",
+    "progress_read": "Reading the source file; no measurable percentage for this step.",
+    "progress_parse": "Parsing ABR; cancellation is checked after this parsing step completes.",
+    "progress_map": "Mapping brushes; cancellation is checked at step boundaries without forced interruption.",
+    "progress_prepare": "Preparing safe staging for this batch; not delivered yet, cancellable.",
+    "progress_convert": "Generating/staging verification: processed {completed}/{total} brushes (includes skipped), not delivered. Stable ID: {preset_id}",
+    "progress_verify": "Per-brush generation ended ({completed}/{total}, includes skipped); preparing/verifying batch files, not delivered yet.",
+    "progress_verified": "All staged files passed read-back verification; awaiting the last safe checkpoint, cancellation can still be requested.",
+    "progress_delivering": "Final delivery: cannot cancel. Placing/reading back files; wait for complete delivery or the transaction failure manifest.",
+    "progress_cancel_requested": "Cancellation request received; awaiting a safe checkpoint. If final delivery has started, this batch will still finish; it is not cancelled yet.",
+    "progress_stopping": "Stopping safely and cleaning this batch staging; another run is blocked until cleanup and thread completion are confirmed.",
+    "progress_finishing": "Background work is finishing; the final result is confirmed after thread completion. Inputs remain frozen.",
+    "parse_cancelled": "Parsing cancelled: no export files; the source can be loaded again.",
+    "result_cancel_late": "Cancellation arrived after the last safe checkpoint and did not interrupt this batch; actual result: {result}",
+    "worker_no_result": "The background thread ended without a result; delivery is unconfirmed. Preserve the scene.",
+    "close_title": "Background task still active",
+    "close_question": "Wait for a safe stop and close, or keep this window open?\nWaiting requests cancellation in cancellable stages. Final delivery cannot be interrupted: wait for this batch to finish. Threads and Krita/PS are never forcibly killed.",
+    "close_wait": "Wait for safe stop, then close",
+    "close_keep": "Keep window open",
+    "close_waiting": "Safe exit is pending: the window closes after the thread ends. You may keep it open, but an issued stop request cannot be withdrawn.",
+})
+
 # 未映射警告来自 mapping.py，中文固定文案；英文界面下显示时翻译。
 _WARNINGS_EN: dict[str, str] = {
     "颜色动态": "Color dynamics",
