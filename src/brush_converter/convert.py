@@ -9,6 +9,7 @@ import math
 import re
 import struct
 import xml.etree.ElementTree as ET
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -17,6 +18,7 @@ from PIL import Image, PngImagePlugin
 
 from . import __version__
 from .abr import AbrFile
+from .export_metadata import BundleMetadata
 from .export_options import (
     ACTUAL_ALTERNATIVE,
     ACTUAL_APPLIED,
@@ -45,6 +47,7 @@ from .export_options import (
     ProgressCallback,
     ProgressEvent,
     SwitchRecord,
+    build_identities,
     notify_progress,
     preset_content_digest,
     source_digest_of_file,
@@ -61,10 +64,14 @@ from .export_transaction import (
 from .hardness_tip import build_tip, verify_generated_tip
 from .kpp import TextureXml, build_preset_xml
 from .kpp.bundle import (
+    BundleIdentity,
+    BundleTrace,
     BundleVerifyResult,
-    build_bundle_bytes,
-    bundle_content_hash8,
+    PresetTrace,
+    SwitchTrace,
+    build_bundle,
     bundle_content_hash8_of_file,
+    bundle_identity_of_file,
 )
 from .kpp.kpp_writer import read_preset_xml, render_tip_preview
 from .kpp.preset_xml import (
@@ -675,7 +682,8 @@ class ConvertResult:
     presets: list[BrushPreset] = field(default_factory=list)
     skipped: list[str] = field(default_factory=list)
     # --- v1.3.1 产物加固 ---
-    content_hash8: str = ""            # 产物名的逻辑内容短哈希（只在有 bundle 时有值）
+    content_hash8: str = ""            # 产物名的逻辑内容短哈希（任务176 起=新版身份 hash8）
+    bundle_identity: BundleIdentity | None = None  # 任务176：新版逻辑身份（含 meta/标签/追溯）
     texture_count: int = 0             # 含真实纹理的预设数（Enabled=true 且非 1x1）
     bundle_reused: bool = False        # 命中「已存在同内容产物」→ 未重复写入
     bundle_renamed: bool = False       # 目标同名但内容不同 → 自动加 _2/_3 后缀
@@ -847,15 +855,22 @@ def convert(abr_path: str, out_dir: str, make_bundle: bool = True,
             cancel: CancelToken | None = None,
             cancel_callback: CancelCallback | None = None,
             progress: ProgressCallback | None = None,
-            staging_dir: str | None = None) -> ConvertResult:
+            staging_dir: str | None = None,
+            metadata: BundleMetadata | None = None,
+            preset_tags: Mapping[str, Sequence[str]] | None = None,
+            package_tags: Sequence[str] | None = None) -> ConvertResult:
     """CLI 便捷入口：解析单个 .abr 文件并转换全部预设。
 
     返回 ConvertResult；GUI 走 convert_presets() 以支持子集转换。
-    option_state 非空时先核对源文件摘要，防止把另一份 ABR 的逐支开关套到本文件。
+    option_state 非空时先核对源文件摘要，防止把另一份 ABR 的逐支开关套到本文件；
+    任务176 起这里把 abr_path 一并交给 convert_presets，包内追溯记录真实源文件名
+    与可复算摘要。
 
     任务169 新增参数只影响写出与进度，默认值下产物与旧版逐字节一致：
     cancel / cancel_callback 提供协作式取消（不强杀线程）；progress 接收冻结的
     ProgressEvent；staging_dir 供测试/高级调用方指定同卷的本次专属暂存目录。
+    任务176 新增 metadata / preset_tags / package_tags（语义见 build_bundle）：
+    preset_tags 以稳定 ID 为键；只影响 .bundle，独立 .kpp 不带元信息/标签。
     """
     if option_state is not None:
         digest = source_digest_of_file(abr_path)
@@ -869,7 +884,48 @@ def convert(abr_path: str, out_dir: str, make_bundle: bool = True,
                            make_standalone=make_standalone,
                            option_state=option_state, cancel=cancel,
                            cancel_callback=cancel_callback, progress=progress,
-                           staging_dir=staging_dir)
+                           staging_dir=staging_dir, metadata=metadata,
+                           preset_tags=preset_tags, package_tags=package_tags,
+                           source_path=abr_path)
+
+
+def _bundle_target_for_write(
+    out_dir: Path, expected: Path, *, guard_legacy: bool = True
+) -> tuple[Path, bool]:
+    """任务176：同名**旧格式**资源包绝不被 kpp-only 哈希当成同包复用。
+
+    169 事务用 bundle_content_hash8_of_file() 判「同内容复用」：v2 包返回新版
+    身份 hash8，旧包只返回旧 kpp-only hash8。两套口径撞在同一个 8 位前缀的概率
+    极低，但「低概率」不是兼容规则；这里显式跳过任何 legacy/坏包，把新包顺延到
+    下一个空名字，由事务照常暂存、校验、交付，原文件内容与 mtime 不变。
+
+    返回 (候选路径, 是否因旧包而顺延)。候选是 v2 包或空名字时由事务继续判重：
+    v2 同身份 → 复用；v2 不同身份/坏包 → 事务自行加 _2/_3，绝不覆盖。
+    """
+    if not guard_legacy:
+        # 本次构建本身就是旧口径（没有 trace）：沿用 175 行为，由事务按
+        # kpp-only hash8 判「同内容复用」，不改旧包的复用语义。
+        return expected, False
+    base = expected
+    skipped_legacy = False
+    for index in range(1, 1000):
+        if index == 1:
+            candidate = base
+        else:
+            candidate = base.with_name(f"{base.stem}_{index}{base.suffix}")
+        if not candidate.exists():
+            return candidate, skipped_legacy
+        if candidate.is_dir():
+            return candidate, skipped_legacy
+        identity = bundle_identity_of_file(candidate)
+        if identity.scheme == "v2":
+            return candidate, skipped_legacy
+        if identity.scheme == "legacy":
+            skipped_legacy = True
+            continue
+        # 坏包/不可读：交给事务按「不同内容」顺延，绝不覆盖或宣称复用。
+        return candidate, skipped_legacy
+    raise OSError(f"同名资源包过多，无法为 {expected.name} 找到可写文件名")
 
 
 def _native_computed_preview_mask(bp: BrushPreset) -> np.ndarray:
@@ -1162,6 +1218,12 @@ def convert_presets(
     cancel_callback: CancelCallback | None = None,
     progress: ProgressCallback | None = None,
     staging_dir: str | None = None,
+    *,
+    metadata: BundleMetadata | None = None,
+    preset_tags: Mapping[str, Sequence[str]] | None = None,
+    package_tags: Sequence[str] | None = None,
+    source_path: str | None = None,
+    source_ordinals: Sequence[int] | None = None,
 ) -> ConvertResult:
     """把给定预设子集转成 .kpp / .bundle（先暂存、回读验证、再交付）。
 
@@ -1186,6 +1248,56 @@ def convert_presets(
     total = len(presets)
     result = ConvertResult(out_dir=str(out_dir), presets=presets)
     resolved = _resolve_option_switches(option_state, presets) if option_state else None
+
+    # ---- 任务176：把源、稳定 ID 与逐支标签的校验全部放在写盘之前 ----
+    # 源摘要优先级：选项状态（已核对源字节）> 显式 source_path（真文件摘要）；
+    # 两者都有时必须一致，否则 stop（防止把另一份 ABR 的开关套到本文件）。
+    source_digest = option_state.source_digest if option_state is not None else ""
+    source_filename = ""
+    if source_path is not None:
+        path_digest = source_digest_of_file(source_path)
+        if source_digest and path_digest != source_digest:
+            raise ValueError(
+                "源文件摘要与逐支选项状态不一致（源文件可能已被替换）："
+                f"选项 {source_digest}，当前文件 {path_digest}")
+        source_digest = path_digest
+        source_filename = Path(source_path).name
+    source_stem = getattr(abr, "name", "") or ""
+    if preset_tags is not None and not isinstance(preset_tags, Mapping):
+        raise TypeError("preset_tags 必须是 {稳定 ID: 标签序列} 的映射")
+    requested_tags = dict(preset_tags or {})
+    # 追溯只在调用方**显式**给出源路径或语义输入（元信息/标签）时启用：
+    # - 175 及更早的 GUI/CLI 入口在本任务不改；它们不传这些参数，继续走旧口径，
+    #   字节与 175 一致，不伪造「源摘要/稳定 ID」；
+    # - 177/178 接入元信息与源路径后自动获得 v2 身份（接口已就绪）；
+    # - convert()/直接 API 传 source_path 时立即产出可验证追溯。
+    emit_trace = (
+        bool(source_filename) or metadata is not None
+        or bool(requested_tags) or bool(package_tags))
+    if not emit_trace:
+        identities: list[PresetIdentity | None] = [None] * total
+    elif option_state is not None and resolved is not None:
+        identities = [
+            option_state.identity(preset_id) for preset_id, _switches in resolved
+        ]
+    elif source_digest:
+        # 直接 API（没有 167 选项状态）也能得到稳定 ID；子集必须显式给
+        # source_ordinals，否则序号只是本次子集顺序（trace 里不冒称源序号）。
+        identities = list(build_identities(presets, source_digest, source_ordinals))
+    else:
+        identities = [None] * total
+    if requested_tags:
+        known_ids = {identity.preset_id for identity in identities
+                     if identity is not None}
+        unknown = sorted(set(requested_tags) - known_ids)
+        if unknown:
+            raise ValueError(
+                "preset_tags 指定了不在本次转换中的稳定 ID："
+                + "、".join(repr(key) for key in unknown))
+        if any(identity is None for identity in identities):
+            raise ValueError(
+                "逐支标签需要稳定原始 ID：请提供 option_state，"
+                "或提供可读取的 source_path（子集还需 source_ordinals）")
 
     def notify(phase: str, completed: int, *, message: str = "",
                preset_id: str | None = None, cancelled: bool = False) -> None:
@@ -1230,6 +1342,8 @@ def convert_presets(
         make_standalone=make_standalone,
     )
     processed = 0
+    trace_entries: list[PresetTrace] = []
+    tags_for_bundle: dict[str, tuple[str, ...]] = {}
     try:
         transaction.begin()
         result.out_dir = str(transaction.out_dir)
@@ -1249,6 +1363,32 @@ def convert_presets(
             fname, xml, preview = _render_preset(bp, i, plan=plan)
             data = _build_kpp_bytes(xml, preview)
             result.kpp_files.append((fname, data))
+            identity = identities[i]
+            if emit_trace:
+                # 任务176：逐支追溯记录**实际**渲染计划（无选项状态时用的就是
+                # 默认三开关的现行处理，与 _render_preset(plan=None) 等价）。
+                trace_plan = plan if plan is not None else plan_preset(bp)
+                trace_entries.append(PresetTrace(
+                    kpp=fname,
+                    ordinal=identity.ordinal if identity is not None else i + 1,
+                    name=bp.name,
+                    preset_id=identity.preset_id if identity is not None else None,
+                    switches=tuple(
+                        SwitchTrace(
+                            switch_id=outcome.switch_id,
+                            applicable=outcome.applicable,
+                            enabled=outcome.enabled,
+                            actual=outcome.actual,
+                            limited=outcome.limited,
+                            reason=outcome.actual_reason,
+                        )
+                        for outcome in trace_plan.outcomes
+                    ),
+                ))
+            if requested_tags and identity is not None:
+                preset_tag_values = requested_tags.get(identity.preset_id, ())
+                if preset_tag_values:
+                    tags_for_bundle[fname] = preset_tag_values
             if make_standalone:
                 item = transaction.stage_kpp(fname, data)
                 result.standalone_paths[fname] = item.final_path
@@ -1272,14 +1412,43 @@ def convert_presets(
 
         if make_bundle and result.kpp_files:
             stem = getattr(abr, "name", None) or "converted"
-            # v1.3.1：产物名带版本号 + 逻辑内容短哈希，让「同名 ⇒ 同内容」成立。
-            # 版本号让不同版本的产物不会互相覆盖，hash8 让同内容可被识别复用。
-            result.content_hash8 = bundle_content_hash8(result.kpp_files)
-            base = transaction.out_dir / (
+            # 任务176：产物名仍带版本号 + 身份 hash8，但 hash8 来自**新版逻辑身份**
+            # （meta/标签/追溯/kpp 全参与），不再只看 .kpp 字节。
+            # build_bundle 的展示名必须是 stem（不含 hash）：否则 dc:title 会带
+            # hash，构成「文件名 → 标题 → 身份」的递归。
+            bundle_trace = None
+            if emit_trace:
+                bundle_trace = BundleTrace(
+                    presets=tuple(trace_entries),
+                    source_filename=source_filename,
+                    source_stem=source_stem,
+                    source_digest=source_digest,
+                )
+            built = build_bundle(
+                result.kpp_files,
+                stem,
+                metadata=metadata,
+                preset_tags=tags_for_bundle or None,
+                package_tags=package_tags,
+                trace=bundle_trace,
+            )
+            result.bundle_identity = built.identity
+            result.content_hash8 = built.identity.hash8
+            expected = transaction.out_dir / (
                 f"{stem}_v{__version__}_{result.content_hash8}.bundle")
-            bundle_bytes = build_bundle_bytes(result.kpp_files, base.stem)
+            # 旧包保护只对 v2 新包启用；legacy 新包沿用 175 的复用语义。
+            target, skipped_legacy = _bundle_target_for_write(
+                transaction.out_dir, expected,
+                guard_legacy=built.identity.scheme == "v2")
+            if skipped_legacy:
+                result.warnings.append(
+                    "检测到同名旧格式资源包（缺少新版追溯身份）：为防误判同包，"
+                    f"本次未使用该文件名（从候选 {target.name} 起由事务继续判重）；"
+                    "原文件内容与 mtime 未变")
+            # 双路径写出仍走 169 事务：暂存 → 回读校验 → 不可取消交付；
+            # 同名 v2 同身份可复用（mtime 不变），不同内容由事务顺延，不覆盖。
             item = transaction.stage_bundle(
-                base.name, bundle_bytes, result.content_hash8)
+                target.name, built.data, result.content_hash8)
             result.bundle_path = item.final_path
             # 旧版命名（stem.bundle）留在同目录时只提示，不覆盖也不删。
             legacy = transaction.out_dir / f"{stem}.bundle"
@@ -1287,6 +1456,15 @@ def convert_presets(
                 result.warnings.append(
                     f"检测到旧版命名产物 {legacy.name}：v1.3.1 不覆盖旧文件，"
                     f"新产物为 {item.final_name}")
+
+        if metadata is not None or requested_tags or package_tags:
+            # 元信息/标签只属于 .bundle；独立 kpp 没有承载这些字段的原生位置。
+            if not make_bundle:
+                result.warnings.append(
+                    "未生成 .bundle：包元信息与标签没有写出（独立 .kpp 不承载）")
+            elif make_standalone:
+                result.warnings.append(
+                    "包元信息与逐支标签只写进 .bundle；独立 .kpp 不包含这些信息")
 
         # 最后一个允许取消的提示；随后 commit() 内部把阶段标成不可取消。
         notify(PHASE_WRITE, total,
@@ -1341,6 +1519,7 @@ def convert_presets(
         result.texture_count = 0
         result.bundle_path = None
         result.content_hash8 = ""
+        result.bundle_identity = None
         result.verify = None
         result.standalone_paths = {}
         if option_state is not None:
