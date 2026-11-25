@@ -1369,8 +1369,13 @@ def convert_presets(
             f"安全写出失败：{exc}", phase=summary.phase,
             summary=summary, cause=exc) from exc
     except Exception as exc:
-        # 其它渲染/校验失败：清理本次暂存后原样抛出；不把失败写成部分成功。
-        transaction.fail(exc)
+        # 普通渲染错误仍保留原异常/CLI退出码1；清理受阻则必须携带真实事务清单，
+        # 不能让GUI丢掉保留现场、CLI误报成没有安全写出风险的普通内部错误。
+        summary = transaction.fail(exc)
+        if summary.retained or summary.blocked:
+            raise ExportTransactionError(
+                f"转换失败且本批暂存清理受阻，请保留现场：{exc}",
+                phase=summary.phase, summary=summary, cause=exc) from exc
         raise
 
 
