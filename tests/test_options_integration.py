@@ -43,6 +43,7 @@ import cli  # noqa: E402
 from brush_converter import convert as conversion  # noqa: E402
 from brush_converter import export_transaction as tx  # noqa: E402
 from brush_converter.abr import AbrFile  # noqa: E402
+from brush_converter.export_metadata import BundleMetadata  # noqa: E402
 from brush_converter.export_options import (  # noqa: E402
     SWITCH_IDS,
     ExportOptionState,
@@ -56,6 +57,7 @@ from brush_converter.mapping import BrushPreset, map_presets  # noqa: E402
 from gui import i18n, main_window, workers  # noqa: E402
 from gui.brush_selection import BrushSelection, state_plan  # noqa: E402
 from gui.main_window import ExportConfirmDialog, MainWindow, export_preview_text  # noqa: E402
+from gui.tag_editor import MetadataExportSnapshot, TagState  # noqa: E402
 from tools import make_test_abr as abr_writer  # noqa: E402
 
 pytestmark = pytest.mark.verify
@@ -236,6 +238,18 @@ def cli_run(monkeypatch, source, out, *, config=None, keys=None, bundle=True,
         argv += ["--no-bundle"]
     if not standalone:
         argv += ["--no-standalone"]
+    if bundle:
+        # 177 起 GUI 空表单默认写包信息/来源标签；178 的 CLI 只在显式配置时
+        # 进入同一口径。这里给 CLI 一份与 GUI 空表单等价的空配置，才是按
+        # 「同配置」比较两入口；不改变产品默认行为，也不放宽断言。
+        metadata_config = Path(str(out) + ".gui-default-metadata173.json")
+        metadata_config.write_text(json.dumps({
+            "format": "brushconverter.export-metadata",
+            "version": 1,
+            "metadata": {},
+            "tags": {},
+        }, ensure_ascii=False), encoding="utf-8")
+        argv += ["--metadata-file", str(metadata_config)]
     with monkeypatch.context() as patch:
         patch.setattr(cli, "convert", observe)
         code = cli.main(argv)
@@ -246,7 +260,23 @@ def snapshot_worker(source, out, *, bundle=True, standalone=True, cancel_at=None
     """工作线程使用真实不可变快照与生产事务；同步run便于钉住取消检查点。"""
     _path, abr, state = source
     model = BrushSelection([state.preset(key) for key in state.preset_ids], state.source_digest)
-    worker = workers.ConvertWorker(abr, [], str(out), bundle, standalone, snapshot=model.snapshot())
+    base = model.snapshot()
+    snapshot = base
+    if bundle:
+        # 与177的生产GUI空表单一致：标题取ABR名、说明用产品默认、作者/许可/
+        # 包版本留空、来源标签=文件名主干；源路径只用于核对字节。
+        filename = Path(_path).name
+        stem = Path(filename).stem
+        tag_state = TagState(model.options.preset_ids, filename)
+        snapshot = MetadataExportSnapshot(
+            presets=base.presets, identities=base.identities,
+            source_digest=base.source_digest, config_json=base.config_json,
+            hidden_selected=base.hidden_selected,
+            metadata=BundleMetadata(name=abr.name or stem or "converted",
+                                    source_filename=filename),
+            tag_plans=tag_state.freeze(tuple(item.preset_id for item in base.identities)),
+            source_path=str(_path), make_bundle=True)
+    worker = workers.ConvertWorker(abr, [], str(out), bundle, standalone, snapshot=snapshot)
     results, events = [], []
     worker.done.connect(results.append)
     worker.progress.connect(events.append)
@@ -435,8 +465,14 @@ def test_snapshot_copies_arrays_and_switch_values(source, tmp_path):
 
 def test_default_bytes_and_sampled_padding_unchanged(source, tmp_path, monkeypatch):
     path, abr, state = source
-    core = conversion.convert_presets(abr, [state.preset(key) for key in state.preset_ids],
-                                     str(tmp_path / "core"))
+    filename, stem = Path(path).name, Path(path).stem
+    tag_state = TagState(state.preset_ids, filename)
+    core = conversion.convert_presets(
+        abr, [state.preset(key) for key in state.preset_ids], str(tmp_path / "core"),
+        metadata=BundleMetadata(name=abr.name or stem or "converted",
+                                source_filename=filename),
+        preset_tags={key: tag_state.plan(key).final() for key in state.preset_ids},
+        source_path=str(path))
     gui_result, _events = snapshot_worker(source, tmp_path / "gui")
     code, cli_result = cli_run(monkeypatch, path, tmp_path / "cli")
     assert code == 0
