@@ -1,0 +1,194 @@
+{
+  "format": "brushconverter.bundle-interop-cases",
+  "version": 1,
+  "note": "仅声明合成输入与人工手列期望；二进制样例运行时只生成到 .tmp/179/；不是 Krita 实机验收。",
+  "metadata": {
+    "name": "179 原生关联合成样例",
+    "description": "179 合成标签回归；不是素材许可或实机通过声明。",
+    "author": "合成作者179",
+    "license": "仅供合成测试",
+    "package_version": "fixture-1"
+  },
+  "common": [
+    " 共享 ",
+    "勾线\t练习",
+    "ink",
+    "Ink",
+    "",
+    " \t\n",
+    "Café"
+  ],
+  "source": [
+    "原来源",
+    "",
+    "来源可删"
+  ],
+  "package_tags": [
+    "只在包级"
+  ],
+  "presets": [
+    {
+      "key": "A",
+      "name": "179同名笔刷",
+      "ordinal": 2,
+      "added": [
+        "仅甲",
+        "符号 & <tag> \"双\" '单'",
+        " 共享 "
+      ],
+      "removed": [
+        "原来源",
+        "来源可删"
+      ],
+      "expected_tags": [
+        "Café",
+        "Ink",
+        "仅甲",
+        "共享",
+        "勾线 练习",
+        "符号 & <tag> \"双\" '单'"
+      ],
+      "expected_tip_size": [
+        8,
+        8
+      ],
+      "expected_tip_pixel_sha256": "9c5d017fb73f179169019755e80e71ae789129f943e1c89e9494507b8302883d"
+    },
+    {
+      "key": "B",
+      "name": "179同名笔刷",
+      "ordinal": 5,
+      "added": [
+        "仅乙",
+        "保留来源"
+      ],
+      "removed": [
+        "共享",
+        "Café",
+        "ink",
+        "来源可删",
+        "不存在"
+      ],
+      "expected_tags": [
+        "仅乙",
+        "保留来源",
+        "勾线 练习",
+        "原来源"
+      ],
+      "expected_tip_size": [
+        8,
+        8
+      ],
+      "expected_tip_pixel_sha256": "cb2e42782ef713c2faac89bee3124e01155e444b79810ad5da07697ccd3f3474"
+    },
+    {
+      "key": "C",
+      "name": "179空标签",
+      "ordinal": 9,
+      "added": [
+        "",
+        "  "
+      ],
+      "removed": [
+        "共享",
+        "勾线 练习",
+        "Ink",
+        "Café",
+        "原来源",
+        "来源可删"
+      ],
+      "expected_tags": [],
+      "expected_tip_size": [
+        8,
+        8
+      ],
+      "expected_tip_pixel_sha256": "a8b7db372286bd5fbe29895b35f0141c7333f309f66c069964d183d1fe04a481"
+    },
+    {
+      "key": "D",
+      "name": "179特殊 & <尖括号> \"引号\"",
+      "ordinal": 12,
+      "added": [
+        " 特殊  空格 ",
+        "符号 & <tag> \"双\" '单'",
+        "é",
+        "é"
+      ],
+      "removed": [
+        "来源可删"
+      ],
+      "expected_tags": [
+        "Café",
+        "Ink",
+        "é",
+        "共享",
+        "勾线 练习",
+        "原来源",
+        "特殊 空格",
+        "符号 & <tag> \"双\" '单'"
+      ],
+      "expected_tip_size": [
+        8,
+        8
+      ],
+      "expected_tip_pixel_sha256": "26c7359ef0048dae3656d74b272208676afefaccb320917793f747218580d929"
+    }
+  ],
+  "expected_filters": {
+    "共享": [
+      "A",
+      "D"
+    ],
+    "勾线 练习": [
+      "A",
+      "B",
+      "D"
+    ],
+    "Café": [
+      "A",
+      "D"
+    ],
+    "Ink": [
+      "A",
+      "D"
+    ],
+    "仅甲": [
+      "A"
+    ],
+    "仅乙": [
+      "B"
+    ],
+    "保留来源": [
+      "B"
+    ],
+    "原来源": [
+      "B",
+      "D"
+    ],
+    "特殊 空格": [
+      "D"
+    ],
+    "é": [
+      "D"
+    ],
+    "符号 & <tag> \"双\" '单'": [
+      "A",
+      "D"
+    ],
+    "来源可删": [],
+    "只在包级": [],
+    "不存在": [],
+    "": []
+  },
+  "expected_untagged": [
+    "C"
+  ],
+  "manual_187": {
+    "import": "待人工",
+    "filter": "待人工",
+    "restart": "待人工",
+    "old_resources": "待人工",
+    "binary_privacy": "待人工"
+  },
+  "tip_expectation_note": "手工8x8 L蒙版：第0/7行255，第2..5行与第2..5列交集为255-原序号*13，其余0；只比较解码像素SHA256，内嵌PNG的MD5仍按原始字节。未选择的源序号1变化不改变四支期望。"
+}
