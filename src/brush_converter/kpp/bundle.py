@@ -12,7 +12,8 @@ v1.3.1 产物加固（使用者批准的 4 条之二/之三/之五）：
    同一输入两次转换产出不同字节，导致「产物是否变化」无法用哈希判断。
 2. **内容短哈希**：bundle_content_hash8() 只对「逻辑内容」做确定性哈希
    （条目名排序 + 每个条目名/字节 sha256），不受 zip 头时间戳影响，
-   用作产物文件名的 hash8 与「同内容复用」判据。
+   用作产物文件名的 hash8；任务182补充起复用判定改用完整身份，8 位
+   hash8 只用于命名/人工核对，不得单独作为同包依据。
 3. **回读校验**：verify_bundle() 写盘后重开产物自查（zip 完整性、mimetype、
    manifest 与条目一致、每个 .kpp 可读出），并记录文件 sha256 与大小。
 
@@ -665,17 +666,50 @@ def bundle_identity_of_file(bundle_path: str | Path) -> BundleIdentityRead:
 def bundle_content_hash8_of_file(bundle_path: str | Path) -> str | None:
     """既有（169 事务使用）的「文件 → hash8」入口，语义按版本显式分派。
 
-    - v2 文件：返回新版逻辑身份 hash8（只有内容全同才与本次构建相同）；
+    - v2 文件：返回新版逻辑身份 hash8（内容全同一定相同；但相同不保证
+      内容全同，真实 32 位前缀碰撞已复现，不能单独作为同包依据）；
     - legacy 文件：返回旧 kpp-only hash8（保持 v1.3.1 既有用例与旧工具口径）；
     - 坏文件/不可判：None（调用方按「不同内容」处理，绝不覆盖）。
 
     注意：返回值本身不带版本信息，所以新的比对代码应改用
-    bundle_identity_of_file()；本包装只为兼容 169 事务的既有签名。
+    bundle_identity_of_file() + bundle_identity_matches()；本包装只为兼容
+    169 任务遗留的调用签名，生产复用判定不再使用它。
     """
     identity = bundle_identity_of_file(bundle_path)
     if identity.scheme in ("v2", "legacy"):
         return identity.hash8
     return None
+
+
+def bundle_identity_matches(
+    actual: BundleIdentityRead, expected: BundleIdentity
+) -> bool:
+    """完整身份比对：只有「口径 + 完整摘要」一致才算同一个包。
+
+    任务182补充纠偏的核心判据（不同内容不得误复用）：
+
+    - v2 ↔ v2：必须比较完整的 64 位 sha256；8 位 hash8 只用于文件名和
+      人工核对，真实生日碰撞（182 已用 125,791 次合成说明复现）绝不能
+      作为复用依据；
+    - legacy ↔ legacy：旧包没有 v2 摘要，只能沿用旧 kpp-only hash8 口径；
+    - invalid、空摘要或跨 scheme：一律 False，绝不因短哈希相同而复用。
+
+    调用方必须先读到具体文件的实际身份，再让本函数与本次构建的完整
+    身份比较；不要先把两边都降成 hash8 再比较。
+    """
+    if expected.scheme == "v2":
+        return (
+            actual.scheme == "v2"
+            and bool(expected.sha256)
+            and actual.sha256 == expected.sha256
+        )
+    if expected.scheme == "legacy":
+        return (
+            actual.scheme == "legacy"
+            and bool(expected.legacy_hash8)
+            and actual.hash8 == expected.legacy_hash8
+        )
+    return False
 
 
 def _checked_preset_name(name: str) -> str:

@@ -894,10 +894,13 @@ def _bundle_target_for_write(
 ) -> tuple[Path, bool]:
     """任务176：同名**旧格式**资源包绝不被 kpp-only 哈希当成同包复用。
 
-    169 事务用 bundle_content_hash8_of_file() 判「同内容复用」：v2 包返回新版
+    169 事务曾用 bundle_content_hash8_of_file() 判「同内容复用」：v2 包返回新版
     身份 hash8，旧包只返回旧 kpp-only hash8。两套口径撞在同一个 8 位前缀的概率
     极低，但「低概率」不是兼容规则；这里显式跳过任何 legacy/坏包，把新包顺延到
     下一个空名字，由事务照常暂存、校验、交付，原文件内容与 mtime 不变。
+
+    任务182补充：v2-v2 的 8 位前缀碰撞也真实存在，事务已改用完整 sha256 判同包；
+    本函数只负责给旧包让名，不承担同内容复用判定。
 
     返回 (候选路径, 是否因旧包而顺延)。候选是 v2 包或空名字时由事务继续判重：
     v2 同身份 → 复用；v2 不同身份/坏包 → 事务自行加 _2/_3，绝不覆盖。
@@ -1446,9 +1449,11 @@ def convert_presets(
                     f"本次未使用该文件名（从候选 {target.name} 起由事务继续判重）；"
                     "原文件内容与 mtime 未变")
             # 双路径写出仍走 169 事务：暂存 → 回读校验 → 不可取消交付；
-            # 同名 v2 同身份可复用（mtime 不变），不同内容由事务顺延，不覆盖。
+            # 同名 v2 同完整身份可复用（mtime 不变），不同内容由事务顺延，不覆盖。
+            # 任务182补充：把完整身份一并交给事务，复用判定不再只看 8 位 hash8。
             item = transaction.stage_bundle(
-                target.name, built.data, result.content_hash8)
+                target.name, built.data, result.content_hash8,
+                identity=built.identity)
             result.bundle_path = item.final_path
             # 旧版命名（stem.bundle）留在同目录时只提示，不覆盖也不删。
             legacy = transaction.out_dir / f"{stem}.bundle"

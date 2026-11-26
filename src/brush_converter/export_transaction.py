@@ -51,8 +51,10 @@ from .export_options import (
     notify_progress,
 )
 from .kpp.bundle import (
+    BundleIdentity,
     BundleVerifyResult,
-    bundle_content_hash8_of_file,
+    bundle_identity_matches,
+    bundle_identity_of_file,
     verify_bundle,
 )
 from .kpp.kpp_writer import read_preset_xml
@@ -435,7 +437,7 @@ class ExportTransaction:
         for ...:
             tx.checkpoint()
             tx.stage_kpp(name, kpp_bytes)
-        tx.stage_bundle(base_name, bundle_bytes, content_hash8)
+        tx.stage_bundle(base_name, bundle_bytes, content_hash8, identity=build.identity)
         summary = tx.commit()
 
     取消：转换循环里的 checkpoint() 抛 ConversionCancelled，调用方
@@ -659,9 +661,14 @@ class ExportTransaction:
             f"同名独立 kpp 过多，无法为 {name} 找到安全文件名", phase=self._phase)
 
     def _resolve_bundle_target(
-        self, base_name: str, content_hash8: str
+        self, base_name: str, identity: BundleIdentity
     ) -> tuple[Path, str, Path | None, BundleVerifyResult | None]:
-        """决定 bundle 的最终路径：同逻辑内容且回读通过才复用。"""
+        """决定 bundle 的最终路径：同完整逻辑身份且回读通过才复用。
+
+        任务182补充纠偏：v2 身份必须比较完整 64 位 sha256，不能只比 8 位
+        hash8；短哈希碰撞时宁可顺延 _2，也绝不把另一份内容的旧包当同包。
+        legacy 构建仍按旧 kpp-only hash8 比较，保持 175 及更早的兼容口径。
+        """
         base = self.out_dir / base_name
         for index in range(1000):
             if index == 0:
@@ -672,7 +679,8 @@ class ExportTransaction:
                 return candidate, "new", None, None
             if candidate.is_dir():
                 continue
-            if bundle_content_hash8_of_file(candidate) != content_hash8:
+            actual = bundle_identity_of_file(candidate)
+            if not bundle_identity_matches(actual, identity):
                 continue
             verified = verify_bundle(candidate)
             if verified.ok:
@@ -733,19 +741,30 @@ class ExportTransaction:
         return item
 
     def stage_bundle(
-        self, base_name: str, data: bytes, content_hash8: str
+        self, base_name: str, data: bytes, content_hash8: str, *,
+        identity: BundleIdentity,
     ) -> TransactionItem:
-        """暂存 .bundle：复用前必须内容哈希相同且回读通过；新写则整包校验。"""
+        """暂存 .bundle：复用前必须完整身份一致且回读通过；新写则整包校验。
+
+        identity 是本次构建的完整身份（v2 含 64 位 sha256，legacy 含旧 hash8）；
+        content_hash8 只保留给既有调用签名，必须与 identity.hash8 一致。
+        """
         if self._staging is None:
             raise RuntimeError("必须先调用 begin()")
         if self._phase not in ("staging", "verify"):
             raise RuntimeError(f"当前阶段 {self._phase} 不允许暂存")
         if not isinstance(data, (bytes, bytearray)):
             raise TypeError("bundle 数据必须是字节")
+        if not isinstance(identity, BundleIdentity):
+            raise TypeError("identity 必须是 BundleIdentity")
+        if identity.hash8 != content_hash8:
+            raise ValueError(
+                "content_hash8 与完整身份不一致："
+                f"参数 {content_hash8}，身份 {identity.hash8}")
         blob = bytes(data)
         self.checkpoint()
         final, resolution, _existing, existing_verify = self._resolve_bundle_target(
-            base_name, content_hash8)
+            base_name, identity)
         item = TransactionItem(
             kind="bundle",
             logical_name=base_name,
@@ -757,8 +776,9 @@ class ExportTransaction:
         if final.name != base_name:
             item.renamed_from = base_name
         if resolution == "reused":
-            # bundle 复用只要求“逻辑内容”相同，zip 字节可能因 meta 标题不同而不同，
-            # 所以清单记录现有文件的真实哈希，不能拿本次内存字节冒充。
+            # bundle 复用要求“完整逻辑身份”相同（v2 为 64 位 sha256）；
+            # zip 字节可能因压缩细节不同，所以清单记录现有文件的真实哈希，
+            # 不能拿本次内存字节冒充。
             item.sha256 = _sha256_file(final)
             item.size = final.stat().st_size
             item.state = STATE_REUSED

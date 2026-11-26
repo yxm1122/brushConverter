@@ -61,13 +61,17 @@ from brush_converter.kpp.bundle import (  # noqa: E402
     TRACE_FORMAT,
     TRACE_META_NAME,
     TRACE_VERSION,
+    BundleIdentity,
+    BundleIdentityRead,
     BundleTrace,
     PresetTrace,
     SwitchTrace,
+    _identity_of_parts,
     build_bundle,
     build_bundle_bytes,
     bundle_content_hash8,
     bundle_content_hash8_of_file,
+    bundle_identity_matches,
     bundle_identity_of_file,
     verify_bundle,
     write_bundle,
@@ -721,6 +725,110 @@ def test_convert_never_reuses_same_named_legacy_bundle(tmp_path):
     assert target.stat().st_mtime_ns == legacy_mtime
     assert any("旧格式资源包" in warning for warning in second.warnings)
     assert verify_bundle(second.bundle_path).ok
+
+
+def test_identity_matcher_requires_full_v2_digest_not_hash8():
+    """8 位前缀相同但完整 sha256 不同，绝不能判为同包；跨口径同样拒绝。"""
+    expected = BundleIdentity(scheme="v2", sha256="a" * 64)
+    same_prefix = BundleIdentityRead(
+        scheme="v2", hash8="a" * 8, sha256="a" * 8 + "b" * 56)
+    assert same_prefix.hash8 == expected.hash8
+    assert bundle_identity_matches(same_prefix, expected) is False
+    assert bundle_identity_matches(
+        BundleIdentityRead(scheme="legacy", hash8="a" * 8), expected) is False
+    assert bundle_identity_matches(
+        BundleIdentityRead(scheme="invalid", hash8="a" * 8), expected) is False
+    assert bundle_identity_matches(
+        BundleIdentityRead(scheme="v2", sha256="a" * 64), expected) is True
+
+    legacy_expected = BundleIdentity(scheme="legacy", legacy_hash8="12345678")
+    assert bundle_identity_matches(
+        BundleIdentityRead(scheme="legacy", hash8="12345678"), legacy_expected) is True
+    assert bundle_identity_matches(
+        BundleIdentityRead(scheme="v2", sha256="a" * 64), legacy_expected) is False
+    assert bundle_identity_matches(
+        BundleIdentityRead(scheme="legacy", hash8=""), legacy_expected) is False
+    assert bundle_identity_matches(
+        BundleIdentityRead(scheme="v2"),
+        BundleIdentity(scheme="v2", sha256="")) is False
+
+
+def test_convert_does_not_reuse_v2_bundle_on_hash8_collision(tmp_path):
+    """真实 32 位前缀碰撞：B 与 A 的 hash8 相同、完整 sha256 不同，必须交付 B。
+
+    这是 182 由真实 CLI 复现的产品缺陷（A 被错误复用给 B）的源码级回归。
+    碰撞用生产同一套 _identity_of_parts() 在内存搜索，不伪造哈希、不猴补丁；
+    找到后仍走真实 convert_presets 写出与回读。
+    """
+    presets = _presets()
+    source = _source_file(tmp_path)
+
+    def run(out_dir: Path, description: str):
+        return convert_presets(
+            _FakeAbr(), presets, str(out_dir), make_standalone=False,
+            metadata=BundleMetadata(description=description),
+            source_path=str(source))
+
+    seed = run(tmp_path / "seed-out", "碰撞种子")
+    assert seed.status == "committed"
+    seed_bytes = Path(seed.bundle_path).read_bytes()
+    meta = _entry_text(seed_bytes, "meta.xml")
+    manifest = _entry_text(seed_bytes, "META-INF/manifest.xml")
+    with zipfile.ZipFile(io.BytesIO(seed_bytes)) as archive:
+        prepared = [
+            (name.removeprefix("paintoppresets/"), archive.read(name))
+            for name in archive.namelist()
+            if name.startswith("paintoppresets/")
+        ]
+    needle = "<dc:description>碰撞种子</dc:description>"
+    assert meta.count(needle) == 1
+
+    seen: dict[str, tuple[str, str]] = {}
+    collision: tuple[str, str, str] | None = None
+    for index in range(250_000):
+        description = f"碰撞候选-{index:06d}"
+        candidate_meta = meta.replace(
+            needle, f"<dc:description>{description}</dc:description>")
+        identity = _identity_of_parts(candidate_meta, manifest, prepared)
+        previous = seen.get(identity.hash8)
+        if previous is not None and previous[1] != identity.sha256:
+            collision = (previous[0], description, identity.hash8)
+            break
+        seen[identity.hash8] = (description, identity.sha256)
+    assert collision is not None, "250000 次合成说明内未找到真实 32 位前缀碰撞"
+    first_description, second_description, short = collision
+
+    first = run(tmp_path / "out", first_description)
+    assert first.status == "committed" and first.bundle_identity is not None
+    first_path = Path(first.bundle_path)
+    first_bytes = first_path.read_bytes()
+    first_mtime = first_path.stat().st_mtime_ns
+    expected_first_meta = meta.replace(
+        needle, f"<dc:description>{first_description}</dc:description>")
+    expected_first = _identity_of_parts(expected_first_meta, manifest, prepared)
+    assert expected_first.sha256 == first.bundle_identity.sha256
+
+    second = run(tmp_path / "out", second_description)
+    assert second.status == "committed" and second.bundle_identity is not None
+    second_path = Path(second.bundle_path)
+
+    assert first.bundle_identity.hash8 == second.bundle_identity.hash8 == short
+    assert first.bundle_identity.sha256 != second.bundle_identity.sha256
+    # 旧判据只比 hash8，恰好会把 A 认成 B；本测试证明生产已改用完整身份。
+    assert bundle_content_hash8_of_file(first_path) == second.content_hash8
+    assert second.bundle_reused is False
+    assert second_path.name == f"{first_path.stem}_2{first_path.suffix}"
+    assert first_path.read_bytes() == first_bytes
+    assert first_path.stat().st_mtime_ns == first_mtime
+
+    first_verified = verify_bundle(first_path)
+    assert first_verified.ok, first_verified.errors
+    assert first_verified.meta["dc:description"] == first_description
+    second_verified = verify_bundle(second_path)
+    assert second_verified.ok, second_verified.errors
+    assert second_verified.identity_scheme == "v2"
+    assert second_verified.identity_sha256 == second.bundle_identity.sha256
+    assert second_verified.meta["dc:description"] == second_description
 
 
 def test_convert_source_digest_mismatch_stops_before_write(tmp_path):

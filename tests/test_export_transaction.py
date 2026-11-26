@@ -52,6 +52,7 @@ from brush_converter.export_transaction import (  # noqa: E402
     ExportTransactionError,
 )
 from brush_converter.kpp.bundle import (  # noqa: E402
+    build_bundle,
     build_bundle_bytes,
     bundle_content_hash8,
     verify_bundle,
@@ -139,8 +140,10 @@ def test_staging_verified_then_committed_with_manifest():
     assert Path(manifest["items"][0]["final_path"]).is_absolute()
 
     content_hash = bundle_content_hash8([("000_甲.kpp", kpp)])
-    bundle = build_bundle_bytes([("000_甲.kpp", kpp)], "样本")
-    bundle_item = tx.stage_bundle("样本.bundle", bundle, content_hash)
+    built = build_bundle([("000_甲.kpp", kpp)], "样本")
+    # 补传完整身份（这里是 legacy 口径）；事务会核对 content_hash8 一致。
+    bundle_item = tx.stage_bundle(
+        "样本.bundle", built.data, content_hash, identity=built.identity)
     assert bundle_item.state == STATE_VERIFIED
     assert not (out / "样本.bundle").exists()
 
