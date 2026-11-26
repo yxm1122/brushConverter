@@ -16,7 +16,8 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "src"))
-TASK = ROOT / ".tmp" / "177"
+# 183A：环境变量优先、原任务目录兜底；隔离断言本身保持不变。
+TASK = Path(os.environ.get("BRUSHCONVERTER_TEST_TASK_ROOT", str(ROOT / ".tmp" / "177")))
 os.environ["QT_QPA_PLATFORM"] = "offscreen"
 
 from PySide6.QtCore import QSettings, QStandardPaths  # noqa: E402

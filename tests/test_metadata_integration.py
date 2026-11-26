@@ -28,7 +28,8 @@ ROOT = Path(__file__).resolve().parents[1]
 for _path in (ROOT, ROOT / "src"):
     if str(_path) not in sys.path:
         sys.path.insert(0, str(_path))
-TASK = ROOT / ".tmp" / "180"
+# 183A：环境变量优先、原任务目录兜底；隔离断言本身保持不变。
+TASK = Path(os.environ.get("BRUSHCONVERTER_TEST_TASK_ROOT", str(ROOT / ".tmp" / "180")))
 
 import test_bundle_interop as native  # noqa: E402
 import test_options_integration as assembled  # noqa: E402

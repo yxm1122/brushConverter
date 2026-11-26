@@ -160,6 +160,8 @@ def invoke(args_list, timeout=DEFAULT_TIMEOUT_S):
 
     cmd = [KRITARUNNER, "-s", SCRIPT_MODULE]
     env = os.environ.copy()
+    # 183A：去掉从 pytest 进程继承的 offscreen 平台，避免无头/真实 Krita 被串扰。
+    env.pop("QT_QPA_PLATFORM", None)
     env["KRITA_RENDER_ARGS"] = json.dumps(list(args_list), ensure_ascii=False)
     env["PYTHONUTF8"] = "1"
     env["PYTHONIOENCODING"] = "utf-8"
@@ -369,6 +371,8 @@ def _render_one_gui_once(preset, out, size=(200, 200), stroke=120, pressure=1.0,
             os.remove(out_path)
         log_path = os.path.join(tmpdir, "gui_log.txt")
         env = os.environ.copy()
+        # 183A：Krita 子进程必须使用真实平台；只移除子进程 env，pytest 自身仍可 offscreen。
+        env.pop("QT_QPA_PLATFORM", None)
         env["BC_AUTO_LOG"] = log_path
         env["BC_AUTO_OUT"] = out_path
         env["BC_AUTO_PRESULT"] = result_json

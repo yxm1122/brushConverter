@@ -19,7 +19,8 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "src"))
-TASK = ROOT / ".tmp" / "170"
+# 183A：全量运行时由 tests/conftest.py 发布统一任务根；单独运行时仍固定 170 目录。
+TASK = Path(os.environ.get("BRUSHCONVERTER_TEST_TASK_ROOT", str(ROOT / ".tmp" / "170")))
 os.environ["QT_QPA_PLATFORM"] = "offscreen"
 
 from PySide6.QtCore import (  # noqa: E402
