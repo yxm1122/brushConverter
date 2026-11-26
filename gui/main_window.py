@@ -17,6 +17,7 @@ from PySide6.QtWidgets import (
     QDialog,
     QDialogButtonBox,
     QFileDialog,
+    QFormLayout,
     QGroupBox,
     QHBoxLayout,
     QLabel,
@@ -37,7 +38,9 @@ from PySide6.QtWidgets import (
 
 from brush_converter.abr import AbrFile
 from brush_converter.convert import ConversionSwitches, ConvertResult, plan_preset
+from brush_converter.export_metadata import BundleMetadata
 from brush_converter.export_options import SWITCH_IDS
+from brush_converter.kpp.bundle import ELEM_PACKAGE_VERSION, ELEM_SOURCE_FILE
 from brush_converter.kpp.kpp_writer import render_tip_preview
 from brush_converter.mapping import BrushPreset
 
@@ -58,6 +61,7 @@ from .i18n import (
     tr_applicability,
     tr_warning,
 )
+from .tag_editor import MetadataExportSnapshot, TagEditor, TagState, tag_plan_text
 from .workers import ConvertFailure, ConvertWorker, ParseCancelled, ParseWorker, WorkerProgress
 
 
@@ -73,15 +77,65 @@ def _gray_to_pixmap(gray: np.ndarray | None, size: int = 64) -> QPixmap:
     return QPixmap.fromImage(image.copy())
 
 
+def metadata_preview_text(snapshot: MetadataExportSnapshot) -> str:
+    """只展示将传后台的包信息；空值默认与175写包口径相同。"""
+    if not snapshot.make_bundle:
+        return tr("metadata_kpp_scope")
+    metadata = snapshot.metadata
+    values = (("metadata_name", metadata.name),
+              ("metadata_description", metadata.description_or_default()),
+              ("metadata_author", metadata.author), ("metadata_license", metadata.license),
+              ("metadata_version", metadata.package_version),
+              ("metadata_source", metadata.source_filename))
+    return "\n".join([tr("metadata_preview"), *[
+        tr("metadata_value", label=tr(key), value=value or tr("metadata_not_provided"))
+        for key, value in values], tr("metadata_help"), tr("metadata_limits")])
+
+
+def metadata_result_text(result: ConvertResult) -> str:
+    """只信任成功交付的回读字段，不用当前表单或预计标签代替实际结果。"""
+    verified = result.verify
+    if result.status in ("committed", "reused_only") and not result.bundle_path and result.standalone_paths:
+        return tr("metadata_kpp_result")
+    if (result.status not in ("committed", "reused_only") or not result.bundle_path
+            or verified is None or not verified.ok):
+        return tr("metadata_not_verified")
+    lines = [tr("metadata_readback"), tr("metadata_readback_brief",
+        n=verified.preset_count,
+        tagged=sum(bool(tags) for tags in verified.preset_tags.values()),
+        links=sum(len(tags) for tags in verified.preset_tags.values()),
+        scheme=verified.identity_scheme or "—", hash=verified.identity_hash8 or "—")]
+    fields = (("metadata_name", "dc:title"), ("metadata_description", "dc:description"),
+              ("metadata_author", "dc:author"), ("metadata_license", "meta:license"),
+              ("metadata_version", f"meta:{ELEM_PACKAGE_VERSION}"),
+              ("metadata_source", f"meta:{ELEM_SOURCE_FILE}"))
+    for label, key in fields:
+        lines.append(tr("metadata_value", label=tr(label),
+                        value=verified.meta.get(key) or tr("metadata_not_provided")))
+    for filename, tags in verified.preset_tags.items():
+        lines.append(tr("tags_readback_row", file=filename,
+                        tags=tr("list_sep").join(tags) or tr("tags_empty")))
+    if verified.trace is not None:
+        lines.append(tr("metadata_trace_readback", n=len(verified.trace["presets"]),
+                        source=verified.trace["source"]["filename"] or tr("metadata_not_provided")))
+    lines.append(tr("metadata_limits"))
+    return "\n".join(lines)
+
+
 def export_preview_text(snapshot: ExportSnapshot) -> str:
     """按同一快照列出最终全体选择和生产计划，隐藏已选不能漏掉。"""
     state = snapshot.option_state()
     counts = {"applied": 0, "alternative": 0, "limited": 0, "skipped": 0}
     lines = []
+    tag_plans = dict(snapshot.tag_plans) if isinstance(snapshot, MetadataExportSnapshot) else {}
     for identity in state.identities:
         preset = state.preset(identity.preset_id)
         lines.append(tr("forecast_brush", ordinal=identity.ordinal, name=preset.name,
                         id=identity.preset_id))
+        if identity.preset_id in tag_plans:
+            lines.append(tag_plan_text(tag_plans[identity.preset_id]))
+            if not is_renderable(preset):
+                lines.append(tr("tags_not_written"))
         if not is_renderable(preset):
             counts["skipped"] += 1
             lines.append(tr("skipped_tip"))
@@ -98,7 +152,9 @@ def export_preview_text(snapshot: ExportSnapshot) -> str:
         lines.append("")
     return "\n".join([
         tr("export_intro", n=len(state.preset_ids), hidden=snapshot.hidden_selected),
-        tr("export_counts", **counts), tr("export_caution"), "", *lines,
+        tr("export_counts", **counts), tr("export_caution"), "",
+        metadata_preview_text(snapshot) if isinstance(snapshot, MetadataExportSnapshot) else "",
+        "", *lines,
     ])
 
 
@@ -158,6 +214,10 @@ class BrushItemWidget(QWidget):
         self.summary = QLabel()
         self.summary.setWordWrap(True)
         column.addWidget(self.summary)
+        self.tags = QLabel()
+        self.tags.setTextFormat(Qt.TextFormat.PlainText)
+        self.tags.setWordWrap(True)
+        column.addWidget(self.tags)
         if preset.warnings:
             warning = QLabel(tr("warn_prefix") + tr("list_sep").join(
                 tr_warning(value) for value in preset.warnings))
@@ -180,6 +240,7 @@ class MainWindow(QMainWindow):
         self._abr: AbrFile | None = None
         self._presets: list[BrushPreset] = []
         self._selection: BrushSelection | None = None
+        self._tags: TagState | None = None
         self._file_path: str | None = None
         self._status: tuple[str, dict] | None = None
         self._busy = False
@@ -263,14 +324,43 @@ class MainWindow(QMainWindow):
         self.process_help = QLabel()
         self.process_help.setWordWrap(True)
         processing.addWidget(self.process_help)
+        self.metadata_scope = QLabel()
+        self.metadata_scope.setWordWrap(True)
+        processing.addWidget(self.metadata_scope)
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         detail = QWidget()
         details = QVBoxLayout(detail)
+        self.metadata_group = QGroupBox()
+        metadata_layout = QFormLayout(self.metadata_group)
+        self.metadata_fields = {}
+        self.metadata_labels = {}
+        for key in ("name", "description", "author", "license", "version"):
+            label = QLabel()
+            edit = QPlainTextEdit() if key in ("description", "license") else QLineEdit()
+            if isinstance(edit, QPlainTextEdit):
+                edit.setMaximumHeight(66)
+            self.metadata_fields[key] = edit
+            self.metadata_labels[key] = label
+            metadata_layout.addRow(label, edit)
+        self.metadata_source_label = QLabel()
+        self.metadata_source = QLabel()
+        self.metadata_source.setTextFormat(Qt.TextFormat.PlainText)
+        self.metadata_source.setWordWrap(True)
+        metadata_layout.addRow(self.metadata_source_label, self.metadata_source)
+        self.metadata_help = QLabel()
+        self.metadata_limits = QLabel()
+        for label in (self.metadata_help, self.metadata_limits):
+            label.setWordWrap(True)
+            metadata_layout.addRow(label)
+        details.addWidget(self.metadata_group)
         self.current_label = QLabel()
         self.current_label.setTextFormat(Qt.TextFormat.PlainText)
         self.current_label.setWordWrap(True)
         details.addWidget(self.current_label)
+        self.tag_editor = TagEditor()
+        self.tag_editor.changed.connect(self._on_tags_changed)
+        details.addWidget(self.tag_editor)
         self.switch_groups = {}
         self.switch_checks = {}
         self.switch_status = {}
@@ -347,6 +437,7 @@ class MainWindow(QMainWindow):
         self.status_label.setTextFormat(Qt.TextFormat.PlainText)
         self.status_label.setWordWrap(True)
         root.addWidget(self.status_label)
+        self.radio_bundle.toggled.connect(self._on_format_changed)
 
     def _retranslate(self) -> None:
         """重建展示不重建模型；稳定ID上的选择/开关/焦点不被语言污染。"""
@@ -363,6 +454,17 @@ class MainWindow(QMainWindow):
                             (self.filter_label, "filter_label"), (self.sort_label, "sort_label"),
                             (self.process_help, "process_help"), (self.reset_label, "reset_notice")):
             widget.setText(tr(key))
+        self.metadata_group.setTitle(tr("metadata_heading"))
+        for key, label in self.metadata_labels.items():
+            label.setText(tr("metadata_" + key))
+            self.metadata_fields[key].setAccessibleName(tr("metadata_" + key))
+            self.metadata_fields[key].setPlaceholderText(tr(
+                "metadata_default_description" if key == "description" else "metadata_optional"))
+        self.metadata_source_label.setText(tr("metadata_source"))
+        self.metadata_help.setText(tr("metadata_help"))
+        self.metadata_limits.setText(tr("metadata_limits"))
+        self.tag_editor.retranslate()
+        self._update_metadata_enabled()
         self.file_label.setText(self._file_path or tr("no_file"))
         self.search_edit.setPlaceholderText(tr("search"))
         for combo, modes, prefix in ((self.filter_combo, FILTER_MODES, "filter"),
@@ -390,6 +492,7 @@ class MainWindow(QMainWindow):
         self._busy = busy
         for group in (self.file_group, self.list_group, self.process_group, self.out_group):
             group.setEnabled(not busy and not self._close_pending)
+        self._update_metadata_enabled()
         self._update_count()
         self._update_cancel_button()
 
@@ -488,6 +591,7 @@ class MainWindow(QMainWindow):
         self._presets = []
         self._selection = None
         self._export_snapshot = None
+        self._reset_metadata()
         with QSignalBlocker(self.search_edit), QSignalBlocker(self.filter_combo), QSignalBlocker(self.sort_combo):
             self.search_edit.clear()
             self.filter_combo.setCurrentIndex(0)
@@ -532,6 +636,7 @@ class MainWindow(QMainWindow):
             self._abr = None
             self._presets = []
             self._selection = None
+        self._reset_metadata(abr if abr is not None else None)
         self._populate()
         self._set_busy(bool(self._active_workers))
         if abr is None:
@@ -579,6 +684,15 @@ class MainWindow(QMainWindow):
                 for outcome in state_plan(self._selection.options, key).outcomes))
         else:
             card.summary.setText(tr("skipped_tip"))
+        if not self.radio_bundle.isChecked():
+            card.tags.setText(tr("metadata_kpp_scope"))
+        elif self._tags:
+            try:
+                tags = self._tags.plan(key).final()
+                card.tags.setText(tr("tags_card", tags=tr("list_sep").join(tags) or tr("tags_empty")) +
+                                  ("\n" + tr("tags_not_written") if not is_renderable(preset) else ""))
+            except (ValueError, TypeError) as exc:
+                card.tags.setText(tr("metadata_invalid", detail=str(exc)))
         item.setSizeHint(card.sizeHint())
 
     def _on_view_changed(self, *_args) -> None:
@@ -638,6 +752,8 @@ class MainWindow(QMainWindow):
         key = self._selection.focused_id if self._selection else None
         visible = self._selection.visible_ids if self._selection else ()
         valid = key in visible
+        self.tag_editor.set_current(key if valid else None,
+            renderable=is_renderable(self._selection.options.preset(key)) if valid else True)
         for group in self.switch_groups.values():
             group.setVisible(valid)
         if not valid:
@@ -692,15 +808,71 @@ class MainWindow(QMainWindow):
         if directory:
             self.out_dir_edit.setText(directory)
 
+    def _reset_metadata(self, abr: AbrFile | None = None) -> None:
+        """不读QSettings，不继承上一次作者/许可；成功重载才生成来源标签。"""
+        filename = Path(self._file_path).name if abr is not None and self._file_path else ""
+        name = getattr(abr, "name", "") if abr is not None else ""
+        for key, edit in self.metadata_fields.items():
+            if key == "name":
+                edit.setText(name or Path(filename).stem)
+            else:
+                edit.clear()
+        self.metadata_source.setText(filename)
+        self._tags = TagState(self._selection.options.preset_ids, filename) if self._selection else None
+        self.tag_editor.bind_model(self._tags)
+        self._update_metadata_enabled()
+
+    def _update_metadata_enabled(self) -> None:
+        bundle = self.radio_bundle.isChecked()
+        enabled = bundle and self._selection is not None and not self._busy and not self._close_pending
+        self.metadata_group.setEnabled(enabled)
+        self.tag_editor.setEnabled(enabled)
+        self.metadata_scope.setText(tr("metadata_bundle_scope" if bundle else "metadata_kpp_scope"))
+
+    def _on_format_changed(self, *_args) -> None:
+        self._update_metadata_enabled()
+        for key in self._items:
+            self._refresh_card(key)
+
+    def _on_tags_changed(self) -> None:
+        for key in self._items:
+            self._refresh_card(key)
+
+    def _make_export_snapshot(self) -> MetadataExportSnapshot:
+        """一次冻结所有选择/开关/元信息/标签；确认和后台不再读取控件。"""
+        selection = self._selection.snapshot()
+        make_bundle = self.radio_bundle.isChecked()
+        metadata = None
+        plans = ()
+        if make_bundle:
+            def text(key):
+                edit = self.metadata_fields[key]
+                return edit.toPlainText() if isinstance(edit, QPlainTextEdit) else edit.text()
+            metadata = BundleMetadata(
+                name=text("name").strip() or self._abr.name or "converted",
+                description=text("description"), author=text("author"), license=text("license"),
+                package_version=text("version"),
+                source_filename=Path(self._file_path).name if self._file_path else "")
+            plans = self._tags.freeze(tuple(item.preset_id for item in selection.identities))
+        return MetadataExportSnapshot(
+            presets=selection.presets, identities=selection.identities,
+            source_digest=selection.source_digest, config_json=selection.config_json,
+            hidden_selected=selection.hidden_selected, metadata=metadata, tag_plans=plans,
+            source_path=self._file_path, make_bundle=make_bundle)
+
     def _on_convert(self) -> None:
         if self._abr is None or self._selection is None or self._busy or self._close_pending:
             return
         if not self._selection.selected_ids:
             QMessageBox.information(self, tr("hint"), tr("need_select"))
             return
-        snapshot = self._selection.snapshot()
+        try:
+            snapshot = self._make_export_snapshot()
+        except (ValueError, TypeError) as exc:
+            QMessageBox.warning(self, tr("hint"), tr("metadata_invalid", detail=str(exc)))
+            return
         out_dir = self.out_dir_edit.text().strip() or "converted"
-        make_bundle = self.radio_bundle.isChecked()
+        make_bundle = snapshot.make_bundle
         dialog = ExportConfirmDialog(snapshot, out_dir, ".bundle" if make_bundle else ".kpp", self)
         if dialog.exec() != QDialog.DialogCode.Accepted:
             return
@@ -850,6 +1022,7 @@ class MainWindow(QMainWindow):
             lines.append(tr("done_bundle", name=Path(r.bundle_path).name, hash=r.content_hash8 or "—"))
         if r.verify is not None and not r.verify.ok:
             lines.append(tr("verify_failed", detail="; ".join(r.verify.errors)))
+        lines.append(metadata_result_text(r))
         raw = [*r.warnings, *r.skipped, *r.not_processed]
         if r.cancel_reason:
             raw.append(r.cancel_reason)
@@ -883,6 +1056,11 @@ class MainWindow(QMainWindow):
                  tr("result_detail", skipped=len(r.skipped), not_processed=len(r.not_processed))]
         if paths:
             brief.append(tr("done_body", paths="\n".join(paths)))
+        if r.bundle_path and r.verify is not None and r.verify.ok and r.status in ("committed", "reused_only"):
+            brief.append(tr("metadata_readback_brief", n=r.verify.preset_count,
+                tagged=sum(bool(tags) for tags in r.verify.preset_tags.values()),
+                links=sum(len(tags) for tags in r.verify.preset_tags.values()),
+                scheme=r.verify.identity_scheme or "—", hash=r.verify.identity_hash8 or "—"))
         if r.transaction and getattr(r.transaction, "retained", ()):
             brief.append(tr("retained_files") + "\n" + "\n".join(r.transaction.retained))
         message.setInformativeText("\n\n".join(brief))

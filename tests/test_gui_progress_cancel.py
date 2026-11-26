@@ -194,7 +194,12 @@ def window(windows):
 
 
 def load(win, presets=None):
-    win._file_path = "synthetic172.abr"
+    # 177接入真实源摘要核对；补齐合成源前提，不绕过生产校验或改旧断言。
+    source = TASK / "sources" / uuid.uuid4().hex / "synthetic172.abr"
+    source.parent.mkdir(parents=True)
+    source.write_bytes(b"task172-synthetic")
+    assert source_digest_of_bytes(source.read_bytes()) == DIGEST
+    win._file_path = str(source)
     win._on_parsed(AbrFile(6, 2, name="synthetic172"),
                    presets if presets is not None else [brush("a"), brush("b"), brush("c")],
                    source_digest=DIGEST)

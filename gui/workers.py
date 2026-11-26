@@ -22,6 +22,7 @@ from brush_converter.export_transaction import TransactionSummary
 from brush_converter.mapping import BrushPreset, map_presets
 
 from .brush_selection import ExportSnapshot
+from .tag_editor import MetadataExportSnapshot
 
 
 @dataclass(frozen=True)
@@ -161,6 +162,15 @@ class ConvertWorker(CooperativeWorker):
         self._make_bundle = make_bundle
         self._make_standalone = make_standalone
         self._write_events = 0
+        self._metadata_args = {}
+        if isinstance(snapshot, MetadataExportSnapshot):
+            if snapshot.make_bundle != make_bundle:
+                raise ValueError("确认快照与后台产物格式不一致，已阻止导出")
+            # 路径只传核心做源字节核对；包内由核心仅记录文件名，不读GUI或系统设置。
+            self._metadata_args = {"source_path": snapshot.source_path}
+            if make_bundle:
+                self._metadata_args.update(metadata=snapshot.metadata,
+                                           preset_tags=snapshot.preset_tags())
 
     def _on_progress(self, event: ProgressEvent) -> None:
         """只转发真实阶段：169先报验证完成，再在最后检查点后报最终交付。
@@ -192,6 +202,7 @@ class ConvertWorker(CooperativeWorker):
                 # 回调在检查点报告stopping；令牌读写均受本类锁保护。
                 cancel_callback=self._poll_cancel,
                 progress=self._on_progress,
+                **self._metadata_args,
             )
             self._complete()
             self.done.emit(result)
