@@ -366,8 +366,9 @@ def _prepare_bundle_metadata(abr: AbrFile, abr_path: str, state: ExportOptionSta
                              ) -> tuple[BundleMetadata, dict[str, tuple[str, ...]]]:
     """把显式配置变成 175/176 的输入；全部校验在任何写盘之前完成。
 
-    - 未给配置文件：与 GUI 空表单等价（包名取 ABR 主干、说明用产品默认、
-      作者/许可/包版本留空、来源标签=文件名主干、无逐支标签）。
+    - 本辅助函数的空配置默认值与 GUI 空表单等价（包名取 ABR 主干、说明用产品
+      默认、作者/许可/包版本留空、来源标签=文件名主干、无逐支标签）；
+      CLI 入口只在显式提供配置文件时调用，不能据此声称无配置入口已写元信息。
     - 给了配置文件：字段缺省仍留空/取默认；source 显式 [] 才是禁用。
     - 未知/未选中稳定 ID、非法字符都整批失败，不静默丢弃。
     """
@@ -436,8 +437,10 @@ def convert(abr_path: str, out_dir: str, *, make_bundle: bool = True,
             progress=None, metadata_file: str | None = None) -> ConvertResult:
     """CLI 薄适配：载入/校验/选子集后只调用既有169转换事务，不复制转换逻辑。
 
-    任务178：生成 .bundle 时总是按 GUI 空表单的默认值准备包信息与来源标签，
-    metadata_file 可覆盖、禁用或逐支增删；输入只交给 175/176 生产函数。
+    显式给 metadata_file 才启用包信息、来源标签与追溯；其中空配置与 GUI 空表单
+    等价，也可覆盖、禁用来源或逐支增删。未给配置仍保留旧 CLI 字节口径，
+    不等于 GUI 空表单；两入口同配置比较必须显式传入元信息文件。
+    输入只交给 175/176 生产函数，不另建写包逻辑。
     独立 .kpp 不承载包信息、原生标签或包内追溯，因此与元信息配置同时使用会
     明确失败，而不是悄悄丢掉使用者要求。
     """
