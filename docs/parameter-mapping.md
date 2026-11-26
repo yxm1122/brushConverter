@@ -3,7 +3,7 @@
 > **English abstract**: Field-level mapping reference for ABR-to-Krita conversion. The published version is v1.5.0; v1.6.0 is an unpublished candidate. Implementation status, measured evidence, known residuals and unverified combinations are reported separately.
 >
 > 引擎：现阶段仅像素引擎（paintbrush）。早期字段来源样本为自备商用ABR，后续证据覆盖范围逐节注明，不承诺任意笔刷精确等价。
-> **版本边界**：v1.5.0已发布；149A单随机源与153亮度越界预烘焙属于本地v1.6.0候选，尚未发布。逐支开关、安全取消、元信息/标签扩展仍是本轮计划，不据此杜撰API。
+> **版本边界**：v1.5.0已发布；当前源码为v1.6.0未发布候选，合并149A/153与逐支三开关、安全取消、元信息/标签/追溯。以下表格默认指外观优先处理；关闭后的受限原生路线单独注明。代码实现、文件回读与Krita实机效果分层，后者仍待187。
 > ✅=实现该映射分支，不等于任意参数域像素精确或人工已验；⛔=不映射；⚠️=已知限制/待量测边界。历史❓记号不替代[参数矩阵](<参数矩阵.json>)中的“未定”。模式verdict/证据等级以[模式总表](<数据/mode-table.json>)为准，参数verdict以矩阵为准，两种对象不混算。
 > 维护与验证入口见[开发指南](<developer-guide.md#maintenance-checks>)；旧方案看[归档说明](<归档/维护参考与归档说明.md>)。本页保留既有§1–§10标题锚点，历史报告与JSON原证据不重写。
 
@@ -52,8 +52,20 @@
 > （PS 标称 200 → Krita 290/250/204）；③ 每支笔多 3–12 KB（h100 @D=200 的 .kpp 5,588→9,143 B）。
 > 生成位图必须**保持正方形 + 边框 255**（铁律 17；`build_tip` 不经 `_square_tip`，正方形与边框是
 > 「径向剖面 + 外环强制归零」的结构性质，勿改回补白）。
-> `auto_brush` 承载链路在 v1.5.0 起已不在生产路径（`convert._computed_brush_def` 保留但不再调用）。
+> v1.5.0不再使用旧auto_brush生产承载；候选关闭位图化时使用独立生产级 `_native_computed_brush_def`，不是历史 `_computed_brush_def` 研究helper，结构自检不等于实机验证。
 > 证据：`docs/验收报告/133-报告.md` §二/§四、`docs/验收报告/136-报告.md` §2.1。
+
+### 候选逐支关闭后的字段口径（已实现，实机待验）
+
+三项仅适用时默认开，换源/重载重算，不适用不能强开；用户操作与CLI配置见[取舍表](<user-guide.md#tradeoffs>)。条件由[共用判定](<../src/brush_converter/export_options.py#L489-L549>)给出，不以开关快照冒充实际命中。
+
+| 关闭项 | 保留的原生字段 | 代价与证据适用范围 |
+|---|---|---|
+| rasterize_computed | auto_brush：size为标称直径、spacing=Spcn/100、angle转弧度、ratio=圆度比、hfade/vfade=硬度比 | 只适用计算笔刷；fade仅作用1.00R内，PS软边可伸出标称半径；历史h0/h50过渡带差−19.81%/+22.63%，不代表本轮新渲染。full_coverage=False，不下发hardMix满覆盖偏置 |
+| prescale_texture | 保留源图尺寸，原生Scale=源百分比/100 | 仅有位图、scale>100且取整尺寸变化才适用；关闭重采样外观代价见§7，Scale>10截断待实机 |
+| bake_texture_bc | 同一calibrated公式的原生B/C/Invert，B按[-1,1]截断 | 仅有位图且未截断反解亮度绝对值>1才适用；关闭不烘焙、不恢复legacy，PS越界区表达不全 |
+
+采样笔尖补方与边框255不可借开关取消。默认位图/烘焙保留的外观证据不能自动覆盖关闭分支；Krita控件可改/可调范围与真实笔触仍待187。默认路径历史残差保留§10，本轮不校准。
 
 ## 3. 形状动态（Shape Dynamics）
 
@@ -131,7 +143,7 @@
 | `Txtr.Idnt` | 资源查找 | patt 记录按 UUID 匹配，PNG 内嵌 | ✅ |
 | `Txtr.Nm` | `Name` / `PatternFileName` | 资源名由内嵌字节派生：`tex_<sha256(内嵌PNG)前12>.png`（v1.2.1；旧版 `tex_<uuid前8>.png` 与内容无关，会与用户图案库撞名） | ✅ |
 | PNG 字节 | `PatternMD5Sum` | md5 hex（`PatternMD5` 留空，绕开 Krita 5.0 写二进制 bug） | ✅ |
-| `textureScale`（%） | `Texture/Pattern/Scale` | **v1.5.0 起**：s>100 先用 PS 同核预缩放把纹理重采样后内嵌、`Scale` 写 1.0；s≤100 仍 `textureScale/100`；两处写入 clamp 已解除（Krita 读取无 clamp，UI 滑块 0..2） | ✅ / ⚠️（200% 预缩放后 0.00%/max1；<100%：s=50 通过、s=75 现行路径 88.720%/max94 超阈，预缩放修法 0.000%/max1 未落地；见 §10.4） |
+| `textureScale`（%） | `Texture/Pattern/Scale` | 条件默认：s>100、有图且取整尺寸变化时预缩放内嵌、Scale=1；其余仍源百分比/100。候选关闭prescale_texture则保留源图及原生Scale；无legacy公式回退 | ✅ / ⚠️（默认200%预缩放历史0.00%/max1；s=75现行88.720%/max94超阈，修法未落地；关闭分支与默认残差分开，见§10.4） |
 | `textureDepth`（%） | `Texture/Strength/Value` | 高度系 `min(1, 1.2×textureDepth/100)`；非高度系 `textureDepth/100`（0..1，v1.2.1） | ✅ / ⚠️（>83% 是 Krita Strength≤1.0 参数域上限、饱和段无像素后果；映射含 ×1.2 经验系数，height 模式 12q 量化判据不可达，见 §7.1 局限 3 与 §10.4） |
 | `textureDepthDynamics.bVTy==2` | `PressureTexture/Strength/` + `Texture/Strength/UseCurve` | `true` + `true`（压感曲线，最小值见下） | ✅ |
 | `textureDepthDynamics.bVTy==0` | `PressureTexture/Strength/` + `Texture/Strength/UseCurve` | `true` + `false`（效果强度开启、无传感器，恒定用 Value） | ✅ |
@@ -153,7 +165,7 @@
 
 **v1.5.0（任务 135）删除了公式开关**：`BRUSHCONVERTER_TEXTURE_FORMULA` 环境变量与 legacy 分支已移除
 （`preset_xml.py` 的引用 13 处 → 0），只剩 calibrated 一条公式；**回退只能 `git revert` + 重转**，
-不提供运行时开关（任务 135 裁决，见 `docs/验收报告/135-报告.md` §四）。
+不提供legacy公式运行时开关（任务135裁决）；候选bake_texture_bc只选择越界烘焙或受限原生字段，不改变calibrated公式，见下方与逐支取舍表。
 
 **历史方案（legacy，v1.1.2 及更早；v1.5.0 已删除，仅留档）**
 
@@ -220,10 +232,10 @@ b_k = (1-k)/(510k) - b/(255k)     （C <  0，亮度在对比度之后 → 反�
 
 **第五轮新增：亮度越界区预烘焙（任务 153，已落地；v1.6.0 候选）**
 
-命中判据：`texture_bc_out_of_range(b, c)` 检查calibrated反解的未截断值 `|b_k|>1`；这是一般判据，C=−50且PS亮度绝对值>127只是当C=−50时的旧实验切片，不与任意C等价。命中时不再把亮度硬截断到±1：
+命中判据：`texture_bc_out_of_range(b,c)`检查calibrated反解未截断亮度绝对值>1，有纹理位图时才适用并默认开启。C=−50且PS亮度绝对值>127只是旧切片，不与任意C等价。以下为开启路径；候选显式关闭bake_texture_bc时保留原生字段、亮度截断，不烘焙、不替换成另一条烘焙链。
 
 - 按**PS 8bit链**把亮度/对比度/反相烘进内嵌PNG（C<0先对比度后亮度，C≥0先亮度后对比度）；
-- 中性字段B=0/C=1/Invert=false；**hardMix满覆盖且无深度压感的专门分支例外**：烘后再令B=−1/255，等价抬高1 LSB，不能把“中性B=0”推广成所有产物的逐字节断言。实现见[转换管线](<../src/brush_converter/convert.py#L297-L350>)。
+- 中性字段B=0/C=1/Invert=false；**hardMix满覆盖且无深度压感的专门分支例外**：烘后再令B=−1/255，不能将中性B=0推广为所有产物断言。若关闭计算笔刷位图化，原生笔尖不再按满覆盖处理。实现见[生产转换](<../src/brush_converter/convert.py>)。
 
 结果：端到端实渲 **12/12 = 0.000%/max0–1**（改前同批 8/12 超阈、最大 61.125%/max23；边界 ±128 组两侧本就一致）。
 
@@ -373,7 +385,7 @@ b_k = (1-k)/(510k) - b/(255k)     （C <  0，亮度在对比度之后 → 反�
 > **现行四档判据（本页保留完整限定，不放宽）**：具体验证入口与退出码见[验证说明](<验证体系使用说明.md>)；旧说明中的单项摘要不能覆盖以下联合条件。
 > 像素级 差异比例 ≤2% 且 max_delta ≤2；几何级 绝对差 ≤2px 或相对差 ≤2%；
 > 随机统计 带高中位数相对差 ≤10% 且两次渲染复现性 ≤5%；结构性 有原文证据 + Krita 无承载/有上限，登记残差不再改。
-> **复核分层，不覆盖旧证据**：本节数据是原报告的当时结论，不是任务164重新量测。当前只读结构与生成一致性命令见[开发指南§9](<developer-guide.md#maintenance-checks>)；新一轮全量与应用渲染等183/187。
+> **复核分层，不覆盖旧证据**：本节数字为默认外观优先路径的历史结论，不是182重新量测，不能直接套给关闭后的原生替代。旧残差仅保留，不更改判据；只读检查见[开发指南§9](<developer-guide.md#maintenance-checks>)，183负责新全量，187负责真实效果。
 >
 > **旧复算工具不是全程只读**：[measure_deviation的主流程](<../tools/measure_deviation.py#L1621-L1654>)即使传--analyze也会回写results，并由[update_manifest](<../tools/measure_deviation.py#L1566-L1615>)改manifest。原来的“只读入库图”只描述图像输入，不代表不写旧JSON。这里撤下可误直接运行的旧命令，不在本工作区回写已有证据；确需复跑，先在工作区内单独副本核实全部固定输出，原件/旧基准只读，光改TEMP不够，也不加--force。
 >
@@ -473,7 +485,7 @@ B10 未测组合（彩色纹理灰度权重、B10+depth<100、B10+hardMix 满覆
 | 2 | `Spcn` | 已测方向 0（131 9/9 ≤2%、B4 50/100% 0.00%）；148：椭圆 dab 步长方向依赖（水平 160px / 垂直 32px @spacing=1.6） | 单一 spacing 常量不能全向对齐；结构性（方向依赖）+未量测（非水平段） | 无（结构性） |
 | 3 | `bVTy` | 5 无承载（PS 初始段方向 vs Krita 基准角 0°：VH/DD 90°/45° 残差）；6→drawingangle 实机等价（拐角 ±90.0°）；7/8 常量输入一致（≤0.9°） | B5 的 1/3/4/5 无等价控制源（结构性）；B6 动态响应需真机 | 结构性不修；B6 需真机 |
 | 4 | `jitter` | 散布 a/D 0.65%/1.69%，`÷200` 经验系数；旋转 j≥50 饱和 A（1.40%）、j<50 修法已落地（三点 PASS，最大 4.06%）；形状残差 R̄ 0.198 vs 0.040 | 散布 ÷200 经验系数 + 旋转 min(1,j/50) 范围裁剪 + PS j>50 环绕非均匀 vs Krita 整圈均匀（形状残差） | j<50 幅度已落地（149A）；形状残差无承载 |
-| 5 | `minimumDepth` | 作用点 A（参数地板，m=0 六档残差 0）；现行量纲缺陷 D145-1（m=20/50 双端不一致 max 120/84）；真实样本 16 预设 minDepth 全 0 | 实现缺陷未修（把 minimumDepth 当绝对 depth%，depth<100 时高估 100/depth 倍并被 clamp）；无像素后果 | 一行未落地（比值改 `depth×Mnm/100`） |
+| 5 | `minimumDepth` | 作用点 A（参数地板，m=0 六档残差 0）；现行量纲缺陷 D145-1（m=20/50 双端不一致 max 120/84）；真实样本 16 预设 minDepth 全 0 | 实现缺陷未修（把 minimumDepth 当绝对 depth%，depth<100 时高估 100/depth 倍并被 clamp）；现有16预设minDepth全0，故仅这些样本不受影响；m>0参数域不能据此称无像素后果 | 一行未落地（比值改 `depth×Mnm/100`） |
 | 6 | `scatter` | a/D 0.65%/1.69%；B7 j=1000% 端点 **18.21%**（a/D 6.0077 vs 5.0048；补偿变体 0.01%） | `÷200` 经验系数 + 尺寸基准耦合（已量测未修 B7） | 补偿变体未落地 |
 | 7 | `scatterDynamics` | 同上（B7 18.21%、补偿 0.01%） | 同上 | 同上 |
 | 8 | `textureBlendMode` | 满覆盖/压感 0.00%；B9 重测 9/10 模式 0.000%；hardMix b×C 真残差 56.873%/38.498%/max255；base<1 现行 10.65%–96.81% | hardMix base<1 在 Krita 无等价承载（结构性 B11）+ b×C 修法候选未落地 | b×C 修法候选未落地；base<1 无承载（候选 D 仍超阈） |

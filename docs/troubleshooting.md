@@ -1,6 +1,6 @@
 # 排错手册：按你看到的现象查
 
-Troubleshooting for the published v1.5.0 Windows workflow, with unpublished candidate behavior identified explicitly. Start by checking whether the original ABR was imported directly; cache rebuilding is optional and may lose custom tags or groups.
+Troubleshooting for the published v1.5.0 Windows workflow and the unreleased v1.6.0 source candidate. It distinguishes safe cancellation, configuration errors, bundle tag scope and unverified Krita behavior; cache rebuilding is optional and may lose custom tags or groups.
 
 [返回首页](<../README.md>) · [用户指南](<user-guide.md>) · [正确导入方式](<user-guide.md#import-krita>)
 
@@ -36,10 +36,11 @@ Troubleshooting for the published v1.5.0 Windows workflow, with unpublished cand
 | 看到什么 | 当前含义 | 接下来做什么 |
 |---|---|---|
 | `convert` 退出码 0 | 命令正常结束 | 仍需有非零预设输出、核对“跳过”与回读摘要；不代表导入或外观通过 |
-| `convert` 退出码 1 / “ABR 结构损坏”等 | 解析、参数或读写错误 | 原样保存原因；核对输入文件、目录和权限；不要改文件后缀伪装格式或改原素材 |
-| argparse 参数错误（通常退出码 2） | 命令拼写/参数不被支持 | 先查 `convert --help`；别猜逐支或标签参数 |
-| `convert` 退出码 3 / “输出校验：失败” | 资源包回读校验失败 | **不要导入该包**；保留失败文件与原因，在新目录重转；重复失败交原始证据 |
-| GUI “完成”中附“产物回读校验失败” | GUI 已报告包的错误，并非合格产物 | 不以标题当成功，按上行处理 |
+| `convert` 退出码 1 | 输入、读写或内部错误 | 原样保存原因，核对输入与目录；候选隐藏原名/路径，不因此当作没有错误 |
+| 候选 `convert` 退出码 2 | 配置/选择错误、零源或全部跳过，也包括 argparse 错误 | 查 `--help` 与错误码，核对两类 JSON、源摘要和稳定 ID；不回退默认掩盖坏输入 |
+| `convert` 退出码 3 / “输出校验：失败” | 候选安全写出/回滚/校验失败；旧版主要是包回读失败 | **不要导入未确认交付的文件**；保存 blocked/rolled_back/retained 明细，不能把部分受阻当完整回滚 |
+| 候选 `convert` 退出码 130 | 协作取消完成或取消异常出口，不是成功 | 核对交付与清理/保留清单，等停止后按[取消恢复](<#cancel-recover>)处理 |
+| GUI 报失败/部分受阻，或旧版“完成”内附回读失败 | 不是合格整批交付 | 不以标题、满进度条或“已处理”计数当成功，保存完整原始详情 |
 | 0 个预设 / “无笔尖位图”被跳过 | 没得到完整可用的输出，或部分预设不可转 | 核对原始 ABR 与解析警告；不要将部分文件当整批成功 |
 | 提示两个输出都关闭 | 同时用了 `--no-bundle` 和 `--no-standalone` | 至少保留一种输出；这不是无写入预演参数 |
 
@@ -51,14 +52,14 @@ Troubleshooting for the published v1.5.0 Windows workflow, with unpublished cand
 
 - 看**本次完成摘要**指向的输出目录，不凭上一次目录或文件时间猜。默认目录与工作目录有关；使用显式 `-o` 或 GUI 选择的新目录最清楚。
 - GUI 一次二选一；CLI 默认两种都有，`--no-bundle`/`--no-standalone` 会分别取消一种。资源包在输出根目录，独立 KPP 在 `kpp/`，详见[输出位置](<user-guide.md#outputs>)。
-- “已存在同内容产物，未重复写入”是资源包复用提示，不是转换失败；内容冲突则改名，需按摘要选择实际生成的那一份。
-- **独立 KPP 不具备同样的冲突保护**，再次写入可能覆盖旧文件。别在旧目录试验；当前也不能承诺错误或强关程序后整批回滚。
+- “已存在同内容产物，未重复写入”是复用提示，不是失败；候选独立 KPP 也有复用/冲突顺延保护。候选 CLI 隐藏文件名/绝对路径，按自己给的目录、产物编号和摘要核对，不沿用上次包名。
+- **已发布 v1.5.0 的独立 KPP** 仍可能覆盖；候选虽增加整批保护，也不能承诺强杀、磁盘/清理故障下全有或全无。不要在旧目录反复试验或自动清理现场。
 - 提取（`extract`）输出的 PNG 和 JSON 只是采样笔尖与信息，不是可直接替代 KPP 的预设。
 
 <a id="old-preset"></a>
 ## 四、更新后仍像旧版 / 曲线与传感器异常
 
-1. 核对来源渠道与实际导入文件，不只看名字；源码候选的版本字段尚可能写作已发布版号，详见[版本区分](<user-guide.md#candidate-status>)。
+1. 核对来源渠道、候选提交与实际导入文件，不只看名字；当前源版本已是 1.6.0，追溯仍是 `unreleased`，旧实验可能仍带 1.5.0。见[版本区分](<user-guide.md#candidate-status>)，不要改写旧样本伪造新版证据。
 2. 若是旧版产物，先读[版本说明](<../releases/RELEASE_NOTES.md>)对应升级注意，用所选版本重新转换到新目录。新程序不会自动改写已经生成的旧 KPP/bundle。
 3. 正常退出 Krita，备份旧测试资源，只替换已确认的旧产物后重新启动，避免新旧同名资源混用；不要直接清空整个库。
 4. 早期空传感器 XML 已在已发布版修复，不能把旧产物的曲线异常一概归为 Krita UI 缺陷；仍有异常就附原始日志与来源，**本轮真实效果待回填**。
@@ -69,15 +70,27 @@ Troubleshooting for the published v1.5.0 Windows workflow, with unpublished cand
 ## 五、外观有差异 / 某些设置不能再调
 
 - 先确定源笔刷是否真的启用了纹理，以及是否选中了转换产物；不是每支笔刷都应该画出纹理。
-- **硬度、纹理缩放等的编辑代价**是当前转换方式的取舍，不等于文件损坏。见[转换取舍](<user-guide.md#tradeoffs>)；不要尝试不存在的 legacy 或逐支开关。
+- **硬度、纹理缩放等的编辑代价**不等于文件损坏。候选可在“逐支处理与编辑能力”关闭对应适用项后从 ABR 重转，保留受限原生字段，并承担外观/范围代价；不是在 Krita 里取消已烘焙像素。见[取舍表](<user-guide.md#tradeoffs>)，legacy 公式环境变量仍已删除。
 - 纹理模式不是全部精确等价：如 hardMix 有条件残差，Drkn 没有等价承载；详细条件只查[映射参考](<parameter-mapping.md>) §7.2、§10，不复制或另造结论表。
 - 已证实的残差、已知缺失、**待验证假设**分开说。单凭截图、控制值看起来不同或机器校验成功，都不能裁决实际笔触一致；记录输入条件并等待有证据的判断，不擅改公式或旧基准。
 
 <a id="planned-features"></a>
 ## 六、找不到开关、标签或元信息表单
 
-这些功能尚未落地时是**计划中**，不是“已实现但你没找到”：逐支可编辑性开关、搜索筛选、真实进度/安全取消、可填写元信息、公共/逐支标签与转换追溯。
-当前没有对应的按钮或 CLI 参数，也不承诺导入后自动出现来源标签。见[当前源码与计划功能](<user-guide.md#candidate-status>)；不可把“包内存在预设”推成“原生标签已经生效”。
+先核版本：v1.5.0 下载包没有这些控件；候选源码已实现，位置见[GUI 步骤](<user-guide.md#gui-convert>)。不是去正式版找候选按钮，也不要把尚未构建的候选 exe 当已下载。
+
+- 列表只有一部分时看“隐藏已选”；全选/取消仅作用可见行，清搜索并恢复“全部笔刷”后再核总数。切语言不丢设置，换源/重载会恢复条件默认与本批元信息/标签。
+- 元信息表停用先看格式：独立 KPP 不承载包信息、原生标签与追溯。候选 CLI 要显式加 --metadata-file 才启用新链，GUI 空表单与无配置 CLI 不等价；--no-bundle 与该配置冲突会退出 2。
+- 标签异常先看“最终标签及来源关系”和回读摘要：来源可改删、单支移除优先。未知/未选中 ID 要修配置，不会静默丢字段。只改说明/标签也产生新身份，旧包不会自动更新；保留两版，不混装来源。
+- 文件回读只是机器证据。Krita 5.3.3 的逐笔筛选、同名关联、重启持久性仍待 187，不能只因 XML 有字段就关闭问题。包内标题、包版本/来源/追溯的显示限制见[包信息说明](<user-guide.md#metadata-tags>)；重存可能丢自定义字段，保留原导出包。
+
+<a id="cancel-recover"></a>
+### 候选取消、部分受阻后如何恢复
+
+1. 保存原始提示、阶段、交付状态与 new/reused/renamed/blocked/rolled_back/retained 计数；GUI 清单原样留存，CLI 按指定目录和产物摘要核对，不删除旧文件。
+2. “请求已接收”不是已取消；等线程安全结束。最终交付期不可取消，迟到请求以实际完整交付/失败清单为准，不强杀应用。
+3. 仅在确认取消且清理完成后，核对选择/开关/标签，换新目录重新开始；没有断点续转。解析取消或源字节改变需重新载入，随后手动设置已重置。
+4. 部分受阻、回滚或清理失败时保留暂存目录与事务清单，停止自动重试/删除，交原始证据确认能处理的本批文件。关窗“取消关闭”也不会撤回已发停止请求。
 
 <a id="readonly-diagnosis"></a>
 ## 七、需要更多证据：可选只读诊断（源码用户）

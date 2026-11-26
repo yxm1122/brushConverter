@@ -3,7 +3,7 @@
 > **English abstract**: Maintainer reference for the ABR-to-Krita pipeline, its evidence trail, and reproducible checks. The published version is v1.5.0; v1.6.0 remains an unpublished candidate. Historical reports are not current acceptance results.
 >
 > 面向维护者：按主题查找现行实现、历史原证据与复核入口。逐字段说明以[参数映射](<parameter-mapping.md>)为准，版本变更以[发布说明](<../releases/RELEASE_NOTES.md>)为准。
-> **版本边界**：对外发布为v1.5.0；本地候选已包含149A旋转单随机源与153亮度越界预烘焙，目标v1.6.0，尚未发布。下文实验数字是注明适用范围的历史证据，不是本轮新回归。
+> **版本边界**：已发布v1.5.0；当前源版本已冻结为1.6.0，仍是未发布候选，合并第五轮149A/153与本轮逐支选项、事务、元信息/标签/追溯。候选exe尚未构建，历史实验不是本轮新回归，真实效果仍待187。
 
 ## 0. 文档索引（先看这里）
 
@@ -65,9 +65,10 @@
 
 ### 0.6 现行实现与计划功能分开
 
-- **已有**：[转换管线](<../src/brush_converter/convert.py#L495-L624>)共用两入口；计算笔刷生成png_brush，采样笔尖按255补方；>100%纹理预缩放，候选亮度越界区预烘焙；单独kpp仍直接写，不能冒称全部输出已事务化防覆盖。
-- **已有**：[资源包实现](<../src/brush_converter/kpp/bundle.py>)有基础meta、manifest、内容身份与回读；详细格式/哈希见§5，不把包里有字段等同于Krita界面已显示或原生逐笔标签生效。
-- **计划中**：本轮逐支选项、整批事务/取消、元信息/标签扩展尚需对应任务实现与验证；不能从研究helper或任务书推断生产API已支持，也不提供伪造参数。
+- **已实现的生产链**：[逐支契约](<../src/brush_converter/export_options.py#L489-L549>) → [转换计划](<../src/brush_converter/convert.py>) → [安全事务](<../src/brush_converter/export_transaction.py>)。三项适用才默认开启；关闭进入独立原生替代，不恢复legacy或旧双随机源。采样笔尖补方/255不变，bundle与独立KPP均不再直接覆盖旧文件。
+- **已实现的接入**：[CLI](<../cli.py#L731-L805>)与[GUI](<../gui/main_window.py>)共用稳定ID、条件默认和实际运行摘要。GUI换源/重载重置，筛选/排序/语言保留隐藏选择；CLI显式JSON与源摘要校验，不按显示名猜身份。用户操作只维护在[用户指南](<user-guide.md>)。
+- **已实现的包格式**：[元信息模型](<../src/brush_converter/export_metadata.py>)与[写包/回读](<../src/brush_converter/kpp/bundle.py>)支持原生逐笔标签、包内追溯及v2身份；独立KPP不承载这套包信息。GUI空表单和不带metadata-file的CLI不是同口径，见§6。
+- **仍待验，不再叫“未实现”**：183本轮全量、185真实分发物、186完整隐私门、187真实GUI/Krita编辑/标签筛选与重启及图片/二进制盲区，见§9。机器结构成功不自动放行这些环节。
 
 ### 0.7 归档与维护约定
 
@@ -98,7 +99,9 @@ BrushPreset 列表（名称 / 尺寸 / 间距 / 角度 / 硬度 / 动态 / 散�
    │  convert_presets()        —— 生成产物
    ├─ build_preset_xml()  → 预设 XML
    ├─ build_kpp()         → .kpp（PNG + iTXt）
-   └─ write_bundle()      → .bundle（ZIP 资源包）
+   └─ build_bundle()    → .bundle（元信息/逐笔标签/实际追溯）
+    │
+    └─ ExportTransaction —— 同卷暂存、逐项回读、最后检查点、交付/回滚清单
 ```
 
 ## 2. 项目结构
@@ -116,11 +119,16 @@ brushConverter/
 │   │   ├── preset_xml.py         #   预设 XML 组装 + 笔尖定义（png_brush/auto_brush）
 │   │   ├── kpp_writer.py         #   PNG 块手工构造（iTXt/tEXt/IDAT）
 │   │   └── bundle.py             #   .bundle（OpenDocument manifest/meta）
+│   ├── export_options.py         # 稳定身份、条件默认、配置/取消与摘要契约
+│   ├── export_metadata.py        # 包信息及逐笔标签归一
+│   ├── export_transaction.py     # 两格式暂存、验证、交付与回滚清单
 │   ├── mapping.py                # 描述符 → BrushPreset 参数映射
 │   ├── hardness_tip.py           # PS硬度剖面生成位图及正方形/边框自检
 │   └── convert.py                # 转换管线编排（convert/convert_presets）
 ├── gui/                          # PySide6 图形界面
-│   ├── main_window.py            #   主窗口（预览/勾选/格式选择/未映射提醒）
+│   ├── brush_selection.py        # 按稳定ID保存选择/开关与可见集合
+│   ├── tag_editor.py             # 元信息/逐支标签状态与导出快照
+│   ├── main_window.py            # 主窗口、逐支代价、确认、进度与安全关闭
 │   ├── workers.py                #   QThread 后台解析/转换
 │   └── __main__.py               #   python -m gui 入口
 ├── cli.py                        # 命令行入口（info/extract/convert/gui）
@@ -231,7 +239,7 @@ Record = u32 len | 记录体（len 字节） | pad 到 4
 
 `map_presets(abr)` 把 desc 里的每个预设描述符转成一个 `BrushPreset` dataclass，字段包括：名称、间距、角度、圆度、硬度、直径、缩放、笔尖灰度数组、UUID、是否计算笔刷、各动态曲线、散布参数、未映射警告。
 
-映射后的 `BrushPreset` 在 `preset_xml.py` 里被序列化成 Krita 的预设 XML。核心映射：
+映射后的 `BrushPreset` 在 `preset_xml.py` 序列化。下表为外观优先的条件默认口径；候选关闭后的原生字段/可调范围见[参数§2](<parameter-mapping.md>)及[用户取舍表](<user-guide.md#tradeoffs>)，不得把默认位图路径写成唯一生产承载。核心映射：
 
 | 类别 | ABR 源 | Krita 目标 |
 |------|--------|-----------|
@@ -249,7 +257,7 @@ Record = u32 len | 记录体（len 字节） | pad 到 4
 
 **控制源编码（bVTy）**：0=关、1=渐隐、2=压力、3=倾斜、4=转轮、**5=初始方向、6=笔划方向、7=速度、8=旋转**（v1.5.0 任务 134-3 按 124 A 级 9 值表修正；旧文档写的「5 旋转 / 6 方向 / 7 初始方向」是错的）。映射到 Krita 传感器：pressure（2）、drawingangle（6）、speed（7）、rotation（8）；5/1/3/4 未映射（Krita 同名传感器语义不等价：`fade`=时间渐隐、`ytilt`=倾侧、`tangentialpressure`=转轮）。旋转/散布的逐项换算（含 bVTy=0 纯随机抖动的 fuzzy 传感器、`RotationValue=min(1,jitter/50)`、散布 `ScatterValue=jitter/200`、随机度曲线归一化 `0,0;1,1;`，且旋转只写 **1 条** fuzzy 随机曲线、禁止 fuzzystroke）见 [`parameter-mapping.md`](parameter-mapping.md) §3、§5、§8。
 
-**计算笔刷**（无 `sampledData` UUID，只有参数）：v1.5.0（任务 133）起映射为按 PS 硬度剖面生成的 `png_brush` 位图（`hardness_tip.build_tip`，尺寸=PS 实际足印），`auto_brush` 链路不在生产路径；Krita 里 fade/硬度不可再调。中间硬度/大直径/小直径的残差见 `parameter-mapping.md` §10.2、§10.5。
+**计算笔刷**（无自带位图）：v1.5.0起默认按PS硬度剖面生成png_brush，尺寸为实际足印、硬度/fade不再按PS语义编辑。v1.6.0候选关闭位图化后走独立生产级 `_native_computed_brush_def`，而不是历史研究 `_computed_brush_def`；原生硬度可调但受1.00R、几何和满覆盖条件限制，结构自检不等于实机编辑通过。既有默认残差仍见参数§10。
 
 完整逐字段清单见 [`parameter-mapping.md`](parameter-mapping.md)。
 
@@ -316,7 +324,7 @@ PS 纹理深度无论是否接传感器都要设为 `true`；深度随压感（`
 `bVTy==0`（无传感器）时设 `Texture/Strength/UseCurve=false`，由
 `Texture/Strength/Value` 提供恒定强度。
 
-强度与曲线只在[参数参考§7](<parameter-mapping.md#texture-bc-current>)维护；[生产管线](<../src/brush_converter/convert.py#L325-L350>)先按高度系增益/非高度系路径算强度，再生成乘性曲线比值。§7.6第23条保留增益来源，不把旧绝对0端点描述复制回实现。
+强度与曲线只在[参数参考§7](<parameter-mapping.md#texture-bc-current>)维护；[生产管线](<../src/brush_converter/convert.py>)先按高度系增益/非高度系算强度，再生成乘性曲线比值。§7.6第23条保留增益来源，不把旧绝对0端点复制回实现。
 
 注意：
 - **`PatternMD5Sum` 存 hex md5**；`PatternMD5` 留空——Krita 5.0 曾在该字段写原始
@@ -325,7 +333,7 @@ PS 纹理深度无论是否接传感器都要设为 `true`；深度随压感（`
 - 亮度/对比度当前只有calibrated路径。v1.5.0已取消对比度min(2.0,k)写入截断，C>50写原值并提高序列化精度；UI滑块0..2不是读取上限。公式、精度、越界预烘焙与局限只在[参数§7.1](<parameter-mapping.md#texture-bc-current>)维护。
 - legacy旧公式和环境变量在v1.5.0已删除，没有运行时回退。Linear Height旧0.30基线/对比度倒数仅作历史；不得据[早期调研](<归档/photoshop-texture-brightness-contrast-research.md>)恢复。整体版本回退需明确授权并重转，不能把旧缺陷包装成开关。
 
-**v1.6.0候选：亮度越界区预烘焙（任务153）**：命中判据是未截断亮度 `|b_k|>1`；C=−50且亮度绝对值>127只是旧实验网格切片，不是任意C的等价条件。
+**v1.6.0候选：亮度越界区预烘焙（默认处理）**：有纹理且未截断亮度绝对值>1才适用，适用才默认开；显式关闭保留原生字段并按[-1,1]截断，不改成另一条烘焙链。C=−50且亮度绝对值>127只是旧实验切片。
 转换器把 PS 的亮度/对比度/反相按 PS 8bit 链（C<0 先对比度后亮度 / C≥0 先亮度后对比度）烘进内嵌纹理 PNG，
 Krita字段的中性起点与hardMix满覆盖无压感偏置例外见[参数§7.1](<parameter-mapping.md#texture-bc-current>)；历史端到端12/12=0.000%/max0–1。代价：命中区纹理字段失去PS语义（再调会二次叠加），
 每 (b,c,invert) 一份纹理资源、旧 `.kpp` 必重转；非命中区仍走 calibrated 闭式解。依据：`docs/验收报告/153-报告.md`。
@@ -337,21 +345,34 @@ Krita字段的中性起点与hardMix满覆盖无压感偏置例外见[参数§7.
 ```
 mimetype                      首项、stored 不压缩 = "application/x-krita-resourcebundle"
 META-INF/manifest.xml         OpenDocument manifest 命名空间（易错，见 §7）
-meta.xml                      OpenDocument meta
+meta.xml                      meta:meta根；原生字段及meta-userdefined包内追溯
 paintoppresets/*.kpp          自包含笔刷预设
 ```
 
 **v1.3.1 产物加固**（内容短哈希命名 / 覆盖防呆 / 回读校验 / 纹理计数，使用者批准的 4 条）：
 
-- **命名**：`<ABR名>_v<版本>_<8位逻辑内容哈希>.bundle`，让「同名 ⇒ 同内容」成立（`bundle_content_hash8`）；版本号隔离不同版本产物。
-- **覆盖防呆**：目标同内容 → 复用不重写；同名不同内容 → 自动 `_2/_3` 后缀、原文件不覆盖；旧版 `stem.bundle` 只提示不覆盖不删（`_resolve_bundle_path`）。
-- **回读校验**：写出后校验 zip 可读 / 条目数 / mimetype / manifest md5 / 每个 `.kpp`，失败结论进 `ConvertResult.verify`，CLI 退出码 3（`verify_bundle`）。
+- **命名**：`<ABR名>_v<版本>_<8位逻辑内容哈希>.bundle`；短哈希便于定位，不是完整SHA-256或发布凭证。启用本轮元信息链后按v2身份涵盖meta/manifest/KPP，不能只看预设字节判同包。
+- **覆盖防呆**：候选由同一ExportTransaction保护bundle与独立KPP；复用不重写、冲突顺延，旧文件不删不覆盖。最终多文件交付非OS原子性；回滚/清理失败保留清单，不静默宣称全有或全无。
+- **回读校验**：v1.3.1旧接口把包校验结果放在ConvertResult.verify；候选暂存校验失败直接抛[ExportTransactionError](<../src/brush_converter/export_transaction.py#L803-L807>)并携事务清单，CLI退出3。成功交付/复用才取得回读结果；不能只看result.verify推断失败路径。
 - **纹理计数**：「含真实纹理」口径 = `Texture/Pattern/Enabled=true` 且内嵌图案非 1×1（`count_real_textures`，GUI 摘要与回归共用）。
+
+### 5.5 原生元信息、逐笔标签、追溯与身份（v1.6.0候选）
+
+- **来源与许可**：[模型字段](<../src/brush_converter/export_metadata.py#L185-L202>)明确区分工具生成信息与素材信息。GUI/显式配置CLI采集包名、说明、可空作者/许可/包版本；来源只取文件名与源字节摘要，不读系统身份，不套项目MIT、不自动日期。默认说明为Converted from Photoshop ABR。模型底层的邮箱/网站/日期不是CLI表单入口，不能虚构相应参数。
+- **原生格式证据**：meta根为字面meta:meta；manifest每个paintoppresets条目内的tags/tag才是逐笔关联，包级meta-userdefined tag不能替代。目标已锁Krita5.3.3（git858d352）；文件结构与读取源码证据不等于用户界面/重启已通过。
+- **字段显示范围**：按目标源码，说明/作者/许可有详情字段；dc:title不作管理器标题，包版本/来源等为包内扩展。详细追溯存meta-userdefined，meta:name=brushconverter-trace，内容是版本1的JSON；Krita界面不显示这份追溯，重存可能丢扩展字段，应保留原导出包。
+- **实际处理**：[追溯结构](<../src/brush_converter/kpp/bundle.py#L501-L536>)记录producer版本/未发布状态、source文件名/摘要、稳定ID、最终标签、applicable/enabled/actual/limited与代价文本哈希。跳过项不冒充命中；预计计划、内存生成、成功交付和实机效果是四层事实。
+- **v2身份**：[身份计算](<../src/brush_converter/kpp/bundle.py#L548-L573>)覆盖meta.xml、manifest和各KPP原字节，包含meta/tag/实际追溯；排除ZIP头时间、输出路径/文件名、自身哈希，不自引用。逻辑身份格式2、追溯JSON版本1、程序1.6.0与用户资源包版本是四个不同概念；unreleased仍表示候选。
+- **升级兼容**：旧包能读，不作为同一v2包复用；只改meta/tag也应形成新身份，KPP可以保持不变。判断复用与格式版本不能只比较旧kpp-only哈希；完整身份与8位文件名后缀分清。
+
+- **复用判定已绑定完整身份（182补充纠偏）**：此前真实CLI复现v2完整身份不同但hash8相同的两包误复用；[事务判重](<../src/brush_converter/export_transaction.py#L663-L689>)现比较实际包与本次构建的`scheme`+完整64位`sha256`，legacy仅沿用旧kpp-only hash8兼容口径，跨scheme/invalid一律不复用。原A/B反例复跑第二份交付为`_2`包、reused=0；真实32位前缀碰撞负例在`tests/test_bundle_identity.py`。定向63/227通过，仍需183全量、185打包、186隐私门、187人工；8位文件名后缀不是同包凭证。
+- **适用与责任**：本节只覆盖bundle。归一、独立回读与坏包反例是机器证据；187由使用者验真实逐笔筛选、同名关联、字段显示、重存风险和退出重启持久性，不能用XML有字段替代目标。
 
 ## 6. CLI 与 GUI
 
-- **CLI**（`cli.py`）：`info`（概况）、`extract`（导出笔尖 PNG）、`convert`（转换）、`gui`（启动界面）。
-- **GUI**（`gui/`）：解析和转换都在 `QThread` 后台线程（`workers.py`），界面不卡。每支笔刷一张卡片（勾选框 + 缩略图 + 名称 + 未映射警告），支持全选/全不选、产物格式选择（.kpp/.bundle）、转换前对含未映射参数的笔刷弹窗提醒。
+- **CLI**（`cli.py`）：info/extract/convert/gui保留；convert新增真实--list-presets、可重复--preset-id、--options-file及--metadata-file。两类UTF-8 JSON分别按export-options/export-metadata的version=1校验；至少一种输出，元信息与--no-bundle冲突会拒绝，不悄悄丢字段。完整示例见[用户指南](<user-guide.md#cli-convert>)，不让普通用户复制内部笔记。
+- **GUI**（`gui/`）：QThread传递真实阶段与安全取消请求，输入冻结至finished。按稳定ID保存逐支选项/标签、仅批量操作可见集合，导出确认显示隐藏已选和受限代价。换源/重载重置；关窗不强杀、取消关闭不撤回停止。实际界面待187。
+- **必须显式对齐元信息**：不带metadata-file的CLI沿用兼容口径，不启用新表单/原生标签/追溯；给出空metadata/tags配置才与GUI空表单同口径。两入口字节等价须同源、同选择、同开关、同配置及同程序版本。
 
 ## 7. 开发过程中的重要发现（坑）
 
@@ -370,7 +391,7 @@ paintoppresets/*.kpp          自包含笔刷预设
 
 6. **角度存弧度，不是度**。Krita 笔刷 XML 的 `angle` 存弧度（`CommonData.angle`），UI 用 `zoom(scale(180/π))` 转成度显示。
 7. **角度 UI 范围是 [0,360)，负角度会被 clamp 到 0**。`KisAngleSelector` 的 spin box 是 `setRange(0,360)`，负角度 `-33°` 会被 `setValue` 夹到 0（=360°）。所以必须 `angle % 360` 先 normalize 成正角度（`-33° → 327°`）再转弧度。这是一个「度→弧度方向对了、但负角度仍显示 360°」的二次 bug。
-8. **历史auto_brush的硬度 `fade = Hrdn/100`，不是 `(100-Hrdn)/100`**（v1.5.0起不再是生产计算笔刷承载）。Krita auto_brush 的 `hfade/vfade` 是「实心区占半径比例」（`valueAt` 里 `n < fade` 为实心），与 Photoshop 硬度同向（84% → 0.84，不是 0.16）。
+8. **auto_brush的fade=Hrdn/100，与硬度同向**。v1.5.0默认计算笔刷改用位图；v1.6.0关闭位图化时以独立原生生产分支重新承载，不调用历史研究helper。字段可调不等于PS软边几何等价；真实编辑与边界留187。
 9. **`PressureScatter` 是「散布选项是否启用」的开关，不是「压感控制散布」**。它序列化的是 `isChecked`（`getBool("Pressure" + id)`），压感控制由 `ScatterSensor` 决定。误读它会同时搞错两个方向。
 10. **散布量在 `scatterDynamics.jitter`，不在顶层 `Spcn`**。顶层 `Spcn` 是间距。散布量 `jitter` 是 0–1000%。
 11. **旧“÷400／PS高斯分布”解释已失效**。当前为 `jitter/200`，依据[任务129报告](<验收报告/129-报告.md>)的分布型统计量，不是单点视觉锚定；1000%端点仍有已量测未修残差，见[参数§10.3](<parameter-mapping.md#residual-current>)。编号保留，不据旧说改回系数。
@@ -451,7 +472,7 @@ paintoppresets/*.kpp          自包含笔刷预设
       （实测 006 的 Alpha 非零数 8844→4672，纹理列表为空）。
     排查：看 `storages.location` 有没有对应行、`resources.status` 是否 active、`PRAGMA integrity_check` 是否 ok；
     可选兜底（不是首选）：由使用者退出Krita、备份配置并核对准确文件后重建 `resourcecache.sqlite`；自定义标签/分组可能丢失，不能据此删除资源文件。先排除ABR直读库混淆，见第26条与[排错指南](<troubleshooting.md>)；本轮模型不操作用户配置或重启软件。
-    覆盖产物时务必「先退出 Krita，复制完成后再启动」。一条命令体检：`python tools/diagnose_profile.py --krita-dir "%APPDATA%/krita" --bundle <你的.bundle> --predict`。
+    覆盖产物须先正常退出Krita、复制完成后再启动。可选诊断只使用[排错手册的完整隔离步骤](<troubleshooting.md#readonly-diagnosis>)，不再维护PATH默认Python、CMD式变量与未引用占位符的第二套内联命令。
 
 26. **Krita 5.3 会把 `.abr` 当「Adobe Brush Library」直读，生成一套没有经过本工具转换的同款笔刷**。
     原始 `.abr` 被放进 `%APPDATA%\krita`（或在资源管理器里导入 ABR）时，Krita 不走转换链，而是自己解析 ABR
@@ -551,7 +572,7 @@ paintoppresets/*.kpp          自包含笔刷预设
 - **SonyStone/ABR-Viewer**（MIT）：desc 描述符解析参考。
 - 以上源码下载在 `research/`（本地保留、不进 git）。
 
-**引用版本规则**：第三方参考是历史线索，不自动等于目标Krita 5.3.3。核验须登记准确tag/commit、来源与行号；未锁定就标“跨版本未验证”，不能拿master或本地旧快照断言原生meta/标签已生效。本轮不下载、不改第三方参考。
+**引用版本规则**：元信息/标签读取合同已核目标Krita5.3.3（git858d352），但未做本轮实机导入/显示/重启。其余GIMP/PS与研究helper只作注明范围的历史参考，未登记准确版本时仍标“跨版本未验证”，不能拿master或本地快照扩大承诺。本次182不下载、不改参考文件；实现变更维护源码与定向证据，183负责新全量、187负责用户效果。
 
 ## 9. 开发与测试
 
@@ -563,6 +584,7 @@ paintoppresets/*.kpp          自包含笔刷预设
 
 ```powershell
 & $PY -B -c "import sys; print(sys.executable); print(sys.version); assert sys.version_info >= (3,12)"
+if ($LASTEXITCODE -ne 0) { throw '解释器核验失败，停止' }
 # 维护时替换为本任务的全新工作区内目录；已有目录不删，另起编号。
 $RUN = Join-Path (Get-Location).Path '.tmp/maintenance-01'
 if (Test-Path -LiteralPath $RUN) { throw '目录已存在，请换一个本任务目录，不覆盖旧证据' }
@@ -581,6 +603,7 @@ $env:PYTHONNOUSERSITE = '1'
 $env:PYTHONDONTWRITEBYTECODE = '1'
 $env:PYTHONIOENCODING = 'utf-8'
 & $PY -B -c "import pathlib,tempfile; root=pathlib.Path.cwd().resolve(); p=pathlib.Path(tempfile.gettempdir()).resolve(); assert p.is_relative_to(root / '.tmp'); print('临时目录已在工作区内')"
+if ($LASTEXITCODE -ne 0) { throw '临时目录未隔离，停止' }
 ```
 
 TEMP只约束运行期临时文件，不等于所有工具已隔离：先读工具的固定输出路径、配置写入与应用启动行为；不能证明隔离就停。特别是[旧偏差工具](<../tools/measure_deviation.py#L1621-L1654>)即使--analyze也会回写结果与manifest，不能在只读证据目录“顺手复算”。缺工具先核来源、版本与落点，工作区外安装单独授权。

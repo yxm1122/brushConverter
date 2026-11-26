@@ -1,5 +1,5 @@
 # brushConverter
-Convert Photoshop brush sets (.abr) into Krita presets (.kpp) and resource packs (.bundle). Published version: v1.5.0; Windows GUI and CLI downloads are available below.
+Convert Photoshop brush sets (.abr) into Krita presets (.kpp) and resource packs (.bundle). Published version: v1.5.0; the v1.6.0 source candidate is unreleased.
 把 Photoshop 笔刷转成 Krita 预设与资源包。**已发布 v1.5.0** · [正式版下载](https://github.com/yxm1122/brushConverter/releases/tag/v1.5.0)
 
 ## 下载与三步上手
@@ -15,15 +15,19 @@ Convert Photoshop brush sets (.abr) into Krita presets (.kpp) and resource packs
 2. **导入**：把生成的 `.bundle` 导入 Krita，**不是把原始 `.abr` 直接导入**。另有独立 `.kpp` 的导入办法，见[导入与检查](<docs/user-guide.md#import-krita>)。
 3. **遇到问题**：先保留完整报错，再按[排错手册](<docs/troubleshooting.md>)找相同现象；缓存重建是有代价的可选兜底，不是必做步骤。
 
-操作说明以 Windows 64 位、Krita 5.3.3 的既有记录为参考；其他系统与 Krita 版本未验证。完整说明见[用户指南](<docs/user-guide.md>)；[GUI 外观示意](<docs/screenshot-gui.png>)仅作参考，不代表计划功能已实现。
+操作目标为 Windows 64 位、Krita 5.3.3；其他系统与 Krita 版本未验证。完整说明见[用户指南](<docs/user-guide.md>)；[GUI 外观示意](<docs/screenshot-gui.png>)为旧版参考，不代表候选控件或本轮实机验收。
 
 ## 已知限制（摘要）
 
 - **转换不等于逐像素复刻 Photoshop**：纹理混合模式（blend mode）有近似、无等价承载或有条件成立的情况，不能把“能转换”理解为所有模式完全准确。详见[参数映射参考](<docs/parameter-mapping.md>) §7.2、§10。
-- **部分设置已烘焙（bake）进像素**：计算笔刷的硬度，以及预放大纹理的缩放/相位，不能在 Krita 中按原 PS 语义继续调整；双笔刷、颜色动态、湿边等尚未映射。见[转换取舍](<docs/user-guide.md#tradeoffs>)与[映射参考](<docs/parameter-mapping.md>) §2、§6、§7。
+- **外观优先有编辑代价**：候选默认按条件位图化/预缩放/亮度越界烘焙，可逐支关闭改走受限原生字段，并承担外观或范围代价；不能同时承诺完全复刻与完全可编辑。双笔刷、颜色动态、湿边等仍未映射。见[转换取舍](<docs/user-guide.md#tradeoffs>)。
 - **边界残差仍存在**：硬度、散布端点、hardMix、纹理缩放等需按适用条件判断；逐条证据与待验证项只维护在[映射参考](<docs/parameter-mapping.md>) §10，不在首页另抄一套数字表。
-- **输出保护有范围**：资源包有同内容复用、冲突改名与回读校验；独立 `.kpp` 仍可能覆盖同名文件，请每次选新目录。详见[输出与安全边界](<docs/user-guide.md#outputs>)。
-- **候选 v1.6.0（未发布）**：这是本地待发布工作，不是上方下载包。候选已提交的变化见[版本说明](<releases/RELEASE_NOTES.md>)首段；逐支可编辑性开关、取消、元信息与标签等尚未落地的部分只标[计划中](<docs/user-guide.md#candidate-status>)，不提供假按钮或假命令。
+- **输出保护须看版本**：候选 bundle 与独立 KPP 均先暂存验证、复用/冲突改名并保护旧文件；取消是协作请求，最终交付期不可取消，不虚称多文件系统原子性。已发布 v1.5.0 的独立 KPP 仍可能覆盖。见[输出与安全边界](<docs/user-guide.md#outputs>)。
+- **候选 v1.6.0（未发布）**：源码已实现三开关、筛选/隐藏选择、安全取消、包信息与逐支标签/追溯；不是上方下载包，两份候选 exe 尚未构建。见[候选操作与待验边界](<docs/user-guide.md#candidate-status>)、[真实 CLI 配置](<docs/user-guide.md#cli-convert>)及[包信息/标签范围](<docs/user-guide.md#metadata-tags>)。Krita 实际筛选/编辑/重启仍待 187 人工，不能用 XML 有字段代替通过。
+
+**候选升级必读**：亮度越界命中区、所有旋转随机抖动的旧 KPP 及所属 bundle 须从原 ABR 重转；只改元信息/标签产生新包身份是另一件事，不表示映射算法又变了。详见[合并候选升级说明](<releases/RELEASE_NOTES.md>)；不恢复 legacy 公式或双随机源。
+
+**候选复用纠偏已定向验证（未全量）**：此前合成的不同元信息短哈希碰撞反例所暴露的复用判定，已改为按完整v2身份（scheme+64位sha256）比较；同一A/B真实CLI复跑中B独立交付为`_2`包、`reused=0`、A字节与mtime不变，真实32位前缀碰撞负例已进定向测试。183全量/185打包/187人工仍未执行，候选不会因此自动成为正式版；详见[候选已知限制](<releases/RELEASE_NOTES.md#已知限制>)。
 
 ## 升级必读（已发布版本的历史记录）
 
