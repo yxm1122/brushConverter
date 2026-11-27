@@ -21,7 +21,10 @@ def put(root: Path, name: str, text: str) -> Path:
 
 
 @pytest.fixture
-def root() -> Path:
+def root(monkeypatch) -> Path:
+    # 合成发布版本独立于当前产品版本；历史版本正反例无需随补丁发版改写。
+    monkeypatch.setattr(docs, "RELEASED", "v1.6.0")
+    monkeypatch.setattr(docs, "RELEASE_DATE", "2026-11-27")
     # 不使用系统临时目录，也不修改全局pytest配置。
     WORK.mkdir(parents=True, exist_ok=True)
     root = Path(tempfile.mkdtemp(prefix="case-", dir=WORK))

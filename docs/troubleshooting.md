@@ -1,6 +1,6 @@
 # 排错手册：按你看到的现象查
 
-Troubleshooting for the published v1.6.0 Windows workflow, with older-version risks and remaining untested behavior clearly separated. It covers safe cancellation, configuration errors, bundle tag scope and the known CLI-redirection and same-name import issues; cache rebuilding is optional and may lose custom tags or groups.
+Troubleshooting for the published v1.6.1 Windows workflow, with older-version risks and remaining untested behavior clearly separated. It covers safe cancellation, configuration errors, bundle tag scope and the known CLI-redirection and same-name import issues; cache rebuilding is optional and may lose custom tags or groups.
 
 [返回首页](<../README.md>) · [用户指南](<user-guide.md>) · [正确导入方式](<user-guide.md#import-krita>)
 
@@ -79,7 +79,7 @@ v1.5.0 的历史升级与当前 v1.6.0 升级不是同一件事：v1.6.0 另有�
 <a id="planned-features"></a>
 ## 六、找不到开关、标签或元信息表单
 
-先核版本：这些控件已包含在 v1.6.0 正式包中，位置见[GUI 步骤](<user-guide.md#gui-convert>)；v1.5.0 及更早下载包没有这些新增控件。请从[正式发布页](https://github.com/yxm1122/brushConverter/releases/tag/v1.6.0)获取正确版本，不能仅凭 exe 文件名判断来源。
+先核版本：这些控件已包含在 v1.6.0 正式包中，位置见[GUI 步骤](<user-guide.md#gui-convert>)；v1.5.0 及更早下载包没有这些新增控件。请从[正式发布页](https://github.com/yxm1122/brushConverter/releases/tag/v1.6.1)获取正确版本，不能仅凭 exe 文件名判断来源。
 
 - 列表只有一部分时看“隐藏已选”；全选/取消仅作用可见行，清搜索并恢复“全部笔刷”后再核总数。切语言不丢设置，换源/重载会恢复条件默认与本批元信息/标签。
 - 元信息表停用先看格式：独立 KPP 不承载包信息、原生标签与追溯。v1.6.0 的 CLI 要显式加 --metadata-file 才启用新链，GUI 空表单与无配置 CLI 不等价；--no-bundle 与该配置冲突会退出 2。

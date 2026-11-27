@@ -1,9 +1,9 @@
 # ABR → Krita 完整参数映射清单
 
-> **English abstract**: Field-level mapping reference for ABR-to-Krita conversion. Version v1.6.0 was officially released on 2026-11-27; 30 human acceptance items passed and six unverified items were conditionally waived, not marked as passed. Implementation status, measured evidence, known residuals and unverified combinations are reported separately.
+> **English abstract**: Field-level mapping reference for ABR-to-Krita conversion. Version v1.6.1 is a GUI maintenance release dated 2026-11-27; conversion mappings are unchanged from v1.6.0, whose acceptance recorded 30 passed human items and six conditionally waived but unverified items. Implementation status, measured evidence, known residuals and unverified combinations are reported separately.
 >
 > 引擎：现阶段仅像素引擎（paintbrush）。早期字段来源样本为自备商用ABR，后续证据覆盖范围逐节注明，不承诺任意笔刷精确等价。
-> **版本边界**：v1.6.0已于2026-11-27正式发布，合并149A/153与逐支三开关、安全取消、元信息/标签/追溯。以下表格默认指外观优先处理；关闭后的受限原生路线单独注明。代码实现、文件回读与Krita实机效果分层：187集中人工验收30项通过；E4、E6、F1、F3、F4、G3六项未验、条件性放行，不写通过。精确范围、已知问题及隐私裁决见[发布说明](<../releases/RELEASE_NOTES.md>)首段，不将发布等同任意参数域全验。
+> **版本边界**：v1.6.1 仅修复 GUI 显示与布局，转换映射和既有人工验收边界沿用 v1.6.0；v1.6.0已于2026-11-27正式发布，合并149A/153与逐支三开关、安全取消、元信息/标签/追溯。以下表格默认指外观优先处理；关闭后的受限原生路线单独注明。代码实现、文件回读与Krita实机效果分层：187集中人工验收30项通过；E4、E6、F1、F3、F4、G3六项未验、条件性放行，不写通过。精确范围、已知问题及隐私裁决见[发布说明](<../releases/RELEASE_NOTES.md>)首段，不将发布等同任意参数域全验。
 > ✅=实现该映射分支，不等于任意参数域像素精确或人工已验；⛔=不映射；⚠️=已知限制/待量测边界。历史❓记号不替代[参数矩阵](<参数矩阵.json>)中的“未定”。模式verdict/证据等级以[模式总表](<数据/mode-table.json>)为准，参数verdict以矩阵为准，两种对象不混算。
 > 维护与验证入口见[开发指南](<developer-guide.md#maintenance-checks>)；旧方案看[归档说明](<归档/维护参考与归档说明.md>)。本页保留既有§1–§10标题锚点；验收报告是一次性只读历史，不维护回写，现行勘误在参考文档说明，历史报告与JSON原证据不重写。
 

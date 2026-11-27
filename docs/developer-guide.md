@@ -1,9 +1,9 @@
 # brushConverter 项目结构与原理
 
-> **English abstract**: Maintainer reference for the ABR-to-Krita pipeline, its evidence trail, and reproducible checks. Version v1.6.0 was officially released on 2026-11-27; 30 human acceptance items passed and six unverified items were conditionally waived, not marked as passed. Historical reports are not current acceptance results.
+> **English abstract**: Maintainer reference for the ABR-to-Krita pipeline, its evidence trail, and reproducible checks. Version v1.6.1 is a GUI maintenance release dated 2026-11-27; conversion mappings are unchanged from v1.6.0, whose acceptance recorded 30 passed human items and six conditionally waived but unverified items. Historical reports are not current acceptance results.
 >
 > 面向维护者：按主题查找现行实现、历史原证据与复核入口。逐字段说明以[参数映射](<parameter-mapping.md>)为准，版本变更以[发布说明](<../releases/RELEASE_NOTES.md>)为准。
-> **版本边界**：v1.6.0已于2026-11-27正式发布，合并第五轮149A/153与逐支选项、事务、元信息/标签/追溯；两份冻结构建已作为正式附件发布。187人工验收30项通过；E4、E6、F1、F3、F4、G3六项未验、条件性放行，不写通过。历史实验不是本次文档修订的新回归；精确验收范围、已知问题及隐私裁决以[发布说明](<../releases/RELEASE_NOTES.md>)首段为准。
+> **版本边界**：v1.6.1 仅修复 GUI 显示与布局，转换映射和既有人工验收边界沿用 v1.6.0；v1.6.0已于2026-11-27正式发布，合并第五轮149A/153与逐支选项、事务、元信息/标签/追溯；两份冻结构建已作为正式附件发布。187人工验收30项通过；E4、E6、F1、F3、F4、G3六项未验、条件性放行，不写通过。历史实验不是本次文档修订的新回归；精确验收范围、已知问题及隐私裁决以[发布说明](<../releases/RELEASE_NOTES.md>)首段为准。
 
 ## 0. 文档索引（先看这里）
 

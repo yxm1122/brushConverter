@@ -8,7 +8,7 @@ from pathlib import Path
 
 import numpy as np
 from PySide6.QtCore import QSettings, QSignalBlocker, Qt, QTimer, Slot
-from PySide6.QtGui import QImage, QPixmap
+from PySide6.QtGui import QImage, QPalette, QPixmap
 from PySide6.QtWidgets import (
     QApplication,
     QButtonGroup,
@@ -18,11 +18,11 @@ from PySide6.QtWidgets import (
     QDialogButtonBox,
     QFileDialog,
     QFormLayout,
+    QFrame,
     QGroupBox,
     QHBoxLayout,
     QLabel,
     QLineEdit,
-    QListWidget,
     QListWidgetItem,
     QMainWindow,
     QMessageBox,
@@ -31,6 +31,7 @@ from PySide6.QtWidgets import (
     QPushButton,
     QRadioButton,
     QScrollArea,
+    QSizePolicy,
     QSplitter,
     QVBoxLayout,
     QWidget,
@@ -44,6 +45,8 @@ from brush_converter.kpp.bundle import ELEM_PACKAGE_VERSION, ELEM_SOURCE_FILE
 from brush_converter.kpp.kpp_writer import render_tip_preview
 from brush_converter.mapping import BrushPreset
 
+from .appearance import WINDOW_STYLE
+from .brush_list import BrushListWidget
 from .brush_selection import (
     FILTER_MODES,
     SORT_MODES,
@@ -191,42 +194,53 @@ class BrushItemWidget(QWidget):
         super().__init__(parent)
         self.preset = preset
         layout = QHBoxLayout(self)
+        layout.setContentsMargins(12, 12, 12, 12)
+        layout.setSpacing(10)
         self.checkbox = QCheckBox()
         self.checkbox.setChecked(checked)
         self.checkbox.setAccessibleName(tr("forecast_brush", ordinal=identity.ordinal,
                                           name=preset.name, id=identity.preset_id))
-        layout.addWidget(self.checkbox)
+        layout.addWidget(self.checkbox, 0, Qt.AlignmentFlag.AlignTop)
         thumb = QLabel()
+        thumb.setObjectName("brushThumbnail")
+        thumb.setFixedSize(64, 64)
+        thumb.setAlignment(Qt.AlignmentFlag.AlignCenter)
         thumb.setPixmap(_gray_to_pixmap(preset.tip_gray))
-        layout.addWidget(thumb)
+        layout.addWidget(thumb, 0, Qt.AlignmentFlag.AlignTop)
         column = QVBoxLayout()
-        for text in (preset.name, tr("brush_identity", ordinal=identity.ordinal,
-                                     id=identity.preset_id)):
+        column.setSpacing(6)
+
+        def wrapped_label(text: str = "", name: str = "") -> QLabel:
             label = QLabel(text)
+            label.setObjectName(name)
+            if name in ("brushIdentity", "brushSource"):
+                label.setForegroundRole(QPalette.ColorRole.PlaceholderText)
             label.setTextFormat(Qt.TextFormat.PlainText)
             label.setWordWrap(True)
+            # Long stable IDs/names must not force the card wider than its viewport.
+            label.setMinimumWidth(0)
+            policy = label.sizePolicy()
+            policy.setHorizontalPolicy(QSizePolicy.Policy.Ignored)
+            label.setSizePolicy(policy)
             column.addWidget(label)
+            return label
+
+        self.name_label = wrapped_label(preset.name, "brushName")
+        self.name_label.setToolTip(preset.name)
+        self.identity_label = wrapped_label(tr("brush_identity", ordinal=identity.ordinal,
+                                               id=identity.preset_id), "brushIdentity")
+        self.identity_label.setToolTip(identity.preset_id)
         kind = tr("computed_brush" if preset.is_computed else "sampled_brush")
         diameter = preset.diameter if preset.diameter is not None else "—"
-        self.source_info = QLabel(f"{kind} · " + tr("diameter", d=diameter))
-        self.source_info.setWordWrap(True)
-        column.addWidget(self.source_info)
-        self.summary = QLabel()
-        self.summary.setWordWrap(True)
-        column.addWidget(self.summary)
-        self.tags = QLabel()
-        self.tags.setTextFormat(Qt.TextFormat.PlainText)
-        self.tags.setWordWrap(True)
-        column.addWidget(self.tags)
+        self.source_info = wrapped_label(f"{kind} · " + tr("diameter", d=diameter), "brushSource")
+        self.summary = wrapped_label(name="brushSummary")
+        self.tags = wrapped_label(name="brushTags")
         if preset.warnings:
-            warning = QLabel(tr("warn_prefix") + tr("list_sep").join(
-                tr_warning(value) for value in preset.warnings))
-            warning.setTextFormat(Qt.TextFormat.PlainText)
-            warning.setWordWrap(True)
-            column.addWidget(warning)
-        layout.addLayout(column, 1)
+            wrapped_label(tr("warn_prefix") + tr("list_sep").join(
+                tr_warning(value) for value in preset.warnings), "brushWarning")
         self.edit_btn = QPushButton(tr("edit_brush"))
-        layout.addWidget(self.edit_btn)
+        column.addWidget(self.edit_btn, 0, Qt.AlignmentFlag.AlignRight)
+        layout.addLayout(column, 1)
 
 
 class MainWindow(QMainWindow):
@@ -260,9 +274,16 @@ class MainWindow(QMainWindow):
 
     def _build_ui(self) -> None:
         """只用既有Qt原生控件，处理面板可滚动，不需要额外美术框架。"""
+        # Let system/parent font changes propagate through weight-only QSS rules.
+        QApplication.setAttribute(
+            Qt.ApplicationAttribute.AA_UseStyleSheetPropagationInWidgetStyles, True
+        )
         central = QWidget()
+        central.setStyleSheet(WINDOW_STYLE)
         self.setCentralWidget(central)
         root = QVBoxLayout(central)
+        root.setContentsMargins(12, 12, 12, 12)
+        root.setSpacing(10)
         self.file_group = QGroupBox()
         top = QHBoxLayout(self.file_group)
         self.open_btn = QPushButton()
@@ -272,7 +293,15 @@ class MainWindow(QMainWindow):
         self.file_label = QLabel()
         self.file_label.setTextFormat(Qt.TextFormat.PlainText)
         self.file_label.setWordWrap(True)
+        self.file_label.setMinimumWidth(0)
+        policy = self.file_label.sizePolicy()
+        policy.setHorizontalPolicy(QSizePolicy.Policy.Ignored)
+        self.file_label.setSizePolicy(policy)
         self.lang_combo = QComboBox()
+        self.lang_combo.setMinimumContentsLength(8)
+        self.lang_combo.setSizeAdjustPolicy(
+            QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon
+        )
         self.lang_combo.addItem("中文", "zh")
         self.lang_combo.addItem("English", "en")
         self.lang_combo.setCurrentIndex(0 if get_language() == "zh" else 1)
@@ -283,27 +312,35 @@ class MainWindow(QMainWindow):
         top.addWidget(self.lang_combo)
         root.addWidget(self.file_group)
 
-        splitter = QSplitter(Qt.Orientation.Horizontal)
+        splitter = self.splitter = QSplitter(Qt.Orientation.Horizontal)
+        splitter.setChildrenCollapsible(False)
+        splitter.setHandleWidth(8)
         self.list_group = QGroupBox()
         listing = QVBoxLayout(self.list_group)
         self.search_edit = QLineEdit()
+        self.search_edit.setClearButtonEnabled(True)
         self.search_edit.textChanged.connect(self._on_view_changed)
         listing.addWidget(self.search_edit)
         filters = QHBoxLayout()
-        self.filter_label = QLabel()
         self.filter_combo = QComboBox()
         for mode in FILTER_MODES:
             self.filter_combo.addItem("", mode)
         self.filter_combo.currentIndexChanged.connect(self._on_view_changed)
-        self.sort_label = QLabel()
         self.sort_combo = QComboBox()
         for mode in SORT_MODES:
             self.sort_combo.addItem("", mode)
         self.sort_combo.currentIndexChanged.connect(self._on_sort_changed)
-        for widget in (self.filter_label, self.filter_combo, self.sort_label, self.sort_combo):
-            filters.addWidget(widget)
+        for combo in (self.filter_combo, self.sort_combo):
+            combo.setMinimumContentsLength(8)
+            combo.setSizeAdjustPolicy(
+                QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon
+            )
+            combo.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+            combo.currentTextChanged.connect(combo.setToolTip)
+            filters.addWidget(combo)
         listing.addLayout(filters)
-        self.brush_list = QListWidget()
+        self.brush_list = BrushListWidget()
+        self.brush_list.setObjectName("brushList")
         self.brush_list.currentItemChanged.connect(self._on_current_changed)
         listing.addWidget(self.brush_list, 1)
         selection_row = QHBoxLayout()
@@ -315,6 +352,7 @@ class MainWindow(QMainWindow):
         selection_row.addWidget(self.sel_none_btn)
         listing.addLayout(selection_row)
         self.count_label = QLabel()
+        self.count_label.setObjectName("selectionCount")
         self.count_label.setWordWrap(True)
         listing.addWidget(self.count_label)
         splitter.addWidget(self.list_group)
@@ -323,16 +361,20 @@ class MainWindow(QMainWindow):
         processing = QVBoxLayout(self.process_group)
         self.process_help = QLabel()
         self.process_help.setWordWrap(True)
-        processing.addWidget(self.process_help)
         self.metadata_scope = QLabel()
         self.metadata_scope.setWordWrap(True)
-        processing.addWidget(self.metadata_scope)
-        scroll = QScrollArea()
+        scroll = self.detail_scroll = QScrollArea()
         scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
         detail = QWidget()
         details = QVBoxLayout(detail)
+        details.setContentsMargins(0, 0, 0, 0)
+        details.setSpacing(10)
+        details.addWidget(self.process_help)
+        details.addWidget(self.metadata_scope)
         self.metadata_group = QGroupBox()
         metadata_layout = QFormLayout(self.metadata_group)
+        metadata_layout.setRowWrapPolicy(QFormLayout.RowWrapPolicy.WrapLongRows)
         self.metadata_fields = {}
         self.metadata_labels = {}
         for key in ("name", "description", "author", "license", "version"):
@@ -355,6 +397,7 @@ class MainWindow(QMainWindow):
             metadata_layout.addRow(label)
         details.addWidget(self.metadata_group)
         self.current_label = QLabel()
+        self.current_label.setObjectName("currentBrush")
         self.current_label.setTextFormat(Qt.TextFormat.PlainText)
         self.current_label.setWordWrap(True)
         details.addWidget(self.current_label)
@@ -388,9 +431,11 @@ class MainWindow(QMainWindow):
         processing.addWidget(scroll, 1)
         self.reset_label = QLabel()
         self.reset_label.setWordWrap(True)
-        processing.addWidget(self.reset_label)
+        details.addWidget(self.reset_label)
         splitter.addWidget(self.process_group)
         splitter.setSizes([560, 520])
+        splitter.setStretchFactor(0, 1)
+        splitter.setStretchFactor(1, 1)
         root.addWidget(splitter, 1)
 
         self.out_group = QGroupBox()
@@ -418,8 +463,10 @@ class MainWindow(QMainWindow):
         output.addLayout(directory)
         root.addWidget(self.out_group)
         self.convert_btn = QPushButton()
+        self.convert_btn.setObjectName("primaryAction")
         self.convert_btn.clicked.connect(self._on_convert)
         actions = QHBoxLayout()
+        actions.addStretch(1)
         actions.addWidget(self.convert_btn)
         self.cancel_btn = QPushButton()
         self.cancel_btn.clicked.connect(self._on_cancel)
@@ -451,7 +498,6 @@ class MainWindow(QMainWindow):
                             (self.radio_bundle, "bundle"), (self.out_dir_label, "out_dir"),
                             (self.browse_btn, "browse"), (self.convert_btn, "convert"),
                              (self.cancel_btn, "cancel"), (self.abort_close_btn, "abort_close"),
-                            (self.filter_label, "filter_label"), (self.sort_label, "sort_label"),
                             (self.process_help, "process_help"), (self.reset_label, "reset_notice")):
             widget.setText(tr(key))
         self.metadata_group.setTitle(tr("metadata_heading"))
@@ -467,6 +513,12 @@ class MainWindow(QMainWindow):
         self._update_metadata_enabled()
         self.file_label.setText(self._file_path or tr("no_file"))
         self.search_edit.setPlaceholderText(tr("search"))
+        self.search_edit.setAccessibleName(tr("search"))
+        self.brush_list.setAccessibleName(tr("brush_list"))
+        self.filter_combo.setAccessibleName(tr("filter_label"))
+        self.sort_combo.setAccessibleName(tr("sort_label"))
+        self.filter_combo.setToolTip(tr(f"filter_{self.filter_combo.currentData()}"))
+        self.sort_combo.setToolTip(tr(f"sort_{self.sort_combo.currentData()}"))
         for combo, modes, prefix in ((self.filter_combo, FILTER_MODES, "filter"),
                                      (self.sort_combo, SORT_MODES, "sort")):
             with QSignalBlocker(combo):
@@ -487,6 +539,7 @@ class MainWindow(QMainWindow):
         if self._close_pending:
             text += "\n" + tr("close_waiting")
         self.status_label.setText(text)
+        self.status_label.setVisible(bool(text))
 
     def _set_busy(self, busy: bool) -> None:
         self._busy = busy
@@ -666,7 +719,7 @@ class MainWindow(QMainWindow):
                                            self._selection.is_selected(key))
                     card.checkbox.toggled.connect(lambda value, preset_id=key: self._on_checked(preset_id, value))
                     card.edit_btn.clicked.connect(lambda _checked=False, preset_id=key:
-                                                  self.brush_list.setCurrentItem(self._items[preset_id][0]))
+                                                  self._inspect_brush(preset_id))
                     self.brush_list.addItem(item)
                     self.brush_list.setItemWidget(item, card)
                     self._items[key] = (item, card)
@@ -674,7 +727,7 @@ class MainWindow(QMainWindow):
         self._apply_view()
 
     def _refresh_card(self, key: str) -> None:
-        item, card = self._items[key]
+        _item, card = self._items[key]
         preset = self._selection.options.preset(key)
         if is_renderable(preset):
             card.summary.setText(" · ".join(
@@ -693,7 +746,7 @@ class MainWindow(QMainWindow):
                                   ("\n" + tr("tags_not_written") if not is_renderable(preset) else ""))
             except (ValueError, TypeError) as exc:
                 card.tags.setText(tr("metadata_invalid", detail=str(exc)))
-        item.setSizeHint(card.sizeHint())
+        self.brush_list.request_item_layout()
 
     def _on_view_changed(self, *_args) -> None:
         if self._busy or self._close_pending:
@@ -717,8 +770,15 @@ class MainWindow(QMainWindow):
                 item.setHidden(key not in visible)
             key = self._selection.focused_id if self._selection else None
             self.brush_list.setCurrentItem(self._items[key][0] if key in visible else None)
+        self.brush_list.set_placeholder_text(tr(
+            "list_no_matches" if self._items else "list_empty"))
+        self.brush_list.request_item_layout()
         self._update_count()
         self._refresh_detail()
+
+    def _inspect_brush(self, key: str) -> None:
+        self.brush_list.setCurrentItem(self._items[key][0])
+        self.detail_scroll.ensureWidgetVisible(self.current_label, 0, 16)
 
     def _on_current_changed(self, current, _previous) -> None:
         if current is not None and self._selection:

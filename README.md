@@ -1,6 +1,10 @@
 # brushConverter
 Bring your favorite Photoshop brushes to Krita. Convert ABR sets into import-ready presets and bundles, with brush tips, textures, pressure response, and scatter mapped to bring strokes closer to their original look. Per-brush options let you balance visual similarity and editability—less setup, more creating.
-把熟悉的 Photoshop 笔刷带进 Krita。将 ABR 笔刷集转成可导入的预设与资源包，不只提取笔尖，还映射纹理、压感和散布等常用效果，尽量接近原笔触。支持逐支在外观还原与编辑空间之间取舍，少折腾设置，多花时间画画。**已发布 v1.6.0** · [正式版下载](https://github.com/yxm1122/brushConverter/releases/tag/v1.6.0)
+把熟悉的 Photoshop 笔刷带进 Krita。将 ABR 笔刷集转成可导入的预设与资源包，不只提取笔尖，还映射纹理、压感和散布等常用效果，尽量接近原笔触。支持逐支在外观还原与编辑空间之间取舍，少折腾设置，多花时间画画。**已发布 v1.6.1** · [正式版下载](https://github.com/yxm1122/brushConverter/releases/tag/v1.6.1)
+
+![brushConverter v1.6.1 English GUI with synthetic demo brushes](<docs/screenshot-gui-en.png>)
+
+*English GUI · v1.6.1 · Synthetic demo brushes / 英文界面，使用合成演示笔刷。*
 
 ## 下载与三步上手
 
@@ -8,8 +12,8 @@ Bring your favorite Photoshop brushes to Krita. Convert ABR sets into import-rea
 
 | 你需要什么 | 在正式版下载页选择 | 使用入口 |
 |---|---|---|
-| 点按钮转换（推荐新手） | `brushConverter-v1.6.0-win64.zip` | [GUI 分步操作](<docs/user-guide.md#gui-convert>) |
-| 用命令批量转换 | `brushconverter-cli-v1.6.0-win64.zip` | [CLI 分步操作](<docs/user-guide.md#cli-convert>) |
+| 点按钮转换（推荐新手） | `brushConverter-v1.6.1-win64.zip` | [GUI 分步操作](<docs/user-guide.md#gui-convert>) |
+| 用命令批量转换 | `brushconverter-cli-v1.6.1-win64.zip` | [CLI 分步操作](<docs/user-guide.md#cli-convert>) |
 
 > **Windows 运行提示**：本项目 Windows 程序暂未进行代码签名，首次运行时可能出现 SmartScreen“Windows 已保护你的电脑 / 发布者未知”提示，这不等于检测到病毒。请仅从本项目[正式发布页](https://github.com/yxm1122/brushConverter/releases)下载，确认来源可信后，点击“更多信息”→“仍要运行”（按钮已显示时可直接点击）。无需关闭 SmartScreen 或 Defender；若出现明确的病毒检测，请停止运行并反馈。
 
@@ -17,7 +21,7 @@ Bring your favorite Photoshop brushes to Krita. Convert ABR sets into import-rea
 2. **导入**：把生成的 `.bundle` 导入 Krita，**不是把原始 `.abr` 直接导入**。另有独立 `.kpp` 的导入办法，见[导入与检查](<docs/user-guide.md#import-krita>)。
 3. **遇到问题**：先保留完整报错，再按[排错手册](<docs/troubleshooting.md>)找相同现象；缓存重建是有代价的可选兜底，不是必做步骤。
 
-操作目标为 Windows 64 位、Krita 5.3.3；其他系统与 Krita 版本未验证。完整说明见[用户指南](<docs/user-guide.md>)；[GUI 外观示意](<docs/screenshot-gui.png>)为旧版参考，不代表当前控件或完整实机验收。
+操作目标为 Windows 64 位、Krita 5.3.3；其他系统与 Krita 版本未验证。完整说明见[用户指南](<docs/user-guide.md>)；上方[英文 GUI 截图](<docs/screenshot-gui-en.png>)来自 v1.6.1 的真实窗口与合成演示数据，不代表 Photoshop/Krita 笔触效果或完整实机验收。
 
 ## 已知限制（摘要）
 
@@ -31,7 +35,7 @@ Bring your favorite Photoshop brushes to Krita. Convert ABR sets into import-rea
 
 **v1.6.0 升级必读**：亮度越界命中区、所有旋转随机抖动的旧 KPP 及所属 bundle 须从原 ABR 重转；只改元信息/标签产生新包身份是另一件事，不表示映射算法又变了。详见[v1.6.0 升级说明](<releases/RELEASE_NOTES.md>)；不恢复 legacy 公式或双随机源。
 
-**发布验证与保留边界（2026-11-27）**：资源包复用已按完整 v2 身份（scheme+64 位 sha256）比较，定向反例与发布前全量 1149/0/0/0（两次一致）、verify_all 235/0/0 已留证；两份正式包已上传并核对。发布 ZIP 扫描的 14 个 block 经使用者接受并披露，6 项人工未验仍保留，不因发布改写为全验；详见[版本说明的限制与验证](<releases/RELEASE_NOTES.md#已知限制>)。
+**v1.6.0 历史发布验证与保留边界（2026-11-27）**：资源包复用已按完整 v2 身份（scheme+64 位 sha256）比较，定向反例与发布前全量 1149/0/0/0（两次一致）、verify_all 235/0/0 已留证；两份正式包已上传并核对。发布 ZIP 扫描的 14 个 block 经使用者接受并披露，6 项人工未验仍保留，不因发布改写为全验；详见[版本说明的限制与验证](<releases/RELEASE_NOTES.md#release-v160>)。
 
 ## 升级必读（已发布版本的历史记录）
 

@@ -1,3 +1,46 @@
+# brushConverter v1.6.1（2026-11-27）
+
+Version 1.6.1 fixes clipped text in the brush list when the window or sidebar is narrowed, and refines the GUI layout, navigation and empty states. Brush conversion mappings and their known limitations are unchanged from v1.6.0. The README now includes an English GUI screenshot captured with synthetic demo brushes.
+
+本次为 GUI 显示与易用性补丁；Windows GUI 与 CLI 均重新构建为 v1.6.1。新截图仅演示真实界面，不使用商用笔刷或个人路径。
+
+## 主要变化
+
+- **修复笔刷文字上下裁切与横向溢出**：按列表视口的实际宽度测量换行高度，计入主题边框与内边距；窗口/分栏、内容、语言、字体与样式变化后合并重排，不用固定大行高掩盖问题。
+- **更适合小窗口**：精简筛选栏与重复留白，说明放入可滚动区域；窄面板表单可换行，长卡片可逐像素滚动。
+- **界面与导航优化**：突出笔刷名、当前选择与主操作；增加搜索清除、空列表/无匹配提示；“查看/调整”定位到当前笔刷说明。保留隐藏选择、开关与标签状态。
+- **英文界面截图**：README 中英简介下展示本版英文 GUI，使用合成演示笔刷。
+
+## 升级注意
+
+- 请完整解压新版本的 Windows GUI 或 CLI 压缩包，不只替换 exe，也不要在旧版目录中混拷依赖。
+- **无需仅为本次 GUI 修复重转 v1.6.0 的已有笔刷**：转换公式、参数语义与采样笔尖补方/边框 255 均未改变。v1.6.0 对更早版本的重转要求仍按下方历史说明执行。
+- 工具版本会进入新资源包文件名与追溯，进而可能改变新版 bundle 的逻辑身份与字节；“映射未变”不表示不同程序版本的包哈希相同。
+
+## 已知限制
+
+- 继承 [v1.6.0 的映射、导入与验收边界](<#release-v160>)：同批 bundle 与同名散装 KPP 不宜同时导入 Krita；CLI 在代码页 936 下重定向含特定 Unicode 字符的输出仍有已知问题。
+- 本次 GUI 回归与成包检查不替代 Photoshop/Krita 新一轮人工效果验收，也不把 v1.6.0 的六项人工未验改写为通过。
+- 包内追溯的 release_state 仍沿用既有字面值 unreleased；真实程序版本为 1.6.1，正式发布状态以本版 tag/Release 为准。
+- Windows 程序仍未代码签名；仅从本项目发布页下载，不需要关闭系统安全软件。
+
+## 验证
+
+- **本次完整回归**：pytest 1187 通过 / 0 失败 / 0 错误 / 0 跳过（211.77 秒）；结果来自统一 Windows profile/AppData 路径的独立测试环境，不复用 v1.6.0 的旧数字。
+- **本次三层验证**：verify_all 235 通过 / 0 失败 / 0 跳过（参数 192、像素 34、手感 9）。文档、两份公开索引、矩阵/模式表和 UI 控件结构检查均 exit 0；不重写旧基准或历史验收报告。
+- **GUI 布局回归**：新增 19 项覆盖中英文、720×540/820×620/1120×820、窄分栏、字体与主题、格式/标签变化、筛选重建和生命周期；150%/200% Qt 缩放下分别复跑。Windows 原生控件测量未发现标签高度不足或卡片横向溢出。
+- **本次成包自检**：GUI/CLI 包内真实版本均为 1.6.1，新增 GUI 模块已进入归档；GUI 原生启动并正常关闭（exit 0）；CLI help、convert help、列出预设和实际转换均 exit 0，生成的 1 支预设 bundle 回读通过。
+- **分发包**：GUI ZIP 62,849,099 字节、260 个文件；CLI ZIP 25,012,429 字节、110 个文件，CRC 校验通过。相对 v1.6.0 无增删依赖；可执行文件更新，base_library.zip 的内部文件字节一致，仅容器重建。
+- **本次隐私检查与独立处置**：源码/全部 Git 历史扫描 block=0（既有告警和二进制/图片检查边界保留）。提高仅读取预算后，新 ZIP 扫描仍有 **20 个原始 block**：18 个 NumPy 公开联系/版权署名记录、2 个 DELVEWHEEL 的公共 CI 路径；凭据 0、容量限制项 0。逐条核对发现所在文件，与已公开 v1.6.0 附件对应文件字节及 SHA-256 相同，确认为上游公开归属与构建来源信息，保留许可证并披露。**未改写扫描严重级别、未声称 ZIP block 清零，也未冒称使用者作出本轮新豁免**；这项复核不表示任意二进制内容均已机器读完。
+
+## 回退方式
+
+保留旧版本完整目录可并行回到 v1.6.0，但会重新出现本次修复的小窗口显示问题。不要混拷两版依赖，不删除已有资源或原始 ABR；本次不提供旧映射公式开关。
+
+---
+
+<a id="release-v160"></a>
+
 # brushConverter v1.6.0（2026-11-27）
 
 Published v1.6.0 combines the fifth-round conversion fixes with per-brush options, safe batch delivery, and bundle metadata, tags and traceability. Both Windows packages were published on 2026-11-27. The acceptance round recorded 30 human items passed and 6 deliberately skipped with conditional release approval; those six items remain untested, and the known issues and privacy-scan disclosures below still apply.

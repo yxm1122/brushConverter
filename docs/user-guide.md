@@ -1,13 +1,13 @@
 # 用户指南：从 ABR 到 Krita
 
-This guide covers the published v1.6.0 Windows downloads, per-brush choices, safe cancellation, bundle metadata and tags. It separates older-version risks from current behavior and retains the known issues and six untested acceptance items; release does not promise identical Photoshop rendering or complete acceptance.
+This guide covers the published v1.6.1 Windows downloads, per-brush choices, safe cancellation, bundle metadata and tags. Version 1.6.1 improves GUI layout without changing the v1.6.0 conversion mappings. It separates older-version risks from current behavior and retains the known issues and six untested acceptance items; release does not promise identical Photoshop rendering or complete acceptance.
 
 [返回首页](<../README.md>) · [按现象排错](<troubleshooting.md>) · [版本说明](<../releases/RELEASE_NOTES.md>)
 
 ## 一、先选对版本和文件
 
-- **当前正式版 v1.6.0（2026-11-27）**：从[正式版下载页](https://github.com/yxm1122/brushConverter/releases/tag/v1.6.0)获取 Windows 64 位压缩包；新手选 GUI 包，重复批量操作可选 CLI 包。完整解压，不在压缩包内运行、不只复制 exe；发行包不要求另装 Python。
-- **本文的当前操作适用于 v1.6.0**：三开关、筛选、取消及元信息/标签已随两份正式包发布；v1.5.0 及更早版本不具备这些新增控件或接口。源码入口另见[源码运行](<#source-run>)，不是 exe 用户的必做步骤。
+- **当前正式版 v1.6.1（2026-11-27）**：从[正式版下载页](https://github.com/yxm1122/brushConverter/releases/tag/v1.6.1)获取 Windows 64 位压缩包；新手选 GUI 包，重复批量操作可选 CLI 包。完整解压，不在压缩包内运行、不只复制 exe；发行包不要求另装 Python。
+- **本文的当前操作适用于 v1.6.1（同样适用于 v1.6.0）**：三开关、筛选、取消及元信息/标签已随两份正式包发布；v1.5.0 及更早版本不具备这些新增控件或接口。源码入口另见[源码运行](<#source-run>)，不是 exe 用户的必做步骤。
 - 原始 `.abr` 是本工具的输入；`.bundle` 适合整包导入，`.kpp` 是单支预设。PNG 笔尖不是完整预设，**不要将原始 ABR 直接导入 Krita 代替转换产物**。
 - 保留原始 ABR 与旧产物，每次先选新的空输出目录，不将输出设到原始素材目录或已有资源库。作者、版权和许可由你确认；项目 MIT 不会授权第三方笔刷的分享。
 - 适用目标为 **Windows 64 位、Krita 5.3.3**；其他环境未验证。2026-11-27 使用者集中验收记录为 **30 项通过、6 项未验并条件放行**，不是所有功能/组合均通过；具体未验项、已知问题与发布边界见[第七节](<#candidate-status>)。源码或 XML 回读不能代替实机通过。
@@ -15,13 +15,13 @@ This guide covers the published v1.6.0 Windows downloads, per-brush choices, saf
 <a id="gui-convert"></a>
 ## 二、图形界面转换（新手推荐）
 
-### 当前正式版 v1.6.0 的基本路径
+### 当前正式版 v1.6.1 的基本路径
 
-完整解压 GUI 包 `brushConverter-v1.6.0-win64.zip`，运行其中的 `brushConverter.exe` → 打开 ABR → 勾选笔刷 → 选格式和新目录 → 阅读警告后开始转换 → 核对非零预设数与回读结果，再[导入 Krita](<#import-krita>)。下述选择、三开关及取消控件属于当前正式版；v1.5.0 及更早版本没有这些新增按钮。
+完整解压 GUI 包 `brushConverter-v1.6.1-win64.zip`，运行其中的 `brushConverter.exe` → 打开 ABR → 勾选笔刷 → 选格式和新目录 → 阅读警告后开始转换 → 核对非零预设数与回读结果，再[导入 Krita](<#import-krita>)。下述选择、三开关及取消控件属于当前正式版；v1.5.0 及更早版本没有这些新增按钮。
 
 ### v1.6.0：选择与逐支调整
 
-1. 打开 ABR，等待解析结束；先核对名称、缩略图和警告。解析报错就保留原文，不继续导入半成品。
+1. 打开 ABR，等待解析结束；先核对名称、缩略图和警告。v1.6.1 的列表会随窗口宽度重新换行和计算行高，长卡片可连续滚动；“查看/调整”会定位到当前笔刷说明。解析报错就保留原文，不继续导入半成品。
 2. 在列表勾选要导出的笔刷。**行复选框只决定导出选择**；点击笔刷行或“查看/调整”，在“逐支处理与编辑能力”查看三项处理、适用原因、条件默认和开启/关闭的后果，见[三开关取舍表](<#tradeoffs>)。不适用项不能强开。
 3. 可搜索名称、稳定 ID 或源序号，筛选“全部笔刷 / 仅已选 / 计算笔刷 / 采样笔刷 / 有适用处理”，按源顺序或名称升降序排序。稳定 ID 是这支笔刷的身份，不是显示名或筛选后的行号；同名笔刷不会因此共用设置。源序号指解析去重后、筛选前的顺序。
 4. **“全选可见项”“取消可见项选择”只作用于当前可见行**。搜索、筛选、排序和切语言不清掉隐藏选择、逐支设置或标签；“总已选 / 隐藏已选”会提示实际数量，隐藏已选仍会导出。要全不选，先清搜索、恢复“全部笔刷”，再取消可见项选择。
@@ -195,9 +195,11 @@ v1.6.0 两种输出均受同一整批事务保护，**最终多文件交付不�
 
 > 兼容旧链接：上方显式锚点 `candidate-status` 继续保留；本节描述的是已发布正式版，不再表示候选状态。
 
+**当前 v1.6.1 为 GUI 显示与布局补丁**，本版回归和新包检查见[本版发布说明](<../releases/RELEASE_NOTES.md>)；下述数字与人工结论属于 v1.6.0 历史验收，不自动成为新版本的验证结果。
+
 **v1.6.0 已于 2026-11-27 16:33:35（Asia/Shanghai）正式发布**，合并第五轮亮度越界预烘焙、旋转抖动单随机源修正，以及本轮三开关/筛选/取消/元信息/标签/追溯。[升级说明](<../releases/RELEASE_NOTES.md>)区分旧 KPP/bundle 必须从 ABR 重转、只改元信息导致新包身份，以及可编辑性取舍。
 
-发布前机器回归记录为 1149/0/0/0（两次一致）、verify_all 235/0/0，Krita 8/8 在全量同批；两份分发包已构建、上传并完成摘要核对。使用者集中验收记录为 **30 项通过，E4/E6/F1/F3/F4/G3 六项未验并条件放行**，未验不写通过。发布 ZIP 的 **14 个 block**（9 个 numpy 第三方文本、1 个 CI 家目录、4 个扫描容量上限）经使用者接受并披露，不等于机器扫描已清零；人工目检为使用者自述完成、未附索引。**D-2**（代码页 936 下重定向/管道打印 U+2212 可能在已交付后退出 1）与 **D-6**（同名 bundle/KPP 同时导入互相遮挡）仍是已知问题，见[版本说明](<../releases/RELEASE_NOTES.md#已知限制>)与[排错手册](<troubleshooting.md>)。正式发布不补写人工通过，也不改写包内 `unreleased` 构建状态。
+v1.6.0 发布前机器回归记录为 1149/0/0/0（两次一致）、verify_all 235/0/0，Krita 8/8 在全量同批；两份分发包已构建、上传并完成摘要核对。使用者集中验收记录为 **30 项通过，E4/E6/F1/F3/F4/G3 六项未验并条件放行**，未验不写通过。发布 ZIP 的 **14 个 block**（9 个 numpy 第三方文本、1 个 CI 家目录、4 个扫描容量上限）经使用者接受并披露，不等于机器扫描已清零；人工目检为使用者自述完成、未附索引。**D-2**（代码页 936 下重定向/管道打印 U+2212 可能在已交付后退出 1）与 **D-6**（同名 bundle/KPP 同时导入互相遮挡）仍是已知问题，见[版本说明](<../releases/RELEASE_NOTES.md#release-v160>)与[排错手册](<troubleshooting.md>)。正式发布不补写人工通过，也不改写包内 `unreleased` 构建状态。
 
 <a id="source-run"></a>
 ## 八、从源码运行（可选，不是 exe 用户的必做步骤）

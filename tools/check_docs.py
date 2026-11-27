@@ -3,7 +3,7 @@
 
 用法：python -B tools/check_docs.py --check [--root 仓库根]
 只读，不改文档、不联网、不执行文档中的命令。退出码：0 通过，1 规则失败，2 输入错误。
-当前发布事实为 v1.6.0（2026-11-27）；没有另行声明的候选版本，不预设下一版本。
+当前发布事实为 v1.6.1（2026-11-27）；没有另行声明的候选版本，不预设下一版本。
 
 范围：README、docs、releases 的 Markdown；内部规划及隐藏目录不扫描。已受Git
 跟踪的研究报告只检查链接；一次性验收报告正文不纳入日常维护，目录README/INDEX仍检查。
@@ -26,7 +26,7 @@ from typing import NamedTuple
 from urllib.parse import unquote, urlsplit
 
 REPO = Path(__file__).resolve().parents[1]
-RELEASED = "v1.6.0"
+RELEASED = "v1.6.1"
 RELEASE_DATE = "2026-11-27"
 CANDIDATE: str | None = None  # 仅在另有候选立项时显式指定；不虚构下一版本。
 INTERNAL = ("docs/优化提示词", "docs/工作流程", ".tmp", ".git")
