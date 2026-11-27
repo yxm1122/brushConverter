@@ -1,0 +1,16 @@
+# brushConverter CI 专用依赖 —— 只放 CI 需要、运行期不需要的测试/检查工具。
+#
+# 运行依赖（numpy / Pillow / PySide6）不在这里重复声明：它们由 pyproject.toml 的
+# [project].dependencies 定义，CI 用 `python -m pip install -e .` 安装；运行依赖只保留
+# 一个事实来源，本文件不与 requirements.txt 各自漂移。
+#
+# 安装顺序（工作流与本地一致，见 docs/ci.md）：
+#   python -m pip install -r requirements-ci.txt
+#   python -m pip install -e .
+#
+# pytest 是现有验证体系（pytest.ini / tools/verify_entry.py / tools/ci.py）的必需项，
+# pyproject 的 dev 附加项里没有它，故由本文件提供；ruff 与 dev 附加项同一下限并固定版本。
+# 精确 pin 是为了让 CI 的 lint / 测试口径可复现：升级版本须先在本地（Windows 3.12）
+# 实测，再改这里，不要只改云端。不在此文件引入 pyinstaller / mypy / Qt 额外包。
+pytest==9.2.0
+ruff==0.17.6

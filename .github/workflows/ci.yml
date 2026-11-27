@@ -1,0 +1,133 @@
+# brushConverter CI（GitHub Actions）
+#
+# 目标平台：Windows 64 位 + Python 3.12。pyproject.toml 要求 requires-python >=3.12，
+# README 明确「操作目标为 Windows 64 位」；其他平台/解释器未实测，因此矩阵只列已验证目标，
+# 不把未验证平台写成支持面（新增条目须先有本地实测证据）。
+#
+# 项目检查与测试统一调用 tools/ci.py（本地与云端同一入口、同一退出码）：
+#   0 = 已执行阶段通过（skip 单独计数，不折算成通过）
+#   1 = check 非 0，或 pytest 失败/中断/超时
+#   2 = 未收集到用例、junit 缺失，或检查脚本缺失
+# 用 --phase all 跑「结构检查 → 回归」一次 fail-fast，只产出一次运行的报告（不覆盖、不混阶段）；
+# ci.py 不装包、不联网、不启 Krita/PS；pip 安装由本工作流负责。
+#
+# 动作固定到「轻量 tag → commit SHA」（2026-11-27 git ls-remote 核对，无 ^{} 剥离对象，
+# 即 SHA 就是 commit；三者运行时均为 node24，GitHub 托管 runner 已满足，自托管旧 runner 需先升级）：
+#   actions/checkout        v7.0.1  3d3c42e5aac5ba805825da76410c181273ba90b1
+#   actions/setup-python    v7.1.0  6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+#   actions/upload-artifact v7.0.2  cf430e030ddbb5b0abf93d22962f4752f3646cd9
+# 未写未经核对的 SHA；升级动作时请重新 ls-remote 并同步更新本注释。
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# 最小权限：只读仓库内容；CI 不提交、不发布、不写仓库。
+permissions:
+  contents: read
+
+# 同一分支/PR 的新运行取消旧运行，避免排队与浪费配额。
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Windows 默认 ANSI 代码页（如 936）会让中文摘要与报错乱码；显式 UTF-8。
+  PYTHONUTF8: "1"
+  PYTHONIOENCODING: "utf-8"
+  PYTHONUNBUFFERED: "1"
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+
+jobs:
+  ci:
+    name: CI (Windows · Python ${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
+    # 超时链（自上而下、逐层兜底）：
+    #   ci.py 内部上限 = 7 条 check × 60s + pytest 1200s ≈ 27 分钟；
+    #   ci.py step 35 分钟（先由 ci.py 写超时报告）< job 75 分钟；
+    #   预算 = Install 20 + blocking lint 5 + advisory lint 10 + ci.py 35 = 70 分钟，
+    #   余下 5 分钟给 summary 上页与 artifact 上传。job 上限高于各 step 之和，
+    #   保证 step 被终止后 if: always() 的上传步骤仍能保留已有报告。
+    timeout-minutes: 75
+    strategy:
+      fail-fast: false
+      matrix:
+        # 只列已实测目标；新增 Python/平台前须先有本地实测证据，再改这里与 docs/ci.md。
+        os: [windows-latest]
+        python-version: ["3.12"]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python (pip cache)
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: |
+            requirements-ci.txt
+            pyproject.toml
+
+      - name: Install CI deps + editable project
+        timeout-minutes: 20
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-ci.txt
+          python -m pip install -e .
+
+      # 阻断项只放「语法 / 未定义名 / 坏导入」这类确定性错误，规则集为 ruff 官方推荐的
+      # 正确性子集；本地实测为 0 项（本 step 命令 + ruff 0.17.6 + Python 3.12，云端待验证）。
+      - name: Lint (blocking) - syntax and undefined names
+        timeout-minutes: 5
+        run: python -m ruff check . --select E9,F63,F7,F82 --output-format=concise
+
+      # 全量 ruff 是「建议项」：仓库存在既有风格债务、本次未清零，故不阻断，也不在配置里
+      # 用 ignore 掩掉；结论单独计数、单独上传，不参与 job 成败判定。
+      - name: Lint (advisory) - full ruff report
+        continue-on-error: true
+        timeout-minutes: 10
+        run: |
+          mkdir -p .tmp/ci/reports
+          python -m ruff check . --output-format=concise 2>&1 | tee .tmp/ci/reports/ruff.log
+
+      - name: Structural checks + regression tests (tools/ci.py)
+        timeout-minutes: 35
+        run: python -B tools/ci.py --phase all --report-dir .tmp/ci/reports
+
+      # 把 ci.py 的 summary.md 写进 Actions 运行页摘要，便于人读 passed/failed/skipped
+      # 与外部排除；完整日志仍以 artifact 为准（此步不改变 job 成败）。
+      - name: Publish summary to job page
+        if: always()
+        run: |
+          if [ -f .tmp/ci/reports/summary.md ]; then
+            cat .tmp/ci/reports/summary.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "未生成 .tmp/ci/reports/summary.md（ci.py 未执行到收尾或阶段被中断）" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      # 失败/超时/无用例也保留报告；只按白名单上传日志与 JUnit/摘要。
+      # pytest 工作目录固定为 .tmp/ci/pytest-tmp（报告目录之外），不会混入转换夹具。
+      - name: Upload CI reports
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: ci-reports-${{ runner.os }}-py${{ matrix.python-version }}
+          path: |
+            .tmp/ci/reports/checks.log
+            .tmp/ci/reports/pytest.log
+            .tmp/ci/reports/junit.xml
+            .tmp/ci/reports/summary.json
+            .tmp/ci/reports/summary.md
+            .tmp/ci/reports/ruff.log
+          if-no-files-found: warn
+          include-hidden-files: true
+          retention-days: 14

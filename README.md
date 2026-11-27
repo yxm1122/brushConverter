@@ -58,7 +58,7 @@ Bring your favorite Photoshop brushes to Krita. Convert ABR sets into import-rea
 ## 继续阅读
 
 - 普通用户：[用户指南](<docs/user-guide.md>) → [导入 Krita](<docs/user-guide.md#import-krita>) → [按现象排错](<docs/troubleshooting.md>)。
-- 维护者：[开发指南与文档索引](<docs/developer-guide.md>)、[参数映射参考](<docs/parameter-mapping.md>)、[验证体系说明](<docs/验证体系使用说明.md>)。
+- 维护者：[开发指南与文档索引](<docs/developer-guide.md>)、[参数映射参考](<docs/parameter-mapping.md>)、[验证体系说明](<docs/验证体系使用说明.md>)、[CI 与覆盖边界](<docs/ci.md>)。
 - 升级与版本差异：[版本说明](<releases/RELEASE_NOTES.md>)；当前源码不等于正式下载包，不能仅凭产物文件名判断来源。
 
 项目的 MIT 许可不代表原始笔刷素材的许可；请只转换和分享你有权使用、分发的素材。
