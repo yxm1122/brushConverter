@@ -26,7 +26,7 @@ def root() -> Path:
     WORK.mkdir(parents=True, exist_ok=True)
     root = Path(tempfile.mkdtemp(prefix="case-", dir=WORK))
     put(root, "README.md", "# brushConverter\nA brush conversion tool for Krita.\n"
-        "已发布 v1.5.0 · [下载](https://example.invalid/releases/tag/v1.5.0)\n"
+        "已发布 v1.6.0 · [下载](https://example.invalid/releases/tag/v1.6.0)\n"
         "## 已知限制（摘要）\n见用户指南。\n## 升级必读\n请重转。\n")
     put(root, "docs/user-guide.md", "# 用户指南\nAn introduction to brush conversion.\n" +
         "\n".join(f'<a id="{key}"></a>' for key in docs.STABLE_ANCHORS["docs/user-guide.md"]))
@@ -36,14 +36,27 @@ def root() -> Path:
     put(root, "docs/parameter-mapping.md", "# 参数参考\n" +
         "\n".join(f"## {i}. 参考章节" for i in range(1, 11)) + "\n" +
         "\n".join(f'<a id="{key}"></a>' for key in docs.STABLE_ANCHORS["docs/parameter-mapping.md"]))
-    put(root, "releases/RELEASE_NOTES.md", "# brushConverter v1.6.0（候选 · 待发布，未发布）\n"
-        "This candidate is not released.\n" +
+    put(root, "releases/RELEASE_NOTES.md", "# brushConverter v1.6.0（2026-11-27）\n"
+        "This release was published on 2026-11-27.\n" +
         "\n".join(f"## {title}\n最终数据待回填。" for title in
                     ("主要变化", "升级注意", "已知限制", "验证", "回退方式")) +
         "\n# brushConverter v1.5.0（2026-11-23）\n旧发布段冻结，不必强行套新模板。\n")
     old, new = docs.COMPATIBILITY[0]
     put(root, new, "# 旧标题\n## 原章节\n旧事实只作历史。\n")
     put(root, old, "# 旧标题\n## 原章节\n[归档原文](<归档/" + Path(new).name + ">)\n")
+    return root
+
+
+@pytest.fixture
+def candidate(root, monkeypatch):
+    """候选门的虚构版本夹具，不代表项目已立项下一版本。"""
+    monkeypatch.setattr(docs, "CANDIDATE", "v9.9.0")
+    path = root / "releases/RELEASE_NOTES.md"
+    text = path.read_text(encoding="utf-8").replace(
+        "# brushConverter v1.6.0（2026-11-27）",
+        "# brushConverter v9.9.0（候选 · 待发布，未发布）", 1).replace(
+        "This release was published on 2026-11-27.", "This candidate is not released.", 1)
+    path.write_text(text, encoding="utf-8")
     return root
 
 
@@ -70,7 +83,7 @@ def test_relative_root_reference_html_and_unicode_links(root):
     put(root, "docs/中文 空白 (一).md", "# 中文 标题\n重复标题\n---\n")
     path = put(root, "docs/入口.md", "# 入口\n"
         "[文件相对](<中文 空白 (一).md#中文-标题>)\n"
-        "[根相对](<docs/%E4%B8%AD%E6%96%87%20%E7%A9%BA%E7%99%BD%20(%E4%B8%80).md#中文-标题>)\n"
+        "[根相对](</docs/%E4%B8%AD%E6%96%87%20%E7%A9%BA%E7%99%BD%20(%E4%B8%80).md#中文-标题>)\n"
         "[带标题](<中文 空白 (一).md> \"说明\")\n"
         "[名称含[中括号]](<中文 空白 (一).md#重复标题>)\n"
         "[引用][目标]\n[目标]: <中文 空白 (一).md#中文-标题> \"引用标题\"\n"
@@ -88,11 +101,13 @@ def test_parentheses_escaped_and_image_links(root):
     assert docs.check_paths(root, [path]) == []
 
 
-def test_root_relative_priority_is_explicit(root):
+def test_current_links_follow_file_relative_resolution(root):
     put(root, "同名.md", "# 根目录\n")
     put(root, "docs/同名.md", "# 文件目录\n")
-    path = put(root, "docs/入口.md", "[根优先](同名.md#根目录)\n[明确文件相对](./同名.md#文件目录)\n")
-    # 162合同是根优先；明确 ./ 仍按同一规则，避免悄悄切换解析口径。
+    path = put(root, "docs/入口.md", "[文件相对](同名.md#文件目录)\n"
+        "[明确文件相对](./同名.md#文件目录)\n[父目录](../同名.md#根目录)\n")
+    assert docs.check_paths(root, [path]) == []
+    path.write_text("[错误锚点](同名.md#根目录)\n", encoding="utf-8")
     assert rules(root, path) == {"D_ANCHOR_MISSING"}
 
 
@@ -171,21 +186,21 @@ def test_internal_snapshots_and_evidence_are_not_live_instructions(root):
     assert docs.main(["--check", "--root", str(root)]) == 1
 
 
-def test_wrong_release_version_and_candidate_status(root, capsys):
+def test_wrong_released_version_is_rejected(root, capsys):
     path = root / "README.md"
-    path.write_text(path.read_text(encoding="utf-8").replace("已发布 v1.5.0", "已发布 v1.6.0"), encoding="utf-8")
+    path.write_text(path.read_text(encoding="utf-8").replace("已发布 v1.6.0", "已发布 v1.5.0"), encoding="utf-8")
     before = snapshot(root)
     assert docs.main(["--check", "--root", str(root)]) == 1
     assert snapshot(root) == before
     output = capsys.readouterr().out
     assert "README.md:1 [D_VERSION]" in output
-    assert "[D_CANDIDATE]" in output
+    assert "[D_CANDIDATE]" not in output
 
 
-@pytest.mark.parametrize("addition", ["发布日期：2026-12-01", "tag: v1.6.0",
-                                      "[候选下载](https://example.invalid/releases/tag/v1.6.0)",
-                                      "[候选资产](https://example.invalid/releases/download/v1.6.0/a.zip)"])
-def test_candidate_must_not_pretend_published(root, addition):
+@pytest.mark.parametrize("addition", ["发布日期：2026-12-01", "tag: v9.9.0",
+                                      "[候选下载](https://example.invalid/releases/tag/v9.9.0)",
+                                      "[候选资产](https://example.invalid/releases/download/v9.9.0/a.zip)"])
+def test_candidate_must_not_pretend_published(root, candidate, addition):
     path = root / "releases/RELEASE_NOTES.md"
     text = path.read_text(encoding="utf-8").replace("## 主要变化", addition + "\n## 主要变化", 1)
     path.write_text(text, encoding="utf-8")
@@ -203,7 +218,7 @@ def test_required_section_must_exist_and_not_be_empty(root):
 
 def test_abstract_missing_and_old_sections_are_frozen(root):
     path = root / "releases/RELEASE_NOTES.md"
-    text = path.read_text(encoding="utf-8").replace("This candidate is not released.", "候选简介待补。")
+    text = path.read_text(encoding="utf-8").replace("This release was published on 2026-11-27.", "版本简介待补。")
     path.write_text(text, encoding="utf-8")
     assert any(i.rule == "D_ABSTRACT" and i.file == "releases/RELEASE_NOTES.md" for i in docs.check_contract(root))
 
@@ -253,10 +268,10 @@ def test_tracked_public_history_still_checks_real_links(root, monkeypatch):
     assert path in docs.discover(root)
 
 
-def test_candidate_inline_tag_is_a_fact_not_a_command_example(root):
+def test_candidate_inline_tag_is_a_fact_not_a_command_example(root, candidate):
     path = root / "releases/RELEASE_NOTES.md"
     tick = chr(96)
-    text = path.read_text(encoding="utf-8").replace("## 主要变化", f"tag: {tick}v1.6.0{tick}\n## 主要变化", 1)
+    text = path.read_text(encoding="utf-8").replace("## 主要变化", f"tag: {tick}v9.9.0{tick}\n## 主要变化", 1)
     path.write_text(text, encoding="utf-8")
     assert any(i.rule == "D_CANDIDATE" for i in docs.check_contract(root))
 
@@ -313,9 +328,9 @@ def test_required_section_can_contain_subheadings(root):
     assert not any(i.rule == "D_SECTION" for i in docs.check_contract(root))
 
 
-def test_english_published_claim_cannot_contradict_chinese(root):
+def test_english_published_claim_cannot_contradict_chinese(root, candidate):
     path = root / "README.md"
-    text = path.read_text(encoding="utf-8").replace("A brush conversion tool for Krita.", "Published version: v1.6.0.")
+    text = path.read_text(encoding="utf-8").replace("A brush conversion tool for Krita.", "Published version: v9.9.0.")
     path.write_text(text, encoding="utf-8")
     assert any(i.rule == "D_CANDIDATE" for i in docs.check_contract(root))
 
@@ -329,16 +344,16 @@ def test_comment_opener_in_fence_cannot_hide_later_links(root):
 def test_published_inline_version_and_code_only_section_are_valid(root):
     tick = chr(96)
     path = root / "README.md"
-    path.write_text(path.read_text(encoding="utf-8").replace("已发布 v1.5.0", f"已发布 {tick}v1.5.0{tick}"), encoding="utf-8")
+    path.write_text(path.read_text(encoding="utf-8").replace("已发布 v1.6.0", f"已发布 {tick}v1.6.0{tick}"), encoding="utf-8")
     path = root / "releases/RELEASE_NOTES.md"
     text = path.read_text(encoding="utf-8").replace("## 回退方式\n最终数据待回填。", f"## 回退方式\n{tick}git checkout v1.5.0{tick}")
     path.write_text(text, encoding="utf-8")
     assert docs.check_contract(root) == []
 
 
-def test_non_template_current_page_still_obeys_candidate_red_lines(root):
-    put(root, "docs/其它现行指南.md", "# 指南\n已发布 v1.6.0\n"
-        "[候选下载](https://example.invalid/releases/tag/v1.6.0)\n")
+def test_non_template_current_page_still_obeys_candidate_red_lines(root, candidate):
+    put(root, "docs/其它现行指南.md", "# 指南\n已发布 v9.9.0\n"
+        "[候选下载](https://example.invalid/releases/tag/v9.9.0)\n")
     issues = docs.check_contract(root)
     assert sum(i.file == "docs/其它现行指南.md" and i.rule == "D_CANDIDATE" for i in issues) == 2
 
@@ -352,3 +367,82 @@ def test_non_template_current_page_still_obeys_candidate_red_lines(root):
 def test_static_notation_rule_does_not_exempt_other_links(root, name, link):
     path = put(root, name, "# 真实链接仍检查\n" + link + "\n")
     assert "D_LINK_MISSING" in rules(root, path)
+
+
+def test_released_notes_allow_release_date_tag_and_download(root):
+    assert docs.CANDIDATE is None
+    path = root / "releases/RELEASE_NOTES.md"
+    text = path.read_text(encoding="utf-8").replace("## 主要变化",
+        "发布日期：2026-11-27\ntag: v1.6.0\n"
+        "[正式下载](https://example.invalid/releases/tag/v1.6.0)\n## 主要变化", 1)
+    path.write_text(text, encoding="utf-8")
+    assert docs.check_contract(root) == []
+
+
+@pytest.mark.parametrize("claim", ["v1.6.0 未发布", "v1.6.0（候选 · 待发布，未发布）",
+                                    "unreleased v1.6.0", "v1.6.0 is an unpublished candidate."])
+def test_released_version_cannot_keep_unreleased_status(root, claim):
+    put(root, "docs/其它现行指南.md", "# 指南\n" + claim + "\n")
+    assert any(i.rule == "D_RELEASE_STATUS" for i in docs.check_contract(root))
+
+
+@pytest.mark.parametrize("explanation", [
+    "构建状态unreleased不表示 v1.6.0 尚未发布。",
+    "It does not mean v1.6.0 is unreleased.",
+])
+def test_build_marker_explanation_is_not_a_stale_release_claim(root, explanation):
+    put(root, "docs/构建状态.md", "# 构建状态\n" + explanation + "\n")
+    assert docs.check_contract(root) == []
+
+
+def test_current_link_does_not_fall_back_to_repository_root(root):
+    put(root, "tools/privacy_scan.py", "# 合成工具\n")
+    path = put(root, "docs/入口.md", "[误写](tools/privacy_scan.py)\n")
+    assert rules(root, path) == {"D_LINK_MISSING"}
+    path.write_text("[正确](../tools/privacy_scan.py)\n", encoding="utf-8")
+    assert docs.check_paths(root, [path]) == []
+
+
+def test_legacy_research_root_resolution_is_read_only(root):
+    put(root, "tools/old.py", "# 合成工具\n")
+    path = put(root, "docs/研究报告/历史.md", "# 历史\n[旧根路径](tools/old.py)\n")
+    before = snapshot(root)
+    assert docs.check_paths(root, [path]) == []
+    assert snapshot(root) == before
+
+
+def test_one_shot_acceptance_reports_are_not_maintained_but_targets_are_checked(root, monkeypatch):
+    path = put(root, "docs/验收报告/已公开.md", "# 当时结论\n[旧断链](不存在.md)\nv1.6.0 未发布\n")
+    monkeypatch.setattr(docs, "_tracked_reports", lambda repo: {"docs/验收报告/已公开.md"})
+    before = snapshot(root)
+    assert path not in docs.discover(root)
+    assert docs.main(["--check", "--root", str(root)]) == 0
+    assert snapshot(root) == before
+    live = put(root, "docs/现行.md", "[原证据](验收报告/已公开.md#当时结论)\n")
+    assert docs.check_paths(root, [live]) == []
+    live.write_text("[坏章节](验收报告/已公开.md#不存在)\n", encoding="utf-8")
+    assert rules(root, live) == {"D_ANCHOR_MISSING"}
+
+
+@pytest.mark.parametrize("prefix", ["", "\n<!-- published documentation -->\n"])
+def test_release_status_check_handles_heading_after_comments(root, prefix):
+    path = root / "releases/RELEASE_NOTES.md"
+    text = path.read_text(encoding="utf-8").replace(
+        "This release was published on 2026-11-27.", "This is unreleased v1.6.0.", 1)
+    path.write_text(prefix + text, encoding="utf-8")
+    assert any(i.rule == "D_RELEASE_STATUS" for i in docs.check_contract(root))
+
+
+def test_candidate_unpublished_description_is_not_a_release_claim(root, candidate):
+    path = root / "releases/RELEASE_NOTES.md"
+    text = path.read_text(encoding="utf-8").replace(
+        "This candidate is not released.", "Unpublished version: v9.9.0.", 1)
+    path.write_text(text, encoding="utf-8")
+    assert docs.check_contract(root) == []
+
+
+def test_old_release_status_is_not_rewritten_by_current_contract(root):
+    path = root / "releases/RELEASE_NOTES.md"
+    text = path.read_text(encoding="utf-8") + "\n## 当时计划\nv1.6.0 未发布\n"
+    path.write_text(text, encoding="utf-8")
+    assert docs.check_contract(root) == []

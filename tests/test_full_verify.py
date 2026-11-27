@@ -6,11 +6,12 @@
 2. 总览行与任务 01 契约完全一致（字段次序、全角竖线、跳过提示、skip 不计入通过）；
 3. 退出码 0/1/2 的换算；
 4. 归档文件名带时间戳且同名加序号不覆盖；归档内容含总览表/环境三行/摘要行；
-5. feel 子清单合并进顶层 manifest：条数对账 = 合并前 + 新增，且幂等（重复合并新增 0），每项 11 字段。
+5. feel 合并按四源对账；新增/历史三源迁移与重复合并字节幂等均使用工作区合成夹具，不写真实基准。
 """
 
 import json
 import sys
+import tempfile
 from pathlib import Path
 
 import pytest
@@ -93,9 +94,9 @@ def test_exit_codes():
     assert verify_all.decide_overall_exit_code(empty_results) == 2
 
 
-def test_archive_name_has_timestamp_and_never_overwrites(tmp_path, monkeypatch):
+def test_archive_name_has_timestamp_and_never_overwrites(workspace_tmp_path, monkeypatch):
     """归档文件名带时间戳；同一时间戳重复运行加 -2、-3，不覆盖历史。"""
-    monkeypatch.setattr(verify_all, "ARCHIVE_DIR", tmp_path)
+    monkeypatch.setattr(verify_all, "ARCHIVE_DIR", workspace_tmp_path)
     first = verify_all.archive_path("20260101-000000")
     assert first.name == "verify-20260101-000000.md"
     first.write_text("# 第一次", encoding="utf-8")
@@ -125,50 +126,181 @@ def test_archive_content_has_summary_table_and_environment():
     assert "Krita：未检测到" in text and "Photoshop：未检测到" in text
 
 
+@pytest.fixture
+def workspace_tmp_path():
+    """每个磁盘夹具独占全新工作区 .tmp 子目录；不接触真实基准或系统临时目录。"""
+    work = (REPO_ROOT / ".tmp").resolve()
+    if not work.is_relative_to(REPO_ROOT):
+        raise RuntimeError("合成夹具目录越出工作区，停止")
+    work.mkdir(exist_ok=True)
+    return Path(tempfile.mkdtemp(prefix="verify-merge-", dir=work))
+
+
 def _write_png(path, alpha=255, size=(4, 4)):
     path.parent.mkdir(parents=True, exist_ok=True)
     Image.new("RGBA", size, (0, 0, 0, alpha)).save(path, "PNG")
 
 
-def test_merge_feel_manifest_reconciles_and_is_idempotent(tmp_path):
-    """合并条数对账：合并后 = 合并前 + 新增；重复合并新增 0；每项 11 字段齐全。"""
-    bases = tmp_path / "baselines"
-    feel_dir = bases / "feel"
-    _write_png(feel_dir / "feel__a__p1.00__s200x200.png")
-    _write_png(feel_dir / "feel__b__p1.00__s200x200.png")
-    _write_png(bases / "ps" / "ps__old.png")
-    top = bases / "manifest.json"
-    top.write_text(json.dumps({
+def _write_json(path, data):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
+def _item(source, filename):
+    return {"file": source + "/" + filename, "source": source, "size": "4x4",
+            "pressure": None, "mode": None, "depth": None, "brightness": None,
+            "contrast": None, "status": None, "alpha_nonzero": 16, "note": "原始合成条目"}
+
+
+def _feel_entry(filename):
+    return {"preset": "a.kpp", "brush": "a", "pressure": 1.0, "file": filename,
+            "curve_file": "a.json", "size": "4x4", "stroke_length": 120,
+            "alpha_nonzero": 9999}  # 新增时必须读 PNG，不抄这个故意错误的值。
+
+
+def _four_source_fixture(root):
+    """合成与发布前相同的 341=298+29+2+12 规模，不读写仓库真实清单。"""
+    counts = {"ps": 298, "krita": 29, "handmade": 2, "feel": 12}
+    items = [_item(source, "%s__%03d.png" % (source, index))
+             for source, count in counts.items() for index in range(count)]
+    specs = {"ps": "images", "krita": "items", "handmade": "entries", "feel": "items"}
+    top_data = {
         "schema": "brushconverter.baseline.manifest/v1",
-        "counts": {"total": 1, "ps": 1, "krita": 0, "handmade": 0},
-        "items": [{"file": "ps/ps__old.png", "source": "ps", "size": "4x4",
-                   "pressure": None, "mode": None, "depth": None, "brightness": None,
-                   "contrast": None, "status": None, "alpha_nonzero": 16, "note": "旧条目"}],
-    }, ensure_ascii=False, indent=1), encoding="utf-8")
-    feel = feel_dir / "manifest.json"
-    feel.write_text(json.dumps({
-        "schema_version": 1, "pressure_injected": True,
-        "items": [
-            {"preset": "a.kpp", "brush": "a", "pressure": 1.0, "file": "feel__a__p1.00__s200x200.png",
-             "curve_file": "a.json", "size": "200x200", "stroke_length": 120, "alpha_nonzero": 16},
-            {"preset": "b.kpp", "brush": "b", "pressure": 1.0, "file": "feel__b__p1.00__s200x200.png",
-             "curve_file": "b.json", "size": "200x200", "stroke_length": 120, "alpha_nonzero": 16},
-        ],
-    }, ensure_ascii=False, indent=1), encoding="utf-8")
+        "merged_at": "2026-01-01T00:00:00+08:00", "merged_by": "原始合成写者",
+        "field_spec": {"source": "ps / krita / handmade / feel"},
+        "counts": {"total": 341, **counts, "reconciliation": "341 = 298 + 29 + 2 + 12"},
+        "sources": {source: {"manifest": "tests/baselines/%s/manifest.json" % source,
+                             "list_key": specs[source], "count": count}
+                    for source, count in counts.items()},
+        "items": items, "merge_history": [{"by": "历史记录", "added": 12}],
+        "note": "保留原注释", "superseded": "保留原来源声明",
+    }
+    top_data["sources"]["feel"].update(upgraded_to_source=True, note="独立手感来源")
+    top = root / "baselines" / "manifest.json"
+    feel = top.parent / "feel" / "manifest.json"
+    feel_data = {"schema_version": 1, "pressure_injected": True,
+                 "items": [_feel_entry("feel__%03d.png" % i) for i in range(12)]}
+    _write_json(top, top_data)
+    _write_json(feel, feel_data)
+    return top, feel, top_data, feel_data
+
+
+def test_merge_feel_manifest_reconciles_and_is_idempotent(workspace_tmp_path):
+    """新增走 feel 正式来源；重复合并保持字节、mtime、时间戳及历史不变。"""
+    bases = workspace_tmp_path / "baselines"
+    filenames = ["feel__a__p1.00__s200x200.png", "feel__b__p1.00__s200x200.png"]
+    for filename in filenames:
+        _write_png(bases / "feel" / filename)
+    top = bases / "manifest.json"
+    _write_json(top, {"schema": "brushconverter.baseline.manifest/v1",
+                     "counts": {"total": 1, "ps": 1, "krita": 0, "handmade": 0},
+                     "items": [_item("ps", "ps__old.png")]})
+    feel = bases / "feel" / "manifest.json"
+    _write_json(feel, {"items": [_feel_entry(filename) for filename in filenames]})
 
     first = verify_all.merge_feel_manifest(top, feel)
-    assert first["before_total"] == 1
-    assert first["added"] == 2
-    assert first["after_total"] == 3
+    assert first["before_total"] == 1 and first["added"] == 2 and first["after_total"] == 3
+    assert first["changed"] and first["migrated"] == 0
     assert first["reconciliation"] == "3 = 合并前 1 + 新增 2"
     merged = json.loads(top.read_text(encoding="utf-8"))
-    assert merged["counts"]["total"] == 3
-    assert merged["counts"]["reconciliation"] == "3 = 1 + 2 + 0"
+    assert merged["counts"] == {"total": 3, "ps": 1, "krita": 0, "handmade": 0,
+                                "feel": 2, "reconciliation": "3 = 1 + 0 + 0 + 2"}
+    assert {source: row["count"] for source, row in merged["sources"].items()} == {
+        "ps": 1, "krita": 0, "handmade": 0, "feel": 2}
     for item in merged["items"]:
         assert list(item.keys()) == verify_all.FIELD_ORDER
-    assert all(item["alpha_nonzero"] > 0 for item in merged["items"])
-
+        assert item["alpha_nonzero"] == 16
+    before_bytes, before_mtime = top.read_bytes(), top.stat().st_mtime_ns
     second = verify_all.merge_feel_manifest(top, feel)
-    assert second["added"] == 0
-    assert second["duplicates_skipped"] == 2
-    assert second["after_total"] == 3
+    assert second["added"] == 0 and second["duplicates_skipped"] == 2
+    assert second["after_total"] == 3 and not second["changed"]
+    assert top.read_bytes() == before_bytes and top.stat().st_mtime_ns == before_mtime
+    assert json.loads(top.read_text(encoding="utf-8")) == merged
+
+
+def test_four_source_341_manifest_repeat_is_byte_identical(workspace_tmp_path, monkeypatch):
+    """当前四源规模的合成副本 341 条全部保留；无新增不触碰 PNG 或元数据。"""
+    top, feel, original, _feel_data = _four_source_fixture(workspace_tmp_path)
+    before_bytes, before_mtime = top.read_bytes(), top.stat().st_mtime_ns
+    monkeypatch.setattr(verify_all, "_alpha_nonzero", lambda _path: pytest.fail("重复项不应重读 PNG"))
+    for _ in range(2):
+        result = verify_all.merge_feel_manifest(top, feel)
+        assert result["added"] == result["migrated"] == 0
+        assert result["duplicates_skipped"] == 12 and result["after_total"] == 341
+        assert not result["changed"]
+        assert top.read_bytes() == before_bytes and top.stat().st_mtime_ns == before_mtime
+        assert json.loads(top.read_text(encoding="utf-8")) == original
+
+
+def test_new_feel_preserves_all_341_existing_items(workspace_tmp_path):
+    top, feel, original, child = _four_source_fixture(workspace_tmp_path)
+    child["items"].append(_feel_entry("feel__new.png"))
+    _write_json(feel, child)
+    _write_png(feel.parent / "feel__new.png")
+    result = verify_all.merge_feel_manifest(top, feel)
+    assert result["added"] == 1 and result["duplicates_skipped"] == 12
+    merged = json.loads(top.read_text(encoding="utf-8"))
+    assert merged["items"][:341] == original["items"]
+    assert merged["items"][341]["source"] == "feel"
+    assert merged["items"][341]["alpha_nonzero"] == 16
+    assert merged["counts"] == {"total": 342, "ps": 298, "krita": 29, "handmade": 2,
+                                "feel": 13, "reconciliation": "342 = 298 + 29 + 2 + 13"}
+    for source in ("ps", "krita", "handmade", "feel"):
+        assert merged["sources"][source]["count"] == merged["counts"][source]
+    assert merged["merge_history"][:-1] == original["merge_history"]
+    assert merged["note"] == original["note"] and merged["superseded"] == original["superseded"]
+    before_bytes, before_mtime = top.read_bytes(), top.stat().st_mtime_ns
+    again = verify_all.merge_feel_manifest(top, feel)
+    assert not again["changed"] and again["added"] == 0
+    assert top.read_bytes() == before_bytes and top.stat().st_mtime_ns == before_mtime
+
+
+def test_legacy_three_source_feel_prefix_migrates_once(workspace_tmp_path):
+    """旧三源只迁移 feel/ 的 krita 项；旧历史/像素登记不动，四源按已入顶层计数。"""
+    bases = workspace_tmp_path / "baselines"
+    top, feel = bases / "manifest.json", bases / "feel" / "manifest.json"
+    old_feel = _item("feel", "feel__old.png")
+    old_feel["source"] = "krita"
+    old_history = [{"at": "2026-01-01", "by": "task-15", "added": 1}]
+    original_items = [_item("ps", "ps__old.png"), _item("krita", "krita__old.png"), old_feel]
+    _write_json(top, {
+        "field_spec": {"source": "ps / krita / handmade"},
+        "counts": {"total": 3, "ps": 1, "krita": 2, "handmade": 0,
+                   "reconciliation": "3 = 1 + 2 + 0"},
+        "sources": {"krita": {"count": 2, "note": "含任务14合入的手感基线 12 张（来源子清单 tests/baselines/feel/manifest.json）"},
+                    "feel": {"count": 1, "merged_as_source": "krita", "custom": "保留"}},
+        "items": original_items, "merge_history": old_history,
+    })
+    # 缺失 PNG 的未入顶层项不能用子清单长度冒充 sources.feel.count。
+    _write_json(feel, {"items": [_feel_entry("feel__old.png"), _feel_entry("feel__missing.png")]})
+    result = verify_all.merge_feel_manifest(top, feel)
+    assert result["added"] == 0 and result["migrated"] == 1 and result["changed"]
+    merged = json.loads(top.read_text(encoding="utf-8"))
+    assert merged["items"][:2] == original_items[:2]
+    expected_feel = dict(old_feel, source="feel")
+    assert merged["items"][2] == expected_feel
+    assert merged["counts"] == {"total": 3, "ps": 1, "krita": 1, "handmade": 0,
+                                "feel": 1, "reconciliation": "3 = 1 + 1 + 0 + 1"}
+    assert merged["sources"]["krita"]["count"] == 1 and "note" not in merged["sources"]["krita"]
+    assert merged["sources"]["feel"]["count"] == 1
+    assert merged["sources"]["feel"]["upgraded_to_source"] is True
+    assert "merged_as_source" not in merged["sources"]["feel"]
+    assert merged["sources"]["feel"]["custom"] == "保留"
+    assert merged["field_spec"]["source"] == "ps / krita / handmade / feel"
+    assert merged["merge_history"][:-1] == old_history
+    assert merged["merge_history"][-1]["migrated"] == 1
+    before_bytes, before_mtime = top.read_bytes(), top.stat().st_mtime_ns
+    again = verify_all.merge_feel_manifest(top, feel)
+    assert again["migrated"] == 0 and not again["changed"]
+    assert top.read_bytes() == before_bytes and top.stat().st_mtime_ns == before_mtime
+
+
+def test_merge_unknown_source_fails_without_rewriting(workspace_tmp_path):
+    top = workspace_tmp_path / "baselines" / "manifest.json"
+    feel = top.parent / "feel" / "manifest.json"
+    _write_json(top, {"items": [_item("unknown", "unrecognised.png")]})
+    _write_json(feel, {"items": []})
+    before = top.read_bytes()
+    with pytest.raises(ValueError, match="未知 source"):
+        verify_all.merge_feel_manifest(top, feel)
+    assert top.read_bytes() == before

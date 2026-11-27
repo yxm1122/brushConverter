@@ -1,9 +1,9 @@
 # brushConverter 项目结构与原理
 
-> **English abstract**: Maintainer reference for the ABR-to-Krita pipeline, its evidence trail, and reproducible checks. The published version is v1.5.0; v1.6.0 remains an unpublished candidate. Historical reports are not current acceptance results.
+> **English abstract**: Maintainer reference for the ABR-to-Krita pipeline, its evidence trail, and reproducible checks. Version v1.6.0 was officially released on 2026-11-27; 30 human acceptance items passed and six unverified items were conditionally waived, not marked as passed. Historical reports are not current acceptance results.
 >
 > 面向维护者：按主题查找现行实现、历史原证据与复核入口。逐字段说明以[参数映射](<parameter-mapping.md>)为准，版本变更以[发布说明](<../releases/RELEASE_NOTES.md>)为准。
-> **版本边界**：已发布v1.5.0；当前源版本已冻结为1.6.0，仍是未发布候选，合并第五轮149A/153与本轮逐支选项、事务、元信息/标签/追溯。候选 exe 已在本机构建并冻结待 187 验收，但未发布；历史实验不是本轮新回归，真实效果仍待 187。
+> **版本边界**：v1.6.0已于2026-11-27正式发布，合并第五轮149A/153与逐支选项、事务、元信息/标签/追溯；两份冻结构建已作为正式附件发布。187人工验收30项通过；E4、E6、F1、F3、F4、G3六项未验、条件性放行，不写通过。历史实验不是本次文档修订的新回归；精确验收范围、已知问题及隐私裁决以[发布说明](<../releases/RELEASE_NOTES.md>)首段为准。
 
 ## 0. 文档索引（先看这里）
 
@@ -33,12 +33,12 @@
 | 参数语义的静态/动态依据 | [PS逆向静态](<研究报告/ps-逆向-静态.md>)、[动态](<研究报告/ps-逆向-动态.md>)、[参考实现](<研究报告/ps-纹理公式-参考实现.md>) | 参数语义证据与数据拟合的像素公式分开；未定位消费端不等于没有像素作用 |
 | 缩放/深度（v1.2.1历史归因） | [缩放深度归因实验](<研究报告/缩放深度-归因实验.md>) | 当时缩放残差不是当前现状：v1.5.0已落地>100%预缩放，剩余边界看[参数§10](<parameter-mapping.md#residual-current>) |
 | Krita渲染通路 | [kritarunner可行性](<研究报告/krita-runner-可行性.md>) | 记录5.3.3无头落笔失败与GUI路线A；本轮未重渲，不承诺其它版本 |
-| 候选新增与旧结论勘误 | [149A报告](<验收报告/149A-报告.md>)、[152报告](<验收报告/152-报告.md>)、[153报告](<验收报告/153-报告.md>) | 单随机源、B9错配更正、B10预烘焙；当前残差仍以参数§10和数据真相为准 |
+| 第五轮历史候选新增与旧结论勘误 | [149A报告](<验收报告/149A-报告.md>)、[152报告](<验收报告/152-报告.md>)、[153报告](<验收报告/153-报告.md>) | 单随机源、B9错配更正、B10预烘焙；当前残差仍以参数§10和数据真相为准 |
 | 历史方案 | [初版映射](<归档/mapping-proposal.md>)、[纹理方案](<归档/texture-mapping-proposal.md>)、[可行性](<归档/feasibility.md>)、[文档对齐报告](<归档/文档对齐报告.md>) | 已被取代或阶段性报告，不据此恢复GBR、legacy、旧系数或旧生产路径；见[归档说明](<归档/维护参考与归档说明.md>) |
 
 ### 0.3 验收证据（证据归档，非上手必读；编号对应内部任务书）
 
-- [验收报告索引](<验收报告/INDEX.md>)与[研究报告索引](<研究报告/INDEX.md>)由原生成器维护；报告是“当时测出了什么”，不是“现在已通过什么”。不重排旧编号、不重写旧数据；勘误须说明原结论、失效范围、根因和新证据。
+- [验收报告索引](<验收报告/INDEX.md>)与[研究报告索引](<研究报告/INDEX.md>)由原生成器维护；验收报告是一次性只读历史，记录“当时测出了什么”，不是持续维护的现状页。后续勘误在现行参考文档说明原结论、失效范围、根因与新证据，不回写验收报告正文、不重排旧编号或旧数据。
 - [验收归档目录](<验收报告/归档/>)保留三层验收记录；生成命令及退出码口径见[全量验收说明](<全量验收说明.md>)。历史实验图、JSON、kpp和二进制不因目录整齐而搬迁。
 - **公开索引使用已实现的 `--tracked-only` 模式**：只收录顶层、Git已跟踪且未声明为内部/仅本地/预写/原始证据的报告；本地报告不公开。两份索引已在文档汇合阶段由主会话串行生成，日常只读检查见§9。默认旧模式仍保留，不用于维护这两份公开INDEX；可见性过滤不等于隐私门或发布批准。
 
@@ -68,11 +68,11 @@
 - **已实现的生产链**：[逐支契约](<../src/brush_converter/export_options.py#L489-L549>) → [转换计划](<../src/brush_converter/convert.py>) → [安全事务](<../src/brush_converter/export_transaction.py>)。三项适用才默认开启；关闭进入独立原生替代，不恢复legacy或旧双随机源。采样笔尖补方/255不变，bundle与独立KPP均不再直接覆盖旧文件。
 - **已实现的接入**：[CLI](<../cli.py#L731-L805>)与[GUI](<../gui/main_window.py>)共用稳定ID、条件默认和实际运行摘要。GUI换源/重载重置，筛选/排序/语言保留隐藏选择；CLI显式JSON与源摘要校验，不按显示名猜身份。用户操作只维护在[用户指南](<user-guide.md>)。
 - **已实现的包格式**：[元信息模型](<../src/brush_converter/export_metadata.py>)与[写包/回读](<../src/brush_converter/kpp/bundle.py>)支持原生逐笔标签、包内追溯及v2身份；独立KPP不承载这套包信息。GUI空表单和不带metadata-file的CLI不是同口径，见§6。
-- **183 全量已通过，其余仍待验**：183 已于 2026-11-27 重跑 1149/0/0/0（两次一致），verify_all 235/0/0，四结构校验 exit 0；185真实分发物、186完整隐私门、187真实GUI/Krita编辑/标签筛选与重启及图片/二进制盲区仍待验，见§9。机器结构成功不自动放行这些环节。
+- **v1.6.0已完成发布，未验项如实保留**：183于2026-11-27全量1149/0/0/0（两次一致），verify_all235/0/0，四结构校验exit0；185已构建两附件，186源码/全部历史block=0，ZIP的14个block及未读项按裁决接受并披露。187人工30项通过、六项未验条件性放行，188已按批准对象发布；不将条件放行、人工自述或机器结构成功改写为全量人工通过。详细范围与D-2/D-6见发布说明首段。
 
 ### 0.7 归档与维护约定
 
-技术事实按主题查本页和参数参考，历史数据按原报告查。机器仍引用的证据原址逻辑归档，人工维护Markdown只有明确批准才能迁移；旧路径保留兼容入口、原标题锚点与行号对照。生成物不搬、不手改；内部资料不进公共索引。一次检查的退出码0不能替代未做的真实效果或全量发布门。
+技术事实按主题查本页和参数参考，历史数据按原报告查。验收报告正文一次性交付后只读，不因后续发版、勘误或链接规则变化维护回写；日常文档检查排除其正文，但现行文档指向报告的目标/锚点仍检查，目录README/INDEX仍作为维护入口检查。机器引用的原证据不迁移、不重排行号，现行勘误另述，不改原件。其他人工维护Markdown迁移须明确批准并保留旧路径/原标题锚点与行号对照；生成物不搬、不手改，内部资料不进公共索引。退出码0不能替代未做的真实效果或发布门。
 
 ---
 
@@ -168,15 +168,15 @@ v6.2 单笔尖项布局（对照 GIMP `gimpbrush-load.c`）：
 
 ```
 u32  item_size
-     [v6.2 跳过 301 字节]  (v6.1 跳过 47 字节)
-     [1+36 字节 UUID（Pascal 风格：1 字节长度 + ASCII）]
-4×i32 rect (top, left, bottom, right)
-i16  depth_bits   (8 或 16)
-i8   compress     (0=原始, 1=RLE)
-...  像素数据
+     [项头 skip 字节：v6.2=301，v6.1=47；UUID已包含在其中]
+     [项体+0为UUID长度，+1起为UUID；不额外再跳过1+36字节]
+4×i32 rect (top, left, bottom, right)  # 项体+skip
+u16  depth_bits   (8 或 16)            # 项体+skip+16
+u8   compress     (0=原始, 1=RLE)      # 项体+skip+18
+...  像素数据                         # 项体+skip+19
 ```
 
-笔尖宽高 = `right - left`、`bottom - top`。下一支笔尖位置 = `pos + 4 + round_up_to_4(item_size)`。
+项体从item_size之后开始（pos+4）；UUID从该处读取，矩形固定在pos+4+skip，不再额外加37字节。笔尖宽高=`right-left`、`bottom-top`；下一项位置=`pos+4+round_up_to_4(item_size)`，见[解析实现](<../src/brush_converter/abr/samples.py#L136-L162>)。
 
 v1/v2 旧布局：`u16 type`（1=计算笔刷跳过 / 2=采样）→ `u32 size` → `u32 misc` → `u16 spacing` → [v2: UCS-2 名称] → `u8 aa` → `4×i16 short bounds` → `4×i32 long bounds` → `u16 depth` → `u8 compress` → 数据。
 
@@ -239,12 +239,12 @@ Record = u32 len | 记录体（len 字节） | pad 到 4
 
 `map_presets(abr)` 把 desc 里的每个预设描述符转成一个 `BrushPreset` dataclass，字段包括：名称、间距、角度、圆度、硬度、直径、缩放、笔尖灰度数组、UUID、是否计算笔刷、各动态曲线、散布参数、未映射警告。
 
-映射后的 `BrushPreset` 在 `preset_xml.py` 序列化。下表为外观优先的条件默认口径；候选关闭后的原生字段/可调范围见[参数§2](<parameter-mapping.md>)及[用户取舍表](<user-guide.md#tradeoffs>)，不得把默认位图路径写成唯一生产承载。核心映射：
+映射后的 `BrushPreset` 在 `preset_xml.py` 序列化。下表为外观优先的条件默认口径；v1.6.0关闭后的原生字段/可调范围见[参数§2](<parameter-mapping.md>)及[用户取舍表](<user-guide.md#tradeoffs>)，不得把默认位图路径写成唯一生产承载。核心映射：
 
 | 类别 | ABR 源 | Krita 目标 |
 |------|--------|-----------|
 | 尺寸 | `Dmtr` | `scale = Dmtr / max(笔尖宽, 笔尖高)`；采样笔尖内嵌PNG以255居中补白为正方形（不改现行补白）；计算笔刷为硬度剖面生成的 `png_brush`（尺寸=PS 实际足印） |
-| 间距 | `Spcn`（#Prc） | 计算笔刷 `spacing = Spcn/100 × 标称直径/位图边长`；采样笔刷再乘短边/长边（见 `parameter-mapping.md` §1） |
+| 间距 | `Spcn`（#Prc） | 默认位图化计算笔刷：`spacing = Spcn/100 × Dmtr × clamp(Rndn/100,0.001,1) / edge`（edge为位图边长，圆度100%才可省圆度因子）；采样笔刷：`Spcn/100 × 原始短边/长边`；关闭位图化的原生分支为Spcn/100，见参数§1/§2 |
 | 角度 | `Angl`（度） | `angle = math.radians(Angl % 360)` |
 | 硬度（计算笔刷） | `Hrdn` | v1.5.0 起按 PS 剖面生成 `png_brush` 位图（`hardness_tip.build_tip`），不再写 `hfade/vfade`（Krita 里硬度不可再调） |
 | 压感→大小 | `szVr.bVTy==2` + `minimumDiameter` | `SizecommonCurve` |
@@ -257,7 +257,7 @@ Record = u32 len | 记录体（len 字节） | pad 到 4
 
 **控制源编码（bVTy）**：0=关、1=渐隐、2=压力、3=倾斜、4=转轮、**5=初始方向、6=笔划方向、7=速度、8=旋转**（v1.5.0 任务 134-3 按 124 A 级 9 值表修正；旧文档写的「5 旋转 / 6 方向 / 7 初始方向」是错的）。映射到 Krita 传感器：pressure（2）、drawingangle（6）、speed（7）、rotation（8）；5/1/3/4 未映射（Krita 同名传感器语义不等价：`fade`=时间渐隐、`ytilt`=倾侧、`tangentialpressure`=转轮）。旋转/散布的逐项换算（含 bVTy=0 纯随机抖动的 fuzzy 传感器、`RotationValue=min(1,jitter/50)`、散布 `ScatterValue=jitter/200`、随机度曲线归一化 `0,0;1,1;`，且旋转只写 **1 条** fuzzy 随机曲线、禁止 fuzzystroke）见 [`parameter-mapping.md`](parameter-mapping.md) §3、§5、§8。
 
-**计算笔刷**（无自带位图）：v1.5.0起默认按PS硬度剖面生成png_brush，尺寸为实际足印、硬度/fade不再按PS语义编辑。v1.6.0候选关闭位图化后走独立生产级 `_native_computed_brush_def`，而不是历史研究 `_computed_brush_def`；原生硬度可调但受1.00R、几何和满覆盖条件限制，结构自检不等于实机编辑通过。既有默认残差仍见参数§10。
+**计算笔刷**（无自带位图）：v1.5.0起默认按PS硬度剖面生成png_brush，尺寸为实际足印、硬度/fade不再按PS语义编辑。v1.6.0关闭位图化后走独立生产级 `_native_computed_brush_def`，而不是历史研究 `_computed_brush_def`；原生spacing=Spcn/100，不乘位图edge/圆度补偿，size为标称直径、ratio为圆度比。原生硬度可调但受1.00R、几何和满覆盖条件限制；结构自检不等于任意参数实机编辑通过。既有默认残差仍见参数§10。
 
 完整逐字段清单见 [`parameter-mapping.md`](parameter-mapping.md)。
 
@@ -330,10 +330,10 @@ PS 纹理深度无论是否接传感器都要设为 `true`；深度随压感（`
 - **`PatternMD5Sum` 存 hex md5**；`PatternMD5` 留空——Krita 5.0 曾在该字段写原始
   二进制导致非法 XML（Krita 官方 MR 修复），新版本以 `PatternMD5Sum` 为准。
 - 纹理枚举与逐模式口径以[模式总表](<数据/mode-table.json>)及[参数§7.2](<parameter-mapping.md#texture-modes-current>)为准：PS UI十项是8可映射/1需校准hardMix/1不可映射Drkn，不承诺全部支持；0.00%可能受饱和、退化或塌缩条件限制。
-- 亮度/对比度当前只有calibrated路径。v1.5.0已取消对比度min(2.0,k)写入截断，C>50写原值并提高序列化精度；UI滑块0..2不是读取上限。公式、精度、越界预烘焙与局限只在[参数§7.1](<parameter-mapping.md#texture-bc-current>)维护。
+- 亮度/对比度当前只有calibrated路径。v1.5.0取消的是对比度min(2.0,k)上限，contrast仍round(k,3)并保留非负防御；brightness在k≤2时round3、否则round9。XML整数纯十进制，非整数用:g六位有效数字；计算舍入不等于最终小数位数，UI滑块0..2也不是读取上限。完整公式、越界预烘焙与局限见[参数§7.1](<parameter-mapping.md#texture-bc-current>)及[实现](<../src/brush_converter/kpp/preset_xml.py#L380-L388>)、[序列化](<../src/brush_converter/kpp/preset_xml.py#L453-L462>)。
 - legacy旧公式和环境变量在v1.5.0已删除，没有运行时回退。Linear Height旧0.30基线/对比度倒数仅作历史；不得据[早期调研](<归档/photoshop-texture-brightness-contrast-research.md>)恢复。整体版本回退需明确授权并重转，不能把旧缺陷包装成开关。
 
-**v1.6.0候选：亮度越界区预烘焙（默认处理）**：有纹理且未截断亮度绝对值>1才适用，适用才默认开；显式关闭保留原生字段并按[-1,1]截断，不改成另一条烘焙链。C=−50且亮度绝对值>127只是旧实验切片。
+**v1.6.0：亮度越界区预烘焙（默认处理，源自第五轮历史候选）**：有纹理且未截断亮度绝对值>1才适用，适用才默认开；显式关闭保留原生字段并按[-1,1]截断，不改成另一条烘焙链。C=−50且亮度绝对值>127只是旧实验切片。
 转换器把 PS 的亮度/对比度/反相按 PS 8bit 链（C<0 先对比度后亮度 / C≥0 先亮度后对比度）烘进内嵌纹理 PNG，
 Krita字段的中性起点与hardMix满覆盖无压感偏置例外见[参数§7.1](<parameter-mapping.md#texture-bc-current>)；历史端到端12/12=0.000%/max0–1。代价：命中区纹理字段失去PS语义（再调会二次叠加），
 每 (b,c,invert) 一份纹理资源、旧 `.kpp` 必重转；非命中区仍走 calibrated 闭式解。依据：`docs/验收报告/153-报告.md`。
@@ -352,26 +352,27 @@ paintoppresets/*.kpp          自包含笔刷预设
 **v1.3.1 产物加固**（内容短哈希命名 / 覆盖防呆 / 回读校验 / 纹理计数，使用者批准的 4 条）：
 
 - **命名**：`<ABR名>_v<版本>_<8位逻辑内容哈希>.bundle`；短哈希便于定位，不是完整SHA-256或发布凭证。启用本轮元信息链后按v2身份涵盖meta/manifest/KPP，不能只看预设字节判同包。
-- **覆盖防呆**：候选由同一ExportTransaction保护bundle与独立KPP；复用不重写、冲突顺延，旧文件不删不覆盖。最终多文件交付非OS原子性；回滚/清理失败保留清单，不静默宣称全有或全无。
-- **回读校验**：v1.3.1旧接口把包校验结果放在ConvertResult.verify；候选暂存校验失败直接抛[ExportTransactionError](<../src/brush_converter/export_transaction.py#L803-L807>)并携事务清单，CLI退出3。成功交付/复用才取得回读结果；不能只看result.verify推断失败路径。
+- **覆盖防呆**：v1.6.0由同一ExportTransaction保护bundle与独立KPP；复用不重写、冲突顺延，旧文件不删不覆盖。最终多文件交付非OS原子性；回滚/清理失败保留清单，不静默宣称全有或全无。
+- **回读校验**：v1.3.1旧接口把包校验结果放在ConvertResult.verify；v1.6.0暂存校验失败直接抛[ExportTransactionError](<../src/brush_converter/export_transaction.py#L803-L807>)并携事务清单，CLI退出3。成功交付/复用才取得回读结果；不能只看result.verify推断失败路径。
 - **纹理计数**：「含真实纹理」口径 = `Texture/Pattern/Enabled=true` 且内嵌图案非 1×1（`count_real_textures`，GUI 摘要与回归共用）。
 
-### 5.5 原生元信息、逐笔标签、追溯与身份（v1.6.0候选）
+<a id="55-原生元信息逐笔标签追溯与身份v160候选"></a>
+### 5.5 原生元信息、逐笔标签、追溯与身份（v1.6.0）
 
 - **来源与许可**：[模型字段](<../src/brush_converter/export_metadata.py#L185-L202>)明确区分工具生成信息与素材信息。GUI/显式配置CLI采集包名、说明、可空作者/许可/包版本；来源只取文件名与源字节摘要，不读系统身份，不套项目MIT、不自动日期。默认说明为Converted from Photoshop ABR。模型底层的邮箱/网站/日期不是CLI表单入口，不能虚构相应参数。
 - **原生格式证据**：meta根为字面meta:meta；manifest每个paintoppresets条目内的tags/tag才是逐笔关联，包级meta-userdefined tag不能替代。目标已锁Krita5.3.3（git858d352）；文件结构与读取源码证据不等于用户界面/重启已通过。
 - **字段显示范围**：按目标源码，说明/作者/许可有详情字段；dc:title不作管理器标题，包版本/来源等为包内扩展。详细追溯存meta-userdefined，meta:name=brushconverter-trace，内容是版本1的JSON；Krita界面不显示这份追溯，重存可能丢扩展字段，应保留原导出包。
-- **实际处理**：[追溯结构](<../src/brush_converter/kpp/bundle.py#L501-L536>)记录producer版本/未发布状态、source文件名/摘要、稳定ID、最终标签、applicable/enabled/actual/limited与代价文本哈希。跳过项不冒充命中；预计计划、内存生成、成功交付和实机效果是四层事实。
-- **v2身份**：[身份计算](<../src/brush_converter/kpp/bundle.py#L548-L573>)覆盖meta.xml、manifest和各KPP原字节，包含meta/tag/实际追溯；排除ZIP头时间、输出路径/文件名、自身哈希，不自引用。逻辑身份格式2、追溯JSON版本1、程序1.6.0与用户资源包版本是四个不同概念；unreleased仍表示候选。
+- **实际处理**：[追溯结构](<../src/brush_converter/kpp/bundle.py#L501-L536>)记录producer版本/构建时release标记、source文件名/摘要、稳定ID、最终标签、applicable/enabled/actual/limited与代价文本哈希。跳过项不冒充命中；预计计划、内存生成、成功交付和实机效果是四层事实。
+- **v2身份**：[身份计算](<../src/brush_converter/kpp/bundle.py#L548-L573>)覆盖meta.xml、manifest和各KPP原字节，包含meta/tag/实际追溯；排除ZIP头时间、输出路径/文件名、自身哈希，不自引用。逻辑身份格式2、追溯JSON版本1、程序1.6.0与用户资源包版本是四个不同概念；已发布v1.6.0沿用冻结构建，包内unreleased为构建时保留值，不据此反推当前未公开发布，也不为改标记重写已发布产物。公开发布状态以正式tag/发布说明为准。
 - **升级兼容**：旧包能读，不作为同一v2包复用；只改meta/tag也应形成新身份，KPP可以保持不变。判断复用与格式版本不能只比较旧kpp-only哈希；完整身份与8位文件名后缀分清。
 
-- **复用判定已绑定完整身份（182补充纠偏）**：此前真实CLI复现v2完整身份不同但hash8相同的两包误复用；[事务判重](<../src/brush_converter/export_transaction.py#L663-L689>)现比较实际包与本次构建的`scheme`+完整64位`sha256`，legacy仅沿用旧kpp-only hash8兼容口径，跨scheme/invalid一律不复用。原A/B反例复跑第二份交付为`_2`包、reused=0；真实32位前缀碰撞负例在`tests/test_bundle_identity.py`。定向63/227通过，仍需183全量、185打包、186隐私门、187人工；8位文件名后缀不是同包凭证。
-- **适用与责任**：本节只覆盖bundle。归一、独立回读与坏包反例是机器证据；187由使用者验真实逐笔筛选、同名关联、字段显示、重存风险和退出重启持久性，不能用XML有字段替代目标。
+- **复用判定已绑定完整身份（182补充纠偏）**：此前真实CLI复现v2完整身份不同但hash8相同的两包误复用；[事务判重](<../src/brush_converter/export_transaction.py#L663-L689>)现比较实际包与本次构建的`scheme`+完整64位`sha256`，legacy仅沿用旧kpp-only hash8兼容口径，跨scheme/invalid一律不复用。原A/B反例复跑第二份交付为`_2`包、reused=0；真实32位前缀碰撞负例在`tests/test_bundle_identity.py`。定向63/227及后续183全量已覆盖相关用例；185构建、186隐私裁决、187人工条件放行和188发布均已完成，精确边界见§0.6与发布说明。8位文件名后缀不是同包凭证，也不把30项人工通过扩大为六项未验已完成。
+- **适用与责任**：本节只覆盖bundle。归一、独立回读与坏包反例是机器证据；2026-11-27人工结果只限明确通过的项目，E4逐笔命中/同名不串、E6重存扩展/追溯及其余四项仍未验。不能把XML有字段、笼统“标签可用”或发布状态替代这些具体目标。
 
 ## 6. CLI 与 GUI
 
 - **CLI**（`cli.py`）：info/extract/convert/gui保留；convert新增真实--list-presets、可重复--preset-id、--options-file及--metadata-file。两类UTF-8 JSON分别按export-options/export-metadata的version=1校验；至少一种输出，元信息与--no-bundle冲突会拒绝，不悄悄丢字段。完整示例见[用户指南](<user-guide.md#cli-convert>)，不让普通用户复制内部笔记。
-- **GUI**（`gui/`）：QThread传递真实阶段与安全取消请求，输入冻结至finished。按稳定ID保存逐支选项/标签、仅批量操作可见集合，导出确认显示隐藏已选和受限代价。换源/重载重置；关窗不强杀、取消关闭不撤回停止。实际界面待187。
+- **GUI**（`gui/`）：QThread传递真实阶段与安全取消请求，输入冻结至finished。按稳定ID保存逐支选项/标签、仅批量操作可见集合，导出确认显示隐藏已选和受限代价。换源/重载重置；关窗不强杀、取消关闭不撤回停止。实际界面验收按2026-11-27的30项通过/六项未验边界记录，不将已验GUI操作推广到所有未验效果。
 - **必须显式对齐元信息**：不带metadata-file的CLI沿用兼容口径，不启用新表单/原生标签/追溯；给出空metadata/tags配置才与GUI空表单同口径。两入口字节等价须同源、同选择、同开关、同配置及同程序版本。
 
 ## 7. 开发过程中的重要发现（坑）
@@ -391,7 +392,7 @@ paintoppresets/*.kpp          自包含笔刷预设
 
 6. **角度存弧度，不是度**。Krita 笔刷 XML 的 `angle` 存弧度（`CommonData.angle`），UI 用 `zoom(scale(180/π))` 转成度显示。
 7. **角度 UI 范围是 [0,360)，负角度会被 clamp 到 0**。`KisAngleSelector` 的 spin box 是 `setRange(0,360)`，负角度 `-33°` 会被 `setValue` 夹到 0（=360°）。所以必须 `angle % 360` 先 normalize 成正角度（`-33° → 327°`）再转弧度。这是一个「度→弧度方向对了、但负角度仍显示 360°」的二次 bug。
-8. **auto_brush的fade=Hrdn/100，与硬度同向**。v1.5.0默认计算笔刷改用位图；v1.6.0关闭位图化时以独立原生生产分支重新承载，不调用历史研究helper。字段可调不等于PS软边几何等价；真实编辑与边界留187。
+8. **auto_brush的fade=Hrdn/100，与硬度同向**。v1.5.0默认计算笔刷改用位图；v1.6.0关闭位图化时以独立原生生产分支重新承载，不调用历史研究helper。字段可调不等于PS软边几何等价；真实编辑只按187明确已验范围，六项未验及历史边界不因发布转为通过。
 9. **`PressureScatter` 是「散布选项是否启用」的开关，不是「压感控制散布」**。它序列化的是 `isChecked`（`getBool("Pressure" + id)`），压感控制由 `ScatterSensor` 决定。误读它会同时搞错两个方向。
 10. **散布量在 `scatterDynamics.jitter`，不在顶层 `Spcn`**。顶层 `Spcn` 是间距。散布量 `jitter` 是 0–1000%。
 11. **旧“÷400／PS高斯分布”解释已失效**。当前为 `jitter/200`，依据[任务129报告](<验收报告/129-报告.md>)的分布型统计量，不是单点视觉锚定；1000%端点仍有已量测未修残差，见[参数§10.3](<parameter-mapping.md#residual-current>)。编号保留，不据旧说改回系数。
@@ -426,7 +427,7 @@ paintoppresets/*.kpp          自包含笔刷预设
     v1.2.0–v1.4.x 期间默认 `calibrated`、可切 `legacy`（v1.1.2 经验公式）；v1.5.0（任务 135）已把环境变量、legacy 分支与旧用例**物理删除**
     （`preset_xml.py` 引用 13 处 → 0），只剩 calibrated 一条公式，**运行时没有回退路径**。旧文档里的
     `BRUSHCONVERTER_TEXTURE_FORMULA=legacy python cli.py convert …` 命令对当前版本无效；整体回退 = `git revert` + 重转。
-    对比度 `min(2.0,k)` 也在同一任务删除（C>50 写 k 原值），见 §7.9 第 35 条。
+    对比度 `min(2.0,k)` 上限也在同一任务删除，当前contrast仍round(k,3)，不表示无舍入原值写入；见§7.9第35条。
     回归用例 `tests/test_texture_formula_switch.py` 现只断言 calibrated 数值与 152 的 B9 记录；公式、A/B 数字与局限见 `docs/parameter-mapping.md` §7.1 与 `docs/验收报告/13-报告.md`。
 
 ### 7.6 纹理深度与资源命名层面（v1.2.1 新增）
@@ -504,7 +505,7 @@ paintoppresets/*.kpp          自包含笔刷预设
     2026-11-21 已改为合法 `pressure` 占位（回归 `tests/test_sensor_defaults_v140.py`）。
     **旧版产物必须重转。**
 29. **间距短边补偿只改 spacing，不改补白**。采样笔刷 `spacing = Spcn/100 × 短边/长边`
-    （[转换管线](<../src/brush_converter/convert.py>)中的spacing_basis）；近方形按实际短/长边。计算笔刷不使用“采样短边比”，但v1.5.0起仍按标称直径/生成位图边长反算spacing，见[参数§2](<parameter-mapping.md>)。采样笔尖补方与255填充值是刻意保留的，
+    （[转换管线](<../src/brush_converter/convert.py>)中的spacing_basis）；近方形按实际短/长边。默认位图化计算笔刷按 `Spcn/100 × Dmtr × clamp(Rndn/100,0.001,1) / edge` 反算spacing，只有圆度100%才可省圆度因子；关闭后的原生分支直接Spcn/100，见[参数§2](<parameter-mapping.md>)。采样笔尖补方与255填充值是刻意保留的，
     不要为了修间距去动它——那会同时改笔迹本体（非方形笔迹仍比 PS 高约 1.3–1.5×，属已知）。
 30. **Krita 界面参数错乱先查 sensor id，不要先归因 UI bug**。5.3.3 里点「新建画笔（像素引擎）」
     再切回测试笔刷，确实可能让编辑器显示状态混乱；但 2026-11-21 复核发现，之前记录的
@@ -532,10 +533,11 @@ paintoppresets/*.kpp          自包含笔刷预设
     （会踩 Krita 同名串用坑）。体积代价 +0.8 KB~+434 KB/预设。
 35. **legacy 纹理公式已物理删除（135）**。`BRUSHCONVERTER_TEXTURE_FORMULA` 与旧公式分支、旧用例全部移除
     （引用 13 处 → 0）；不要按旧文档给「回退命令」——运行时没有回退，只能 `git revert` + 重转。
-    对比度 `min(2.0, k)` 同时删除：C>50 现在写 k 原值（9 位小数），Krita 滑块只显示 0..2 属预期。
+    对比度取消的是min(2.0,k)上限，仍为max(0,round(k,3))；brightness按k≤2用round3、否则round9。XML整数纯十进制、非整数:g六位有效数字；不是对比度九位或无舍入直写，Krita滑块0..2另属显示限制。
     §7.5 第 21 条是同一事件的历史说明（已同步为「已删除」），两处不再矛盾。
 
-### 7.10 v1.6.0 候选新增的坑（构建 PATH、压感装置、旋转传感器、会话恢复、纹理预烘焙）
+<a id="710-v160-候选新增的坑构建-path压感装置旋转传感器会话恢复纹理预烘焙"></a>
+### 7.10 v1.6.0 新增的坑（构建 PATH、压感装置、旋转传感器、会话恢复、纹理预烘焙）
 
 36. **构建会话 PATH 会改变 PyInstaller 产物内容（任务 154）**。若 PATH 含 `<GIT_MINGW64_BIN>`（Git for Windows 自带 OpenSSL 3），
     `_ssl.pyd`/`_hashlib.pyd` 的依赖 `libcrypto-3-x64.dll`（5,122,716 B）+ `libssl-3-x64.dll`（930,460 B）会被收进 `_internal/`：
@@ -572,7 +574,7 @@ paintoppresets/*.kpp          自包含笔刷预设
 - **SonyStone/ABR-Viewer**（MIT）：desc 描述符解析参考。
 - 以上源码下载在 `research/`（本地保留、不进 git）。
 
-**引用版本规则**：元信息/标签读取合同已核目标Krita5.3.3（git858d352），但未做本轮实机导入/显示/重启。其余GIMP/PS与研究helper只作注明范围的历史参考，未登记准确版本时仍标“跨版本未验证”，不能拿master或本地快照扩大承诺。本次182不下载、不改参考文件；实现变更维护源码与定向证据，183 已完成新全量（2026-11-27），187负责用户效果。
+**引用版本规则**：元信息/标签读取合同已核目标Krita5.3.3（git858d352）；2026-11-27人工导入/显示/重启结论仅限187明确通过的项目，E4/E6等六项仍未验。其余GIMP/PS与研究helper按原报告所述范围作历史参考，未登记准确版本仍标“跨版本未验证”，不拿master或本地快照扩大承诺。183历史全量与187人工结果分层引用；后续更新现行参考，不回写一次性验收报告。
 
 ## 9. 开发与测试
 
@@ -611,7 +613,7 @@ TEMP只约束运行期临时文件，不等于所有工具已隔离：先读工�
 ### 9.2 本轮可执行的只读检查
 
 
-a. 文档合同与公开索引检查均已实现。以下命令只读：索引必须显式使用 `--tracked-only`，否则会按旧模式计入本地报告并与公开索引不一致。若检查失败先保留原始报错、区分可见性与真实断链；只有获准的任务主会话可用同参数去掉 `--check` 串行重生成，禁止手改生成物或削弱规则凑绿。
+a. 文档合同与公开索引检查均已实现。以下命令只读：现行文档按文件相对路径检查，历史研究报告保留旧解析兼容；一次性验收报告正文不做日常维护扫描，但入链目标/锚点及目录README/INDEX照查。索引必须显式使用 `--tracked-only`，否则会计入本地报告。失败先保留报错、区分可见性与真实断链；只有获准任务主会话可按同参数去掉 `--check` 串行重生成索引，不借此改报告正文、手改生成物或削弱规则凑绿。
 
 ```powershell
 & $PY -B tools/check_docs.py --check
@@ -632,10 +634,10 @@ b. 日常隐私使用162A已经实现的增量入口；将BASE设为本任务开
 
 ### 9.3 回归、构建与发布交接（本轮文档任务不执行）
 
-1. **全量回归归183且串行**：pytest指定工作区内basetemp和cache_dir；三层入口与退出码以[验证说明](<验证体系使用说明.md>)为准。固定摘要“通过N／失败M／跳过K”分别记录；退出0但有跳过仍是“含跳过，未全验”。不能把历史396/122当新结果，也不改阈值或旧基准。
-2. **候选构建归185**：先用项目解释器核对PyInstaller版本与--help，检查[CLI配置](<../brushconverter-cli.spec>)、[GUI配置](<../brushconverter-gui.spec>)、libexpat收集与构建PATH（§7.10第36条）。distpath/workpath及缓存全部放全新任务目录，不清旧包。两包的字节数、SHA-256与真实CLI自检都须留证，GUI真实操作待人工。
-3. **冻结后隐私归186**：只在候选冻结后做完整工作区+全部提交历史双向扫描，含作者/提交者/提交信息，block必须0。图片/二进制盲区统一187人工关闭；内容或历史漂移使旧门失效，新凭据先吊销再清理，已发布历史不擅改。
-4. **187人工批准后才有188发布**：批准必须绑定准确仓库、候选提交与两包摘要；发布前再次核对同一对象。没有批准不push/tag/Release，不force-push或移动旧tag。当前v1.6.0仍未发布。
+1. **全量回归串行（v1.6.0对应183，已完成）**：本版历史结果为1149/0/0/0与verify_all235/0/0，不冒作本次文档修订新结果。后续回归的pytest指定工作区内basetemp/cache_dir，三层入口与退出码以[验证说明](<验证体系使用说明.md>)为准；通过/失败/跳过分别记录，退出0但有跳过仍未全验。不改阈值、旧基准或一次性报告。
+2. **构建阶段（v1.6.0对应185，已完成）**：本版两附件已冻结并发布，不重打同名版本。未来构建先核项目解释器/PyInstaller及[CLI配置](<../brushconverter-cli.spec>)、[GUI配置](<../brushconverter-gui.spec>)、libexpat和PATH（§7.10第36条）；dist/work/cache放全新任务目录，不清旧包。字节数、SHA-256、真实CLI与GUI结果分开留证。
+3. **冻结后隐私（v1.6.0对应186/187，已裁决）**：本版源码/全部历史block=0；ZIP仍有14个block及未读覆盖，已按使用者裁决接受并在发布说明披露，人工目检为自述且未附索引，不改写成扫描全绿。未来冻结后仍须完整工作区+全部历史扫描并登记图片/二进制盲区；未处置block不自动通过，漂移使旧门失效，已发布历史不擅改。
+4. **批准发布（v1.6.0的187/188已完成）**：本版于2026-11-27按准确对象批准并正式发布；人工30项通过、六项未验条件性放行，不能补写通过。未来发布仍须绑定仓库、提交与两包摘要并复核同一对象；没有批准不push/tag/Release，不force-push或移动旧tag。
 5. **仅提交获准业务文件**：显式暂存白名单，不提交内部规划、预写报告或原始证据；提交使用中性身份，不读取系统个人身份。提交后检查署名与逐文件清单，不用git add -f或全目录重新暂存。
 
-测试样本为自备商用ABR，保持只读，不修改、不删除、不提交；新增合成数据只进本任务目录。实际GUI、浏览器、Krita/PS操作与最终效果均等使用者集中验收，不以文件解析冒充通过。
+测试样本为自备商用ABR，保持只读，不修改、不删除、不提交；新增合成数据只进本任务目录。未来涉及实际GUI、浏览器、Krita/PS操作与最终效果仍须使用者验收；本版沿用已公布的30项通过/六项未验边界，不以文件解析或发布状态冒充未验通过。

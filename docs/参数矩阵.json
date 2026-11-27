@@ -1413,7 +1413,7 @@
    "krita",
    "parser"
   ],
-  "krita_target": "Texture/Pattern/Contrast：读取层无 clamp，k 原值直写（C=75→4、C=84→6.25、C=100→1e6）；C>50 用 9 位小数 + _format_number，仅 UI 滑块 0..2 显示越界。可表达网格 79/81 组掩码差异 0.00%/max≤1。B9 已由 152 重测更正：128A 的「b×C 交互 multiply/subtract/linearBurn 76.680%」作废（配对错配），正确配对后 b=50/c=50 下 9/10 模式两纹理 0.000%/max≤1（C<0 区 5 组亦 0.000%/max1）⇒ 本行原「B9 结构性」归属撤回；B10 越界区（C=−50 且 PS 亮度绝对值 >127）已由 153 预烘焙落地 12/12=0.000%。残差：B13 预缩放（s=200）+C=80 组合 5.650%/max5（d=50 组合 5.330%/max3），根因=8-bit 预缩放量化差被 k=5 放大（假设）；另 C>50 的 UI 滑块越界显示属参数域上限、无像素后果。归属：需校准维持（已量测未修 B13）；复核：python -m pytest -q tests/test_texture_v150.py tests/test_texture_b10_v160.py；2026-11-23",
+  "krita_target": "Texture/Pattern/Contrast：读取层无 clamp，取消 min(2,k) 上限但计算仍 round(k,3)（C=75→4、C=84→6.25、C=100→1e6）；9位条件舍入用于 C>50 的亮度而非对比度；XML 整数写纯十进制，非整数由 _format_number 用6位有效数字，仅 UI 滑块 0..2 显示越界。可表达网格 79/81 组掩码差异 0.00%/max≤1。B9 已由 152 重测更正：128A 的「b×C 交互 multiply/subtract/linearBurn 76.680%」作废（配对错配），正确配对后 b=50/c=50 下 9/10 模式两纹理 0.000%/max≤1（C<0 区 5 组亦 0.000%/max1）⇒ 本行原「B9 结构性」归属撤回；B10 越界区（C=−50 且 PS 亮度绝对值 >127）已由 153 预烘焙落地 12/12=0.000%。残差：B13 预缩放（s=200）+C=80 组合 5.650%/max5（d=50 组合 5.330%/max3），根因=8-bit 预缩放量化差被 k=5 放大（假设）；另 C>50 的 UI 滑块越界显示属参数域上限、无像素后果。归属：需校准维持（已量测未修 B13）；复核：python -m pytest -q tests/test_texture_v150.py tests/test_texture_b10_v160.py；2026-11-23",
   "verdict": "需校准",
   "ui_visibility": "有",
   "ui_control": "纹理/对比度"

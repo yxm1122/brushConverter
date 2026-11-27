@@ -16,7 +16,7 @@
 用法：
     python tools/verify_all.py                 # 只跑并打印
     python tools/verify_all.py --archive       # 跑完写 docs/验收报告/归档/verify-<时间戳>.md
-    python tools/verify_all.py --merge-manifest  # 把 feel 子清单合并进顶层 tests/baselines/manifest.json
+    # --merge-manifest 是写操作：先在副本验证四源合并，再明确授权应用；见 docs/全量验收说明.md §5
 
 退出码（与任务 01 一致）：有失败或 pytest 异常 -> 1；全通过（含跳过）-> 0；三层一条用例都没收集到 -> 2。
 """
@@ -415,10 +415,12 @@ def _alpha_nonzero(path):
 
 
 def merge_feel_manifest(top_manifest_path=None, feel_manifest_path=None):
-    """把 feel 子清单合并进顶层清单（幂等：已存在的 file 不重复添加）。
+    """显式写操作：按 file 合并 feel，维护 ps/krita/handmade/feel 四源。
 
-    合并口径沿用任务 09：file 用相对 tests/baselines 的路径；字段固定 11 个（缺 null）；
-    alpha_nonzero 当场读 PNG 实测；条数对账 = 合并前 + 新增。
+    仅把旧三源结果中 feel/ 前缀且 source=krita 的条目迁为 feel；保留其余字段、
+    条目顺序与旧 merge_history。新增项的 alpha_nonzero 从副本 PNG 实测。
+    四源内容及统计已一致时不写文件，因而不改字节、mtime、时间戳或历史。
+    调用前须在工作区副本验证；不传路径时会写真实顶层清单。
     """
     top_path = Path(top_manifest_path or TOP_MANIFEST)
     feel_path = Path(feel_manifest_path or FEEL_MANIFEST)
@@ -426,10 +428,26 @@ def merge_feel_manifest(top_manifest_path=None, feel_manifest_path=None):
         top = json.load(fh)
     with open(feel_path, "r", encoding="utf-8") as fh:
         feel = json.load(fh)
+    original_state = json.dumps(top, ensure_ascii=False, sort_keys=True)
 
+    source_specs = {
+        "ps": ("tests/baselines/ps/manifest.json", "images"),
+        "krita": ("tests/baselines/krita/manifest.json", "items"),
+        "handmade": ("tests/baselines/handmade/manifest.json", "entries"),
+        "feel": ("tests/baselines/feel/manifest.json", "items"),
+    }
     items = top.get("items") or []
-    existing_files = {str(item.get("file")) for item in items}
+    top["items"] = items
     before_total = len(items)
+    migrated = 0
+    for item in items:
+        if str(item.get("file", "")).startswith("feel/") and item.get("source") == "krita":
+            item["source"] = "feel"
+            migrated += 1
+        if item.get("source") not in source_specs:
+            raise ValueError("顶层清单含未知 source，未写入：%r" % item.get("source"))
+
+    existing_files = {str(item.get("file")) for item in items}
     added = 0
     duplicates = 0
     for entry in feel.get("items") or []:
@@ -442,7 +460,7 @@ def merge_feel_manifest(top_manifest_path=None, feel_manifest_path=None):
             continue
         items.append({
             "file": rel,
-            "source": "krita",
+            "source": "feel",
             "size": entry.get("size"),
             "pressure": entry.get("pressure"),
             "mode": None,
@@ -457,55 +475,58 @@ def merge_feel_manifest(top_manifest_path=None, feel_manifest_path=None):
         existing_files.add(rel)
         added += 1
 
-    counts_by_source = {"ps": 0, "krita": 0, "handmade": 0}
+    counts_by_source = {source: 0 for source in source_specs}
     for item in items:
-        source = item.get("source")
-        if source in counts_by_source:
-            counts_by_source[source] += 1
+        counts_by_source[item["source"]] += 1
     after_total = len(items)
-    merged_at = datetime.datetime.now().astimezone().replace(microsecond=0).isoformat()
-    top["merged_at"] = merged_at
-    top["merged_by"] = "任务 15（全量自动验收与归档），执行代理 krita-line"
     top["counts"] = {
         "total": after_total,
         **counts_by_source,
-        "reconciliation": "%d = %d + %d + %d" % (
-            after_total, counts_by_source["ps"], counts_by_source["krita"], counts_by_source["handmade"]),
+        "reconciliation": "%d = %d + %d + %d + %d" % (
+            after_total, counts_by_source["ps"], counts_by_source["krita"],
+            counts_by_source["handmade"], counts_by_source["feel"]),
     }
     sources = top.setdefault("sources", {})
-    sources.setdefault("ps", {})
-    sources.setdefault("handmade", {})
-    sources["krita"] = {
-        "manifest": "tests/baselines/krita/manifest.json",
-        "list_key": "items",
-        "count": counts_by_source["krita"],
-        "note": "含任务14合入的手感基线 12 张（来源子清单 tests/baselines/feel/manifest.json）",
-    }
-    sources["feel"] = {
-        "manifest": "tests/baselines/feel/manifest.json",
-        "list_key": "items",
-        "count": len(feel.get("items") or []),
-        "merged_as_source": "krita",
-    }
-    history = top.setdefault("merge_history", [])
-    history.append({
-        "at": merged_at,
-        "by": "task-15",
-        "before_total": before_total,
-        "feel_items": len(feel.get("items") or []),
-        "added": added,
-        "duplicates_skipped": duplicates,
-        "after_total": after_total,
-    })
-    top["note"] = "顶层清单由任务 09 合并、任务 15 再次合并（含 feel 手感基线）；以本文件为唯一权威。"
-    with open(top_path, "w", encoding="utf-8") as fh:
-        json.dump(top, fh, ensure_ascii=False, indent=1)
-        fh.write("\n")
+    for source, (manifest, list_key) in source_specs.items():
+        record = sources.setdefault(source, {})
+        record.update(manifest=manifest, list_key=list_key, count=counts_by_source[source])
+    # 仅去掉旧合并器留下的当前来源声明，不改旧历史记录或自定义说明。
+    old_krita_note = "含任务14合入的手感基线 12 张（来源子清单 tests/baselines/feel/manifest.json）"
+    if sources["krita"].get("note") == old_krita_note:
+        sources["krita"].pop("note")
+    if sources["feel"].get("merged_as_source") == "krita":
+        sources["feel"].pop("merged_as_source")
+        sources["feel"]["upgraded_to_source"] = True
+    if migrated:
+        sources["feel"]["upgraded_to_source"] = True
+    if isinstance(top.get("field_spec"), dict):
+        top["field_spec"]["source"] = "ps / krita / handmade / feel"
+
+    changed = json.dumps(top, ensure_ascii=False, sort_keys=True) != original_state
+    if changed:
+        merged_at = datetime.datetime.now().astimezone().replace(microsecond=0).isoformat()
+        top["merged_at"] = merged_at
+        top["merged_by"] = "tools/verify_all.py（feel 四源合并）"
+        top.setdefault("merge_history", []).append({
+            "at": merged_at,
+            "by": "verify_all.merge_feel_manifest",
+            "before_total": before_total,
+            "feel_items": len(feel.get("items") or []),
+            "added": added,
+            "migrated": migrated,
+            "duplicates_skipped": duplicates,
+            "after_total": after_total,
+        })
+        with open(top_path, "w", encoding="utf-8") as fh:
+            json.dump(top, fh, ensure_ascii=False, indent=1)
+            fh.write("\n")
     return {
-        "merged_at": merged_at,
+        "merged_at": top.get("merged_at"),
         "before_total": before_total,
         "feel_items": len(feel.get("items") or []),
         "added": added,
+        "migrated": migrated,
+        "changed": changed,
         "duplicates_skipped": duplicates,
         "after_total": after_total,
         "counts": top["counts"],
@@ -520,7 +541,7 @@ def merge_feel_manifest(top_manifest_path=None, feel_manifest_path=None):
 def main(argv=None):
     parser = argparse.ArgumentParser(description="全量自动验收与归档（三层串行 + 总览 + 归档 + 清单合并）")
     parser.add_argument("--archive", action="store_true", help="把本次结果写成带时间戳的归档报告")
-    parser.add_argument("--merge-manifest", action="store_true", help="把 feel 子清单合并进顶层 manifest")
+    parser.add_argument("--merge-manifest", action="store_true", help="写操作：将 feel 按四源合并进真实顶层清单；须先在副本验证并明确授权应用")
     parser.add_argument("--timeout", type=int, default=900, help="单层 pytest 超时秒数，默认 900")
     parser.add_argument("--json", default=None, help="把本次结构化结果另存为 JSON（可选）")
     parser.add_argument("--selftest-failure", action="store_true",

@@ -1,8 +1,8 @@
-# brushConverter v1.6.0（候选 · 待发布，未发布）
+# brushConverter v1.6.0（2026-11-27）
 
-This unreleased v1.6.0 candidate combines the fifth-round conversion fixes with per-brush options, safe batch delivery, and bundle metadata, tags and traceability. Published downloads remain v1.5.0. The 2026-11-27 acceptance round recorded 30 human items passed and 6 deliberately skipped; release still requires the recorded approval object.
+Published v1.6.0 combines the fifth-round conversion fixes with per-brush options, safe batch delivery, and bundle metadata, tags and traceability. Both Windows packages were published on 2026-11-27. The acceptance round recorded 30 human items passed and 6 deliberately skipped with conditional release approval; those six items remain untested, and the known issues and privacy-scan disclosures below still apply.
 
-> **状态：待发布（v1.6.0 候选，未发布）。** 按当前源码描述已实现能力，两份候选 exe 已在本机构建并冻结。2026-11-27 集中人工验收：30 项通过、6 项由使用者决定跳过（E4、E6、F1、F3、F4、G3，未验不写通过）；已知问题见「已知限制」与「验证」。发布日期不预填，正式 tag/Release 只在最终验收与精确对象批准后创建。
+> **状态：v1.6.0 已正式发布。** 2026-11-27 16:33:35（Asia/Shanghai；08:33:35Z）创建[正式 Release](https://github.com/yxm1122/brushConverter/releases/tag/v1.6.0)，两份 Windows 包已上传；tag `v1.6.0` 指向批准提交 `5b7cbdc`。集中人工验收记录为 30 项通过、6 项由使用者决定跳过并条件放行（E4、E6、F1、F3、F4、G3，未验不写通过）；两项已知问题和 ZIP 隐私扫描接受披露见下文。正式发布不改变这些未验与限制。
 
 **升级必读分三件事**：① 亮度越界命中区及旋转随机抖动的旧 KPP/bundle 必须从原 ABR 重转；② 元信息/标签/实际追溯改变会形成新包身份，即使预设像素没变；③ 关闭外观优先处理是受限可编辑替代，有外观或可调范围代价，不是恢复 legacy 公式或旧缺陷。
 
@@ -30,12 +30,12 @@ This unreleased v1.6.0 candidate combines the fifth-round conversion fixes with 
 2. **所有angleDynamics.jitter>0的旧KPP及所属bundle必须重转**：j<50幅度修正；j≥50随机序列变化，分布形状残差仍保留，不恢复双随机源来“回退”。
 3. 更早版本的计算笔刷、散布/旋转、预缩放、传感器与非方形间距升级仍按[README历史必读](<../README.md#升级必读已发布版本的历史记录>)执行。采样笔尖补方/边框255不变。
 4. **只改说明/许可/标签也会产生新包身份**，不表示KPP映射算法又改变。保留原导出包与旧包，不改旧样本冒充本轮证据，不混装新旧同名来源。
-5. 作者许可仅按本次显式输入写；项目MIT不是笔刷素材许可。按目标Krita5.3.3源码，说明/作者/许可有详情字段；标题、包版本、来源与追溯的界面范围有限，扩展字段重存可能丢失，保留原包。真实显示/筛选/重启仍待187。
+5. 作者许可仅按本次显式输入写；项目MIT不是笔刷素材许可。按目标Krita5.3.3源码，说明/作者/许可有详情字段；标题、包版本、来源与追溯的界面范围有限，扩展字段重存可能丢失，保留原包。真实效果仅按下表已验项目记录，六项未验仍保留；不从字段存在推定界面全验。
 6. 三开关关闭仅保留受限原生编辑能力，可能降低PS外观相似度。将原生缩放历史残差、域截断与默认路径分开，不说成默认路径的新回归。
 
 ## 已知限制
 
-**复用判定已修复（定向验证，非全量通过）**：此前两份不同说明、完整v2逻辑身份不同但8位短哈希相同（合成对c6509fe4）的资源包，第二次真实CLI会误复用第一份；现改为比较完整v2身份（scheme+64位sha256），legacy仅沿用旧kpp-only hash8兼容口径。原A/B反例复跑中第二份独立交付为`_2`包、`reused=0`，回读身份属于第二份，第一份字节与mtime不变；真实32位前缀碰撞负例已进定向测试。该修复本身只是定向验证；183A 返工后 2026-11-27 全量重跑 1149 通过/0 失败/0 错误/0 跳过（两次一致）已覆盖相关用例，但不等于 185 打包、186 隐私门或 187 人工验收，候选仍未发布，不降低“不同内容不得误复用”的承诺。
+**复用判定已修复（定向及发布前全量验证）**：此前两份不同说明、完整v2逻辑身份不同但8位短哈希相同（合成对c6509fe4）的资源包，第二次真实CLI会误复用第一份；现改为比较完整v2身份（scheme+64位sha256），legacy仅沿用旧kpp-only hash8兼容口径。原A/B反例复跑中第二份独立交付为`_2`包、`reused=0`，回读身份属于第二份，第一份字节与mtime不变；真实32位前缀碰撞负例已进定向测试。183A 返工后 2026-11-27 全量重跑 1149 通过/0 失败/0 错误/0 跳过（两次一致）已覆盖相关用例；随后已完成批准对象的打包、隐私处置和发布，人工仍以 30 项通过、6 项未验条件放行为边界。不同内容不得误复用的承诺不降低，发布也不把未验项目变为通过。
 
 [参数映射§10](<../docs/parameter-mapping.md#residual-current>)仍是旧残差唯一清单：中间硬度/大直径/尺寸字段、椭圆间距方向依赖、minimumDepth量纲、散布端点、hardMix两类、缩放/高对比度、深度经验系数与未测组合准确保留。本轮不改公式/基准、不降低阈值。研究字段承载不等于实机生效；bundle标签筛选不能用XML写入降格替代。
 
@@ -46,10 +46,10 @@ This unreleased v1.6.0 candidate combines the fifth-round conversion fixes with 
 | 证据与适用范围 | 已有什么 | 后续责任 / 当前边界 |
 |---|---|---|
 | 第五轮历史候选（149A/153/156） | 153同批12/12=0.000%/max0–1（改前8/12超阈）；149A三点两批最大相对差4.06%、复现≤4.73%；旧pytest396、verify_all122为历史数字 | 保留原报告，不冒作本轮新回归或推广到所有组合 |
-| 本轮当前源码（逐支/事务/meta-tag/身份/复用纠偏） | 已有定向/组装机器证据和独立文件回读；源版本1.6.0，追溯仍unreleased；复用改为完整身份后63定向+227受影响通过，原A/B反例复跑B独立交付 | 183A 返工后 2026-11-27 重跑：全量 1149/0/0/0（两次一致，128.66s/129.04s），verify_all 235/0/0，四结构校验 exit 0，Krita 8/8 在全量同批；183A 只改测试隔离与子进程环境，不改产品行为 |
+| 本轮当前源码（逐支/事务/meta-tag/身份/复用纠偏） | 已有定向/组装机器证据和独立文件回读；源版本1.6.0，正式分发包的追溯构建状态仍保留字面值 `unreleased`（未重打包，不据此否定发布事实）；复用改为完整身份后63定向+227受影响通过，原A/B反例复跑B独立交付 | 183A 返工后 2026-11-27 重跑：全量 1149/0/0/0（两次一致，128.66s/129.04s），verify_all 235/0/0，四结构校验 exit 0，Krita 8/8 在全量同批；183A 只改测试隔离与子进程环境，不改产品行为 |
 | 本轮产品文档 | 六份文档对齐真实接口、版本与操作后果 | 自建文档合同不替代阅读跳转或真实操作 |
-| 最终分发与隐私 | 两份候选包已构建（62,842,353 B / 25,006,238 B）；源码+全部历史 block=0/warn=860；候选 ZIP 仍有 14 个 block（9 个 numpy 第三方文本 + 1 个 CI 家目录 + 4 个扫描容量上限），按 186 裁决登记 | 187 人工目检由使用者自述完成（未附索引）；发布说明保留该披露 |
-| Windows64 / Krita5.3.3 真实效果 | 2026-11-27 使用者集中验收：GUI 启动与转换（G1）、CLI 控制台与重定向（G2）、Krita 导入/标签筛选/退出重启（E1–E5）、包信息与旧包读取等 30 项通过；E4/E6/F1/F3/F4/G3 六项由使用者决定跳过、未验 | 六项未验与 D-6/D-2 如实披露；发布对象与批准见 187 批准记录 |
+| 最终分发与隐私 | GUI 包 62,842,353 B / CLI 包 25,006,238 B 已发布并完成本地、API 与独立下载三方摘要核对；发布前源码+全部历史 block=0/warn=860。分发 ZIP 仍有 14 个 block（9 个 numpy 第三方文本 + 1 个 CI 家目录 + 4 个扫描容量上限），按 186 裁决由使用者接受并披露后条件放行 | 187 人工目检由使用者自述完成（未附索引）；接受不等于扫描 block 已清零或容量盲区已由机器读完 |
+| Windows64 / Krita5.3.3 真实效果 | 2026-11-27 使用者集中验收记录为 30 项通过，包含 GUI 启动与转换、CLI 控制台及已检查的 Krita 导入/标签/重启、包信息与旧包读取项目；E4/E6/F1/F3/F4/G3 六项由使用者决定跳过、未验并条件放行。CLI 重定向例外仍按 D-2 披露 | 不把六项未验写成通过，不把已验样例推广为任意组合；D-6/D-2 与隐私接受披露在发布后继续有效 |
 
 ## 回退方式
 

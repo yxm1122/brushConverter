@@ -3,12 +3,12 @@
 
 用法：python -B tools/check_docs.py --check [--root 仓库根]
 只读，不改文档、不联网、不执行文档中的命令。退出码：0 通过，1 规则失败，2 输入错误。
-本轮版本事实固定为已发布 v1.5.0 / 候选 v1.6.0（未发布），变更须随版本合同审查。
+当前发布事实为 v1.6.0（2026-11-27）；没有另行声明的候选版本，不预设下一版本。
 
 范围：README、docs、releases 的 Markdown；内部规划及隐藏目录不扫描。已受Git
-跟踪的公开历史报告仍检查真正链接，但不套用现行版本模板；未跟踪本地报告不纳入。
+跟踪的研究报告只检查链接；一次性验收报告正文不纳入日常维护，目录README/INDEX仍检查。
 仅识别真正的 Markdown 链接/图片、引用链接、HTML href/src；代码块、行内代码、
-HTML 注释和单纯文件名不是链接。支持根相对与文件相对路径，按162合同根优先。
+HTML 注释和单纯文件名不是链接。现行页面按文件相对路径解析；历史研究保留旧根优先兼容。
 标题锚点采用本项目约定：小写、去标点、空白变连字符，重名依次 -1、-2；显式
 HTML id/name 重名报错。历史静态研究报告的“寄存器+偏移→裸字段”按项目约定
 视为说明，其余目标仍检查。该规则不承诺所有阅读器一致，真实跳转仍须人工验收。
@@ -26,8 +26,9 @@ from typing import NamedTuple
 from urllib.parse import unquote, urlsplit
 
 REPO = Path(__file__).resolve().parents[1]
-RELEASED = "v1.5.0"
-CANDIDATE = "v1.6.0"
+RELEASED = "v1.6.0"
+RELEASE_DATE = "2026-11-27"
+CANDIDATE: str | None = None  # 仅在另有候选立项时显式指定；不虚构下一版本。
 INTERNAL = ("docs/优化提示词", "docs/工作流程", ".tmp", ".git")
 EVIDENCE = ("docs/验收报告", "docs/研究报告")
 # 162批准、164已保留的公开旧入口；不能因当前入链少就静默删除。
@@ -291,6 +292,17 @@ def _history(path: str) -> bool:
         _under(path, "docs/归档") and Path(path).name != "维护参考与归档说明.md")
 
 
+def _link_candidates(root: Path, source: Path, value: str, *, history: bool = False) -> list[Path]:
+    """现行相对链接不因仓库根存在同名文件而假通过；旧研究证据仅保留解析兼容。"""
+    if not value:
+        return [source]
+    if value.startswith("/"):
+        return [root / value.lstrip("/")]
+    if history:
+        return [root / value, source.parent / value]
+    return [source.parent / value]
+
+
 def _tracked_reports(root: Path) -> set[str]:
     """公开证据只取Git库存；失败不退化为全收本地报告。合成无Git根不含公开报告。"""
     if not (root / ".git").exists():
@@ -320,7 +332,8 @@ def discover(root: Path) -> list[Path]:
                 relative = path.relative_to(root).as_posix()
                 local_report = (any(_under(relative, p) for p in EVIDENCE)
                                 and name not in ("README.md", "INDEX.md") and relative not in tracked)
-                if path.suffix.lower() == ".md" and not local_report and not _private(relative):
+                one_shot = _under(relative, "docs/验收报告") and name not in ("README.md", "INDEX.md")
+                if path.suffix.lower() == ".md" and not local_report and not one_shot and not _private(relative):
                     paths.append(path)
     return sorted(paths)
 
@@ -367,14 +380,15 @@ def check_paths(root: Path, paths: list[Path]) -> list[Issue]:
             if "\x00" in path_text or "\\" in path_text:
                 issues.append(Issue(name, line, "D_LINK", f"路径含空字符或反斜线，应使用仓库相对URL：{target}"))
                 continue
-            candidates = [source] if not path_text else [root / path_text.lstrip("/"), source.parent / path_text]
-            candidates = [p.resolve() for p in candidates]
+            candidates = [p.resolve() for p in _link_candidates(root, source, path_text, history=_history(name))]
             safe = [p for p in candidates if p.is_relative_to(root)]
             dest = next((p for p in safe if p.exists()), safe[0] if safe else None)
             if dest is None:
                 issues.append(Issue(name, line, "D_PATH_ESCAPE", f"链接越出仓库根：{target}"))
                 continue
-            if not _history(name) and _private(dest.relative_to(root).as_posix()):
+            private_targets = [dest, (root / path_text.lstrip("/")).resolve()] if path_text else [dest]
+            if not _history(name) and any(p.is_relative_to(root) and _private(p.relative_to(root).as_posix())
+                                          for p in private_targets):
                 issues.append(Issue(name, line, "D_PRIVATE", f"公开入口引用内部规划、预写报告或原始证据：{target}"))
                 continue
             if not dest.exists():
@@ -406,7 +420,7 @@ def check_paths(root: Path, paths: list[Path]) -> list[Issue]:
 
 
 def check_contract(root: Path, paths: list[Path] | None = None) -> list[Issue]:
-    """仅约束当前入口/候选段，绝不把旧发布说明或历史证据套进新模板。"""
+    """约束当前入口与首个版本段；历史版本和一次性证据不套现行模板。"""
     issues = []
 
     def add(path, line, rule, reason):
@@ -438,7 +452,7 @@ def check_contract(root: Path, paths: list[Path] | None = None) -> list[Issue]:
     if readme:
         screen = "\n".join(_without_blocks(readme.text).splitlines()[:3])
         if not re.search(r"已发布\s*" + re.escape(RELEASED) + r"(?!\d|\.\d)", _plain(screen)):
-            add("README.md", 1, "D_VERSION", f"首三行必须标已发布 {RELEASED}，候选 {CANDIDATE} 不能充当当前下载版")
+            add("README.md", 1, "D_VERSION", f"首三行必须标已发布 {RELEASED}，不得将旧版或候选充当当前下载版")
         if not any(RELEASED in link.target and "/releases/" in link.target and link.line <= 3 for link in readme.links):
             add("README.md", 1, "D_DOWNLOAD", f"首三行缺少已发布 {RELEASED} 的下载入口")
         for section in ("已知限制", "升级必读"):
@@ -459,8 +473,10 @@ def check_contract(root: Path, paths: list[Path] | None = None) -> list[Issue]:
     notes = documents.get(notes_name)
     if notes:
         top = next((h for h in notes.headings if h.level == 1), None)
-        if not top or not re.fullmatch(r"brushConverter " + re.escape(CANDIDATE) + r"（候选 · 待发布，未发布）", top.title):
-            add(notes_name, top.line if top else 1, "D_VERSION", f"第一段标题必须为 brushConverter {CANDIDATE}（候选 · 待发布，未发布）")
+        expected_title = (f"brushConverter {CANDIDATE}（候选 · 待发布，未发布）" if CANDIDATE
+                          else f"brushConverter {RELEASED}（{RELEASE_DATE}）")
+        if not top or top.title != expected_title:
+            add(notes_name, top.line if top else 1, "D_VERSION", f"第一段标题必须为 {expected_title}")
         if top:
             end = next((h.line for h in notes.headings if h.level == 1 and h.line > top.line), len(notes.text.splitlines()) + 1)
             headings = [h for h in notes.headings if top.line < h.line < end]
@@ -468,7 +484,7 @@ def check_contract(root: Path, paths: list[Path] | None = None) -> list[Issue]:
             for title in ("主要变化", "升级注意", "已知限制", "验证", "回退方式"):
                 section = next((h for h in headings if h.level == 2 and h.title == title), None)
                 if not section:
-                    add(notes_name, top.line, "D_SECTION", f"候选段缺少必需章节：{title}")
+                    add(notes_name, top.line, "D_SECTION", f"当前版本段缺少必需章节：{title}")
                 else:
                     stop = next((h.line for h in headings if h.line > section.line and h.level <= section.level), end)
                     # 非空检查保留命令正文；代码不是链接，不代表它不能构成章节内容。
@@ -476,13 +492,13 @@ def check_contract(root: Path, paths: list[Path] | None = None) -> list[Issue]:
                     body = re.sub(r"<!--.*?(?:-->|\Z)", "", body, flags=re.S)
                     body = re.sub(r"(?m)^ {0,3}#{1,6}\s+.*$", "", body).strip(" \n\r->" + chr(96))
                     if not body:
-                        add(notes_name, section.line, "D_SECTION", f"候选章节{title}内容为空；可写待回填，不能空节")
+                        add(notes_name, section.line, "D_SECTION", f"当前版本章节{title}内容为空；可写待回填，不能空节")
             intro_end = next((h.line for h in headings if h.level == 2), end)
             intro = "\n".join(notes.prose.splitlines()[top.line:intro_end - 1])
             if not re.search(r"[A-Za-z]{3,}[^\n]*[.!]", intro):
-                add(notes_name, top.line, "D_ABSTRACT", "候选段首缺少英文简介；已发布段冻结，不强行补写")
+                add(notes_name, top.line, "D_ABSTRACT", "当前版本段首缺少英文简介；旧版本段不强行补写")
             body_lines = _without_blocks(notes.text).splitlines()[top.line - 1:end - 1]
-            for offset, text in enumerate(body_lines, top.line):
+            for offset, text in enumerate(body_lines, top.line) if CANDIDATE else []:
                 if re.search(r"(?:发布日期|发布于)\s*[:：]?\s*20\d{2}[-/.年]\d", _plain(text)) or re.search(r"20\d{2}[-/]\d{1,2}[-/]\d{1,2}", top.title):
                     add(notes_name, offset, "D_CANDIDATE", "未发布候选不得填写发布日期；不是禁止记录测试时点")
                 if re.search(r"(?:git\s+tag|tag\s*[:：=])[^\n]*" + re.escape(CANDIDATE), text, re.I):
@@ -497,14 +513,31 @@ def check_contract(root: Path, paths: list[Path] | None = None) -> list[Issue]:
                 pass  # 输入错误由链接层报告，不冒充通过。
     for name, doc in live_documents.items():
         # 版本标签在行内代码中也可能是真实声明；只剔除围栏命令示例，不掩盖这种声明。
-        for number, text in enumerate(_without_blocks(doc.text).splitlines(), 1):
+        visible_lines = _without_blocks(doc.text).splitlines()
+        second_version = None
+        if name == notes_name:
+            version_headings = [h for h in doc.headings if h.level == 1]
+            second_version = version_headings[1].line if len(version_headings) > 1 else None
+            if second_version:
+                visible_lines = visible_lines[:second_version - 1]
+        for number, text in enumerate(visible_lines, 1):
             text = _plain(text)
-            if re.search(r"(?:已发布|正式版|最新稳定版)\s*[:：]?\s*" + re.escape(CANDIDATE) + r"(?!\d|\.\d)", text) or re.search(re.escape(CANDIDATE) + r"\s*[（(:：]?\s*(?:已发布|正式版|最新稳定版)", text):
-                add(name, number, "D_CANDIDATE", f"{CANDIDATE} 尚未发布，不能标成正式版或稳定版")
-            if re.search(r"(?:published|stable|official)(?:\s+version|\s+release)?\s*[:：]?\s*" + re.escape(CANDIDATE) + r"(?!\d|\.\d)", text, re.I):
-                add(name, number, "D_CANDIDATE", f"英文简介不能将候选{CANDIDATE}写成已发布或稳定版")
+            if CANDIDATE:
+                if re.search(r"(?:已发布|正式版|最新稳定版)\s*[:：]?\s*" + re.escape(CANDIDATE) + r"(?!\d|\.\d)", text) or re.search(re.escape(CANDIDATE) + r"\s*[（(:：]?\s*(?:已发布|正式版|最新稳定版)", text):
+                    add(name, number, "D_CANDIDATE", f"{CANDIDATE} 尚未发布，不能标成正式版或稳定版")
+                if re.search(r"\b(?:published|stable|official)(?:\s+version|\s+release)?\s*[:：]?\s*" + re.escape(CANDIDATE) + r"(?!\d|\.\d)", text, re.I):
+                    add(name, number, "D_CANDIDATE", f"英文简介不能将候选{CANDIDATE}写成已发布或稳定版")
+            released = re.escape(RELEASED) + r"(?!\d|\.\d)"
+            stale_zh = released + r"\s*(?:为|是|仍是)?\s*[（(:：]?\s*(?:尚未发布|未发布|候选[^。；\n]{0,12}未发布)"
+            stale_en = r"(?:unreleased|unpublished)\s+" + released + "|" + released + r"\s+(?:is|remains)\s+(?:an?\s+)?(?:unreleased|unpublished)"
+            stale_claims = list(re.finditer(stale_zh, text)) + list(re.finditer(stale_en, text, re.I))
+            negation = r"(?:不(?:表示|代表|意味着|等于)|并非|不是|does not mean|does not imply)\s*$"
+            if any(not re.search(negation, text[:claim.start()], re.I) for claim in stale_claims):
+                add(name, number, "D_RELEASE_STATUS", f"{RELEASED} 已发布，现行说明不能仍声明为未发布")
         for link in doc.links:
-            if re.search(r"/releases/(?:tag|download)/" + re.escape(CANDIDATE) + r"(?:/|$|[?#])", link.target):
+            if second_version and link.line >= second_version:
+                continue  # 旧版本段的发布事实不被当前候选规则覆盖。
+            if CANDIDATE and re.search(r"/releases/(?:tag|download)/" + re.escape(CANDIDATE) + r"(?:/|$|[?#])", link.target):
                 add(name, link.line, "D_CANDIDATE", "不得链接尚未批准发布的候选Release或资产")
     for old, new in COMPATIBILITY:
         try:
@@ -520,7 +553,7 @@ def check_contract(root: Path, paths: list[Path] | None = None) -> list[Issue]:
             url = urlsplit(link.target)
             if not url.scheme and not url.netloc:
                 value = unquote(url.path)
-                candidates = [(root / value.lstrip("/")).resolve(), (root / old).parent.joinpath(value).resolve()]
+                candidates = [p.resolve() for p in _link_candidates(root, root / old, value)]
                 destinations.append(next((p for p in candidates if p.is_relative_to(root.resolve()) and p.exists()), None))
         if (root / new).resolve() not in destinations:
             add(old, 1, "D_COMPAT", "旧入口未链接到批准的归档原文")
@@ -545,7 +578,7 @@ def main(argv: list[str] | None = None) -> int:
     for issue in sorted(set(issues)):
         print(f"FAIL {issue.file}:{issue.line} [{issue.rule}] {issue.reason}")
     print(f"文档检查：{len(paths)}份公开Markdown，{len(set(issues))}项失败；只读，外链未联网。")
-    print("口径：本项目自建合同，不是Krita/Markdown官方标准；内部快照与本地未跟踪报告排除，公开历史仅查链接，人工跳转/效果仍待验。")
+    print("口径：本项目自建合同，不是Krita/Markdown官方标准；一次性验收报告正文、内部快照与本地报告排除，维护入口仍检查；研究历史保留旧链接解析，现行页面按文件相对路径检查。")
     return 2 if any(i.rule == "D_INPUT" for i in issues) else int(bool(issues))
 
 
