@@ -77,7 +77,7 @@ Troubleshooting for the published v1.5.0 Windows workflow and the unreleased v1.
 <a id="planned-features"></a>
 ## 六、找不到开关、标签或元信息表单
 
-先核版本：v1.5.0 下载包没有这些控件；候选源码已实现，位置见[GUI 步骤](<user-guide.md#gui-convert>)。不是去正式版找候选按钮，也不要把尚未构建的候选 exe 当已下载。
+先核版本：v1.5.0 下载包没有这些控件；候选源码已实现，位置见[GUI 步骤](<user-guide.md#gui-convert>)。不是去正式版找候选按钮，也不要把已构建但未发布的候选 exe 当已下载的正式版。
 
 - 列表只有一部分时看“隐藏已选”；全选/取消仅作用可见行，清搜索并恢复“全部笔刷”后再核总数。切语言不丢设置，换源/重载会恢复条件默认与本批元信息/标签。
 - 元信息表停用先看格式：独立 KPP 不承载包信息、原生标签与追溯。候选 CLI 要显式加 --metadata-file 才启用新链，GUI 空表单与无配置 CLI 不等价；--no-bundle 与该配置冲突会退出 2。

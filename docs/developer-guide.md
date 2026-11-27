@@ -3,7 +3,7 @@
 > **English abstract**: Maintainer reference for the ABR-to-Krita pipeline, its evidence trail, and reproducible checks. The published version is v1.5.0; v1.6.0 remains an unpublished candidate. Historical reports are not current acceptance results.
 >
 > 面向维护者：按主题查找现行实现、历史原证据与复核入口。逐字段说明以[参数映射](<parameter-mapping.md>)为准，版本变更以[发布说明](<../releases/RELEASE_NOTES.md>)为准。
-> **版本边界**：已发布v1.5.0；当前源版本已冻结为1.6.0，仍是未发布候选，合并第五轮149A/153与本轮逐支选项、事务、元信息/标签/追溯。候选exe尚未构建，历史实验不是本轮新回归，真实效果仍待187。
+> **版本边界**：已发布v1.5.0；当前源版本已冻结为1.6.0，仍是未发布候选，合并第五轮149A/153与本轮逐支选项、事务、元信息/标签/追溯。候选 exe 已在本机构建并冻结待 187 验收，但未发布；历史实验不是本轮新回归，真实效果仍待 187。
 
 ## 0. 文档索引（先看这里）
 

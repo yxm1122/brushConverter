@@ -23,7 +23,7 @@ Convert Photoshop brush sets (.abr) into Krita presets (.kpp) and resource packs
 - **外观优先有编辑代价**：候选默认按条件位图化/预缩放/亮度越界烘焙，可逐支关闭改走受限原生字段，并承担外观或范围代价；不能同时承诺完全复刻与完全可编辑。双笔刷、颜色动态、湿边等仍未映射。见[转换取舍](<docs/user-guide.md#tradeoffs>)。
 - **边界残差仍存在**：硬度、散布端点、hardMix、纹理缩放等需按适用条件判断；逐条证据与待验证项只维护在[映射参考](<docs/parameter-mapping.md>) §10，不在首页另抄一套数字表。
 - **输出保护须看版本**：候选 bundle 与独立 KPP 均先暂存验证、复用/冲突改名并保护旧文件；取消是协作请求，最终交付期不可取消，不虚称多文件系统原子性。已发布 v1.5.0 的独立 KPP 仍可能覆盖。见[输出与安全边界](<docs/user-guide.md#outputs>)。
-- **候选 v1.6.0（未发布）**：源码已实现三开关、筛选/隐藏选择、安全取消、包信息与逐支标签/追溯；不是上方下载包，两份候选 exe 尚未构建。见[候选操作与待验边界](<docs/user-guide.md#candidate-status>)、[真实 CLI 配置](<docs/user-guide.md#cli-convert>)及[包信息/标签范围](<docs/user-guide.md#metadata-tags>)。Krita 实际筛选/编辑/重启仍待 187 人工，不能用 XML 有字段代替通过。
+- **候选 v1.6.0（未发布）**：源码已实现三开关、筛选/隐藏选择、安全取消、包信息与逐支标签/追溯；不是上方下载包；两份候选 exe 已在本机构建并冻结待验收，但**未发布、无下载链接或发布日期**。见[候选操作与待验边界](<docs/user-guide.md#candidate-status>)、[真实 CLI 配置](<docs/user-guide.md#cli-convert>)及[包信息/标签范围](<docs/user-guide.md#metadata-tags>)。Krita 实际筛选/编辑/重启仍待 187 人工，不能用 XML 有字段代替通过。
 
 **候选升级必读**：亮度越界命中区、所有旋转随机抖动的旧 KPP 及所属 bundle 须从原 ABR 重转；只改元信息/标签产生新包身份是另一件事，不表示映射算法又变了。详见[合并候选升级说明](<releases/RELEASE_NOTES.md>)；不恢复 legacy 公式或双随机源。
 

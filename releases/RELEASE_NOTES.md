@@ -2,7 +2,7 @@
 
 This unreleased v1.6.0 candidate combines the fifth-round conversion fixes with per-brush options, safe batch delivery, and bundle metadata, tags and traceability. Published downloads remain v1.5.0; real Krita acceptance and release approval are still pending.
 
-> **状态：待发布（v1.6.0 候选，未发布）。** 按当前源码描述已实现能力，不代表两份候选 exe 已构建或真实界面已验。发布日期不预填，正式 tag/Release 只在最终验收与精确对象批准后创建。
+> **状态：待发布（v1.6.0 候选，未发布）。** 按当前源码描述已实现能力，两份候选 exe 已在本机构建并冻结待验收，不代表真实界面已验。发布日期不预填，正式 tag/Release 只在最终验收与精确对象批准后创建。
 
 **升级必读分三件事**：① 亮度越界命中区及旋转随机抖动的旧 KPP/bundle 必须从原 ABR 重转；② 元信息/标签/实际追溯改变会形成新包身份，即使预设像素没变；③ 关闭外观优先处理是受限可编辑替代，有外观或可调范围代价，不是恢复 legacy 公式或旧缺陷。
 
@@ -46,7 +46,7 @@ This unreleased v1.6.0 candidate combines the fifth-round conversion fixes with 
 | 第五轮历史候选（149A/153/156） | 153同批12/12=0.000%/max0–1（改前8/12超阈）；149A三点两批最大相对差4.06%、复现≤4.73%；旧pytest396、verify_all122为历史数字 | 保留原报告，不冒作本轮新回归或推广到所有组合 |
 | 本轮当前源码（逐支/事务/meta-tag/身份/复用纠偏） | 已有定向/组装机器证据和独立文件回读；源版本1.6.0，追溯仍unreleased；复用改为完整身份后63定向+227受影响通过，原A/B反例复跑B独立交付 | 183A 返工后 2026-11-27 重跑：全量 1149/0/0/0（两次一致，128.66s/129.04s），verify_all 235/0/0，四结构校验 exit 0，Krita 8/8 在全量同批；183A 只改测试隔离与子进程环境，不改产品行为 |
 | 本轮产品文档 | 六份文档对齐真实接口、版本与操作后果 | 自建文档合同不替代阅读跳转或真实操作 |
-| 最终分发与隐私 | 两份候选包尚未构建，完整隐私门未做 | 185绑定分发物/摘要，186完整机器门；图片/二进制盲区归187 |
+| 最终分发与隐私 | 两份候选包已构建待验收（未发布），完整隐私门未清零 | 185绑定分发物/摘要，186完整机器门；图片/二进制盲区归187 |
 | Windows64 / Krita5.3.3真实效果 | 本轮未操作真实GUI/Krita/PS，未确认标签重启持久性 | 使用者187集中验收并绑定精确对象批准；188获准才发布 |
 
 ## 回退方式
