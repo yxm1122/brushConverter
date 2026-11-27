@@ -11,6 +11,8 @@ Convert Photoshop brush sets (.abr) into Krita presets (.kpp) and resource packs
 | 点按钮转换（推荐新手） | `brushConverter-v1.5.0-win64.zip` | [GUI 分步操作](<docs/user-guide.md#gui-convert>) |
 | 用命令批量转换 | `brushconverter-cli-v1.5.0-win64.zip` | [CLI 分步操作](<docs/user-guide.md#cli-convert>) |
 
+> **Windows 运行提示**：本项目 Windows 程序暂未进行代码签名，首次运行时可能出现 SmartScreen“Windows 已保护你的电脑 / 发布者未知”提示，这不等于检测到病毒。请仅从本项目[正式发布页](https://github.com/yxm1122/brushConverter/releases)下载，确认来源可信后，点击“更多信息”→“仍要运行”（按钮已显示时可直接点击）。无需关闭 SmartScreen 或 Defender；若出现明确的病毒检测，请停止运行并反馈。
+
 1. **转换**：用本工具打开原始 `.abr`，选择笔刷、格式和一个新的输出目录；新手先选 `.bundle` 资源包。
 2. **导入**：把生成的 `.bundle` 导入 Krita，**不是把原始 `.abr` 直接导入**。另有独立 `.kpp` 的导入办法，见[导入与检查](<docs/user-guide.md#import-krita>)。
 3. **遇到问题**：先保留完整报错，再按[排错手册](<docs/troubleshooting.md>)找相同现象；缓存重建是有代价的可选兜底，不是必做步骤。
@@ -23,6 +25,7 @@ Convert Photoshop brush sets (.abr) into Krita presets (.kpp) and resource packs
 - **外观优先有编辑代价**：候选默认按条件位图化/预缩放/亮度越界烘焙，可逐支关闭改走受限原生字段，并承担外观或范围代价；不能同时承诺完全复刻与完全可编辑。双笔刷、颜色动态、湿边等仍未映射。见[转换取舍](<docs/user-guide.md#tradeoffs>)。
 - **边界残差仍存在**：硬度、散布端点、hardMix、纹理缩放等需按适用条件判断；逐条证据与待验证项只维护在[映射参考](<docs/parameter-mapping.md>) §10，不在首页另抄一套数字表。
 - **输出保护须看版本**：候选 bundle 与独立 KPP 均先暂存验证、复用/冲突改名并保护旧文件；取消是协作请求，最终交付期不可取消，不虚称多文件系统原子性。已发布 v1.5.0 的独立 KPP 仍可能覆盖。见[输出与安全边界](<docs/user-guide.md#outputs>)。
+- **资源包与散装 KPP 是同一批预设的两种形态，不要同时导入 Krita**：两者文件名相同，Krita 按文件名跨来源去重、后导入一方被静默忽略；删掉生效那份并重启后预设消失、只余标签（2026-11-27 实测）。要单独用散装 KPP，请先移除同批 bundle。见[导入 Krita](<docs/user-guide.md#import-krita>)。
 - **候选 v1.6.0（未发布）**：源码已实现三开关、筛选/隐藏选择、安全取消、包信息与逐支标签/追溯；不是上方下载包；两份候选 exe 已在本机构建并冻结待验收，但**未发布、无下载链接或发布日期**。见[候选操作与待验边界](<docs/user-guide.md#candidate-status>)、[真实 CLI 配置](<docs/user-guide.md#cli-convert>)及[包信息/标签范围](<docs/user-guide.md#metadata-tags>)。Krita 实际筛选/编辑/重启仍待 187 人工，不能用 XML 有字段代替通过。
 
 **候选升级必读**：亮度越界命中区、所有旋转随机抖动的旧 KPP 及所属 bundle 须从原 ABR 重转；只改元信息/标签产生新包身份是另一件事，不表示映射算法又变了。详见[合并候选升级说明](<releases/RELEASE_NOTES.md>)；不恢复 legacy 公式或双随机源。
