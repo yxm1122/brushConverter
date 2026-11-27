@@ -1,6 +1,6 @@
 # brushConverter
-Convert Photoshop brush sets (.abr) into Krita presets (.kpp) and resource packs (.bundle). Published version: v1.6.0 (2026-11-27); known limitations and untested acceptance items remain disclosed.
-把 Photoshop 笔刷转成 Krita 预设与资源包。**已发布 v1.6.0** · [正式版下载](https://github.com/yxm1122/brushConverter/releases/tag/v1.6.0)
+Bring your favorite Photoshop brushes to Krita. Convert ABR sets into import-ready presets and bundles, with brush tips, textures, pressure response, and scatter mapped to bring strokes closer to their original look. Per-brush options let you balance visual similarity and editability—less setup, more creating.
+把熟悉的 Photoshop 笔刷带进 Krita。将 ABR 笔刷集转成可导入的预设与资源包，不只提取笔尖，还映射纹理、压感和散布等常用效果，尽量接近原笔触。支持逐支在外观还原与编辑空间之间取舍，少折腾设置，多花时间画画。**已发布 v1.6.0** · [正式版下载](https://github.com/yxm1122/brushConverter/releases/tag/v1.6.0)
 
 ## 下载与三步上手
 
